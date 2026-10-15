@@ -1,0 +1,454 @@
+extends Node2D
+## The Violence - vertical slice. Setup: place up to two operators per team and
+## edit their 40 good / 20 bad habits. Run: the simulation auto-resolves at up to
+## 20x while the plan collects the evidence.
+
+const Habits = preload("res://scripts/data/habits.gd")
+const Level = preload("res://scripts/sim/level.gd")
+const Nav = preload("res://scripts/sim/nav.gd")
+const World = preload("res://scripts/sim/world.gd")
+const Op = preload("res://scripts/sim/op.gd")
+const FloorPlan = preload("res://scripts/view/floor_plan.gd")
+const Decals = preload("res://scripts/view/decals.gd")
+const ActorView = preload("res://scripts/view/actor_view.gd")
+const Overlay = preload("res://scripts/view/overlay.gd")
+const Marks = preload("res://scripts/view/marks.gd")
+const SetupMarks = preload("res://scripts/view/setup_marks.gd")
+const UI = preload("res://scripts/ui/ui.gd")
+const PX := 40.0
+const DT := 1.0 / 30.0
+
+var level
+var nav
+var cfgs := {}
+var postures := ["assault", "hold"]
+var sizes := [3, 5]
+const IDS := ["A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5"]
+var sel := "A1"
+var world = null
+var mode := "setup"
+var speed := 2.0
+var paused := false
+var acc := 0.0
+var actual_speed := 0.0
+var _meas_real := 0.0
+var _meas_sim := 0.0
+var _ui_t := 0.0
+var _banner_done := false
+
+var cam: Camera2D
+var plan
+var props_layer: Node2D
+var marks
+var decals
+var actors_layer: Node2D
+var canopy_layer: Node2D
+var overlay
+var setup_marks
+var ui
+var views := {}
+var preview_ops := {}
+var _panning := false
+
+# command-line test hooks: --autorun --seed=N --speed=X --shot=path --shot-at=T --setup-shot=path
+var _args := {}
+
+
+func _ready() -> void:
+	get_window().title = "The Violence - vertical slice"
+	RenderingServer.set_default_clear_color(Color("#d6d6d3"))
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	for a in OS.get_cmdline_user_args():
+		var kv := a.trim_prefix("--").split("=")
+		_args[kv[0]] = kv[1] if kv.size() > 1 else "1"
+	level = Level.new()
+	level.build()
+	nav = Nav.new()
+	nav.build(level)
+	cam = Camera2D.new()
+	add_child(cam)
+	cam.make_current()
+	plan = FloorPlan.new()
+	add_child(plan)
+	plan.setup(level)
+	props_layer = Node2D.new()
+	add_child(props_layer)
+	marks = Marks.new()
+	add_child(marks)
+	marks.setup(level)
+	decals = Decals.new()
+	add_child(decals)
+	actors_layer = Node2D.new()
+	add_child(actors_layer)
+	canopy_layer = Node2D.new()
+	canopy_layer.modulate.a = 0.8
+	add_child(canopy_layer)
+	_build_props()
+	overlay = Overlay.new()
+	add_child(overlay)
+	setup_marks = SetupMarks.new()
+	setup_marks.main = self
+	add_child(setup_marks)
+	_default_cfgs()
+	ui = UI.new()
+	add_child(ui)
+	ui.build(self)
+	_fit_camera()
+	get_viewport().size_changed.connect(_fit_camera)
+	if _args.has("tab"):
+		ui.tabs.current_tab = int(_args["tab"])
+	if _args.has("select"):
+		select_op(_args["select"])
+	if _args.has("zoom"):
+		var zf := float(_args["zoom"])
+		cam.zoom *= zf
+		var f: PackedStringArray = _args.get("focus", "18,12").split(",")
+		cam.position = Vector2(float(f[0]), float(f[1])) * PX + Vector2(UI.PANEL_W / 2.0 / cam.zoom.x, 0)
+	_enter_setup()
+	if _args.has("speed"):
+		speed = float(_args["speed"])
+	if _args.has("autorun"):
+		start_run(int(_args.get("seed", "1001")))
+
+
+# ------------------------------------------------------------------ configuration
+func _cfg_for(id: String, team: int, slot: int, echelon: String) -> Dictionary:
+	var c := {"id": id, "team": team, "slot": slot, "echelon": echelon, "good": {}, "bad": {},
+		"plates": 0, "pos": level.spawns[id]["p"], "face": level.spawns[id]["face"], "enabled": true}
+	_apply_preset(c, echelon)
+	return c
+
+
+func _apply_preset(c: Dictionary, echelon: String) -> void:
+	c["echelon"] = echelon
+	c["good"] = {}
+	for g in Habits.preset_good(echelon):
+		c["good"][g] = true
+	var keep := {}
+	for b in c["bad"]:
+		if Habits.bad_info(b)["kind"] == "trait" and c["bad"][b]:
+			keep[b] = true
+	c["bad"] = keep
+	for b in Habits.stress_bad_ids():
+		c["bad"][b] = true
+	c["plates"] = Habits.PRESET_PLATES[echelon]
+
+
+## Default: an outnumbered special-operations team assaults a house held by militia.
+func _default_cfgs() -> void:
+	var ea: String = _args.get("a", "sof")
+	var eb: String = _args.get("b", "militia")
+	sizes = [clampi(int(_args.get("na", "3")), 1, 5), clampi(int(_args.get("nb", "5")), 1, 5)]
+	cfgs = {}
+	for id in IDS:
+		var team := 0 if id.begins_with("A") else 1
+		var slot := int(id.substr(1)) - 1
+		cfgs[id] = _cfg_for(id, team, slot, ea if team == 0 else eb)
+	_apply_sizes()
+
+
+func _apply_sizes() -> void:
+	for id in IDS:
+		var c: Dictionary = cfgs[id]
+		c["enabled"] = c["slot"] < sizes[c["team"]]
+
+
+func cfg_list() -> Array:
+	var out: Array = []
+	for id in IDS:
+		out.append(cfgs[id])
+	return out
+
+
+func select_op(id: String) -> void:
+	sel = id
+	_refresh()
+
+
+func set_team_size(k: int, n: int) -> void:
+	sizes[k] = clampi(n, 1, 5)
+	_apply_sizes()
+	if not cfgs[sel]["enabled"]:
+		sel = "AB"[k] + "1"
+	_rebuild_previews()
+	_refresh()
+
+
+func set_posture(k: int, p: String) -> void:
+	postures[k] = p
+
+
+func set_echelon(e: String, apply: bool) -> void:
+	if apply:
+		_apply_preset(cfgs[sel], e)
+	else:
+		cfgs[sel]["echelon"] = e
+	_refresh()
+
+
+func set_plates(n: int) -> void:
+	cfgs[sel]["plates"] = n
+	_refresh()
+
+
+func set_habit(hid: String, on: bool) -> void:
+	var key := "good" if hid.substr(0, 2) != "BH" else "bad"
+	cfgs[sel][key][hid] = on
+	_refresh()
+
+
+func bulk(kind: String, on: bool) -> void:
+	var c: Dictionary = cfgs[sel]
+	match kind:
+		"good":
+			for g in Habits.good_ids():
+				c["good"][g] = on
+		"stress":
+			for b in Habits.stress_bad_ids():
+				c["bad"][b] = on
+		"bad":
+			for b in Habits.bad_ids():
+				c["bad"][b] = on
+	_refresh()
+
+
+## Copy the selected operator's echelon, habits and plates to every teammate.
+func copy_to_team() -> void:
+	var c: Dictionary = cfgs[sel]
+	for id in IDS:
+		var m: Dictionary = cfgs[id]
+		if id == sel or m["team"] != c["team"]:
+			continue
+		m["echelon"] = c["echelon"]
+		m["good"] = c["good"].duplicate()
+		m["bad"] = c["bad"].duplicate()
+		m["plates"] = c["plates"]
+	_refresh()
+
+
+func _refresh() -> void:
+	ui.refresh_setup(sel, cfgs, postures, sizes)
+	setup_marks.queue_redraw()
+
+
+# ------------------------------------------------------------------ views
+func _build_props() -> void:
+	for pr in level.props:
+		var s := Sprite2D.new()
+		s.texture = Decals.tex(pr["key"])
+		var r: Rect2 = pr["r"]
+		s.position = r.get_center() * PX
+		var rot: float = pr["rot"]
+		s.rotation = deg_to_rad(rot)
+		var ts: Vector2 = s.texture.get_size()
+		var want := r.size * PX
+		if int(rot) % 180 != 0:
+			want = Vector2(want.y, want.x)
+		s.scale = Vector2(want.x / ts.x, want.y / ts.y)
+		if pr.get("under", false):
+			canopy_layer.add_child(s)
+		else:
+			props_layer.add_child(s)
+
+
+func _clear_views() -> void:
+	for v in views.values():
+		v.queue_free()
+	views.clear()
+
+
+func _rebuild_previews() -> void:
+	_clear_views()
+	preview_ops.clear()
+	for id in cfgs:
+		var c: Dictionary = cfgs[id]
+		if not c["enabled"]:
+			continue
+		var o = Op.new()
+		o.configure(c)
+		o.reset()
+		preview_ops[id] = o
+		var v = ActorView.new()
+		actors_layer.add_child(v)
+		v.setup(o, null)
+		views[id] = v
+
+
+func _enter_setup() -> void:
+	mode = "setup"
+	if world != null:
+		world.dispose()
+		world = null
+	decals.setup_empty()
+	overlay.setup(null)
+	overlay.queue_redraw()
+	_rebuild_previews()
+	ui.show_setup()
+	_refresh()
+
+
+func start_run(seed_val: int) -> void:
+	if world != null:
+		world.dispose()
+	world = World.new()
+	world.setup(level, nav, cfg_list(), postures, seed_val)
+	decals.setup(world)
+	overlay.setup(world)
+	_clear_views()
+	for o in world.ops:
+		var v = ActorView.new()
+		actors_layer.add_child(v)
+		v.setup(o, world)
+		views[o.id] = v
+	mode = "run"
+	acc = 0.0
+	paused = false
+	_banner_done = false
+	ui.show_run(speed)
+	setup_marks.queue_redraw()
+
+
+func back_to_setup() -> void:
+	_enter_setup()
+
+
+func rerun(new_seed: bool) -> void:
+	var s: int = world.seed_used if world != null else 1001
+	if new_seed:
+		s = randi_range(1, 999999)
+	start_run(s)
+
+
+func set_speed(sp: float) -> void:
+	speed = sp
+
+
+func set_paused(on: bool) -> void:
+	paused = on
+
+
+func set_overlay(nm: String, on: bool) -> void:
+	match nm:
+		"Cones":
+			overlay.show_cones = on
+		"Recognition":
+			overlay.show_rec = on
+		"Aim":
+			overlay.show_aim = on
+		"Paths":
+			overlay.show_paths = on
+
+
+# ------------------------------------------------------------------ loop
+func _process(delta: float) -> void:
+	if mode == "run" and world != null:
+		var steps := 0
+		if not paused and not world.over:
+			acc += delta * speed
+			var t0 := Time.get_ticks_usec()
+			while acc >= DT and not world.over:
+				world.step()
+				acc -= DT
+				steps += 1
+				if Time.get_ticks_usec() - t0 > 20000:
+					break
+			acc = minf(acc, DT * 3.0)
+		_meas_real += delta
+		_meas_sim += steps * DT
+		if _meas_real >= 0.5:
+			actual_speed = _meas_sim / _meas_real
+			_meas_real = 0.0
+			_meas_sim = 0.0
+		for ev in world.events:
+			decals.handle(ev)
+			overlay.handle(ev)
+			if ev["type"] == "blood" and views.has(ev["id"]):
+				views[ev["id"]].stain(ev["zone"], ev["side"])
+		world.events.clear()
+		for v in views.values():
+			v.sync()
+		overlay.tick_real(delta)
+		_ui_t -= delta
+		if _ui_t <= 0.0:
+			_ui_t = 0.1
+			ui.refresh_run(world, actual_speed, speed)
+		if world.over and not _banner_done:
+			_banner_done = true
+			ui.refresh_run(world, actual_speed, speed)
+			var names := ["TEAM A WINS", "TEAM B WINS", "DRAW"]
+			ui.show_banner("%s   ·   %02d:%04.1f" % [names[world.winner], int(world.t / 60.0), fmod(world.t, 60.0)])
+	_test_hooks()
+
+
+func _test_hooks() -> void:
+	if _args.has("setup-shot") and Engine.get_process_frames() == 8:
+		_shot(_args["setup-shot"])
+		if not _args.has("autorun"):
+			get_tree().quit()
+	if _args.has("shot") and world != null:
+		var at := float(_args.get("shot-at", "9999"))
+		if world.t >= at or world.over:
+			if not _args.has("_shot_wait"):
+				_args["_shot_wait"] = Engine.get_process_frames()
+			elif Engine.get_process_frames() - int(_args["_shot_wait"]) > 3:
+				_shot(_args["shot"])
+				get_tree().quit()
+
+
+func _shot(path: String) -> void:
+	var img := get_viewport().get_texture().get_image()
+	img.save_png(path)
+
+
+# ------------------------------------------------------------------ camera and input
+func _fit_camera() -> void:
+	var vs := get_viewport().get_visible_rect().size
+	var avail := Vector2(vs.x - UI.PANEL_W, vs.y)
+	var map_px := Vector2(level.W * PX + 140, level.H * PX + 250)
+	var z := minf(avail.x / map_px.x, avail.y / map_px.y)
+	cam.zoom = Vector2(z, z)
+	var centre := Vector2(level.W * PX / 2.0, (level.H * PX + 90.0) / 2.0)
+	cam.position = centre + Vector2(UI.PANEL_W / 2.0 / z, 0)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_WHEEL_UP or mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			if mb.pressed:
+				var f := 1.12 if mb.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.12
+				var before := get_global_mouse_position()
+				cam.zoom = (cam.zoom * f).clamp(Vector2(0.3, 0.3), Vector2(4, 4))
+				cam.position += (before - cam.position) * (1.0 - 1.0 / f)
+			return
+		if mb.button_index == MOUSE_BUTTON_MIDDLE or (mb.button_index == MOUSE_BUTTON_RIGHT and mode == "run"):
+			_panning = mb.pressed
+			return
+		if mode == "setup" and mb.pressed:
+			var p := get_global_mouse_position() / PX
+			if mb.button_index == MOUSE_BUTTON_LEFT:
+				if p.x > 0.3 and p.y > 0.3 and p.x < level.W - 0.3 and p.y < level.H - 0.3 and nav.is_free(p):
+					cfgs[sel]["pos"] = p
+					_rebuild_previews()
+					_refresh()
+			elif mb.button_index == MOUSE_BUTTON_RIGHT:
+				var c: Dictionary = cfgs[sel]
+				c["face"] = (p - c["pos"]).angle()
+				_rebuild_previews()
+				_refresh()
+	elif event is InputEventMouseMotion and _panning:
+		cam.position -= (event as InputEventMouseMotion).relative / cam.zoom.x
+	elif event is InputEventKey and event.pressed and not event.echo:
+		var k := (event as InputEventKey).keycode
+		if mode == "run":
+			if k == KEY_SPACE:
+				paused = not paused
+				ui.pause_btn.set_pressed_no_signal(paused)
+			elif k >= KEY_1 and k <= KEY_7:
+				var i := k - KEY_1
+				speed = UI.SPEEDS[i]
+				ui.speed_buttons[i].set_pressed_no_signal(true)
+			elif k == KEY_ESCAPE:
+				back_to_setup()
+		if k == KEY_HOME:
+			_fit_camera()
