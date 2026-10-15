@@ -17,6 +17,63 @@ const CASES := [
 ]
 
 
+## ---------------------------------------------------------------- watchdogs
+## Tier 0 #3. A match can reach the time limit for a legitimate reason (two
+## evenly matched teams sitting in cover), and those are already reported above.
+## These catch the ones that are bugs: an operator frozen in a state it cannot
+## leave. Each is a "this should never last this long" timer.
+var _wd := {}          # op id -> {kind: seconds}
+var _wd_el := {}       # element key -> {kind: seconds}
+var _flagged := {}     # "kind:who" -> text
+
+
+func _watch(w, ticks: int) -> void:
+	if ticks % 15 != 0:
+		return
+	var dt: float = 15.0 / 30.0
+	for o in w.ops:
+		if not o.alive():
+			continue
+		var rec: Dictionary = _wd.get(o.id, {})
+		# H4: aimed, wanting to fire, with rounds, and not firing
+		var held: bool = (not o.aim.is_empty()) and bool(o.aim.get("on", false)) \
+			and bool(o.aim.get("fire", false)) and o.action.is_empty() \
+			and o.ws()["mag"] > 0 and not o.ws()["jam"]
+		rec["aim_hold"] = (float(rec.get("aim_hold", 0.0)) + dt) if held else 0.0
+		# moving but going nowhere
+		var stuck: bool = o.moving and o.speed > 0.0 and o.vel.length() < 0.01
+		rec["no_progress"] = (float(rec.get("no_progress", 0.0)) + dt) if stuck else 0.0
+		# pinned
+		rec["pinned"] = (float(rec.get("pinned", 0.0)) + dt) if o.suppress > 0.9 else 0.0
+		# memory that never lets go
+		rec["memory"] = (float(rec.get("memory", 0.0)) + dt) if o.mem.size() > 20 else 0.0
+		_wd[o.id] = rec
+		for k in ["aim_hold", "no_progress", "pinned", "memory"]:
+			var lim: float = 10.0 if k == "aim_hold" else (5.0 if k == "no_progress" \
+				else (20.0 if k == "pinned" else 30.0))
+			if float(rec[k]) > lim:
+				_flagged["%s:%s" % [k, o.id]] = "%s held %s for %.1f s (%s, %s)" % [
+					o.id, k, float(rec[k]), o.dbg, o.room]
+				rec[k] = -1.0e9
+	for tm in w.teams:
+		if tm["free"]:
+			continue
+		for el in tm["elements"]:
+			if el["task"].is_empty():
+				continue
+			var ek: String = "%s-%d" % [tm["tag"], el["i"]]
+			var er: Dictionary = _wd_el.get(ek, {})
+			var ph: String = el["phase"]
+			er[ph] = float(er.get(ph, 0.0)) + dt
+			_wd_el[ek] = er
+			var lim2: float = 40.0 if ph == "approach" else (110.0 if ph == "sweep" \
+				else (25.0 if ph == "breach" else 60.0))
+			if float(er[ph]) > lim2:
+				_flagged["phase_%s:%s" % [ph, ek]] = "%s stuck in phase %s for %.1f s (%s)" % [
+					ek, ph, float(er[ph]), str(el["task"])]
+				er[ph] = -1.0e9
+
+
 func _init() -> void:
 	var only := -1
 	var seed_v := 1
@@ -43,6 +100,7 @@ func _init() -> void:
 			while not w.over:
 				w.step()
 				ticks += 1
+				_watch(w, ticks)
 			var alive := [0, 0]
 			for o in w.ops:
 				if o.alive():
@@ -62,4 +120,11 @@ func _init() -> void:
 					print("      A-%d mode %s task %s phase %s" % [el["i"] + 1, el["mode"], str(el["task"]), el["phase"]])
 			w.dispose()
 	print("stalls: %d   (%d s)" % [stalls, (Time.get_ticks_msec() - t_all) / 1000])
+	if _flagged.is_empty():
+		print("watchdogs: clean")
+	else:
+		print("")
+		print("WATCHDOGS: %d frozen state(s)" % _flagged.size())
+		for k in _flagged.keys():
+			print("   %s" % _flagged[k])
 	quit()

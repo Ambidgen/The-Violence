@@ -291,6 +291,197 @@ static func vary(base: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	return e
 
 
+# ================================================================== effect registry
+## Every habit declares the hook points it touches. The registry is the single place
+## that answers "what does this habit actually do?" -- it drives the coverage report
+## (tests/habits_test.gd), the UI's hover text and the generic ablation sweep
+## (tests/sim_test.gd --ablation=all), and it is where a new habit is registered.
+## A habit with no hooks is a pure suspension habit (it only disables good habits).
+const HOOKS := [
+	{"id": "perception", "name": "Perception", "desc": "How fast a figure in view is recognized, and how wide the vision cone stays."},
+	{"id": "attention", "name": "Attention", "desc": "What is held in short-term memory and how long it stays there."},
+	{"id": "sound_reaction", "name": "Reaction to sound", "desc": "What an operator does with a noise it hears."},
+	{"id": "target_selection", "name": "Target selection", "desc": "Which recognized enemy is engaged first."},
+	{"id": "acquisition", "name": "Time on target", "desc": "How fast the muzzle comes onto the chosen target."},
+	{"id": "fire_cadence", "name": "Cadence and stoppages", "desc": "Shot spacing, settling, weapon transitions and drills."},
+	{"id": "movement_mode", "name": "Movement", "desc": "Pace, routing, spacing and bounding."},
+	{"id": "entry_geometry", "name": "Entry geometry", "desc": "Stacking, slicing, points of domination, doors."},
+	{"id": "reload_policy", "name": "Reload policy", "desc": "When and where a magazine is changed."},
+	{"id": "cover_choice", "name": "Cover", "desc": "Which cover is picked, and when it is left."},
+	{"id": "eyes", "name": "Eyes", "desc": "Where the eyes go when nothing is happening."},
+	{"id": "team_task", "name": "Team task", "desc": "How the element picks and executes its job."},
+	{"id": "comms", "name": "Comms", "desc": "Callouts, status and covering announcements."},
+]
+
+## habit id -> the hook points it changes. Kept in step with the call sites in
+## scripts/sim/*.gd; tests/habits_test.gd fails when the two drift apart.
+const EFFECTS := {
+	"PF01": ["movement_mode", "entry_geometry"],
+	"PF02": ["movement_mode", "cover_choice"],
+	"PF03": ["entry_geometry", "eyes"],
+	"PF04": ["entry_geometry"],
+	"PF05": ["cover_choice", "movement_mode"],
+	"PF06": ["movement_mode"],
+	"PF07": ["movement_mode"],
+	"PF08": ["cover_choice"],
+	"PF09": ["cover_choice"],
+	"PF10": ["team_task"],
+	"GD01": ["entry_geometry"],
+	"GD02": ["eyes"],
+	"GD03": ["movement_mode"],
+	"GD04": ["comms", "perception", "attention"],
+	"GD05": ["team_task", "movement_mode"],
+	"GD06": ["entry_geometry"],
+	"GD07": ["movement_mode"],
+	"GD08": ["comms", "team_task"],
+	"GD09": ["eyes", "team_task"],
+	"GD10": ["movement_mode"],
+	"ED01": ["acquisition"],
+	"ED02": ["eyes", "attention"],
+	"ED03": ["eyes", "entry_geometry"],
+	"ED04": ["target_selection"],
+	"ED05": ["fire_cadence", "eyes"],
+	"ED06": ["perception", "attention"],
+	"ED07": ["sound_reaction", "attention", "eyes"],
+	"ED08": ["eyes", "attention"],
+	"ED09": ["eyes", "movement_mode"],
+	"ED10": ["entry_geometry", "eyes"],
+	"WD01": ["reload_policy"],
+	"WD02": ["reload_policy"],
+	"WD03": ["reload_policy", "cover_choice"],
+	"WD04": ["fire_cadence", "entry_geometry"],
+	"WD05": ["fire_cadence"],
+	"WD06": ["fire_cadence", "target_selection"],
+	"WD07": ["fire_cadence"],
+	"WD08": ["target_selection"],
+	"WD09": ["fire_cadence"],
+	"WD10": ["fire_cadence", "target_selection"],
+	"BH01": ["perception", "movement_mode", "comms"],
+	"BH02": ["fire_cadence", "reload_policy"],
+	"BH03": ["fire_cadence", "eyes"],
+	"BH04": ["perception", "eyes", "attention"],
+	"BH05": ["reload_policy"],
+	"BH06": ["entry_geometry"],
+	"BH07": ["movement_mode", "cover_choice", "eyes"],
+	"BH08": ["comms", "eyes"],
+	"BH09": ["fire_cadence", "target_selection"],
+	"BH10": ["cover_choice", "movement_mode"],
+	"BH11": ["entry_geometry", "movement_mode", "eyes"],
+	"BH12": ["movement_mode", "target_selection", "eyes"],
+	"BH13": ["cover_choice", "movement_mode", "comms"],
+	"BH14": ["movement_mode", "entry_geometry"],
+	"BH15": ["movement_mode", "eyes", "team_task"],
+	"BH16": ["target_selection", "fire_cadence"],
+	"BH17": ["fire_cadence", "reload_policy"],
+	"BH18": ["acquisition", "eyes"],
+	"BH19": ["fire_cadence", "target_selection"],
+	"BH20": ["eyes", "sound_reaction", "entry_geometry"],
+	"TR01": ["sound_reaction", "attention"],
+	"TR02": ["sound_reaction", "attention"],
+}
+
+## Hooks that no habit touches: useful for spotting dead code paths.
+static func hooks_unused() -> Array:
+	var used := {}
+	for k in EFFECTS:
+		for h in EFFECTS[k]:
+			used[h] = true
+	var out: Array = []
+	for h in HOOKS:
+		if not used.has(h["id"]):
+			out.append(h["id"])
+	return out
+
+
+static func hook_ids() -> Array:
+	var out: Array = []
+	for h in HOOKS:
+		out.append(h["id"])
+	return out
+
+
+static func hooks_of(hid: String) -> Array:
+	return EFFECTS.get(hid, []).duplicate()
+
+
+static func hook_name(hid: String) -> String:
+	for h in HOOKS:
+		if h["id"] == hid:
+			return h["name"]
+	return hid
+
+
+## Habits that claim a hook point, in declaration order.
+static func by_hook(hook: String) -> Array:
+	var out: Array = []
+	for g in GOOD:
+		if (EFFECTS.get(g["id"], []) as Array).has(hook):
+			out.append(g["id"])
+	for b in BAD:
+		if (EFFECTS.get(b["id"], []) as Array).has(hook):
+			out.append(b["id"])
+	return out
+
+
+# ================================================================== tuning
+## Short-term memory / the cone of attention (the "general alertness" mechanic).
+## Where the cone of vision and the cone of attention overlap, acquisition is
+## faster: ATT_BOOST_MAX off the time on target when the two centre lines are
+## identical, falling linearly to ATT_BOOST_MIN (7.5%) at the point where the
+## two cones have shrunk to touching at one edge, and nothing at all beyond that.
+## A boost of 35% removes 35% of the time. Recognition gets the same boost at
+## ATT_REC_SHARE of the strength, because spotting a figure and swinging onto it
+## are two halves of the same "I was already looking for it" effect.
+const ATT_BOOST_MAX := 0.35
+const ATT_BOOST_MIN := 0.075
+const ATT_REC_SHARE := 0.5
+## Half-angle (degrees) and lifetime (seconds) of an attention entry, by how the
+## threat was learned about. Heard and fired-upon entries are wide and vague;
+## a figure that was seen and lost is narrow and sharp.
+const ATT_HALF_DEG := {"seen": 25.0, "called": 30.0, "heard": 35.0, "fire": 40.0}
+const ATT_TTL := {"seen": 20.0, "called": 25.0, "heard": 18.0, "fire": 12.0}
+const ATT_STRENGTH := {"seen": 1.0, "called": 0.8, "heard": 0.7, "fire": 0.9}
+## Attention also decays with how alert the operator is: GREEN forgets quickly.
+const ATT_ALERT_MUL := [0.6, 1.0, 1.2]
+
+## Suppression: incoming fire you cannot answer degrades everything at once.
+const SUPP_GAIN := 0.35        # per near miss, scaled by how close the round passed
+const SUPP_IMPACT := 0.20      # per round striking cover within SUPP_IMPACT_R of you
+const SUPP_IMPACT_R := 2.0
+const SUPP_LATERAL := 1.0      # metres; a round passing within this is "close"
+const SUPP_DECAY := 0.55       # per second
+const SUPP_SIGMA := 0.60       # dispersion multiplier at full suppression
+const SUPP_REC := 0.35         # recognition-time multiplier at full suppression
+const SUPP_SPEED := 0.15       # fraction of movement speed lost at full suppression
+const SUPP_STRAY := 0.030      # stray-shot chance per second past SUPP_STRAY_T
+const SUPP_STRAY_T := 0.55
+const SUPP_MIN_STRESS_BOOST := 0.05
+
+## Wounds bleed. Bleed is per second as a fraction of the operator's blood
+## volume; at 1.0 they go down. A wounded operator also gathers stress.
+const BLEED_RATE := {"head": 0.0, "chest": 0.030, "abd": 0.022, "arm": 0.010, "legs": 0.014}
+const BLEED_DOWN_STRESS := 0.020   # stress per second per wound level
+const WOUND_SIGMA := 0.25          # dispersion penalty per wound level
+const BLEEDOUT_WOUND_MUL := 0.5    # how much accumulated blood shortens the 5 min clock
+
+## Doors as state. An open door is what every map had before: an arch.
+const DOOR_STATE_OPEN := "open"
+const DOOR_STATE_CLOSED := "closed"
+const DOOR_STATE_LOCKED := "locked"
+const DOOR_OPEN_TIME := 1.20       # push an unlocked door and step through
+const DOOR_BREACH_TIME := 2.60     # kick or force a locked one
+const DOOR_BREACH_P := 0.85        # first-attempt success, plus 0.15 x echelon composure
+
+## Which sound a movement pace makes ("" means silent). Slicing the pie,
+## creeping and a lateral sidestep make no noise; everything else does.
+const MODE_SOUND := {"walk": "walk", "entry": "entry", "clear": "clear", "slice": "",
+	"creep": "", "run": "run", "sprint": "sprint", "step": ""}
+
+
+static func mode_loud(mode: String) -> String:
+	return MODE_SOUND.get(mode, "")
+
+
 ## Physical traits (not habits, not overridden by stress). Hearing is a static attribute:
 ## every operator hears the same unless one of these changes it.
 const TRAITS := [
@@ -305,7 +496,7 @@ const TRAITS := [
 ## Walls between source and listener halve it. Footsteps depend on the pace; creeping,
 ## slicing the pie and side-stepping are silent.
 const SOUND := {"rifle": 45.0, "pistol": 35.0, "sprint": 8.0, "run": 5.0, "walk": 3.0, "entry": 3.5,
-	"clear": 2.0, "reload": 4.0}
+	"clear": 2.0, "reload": 4.0, "door": 6.0, "breach": 30.0}
 
 
 static func trait_ids() -> Array:

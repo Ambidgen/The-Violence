@@ -9,7 +9,16 @@ extends RefCounted
 const Op = preload("res://scripts/sim/op.gd")
 const Geom = preload("res://scripts/sim/geom.gd")
 const Habits = preload("res://scripts/data/habits.gd")
+const Memory = preload("res://scripts/sim/memory.gd")
 const DT := 1.0 / 30.0
+
+## Named interrupt classes. The root ladder is still re-evaluated top to bottom
+## every tick, but every branch now declares which class it belongs to, so the
+## debug text, the trace harness and the overlay can all say *why* an operator is
+## doing what it is doing, and a caller can ask "is this operator available?"
+## without guessing from o.dbg.
+enum Ix {NONE, INVOLUNTARY, RULE, WEAPON, ENGAGE, REACT, MAINTAIN, TASK, EYES}
+const IX_NAMES := ["", "involuntary", "rule", "weapon", "engage", "react", "maintain", "task", "eyes"]
 
 var w
 var tick := 0
@@ -569,7 +578,8 @@ func _sectors(el: Dictionary, al: Array) -> void:
 					continue
 				var best = null
 				for m in al:
-					if m.has("GD09") and m.pos.distance_to(x.pos) < 10.0:
+					# BH08 comms blackout: ignores sector reassignment
+					if m.has("GD09") and not m.hb("BH08") and m.pos.distance_to(x.pos) < 10.0:
 						if best == null or m.pos.distance_to(x.pos) < best.pos.distance_to(x.pos):
 							best = m
 				if best != null:
@@ -577,7 +587,7 @@ func _sectors(el: Dictionary, al: Array) -> void:
 					pend[best.id] = {"dir": lerp_angle(own, el["sectors"][x.id], 0.5), "at": w.t + 1.0}
 		else:
 			for m in al:
-				if m.has("GD09"):
+				if m.has("GD09") and not m.hb("BH08"):
 					pend[m.id] = {"dir": layout.get(m.id, null), "at": w.t + 1.0}
 		el["sector_pending"] = pend
 	for oid in el["sectors"].keys():
@@ -731,9 +741,24 @@ func _assault_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
 			if w.t - el["phase_t"] > 45.0:
 				go = true
 			if go:
+				if w.level.door_blocked(st["door"]):
+					el["phase"] = "breach"
+					el["phase_t"] = w.t
+					w.say("%s: the door into the %s is shut" % [_tag(tm, el),
+						w.level.rooms[st["into"]]["title"].to_lower()], "info")
+				else:
+					el["phase"] = "entry"
+					el["phase_t"] = w.t
+					w.say("%s enters the %s" % [_tag(tm, el), w.level.rooms[st["into"]]["title"].to_lower()], "info")
+		"breach":
+			if not w.level.door_blocked(st["door"]):
 				el["phase"] = "entry"
 				el["phase_t"] = w.t
-				w.say("%s enters the %s" % [_tag(tm, el), w.level.rooms[st["into"]]["title"].to_lower()], "info")
+			elif w.t - el["phase_t"] > 25.0:
+				w.say("%s cannot get the door, looks for another way in" % _tag(tm, el), "info")
+				tm["skipped"][st["into"]] = true
+				_release(tm, el)
+				_next_task(tm, el)
 		"entry":
 			var done := true
 			for m in al:
@@ -904,6 +929,13 @@ func _think(o) -> void:
 	if _maintain(o):
 		_finish_look(o)
 		return
+	# P6.5 GD03: standing in a team-mate's muzzle line and going nowhere
+	if o.has("GD03") and not o.moving and o.sidestep.is_empty() and o.aim.is_empty() \
+			and o.action.is_empty() and _in_line_of_fire(o, w.mates_near(o, 6.0)):
+		o.dbg = "stepping out of the fire lane"
+		if _step_aside(o):
+			_finish_look(o)
+			return
 	# P7 task
 	match el["mode"]:
 		"assault":
@@ -930,13 +962,13 @@ func _close_threat(o):
 	var cur_d := INF
 	for e in w.visible_tracked(o):
 		if not e.alive():
-			var until: float = o.ticker.get("confirm_" + e.id, -1.0)
+			var until: float = float(Memory.field(o, e.id, "confirm_t", -1.0))
 			if until < 0.0 and cur == e.id:
 				until = e.ticker.get("down_t", w.t) + (0.15 if o.has("ED05") else 0.6) + (1.0 if o.hb("BH03") else 0.0)
-				o.ticker["confirm_" + e.id] = until
+				Memory.set_field(o, e.id, "confirm_t", until)
 			if w.t > until:
-				if until > 0.0 and not o.ticker.has("assessed_" + e.id):
-					o.ticker["assessed_" + e.id] = true
+				if until > 0.0 and not Memory.has_field(o, e.id, "assessed"):
+					Memory.set_field(o, e.id, "assessed", true)
 					if not o.has("ED05"):
 						o.ticker["fixate_until"] = w.t + w.rng.randf_range(1.0, 2.0)
 						o.ticker["fixate_p"] = e.pos
@@ -978,8 +1010,8 @@ func _rule1(o, e) -> void:
 		else:
 			_clear(o)
 		return
-	if o.has("PF07") and o.sidestep.is_empty() and not o.ticker.has("pf07_" + e.id) and e.alive():
-		o.ticker["pf07_" + e.id] = true
+	if o.has("PF07") and o.sidestep.is_empty() and not Memory.has_field(o, e.id, "pf07") and e.alive():
+		Memory.set_field(o, e.id, "pf07", true)
 		var b: float = (e.pos - o.pos).angle()
 		var best_dir := Vector2.ZERO
 		var best_s := INF
@@ -1296,6 +1328,25 @@ func _engage_far(o, e) -> void:
 			if spot != null:
 				o.ticker["far_dest"] = spot
 				return
+	# PF07 get off the X: it used to fire only under Rule 1 (inside 10 m), which
+	# meant it did nothing at all in the range band where most shooting happens
+	if o.has("PF07") and o.sidestep.is_empty() and not Memory.has_field(o, e.id, "pf07"):
+		var sb: float = (e.pos - o.pos).angle()
+		var bd2 := Vector2.ZERO
+		var bs2 := INF
+		for sgn2 in [1.0, -1.0]:
+			var dv2: Vector2 = Vector2.from_angle(sb + PI / 2.0 * sgn2)
+			if not w.nav.is_free(o.pos + dv2 * 1.2):
+				continue
+			if not w.geom.sight_clear(o.pos + dv2 * 1.2, o.eye(), e.pos, e.zone_centre("chest")):
+				continue
+			var sc2: float = w.geom.dist_to_kinds(o.pos + dv2 * 1.2, [Geom.COVER, Geom.WALL], 3.0)
+			if sc2 < bs2:
+				bs2 = sc2
+				bd2 = dv2
+		if bd2 != Vector2.ZERO:
+			Memory.set_field(o, e.id, "pf07", true)
+			o.sidestep = {"dir": bd2, "left": 0.8}
 	if o.hb("BH15") and o.pos.distance_to(e.pos) > 6.0:
 		w.move_to(o, e.pos, "walk")
 	else:
@@ -1442,8 +1493,12 @@ func _maintain(o) -> bool:
 				return true
 		elif not o.weapons["rifle"]["lost"] and o.weapons["rifle"]["spare"] > 0:
 			want = "rifle"
-	elif o.has("WD02") and lull > 2.0 and s["mag"] < int(cap * 0.4) and s["spare"] > 0:
-		want = o.active
+	elif (o.has("WD02") or o.has("WD01")) and lull > 2.0 and s["spare"] > 0:
+		# WD01 always knows the count, so it tops up in a lull rather than
+		# running dry; WD02 is the habit of doing it before it gets that low
+		var floor_pct: float = 0.4 if o.has("WD02") else 0.3
+		if s["mag"] < int(cap * floor_pct):
+			want = o.active
 	if want == "":
 		return false
 	var threats := _threats(o)
@@ -1516,13 +1571,33 @@ func _go(o, p: Vector2, mode: String, group := true) -> void:
 ## A teammate's muzzle line is live while they are aiming or have fired in the last
 ## 1.5 s; an overwatcher who is only scanning keeps the muzzle off friends.
 func _in_line_of_fire(o, mates: Array) -> bool:
+	return _pos_in_line_of_fire(o, o.pos + o.vel.normalized() * 0.4, mates)
+
+
+func _pos_in_line_of_fire(o, p: Vector2, mates: Array) -> bool:
 	for m in mates:
+		if m == o:
+			continue
 		if m.aim.is_empty() and w.t - m.last_shot_t > 1.5:
 			continue
 		var u := Vector2.from_angle(m.muzzle_dir)
-		var rel: Vector2 = (o.pos + o.vel.normalized() * 0.4) - m.pos
+		var rel: Vector2 = p - m.pos
 		var s := rel.dot(u)
 		if s > 0.3 and s < 6.0 and absf(rel.cross(u)) < 0.45:
+			return true
+	return false
+
+
+## GD03 respect lines of fire: the old check only stopped you from *walking into*
+## a lane. This gets you out of one you are already standing in.
+func _step_aside(o) -> bool:
+	var u: Vector2 = Vector2.from_angle(o.muzzle_dir)
+	var side: Vector2 = Vector2(-u.y, u.x)
+	var mates: Array = w.mates_near(o, 7.0)
+	for sgn in [1.0, -1.0]:
+		var q: Vector2 = o.pos + side * sgn * 0.9
+		if w.nav.is_free(q) and not _pos_in_line_of_fire(o, q, mates):
+			o.sidestep = {"dir": side * sgn, "left": 0.5}
 			return true
 	return false
 
@@ -1559,6 +1634,9 @@ func _task_assault(o, tm: Dictionary, el: Dictionary) -> void:
 	if not entry.has(o.id):
 		return
 	var d: Dictionary = entry[o.id]
+	# a shut door has to be dealt with before anyone goes through it
+	if _door_step(o, tm, el):
+		return
 	match el["phase"]:
 		"check":
 			if not ctl.has("checker"):
@@ -1684,6 +1762,39 @@ func _task_assault(o, tm: Dictionary, el: Dictionary) -> void:
 					_task_look(o, (w.level.rooms[st["into"]]["label"] - o.pos).angle())
 
 
+## Doors are state now: open, closed or locked. A shut leaf blocks sight, bullets
+## and movement at once (it is a dynamic obstacle in geom), so the element has to
+## open it before it can enter. The number one man works it; the rest cover it.
+## Returns true while the operator is busy with the door.
+func _door_step(o, tm: Dictionary, el: Dictionary) -> bool:
+	var st: Dictionary = el["task"]
+	if st.is_empty() or not w.level.door_blocked(st["door"]):
+		return false
+	var D: Dictionary = w.level.doors[st["door"]]
+	var n_in: Vector2 = w.level.inward(st["door"], st["into"])
+	var stand: Vector2 = D["c"] - n_in * 0.9
+	var d: Dictionary = el["entry"].get(o.id, {})
+	if int(d.get("order", 0)) != 0:
+		o.dbg = "covering the door"
+		w.stop(o)
+		_task_look(o, (D["c"] - o.pos).angle())
+		return true
+	if not o.action.is_empty():
+		o.dbg = "working the door"
+		w.stop(o)
+		return true
+	if not w.at(o, stand, 0.45):
+		_go(o, stand, "walk", false)
+		o.dbg = "moving to the door"
+		return true
+	w.stop(o)
+	var locked: bool = w.level.door_locked(st["door"])
+	var dur: float = (Habits.DOOR_BREACH_TIME if locked else Habits.DOOR_OPEN_TIME) * float(o.ech["reload"])
+	o.dbg = "forcing the door" if locked else "opening the door"
+	w.start_action(o, "breach" if locked else "open", dur, {"did": st["door"], "locked": locked})
+	return true
+
+
 func _task_hold(o) -> void:
 	var inv: Dictionary = o.ticker.get("investigate", {})
 	if not inv.is_empty():
@@ -1790,9 +1901,30 @@ func _finish_look2(o) -> void:
 	if not h.is_empty() and w.t >= h["start"] and w.t <= h["until"]:
 		o.look_goal = h["dir"]
 		return
+	# BH18 relaxed carry: out of contact, the muzzle is low and the eyes go where
+	# the feet are going. It overrides the task look too, which is the point.
+	if o.hb("BH18") and w.t - o.last_enemy_seen_t > 5.0 and o.moving and o.vel.length() > 0.3:
+		o.look_goal = o.vel.angle()
+		return
 	if o.ticker.get("task_look_tick", -1) == tick:
 		o.look_goal = o.ticker["task_look"]
 		return
+	# general alertness: with nothing else asking for the eyes, they keep coming
+	# back to whatever is remembered out there -- a corner someone disappeared
+	# behind, the direction a shot came from. Six tenths of a second of every
+	# second and a half or so, which is enough to be looking the right way when
+	# the figure reappears without ever locking the eyes up.
+	if o.att_alert():
+		var adir: float = float(o.att["dir"])
+		if w.t < o.ticker.get("att_until", -1.0):
+			o.look_goal = adir
+			return
+		if w.t >= o.ticker.get("att_next", 0.0):
+			o.ticker["att_next"] = w.t + w.rng.randf_range(1.2, 2.2)
+			o.ticker["att_until"] = w.t + 0.6
+			o.look_goal = adir
+			o.dbg = o.dbg if o.dbg != "" else "checking " + str(o.att["kind"])
+			return
 	if o.has("ED09") and o.moving and _is_rear(o):
 		if fmod(w.t + o.slot * 1.7, 4.0) < 1.0:
 			o.look_goal = o.vel.angle() + PI
@@ -1824,7 +1956,7 @@ func _finish_look2(o) -> void:
 func _is_rear(o) -> bool:
 	var mates: Array = _el_mates(o)
 	if mates.is_empty():
-		return false
+		return false      # nobody to be behind: "rear security" is meaningless
 	var dir: Vector2 = o.vel.normalized()
 	for m in mates:
 		if (m.pos - o.pos).dot(dir) < 0.0:
@@ -2035,23 +2167,53 @@ func _post_member(el: Dictionary, m, only: Dictionary) -> void:
 	m.spawn_face = posts[0]["face"]
 
 
-## Somebody heard an enemy. Aggressive operators (a hunting team, or the Aggression
-## personality) go after the sound; a defensive squad re-posts to cover the opening of
-## its room closest to the sound.
+## Somebody heard an enemy. Every posture reacts, not just a defensive one:
+##   - an aggressive operator (Aggression, or anyone on a hunt) goes after it;
+##   - an assault element halts and covers the bearing -- it does not walk past a
+##     room it has just heard someone in;
+##   - a defensive squad re-posts to cover the opening of its room nearest the sound.
+## Whoever they are, the sound becomes an attention entry with an approximate
+## position, which is what the cone of attention then points at.
 func on_heard(o, p: Vector2, kind: String) -> void:
 	var tm: Dictionary = w.teams[o.team]
 	if o.el < 0 or o.el >= tm["elements"].size():
 		return
 	var el: Dictionary = tm["elements"][o.el]
-	if el["mode"] != "hold":
+	# BH20 sweeps left to right and ignores what it hears until it is done
+	if o.hb("BH20") and o.ticker.get("sweep_until", -1.0) > w.t:
 		return
-	if o.hb("BH11") or o.hb("BH12"):
-		var inv: Dictionary = o.ticker.get("investigate", {})
-		if inv.is_empty():
-			w.say("%s hears %s and goes after it (aggression)" % [o.id, _sound_name(kind)], "bad")
-		o.ticker["investigate"] = {"p": p, "until": w.t + 25.0}
+	var gun: bool = kind == "rifle" or kind == "pistol" or kind == "breach"
+	# the memory: rough position, wide cone, fades on its own
+	var err: float = o.pos.distance_to(p) * 0.08
+	Memory.note(o, Memory.HEARD, p, "", w.t, err)
+	if el["mode"] == "hold":
+		if o.hb("BH11") or o.hb("BH12"):
+			var inv: Dictionary = o.ticker.get("investigate", {})
+			if inv.is_empty():
+				w.say("%s hears %s and goes after it (aggression)" % [o.id, _sound_name(kind)], "bad")
+			o.ticker["investigate"] = {"p": p, "until": w.t + 25.0}
+			return
+		_cover_sound(tm, el, p, kind)
 		return
-	_cover_sound(tm, el, p, kind)
+	# --- everyone else: gunfire is worth stopping for, footsteps are worth a look
+	if gun:
+		if o.hb("BH11") or o.hb("BH12") or el["mode"] == "hunt":
+			var inv2: Dictionary = o.ticker.get("investigate", {})
+			if inv2.is_empty():
+				w.say("%s hears %s and goes after it" % [o.id, _sound_name(kind)], "comms")
+			o.ticker["investigate"] = {"p": p, "until": w.t + 25.0}
+			return
+		if el["mode"] == "assault" and not el["task"].is_empty():
+			# a room with someone in it is not a room you walk past
+			el["heard"] = {"p": p, "t": w.t, "kind": kind}
+			for m in _alive(el):
+				if m.has("GD04") and w.visible_enemies(m).is_empty():
+					m.look_hint = {"dir": (p - m.pos).angle(), "start": w.t + 0.2,
+						"until": w.t + 2.5, "why": "sound"}
+			w.say("%s hears %s; covers the bearing" % [_tag(tm, el), _sound_name(kind)], "comms")
+			return
+	o.ticker["heard_bearing"] = (p - o.pos).angle()
+	o.ticker["heard_until"] = w.t + 2.0
 
 
 func _sound_name(kind: String) -> String:

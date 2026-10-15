@@ -243,6 +243,8 @@ func set_layer(nm: String, on: bool) -> void:
 			labels.visible = on
 		"cones":
 			overlay.show_cones = on
+		"attention":
+			overlay.show_att = on
 		"ledger":
 			ledger.visible = on
 

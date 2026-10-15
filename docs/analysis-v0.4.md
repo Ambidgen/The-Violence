@@ -11,6 +11,12 @@ the dominant stat) it is a **hypothesis derived from the model's algebra** and i
 §5 as a test with the exact command to run. Treat §5 as a list of things to falsify, not as
 findings.
 
+> **Status: Tiers 0–2 are implemented** (see `docs/tiers-0-2.md` for the change log).
+> §3 and §4 below are still an accurate description of what the project *was*; the
+> specific defects they name have been addressed where §7 called for it. §5.1's list
+> of inert habits and §5.3's hypotheses H1–H5 are **not yet measured** — the
+> harnesses to measure them now exist and are the immediate next step.
+
 ---
 
 ## 1. What this actually is

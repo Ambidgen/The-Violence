@@ -6,6 +6,7 @@ extends RefCounted
 ## All units are metres; y grows downward (south).
 
 const Geom = preload("res://scripts/sim/geom.gd")
+const Habits = preload("res://scripts/data/habits.gd")
 const MAX_TEAM := 20
 const EXT_T := 0.22         # exterior wall thickness
 const INT_T := 0.12         # partition thickness
@@ -41,6 +42,10 @@ var dims: Array = []         # [{a, b, text, ticks}] dimension strings; generate
 var adj := {}                # room -> [door ids]
 var buildings: Array = []    # [Rect2] bounding boxes of connected interior rooms
 var skip_posts := false      # templates for the city: no posts, no patrol, no building boxes
+## Door ids that start shut. Doors are state now: open, closed or locked. Only
+## map 01 uses it so far -- the rest of the game is unchanged.
+var _closed_doors: Array = []
+var _locked_doors: Array = []
 var corners_by_room := {}    # room -> [Vector2] (same points as corners)
 var windows_by_room := {}    # room -> [{c, n_in}] windows opening into that room
 
@@ -57,9 +62,18 @@ func build() -> void:
 	if fenced:
 		_fence()
 	_build()
+	_apply_door_state()
 	geom.build_index()
 	_index()
 	_annotate()
+
+
+## Set the starting state of every door the map asked to be shut.
+func _apply_door_state() -> void:
+	for did in _closed_doors:
+		set_door(did, Habits.DOOR_STATE_CLOSED)
+	for did in _locked_doors:
+		set_door(did, Habits.DOOR_STATE_LOCKED)
 
 
 ## Override: describe the map.
@@ -168,12 +182,48 @@ func _window(x: float, y: float, w := 1.2) -> void:
 	_win_defs.append({"c": Vector2(x, y), "w": w})
 
 
-## Register a door record by hand (for gates in hand-built walls).
+## Register a door record by hand (for gates in hand-built walls). Every leaf
+## that is not an arch gets a dynamic obstacle in geom: switched off while the
+## door is open (so it costs nothing) and on while it is shut, which blocks
+## sight, bullets and movement at the same time.
 func _add_door(did: String, c: Vector2, n: Vector2, half: float, arch := false, hinge := 1) -> void:
 	var a := _side_room(c - n * 0.35)
 	var b := _side_room(c + n * 0.35)
-	doors[did] = {"id": did, "c": c, "n": n, "t": Vector2(-n.y, n.x), "half": half, "a": a, "b": b,
-		"hinge": hinge, "arch": arch}
+	var t := Vector2(-n.y, n.x)
+	var leaf := -1
+	var leaf_rect := Rect2()
+	if not arch:
+		var p0 := c - t * half - n * 0.06
+		var p1 := c + t * half + n * 0.06
+		leaf_rect = Rect2(Vector2(minf(p0.x, p1.x), minf(p0.y, p1.y)),
+			Vector2(absf(p1.x - p0.x), absf(p1.y - p0.y)))
+		leaf = geom.add_dynamic(leaf_rect, Geom.WALL, 2.05)
+	doors[did] = {"id": did, "c": c, "n": n, "t": t, "half": half, "a": a, "b": b,
+		"hinge": hinge, "arch": arch, "state": Habits.DOOR_STATE_OPEN,
+		"leaf": leaf, "leaf_rect": leaf_rect}
+
+
+## Shut or open a door. The caller syncs navigation (nav.sync_doors) afterwards.
+func set_door(did: String, state: String) -> void:
+	if not doors.has(did):
+		return
+	var D: Dictionary = doors[did]
+	D["state"] = state
+	var idx: int = int(D.get("leaf", -1))
+	if idx >= 0:
+		geom.set_dynamic(idx, state != Habits.DOOR_STATE_OPEN)
+
+
+func door_blocked(did: String) -> bool:
+	var D: Dictionary = doors.get(did, {})
+	if D.is_empty():
+		return false
+	return D.get("state", Habits.DOOR_STATE_OPEN) != Habits.DOOR_STATE_OPEN
+
+
+func door_locked(did: String) -> bool:
+	var D: Dictionary = doors.get(did, {})
+	return D.get("state", "") == Habits.DOOR_STATE_LOCKED
 
 
 func _side_room(p: Vector2) -> String:

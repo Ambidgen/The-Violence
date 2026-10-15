@@ -405,6 +405,8 @@ func set_overlay(nm: String, on: bool) -> void:
 	match nm:
 		"Cones":
 			overlay.show_cones = on
+		"Attention":
+			overlay.show_att = on
 		"Recognition":
 			overlay.show_rec = on
 		"Aim":

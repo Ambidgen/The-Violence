@@ -71,6 +71,9 @@ func build(m) -> void:
 	lb.set_pressed_no_signal(true)
 	var cb := _btn(ho, "Cones", func(on): main.set_layer("cones", on), true)
 	cb.set_pressed_no_signal(true)
+	var ab := _btn(ho, "Attention", func(on): main.set_layer("attention", on), true)
+	ab.set_pressed_no_signal(true)
+	ab.tooltip_text = "The cone of attention: what each operator remembers and is watching for"
 	var gb := _btn(ho, "Ledger", func(on): main.set_layer("ledger", on), true)
 	gb.set_pressed_no_signal(true)
 	factions_box = _rich(v, 214)
