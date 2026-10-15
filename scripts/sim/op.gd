@@ -65,7 +65,7 @@ var last_aim_t := -99.0
 var rec := {}           # enemy id -> recognition progress 0..1+
 var vis := {}           # enemy id -> {los, head_only, ecc, dist}
 var first_rec := {}     # enemy id -> time first recognized
-var tracked := {}       # enemy id -> {lost_t, ready_t}: the enemies held in attention
+var tracked := {}       # enemy id -> {lost_t, ready_dur, ready_at}: held in attention
 var cue := {}           # enemy id -> expiry time of a teammate callout
 var lkp := {}           # enemy id -> {p, t}
 var heard := {}         # last enemy sound heard {p, t, kind}
@@ -116,6 +116,7 @@ var last_shot_t := -99.0
 var last_enemy_seen_t := -99.0
 var reloaded_after_contact := true
 var dbg := ""           # short text describing what the brain is doing
+var ix := 0             # which class of interrupt fired last tick (Brain.Ix)
 var events_bad := []    # for UI: recently activated bad habits
 var shots := 0
 var hits := 0
@@ -137,7 +138,7 @@ const TICKER_KEYS := [
 	# --- aiming and firing (owner: world._aim_update / _start_acquire)
 	"clicked", "reengage", "hold_pos_until", "stance_t", "crouch", "task_look",
 	"task_look_tick", "far_dest", "far_until", "form_key", "form_p", "support_key",
-	"support_p", "pf07_",
+	"support_p",
 	# --- reactions (owner: brain._think)
 	"freeze_until", "flinch_until", "last_flinch", "stagger_until", "near_t",
 	"fixate_until", "fixate_p", "sweep_until", "sweep_from", "sweep_t0",

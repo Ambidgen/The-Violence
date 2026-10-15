@@ -835,8 +835,19 @@ func think(o) -> void:
 	w.prof[k] = w.prof.get(k, 0) + Time.get_ticks_usec() - t0
 
 
+## Name the interrupt class that won this tick and, optionally, give the operator
+## a readable label. `o.ix` is the ladder's public shape: anything that wants to
+## know *why* an operator is not on task reads the int, not the string. The
+## distinction matters because the label is edited freely and the class is not.
+func _ix(o, cls: int, label: String = "") -> void:
+	o.ix = cls
+	if label != "":
+		o.dbg = label
+
+
 func _think(o) -> void:
 	o.dbg = ""
+	o.ix = Ix.NONE
 	o.stance_goal = Op.STAND if not o.leg_hit or o.stance_goal != Op.CROUCH else Op.CROUCH
 	var tm: Dictionary = w.teams[o.team]
 	var el: Dictionary = tm["elements"][o.el]
@@ -855,7 +866,7 @@ func _think(o) -> void:
 				cache["t"] = w.t
 	# blocking reactions
 	if o.ticker.get("flinch_until", -1.0) > w.t:
-		o.dbg = "flinch"
+		_ix(o, Ix.INVOLUNTARY, "flinch")
 		o.stance_goal = Op.DUCK
 		return
 	if o.hb("BH07") and o.ticker.get("near_t", -9.0) > o.ticker.get("last_flinch", -9.0) + 0.9:
@@ -866,6 +877,7 @@ func _think(o) -> void:
 		w.stop(o)
 		o.stance_goal = Op.DUCK
 		w.say("%s flinches and turtles" % o.id, "bad")
+		_ix(o, Ix.INVOLUNTARY, "flinch and turtles")
 		return
 	if not o.action.is_empty() and o.ticker.get("duck_action", false):
 		o.stance_goal = Op.DUCK
@@ -875,10 +887,12 @@ func _think(o) -> void:
 		o.dbg = "FROZEN"
 	# BH09: shoots at half-recognized movement, and sometimes at friends
 	if o.hb("BH09") and _jumpy(o):
+		_ix(o, Ix.INVOLUNTARY)
 		return
 	# P1: Rule 1
 	var close = _close_threat(o)
 	if close != null:
+		_ix(o, Ix.RULE)
 		_rule1(o, close)
 		return
 	# retreat (city): a gang member who broke on seeing the police runs for safety
@@ -887,7 +901,7 @@ func _think(o) -> void:
 		if w.t > rt["until"] or w.at(o, rt["p"], 1.5):
 			o.ticker.erase("retreat")
 		else:
-			o.dbg = "RETREATING"
+			_ix(o, Ix.REACT, "RETREATING")
 			o.aim = {}
 			w.move_to(o, rt["p"], "sprint")
 			_finish_look(o)
@@ -895,10 +909,12 @@ func _think(o) -> void:
 	# P2: Rule 2
 	var s: Dictionary = o.ws()
 	if s["mag"] <= 0 or s["lost"]:
+		_ix(o, Ix.WEAPON)
 		_rule2(o)
 		return
 	# P3: stoppage
 	if s["jam"]:
+		_ix(o, Ix.WEAPON)
 		_stoppage(o)
 		return
 	# BH05: panic reload whenever firing stops
@@ -907,36 +923,42 @@ func _think(o) -> void:
 		if since >= 0.5 and since < 6.0:
 			_reload(o, o.active, false)
 			w.say("%s panic-reloads in the open" % o.id, "bad")
+			_ix(o, Ix.WEAPON, "panic-reloading")
 			return
 	# P4: engage beyond 10 m
 	var far = _far_target(o)
 	if far == null and o.ticker.has("far_dest") and _to_far_dest(o):
+		_ix(o, Ix.ENGAGE)
 		return
 	if far != null:
+		_ix(o, Ix.ENGAGE)
 		_engage_far(o, far)
 		return
 	# fixation on a body (no ED05)
 	if o.ticker.get("fixate_until", -1.0) > w.t:
-		o.dbg = "staring at body"
+		_ix(o, Ix.REACT, "staring at body")
 		w.stop(o)
 		o.look_goal = (o.ticker["fixate_p"] - o.pos).angle()
 		return
 	# P5 react
 	if _react(o, tm):
+		_ix(o, Ix.REACT)
 		_finish_look(o)
 		return
 	# P6 maintain
 	if _maintain(o):
+		_ix(o, Ix.MAINTAIN)
 		_finish_look(o)
 		return
 	# P6.5 GD03: standing in a team-mate's muzzle line and going nowhere
 	if o.has("GD03") and not o.moving and o.sidestep.is_empty() and o.aim.is_empty() \
 			and o.action.is_empty() and _in_line_of_fire(o, w.mates_near(o, 6.0)):
-		o.dbg = "stepping out of the fire lane"
+		_ix(o, Ix.MAINTAIN, "stepping out of the fire lane")
 		if _step_aside(o):
 			_finish_look(o)
 			return
 	# P7 task
+	_ix(o, Ix.TASK)
 	match el["mode"]:
 		"assault":
 			_task_assault(o, tm, el)
@@ -950,7 +972,7 @@ func _think(o) -> void:
 			_task_transit(o, el)
 		_:
 			w.stop(o)
-			o.dbg = "waiting"
+			_ix(o, Ix.TASK, "waiting")
 	_finish_look(o)
 
 
@@ -1924,6 +1946,10 @@ func _finish_look2(o) -> void:
 			o.ticker["att_until"] = w.t + 0.6
 			o.look_goal = adir
 			o.dbg = o.dbg if o.dbg != "" else "checking " + str(o.att["kind"])
+			# only claim the operator when nothing else is driving it: the eyes
+			# are the last resort, not a reason to forget a rule or a contact
+			if o.ix == Ix.TASK:
+				o.ix = Ix.EYES
 			return
 	if o.has("ED09") and o.moving and _is_rear(o):
 		if fmod(w.t + o.slot * 1.7, 4.0) < 1.0:

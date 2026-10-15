@@ -360,6 +360,21 @@ Every test takes `--map=N`. Playtest 01 results and recommended system improveme
 
 Regenerate the art with `python3 tools/make_placeholders.py`. All art is original and project-owned.
 
-Lint the scripts without opening Godot with `python3 tools/gdlint.py`. It checks
-indentation, bracket balance, that every `ticker` key used is declared in `op.gd`,
-that every habit id referenced exists, and that every declared habit has a call site.
+Two checks run without Godot at all:
+
+```
+python3 tools/gdlint.py              # lint: indentation, bracket balance, ticker keys, habit coverage
+python3 tools/verify_attention.py    # the cone of attention, checked against its spec
+```
+
+`gdlint.py` checks indentation, bracket balance, that every `ticker` key used is
+declared in `op.gd`, that every habit id referenced exists, and that every declared
+habit has a call site.
+
+`verify_attention.py` re-implements `Memory.boost()` and asserts the properties the
+mechanic was specified with: 35% with the two centre lines aligned, 7.5% where the
+cones just touch, linear and monotonic between them, and zero outside either cone.
+It reads the tuning constants out of `habits.gd` rather than hard-coding them, and it
+greps `memory.gd` for the shape it ported — so if the formula is edited, the script
+stops and says so instead of quietly testing a stale copy. Pass `--verbose` for the
+curve.

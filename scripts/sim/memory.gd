@@ -35,6 +35,11 @@ extends RefCounted
 
 const Habits = preload("res://scripts/data/habits.gd")
 
+## Tolerance on the cone gates in boost(), so that a target sitting exactly on a
+## cone edge counts as inside it. angle_difference() round-trips through a
+## modulo and can land a single ULP outside.
+const EDGE_EPS := 1e-9
+
 const SEEN := "seen"
 const HEARD := "heard"
 const CALLED := "called"
@@ -233,9 +238,13 @@ static func boost(o, bearing: float, now: float) -> float:
 		return 0.0
 	var vhalf: float = float(o.vision_half)
 	var ahalf: float = float(f["half"])
-	if absf(angle_difference(bearing, o.look_dir)) > vhalf:
+	# The gates are inclusive: a target sitting exactly on a cone edge is inside
+	# it. angle_difference() round-trips through a modulo and can land a single
+	# ULP outside, which would make the "the two cones just touching" case --
+	# the one ATT_BOOST_MIN is defined at -- unreachable in principle.
+	if absf(angle_difference(bearing, o.look_dir)) > vhalf + EDGE_EPS:
 		return 0.0
-	if absf(angle_difference(bearing, f["dir"])) > ahalf:
+	if absf(angle_difference(bearing, f["dir"])) > ahalf + EDGE_EPS:
 		return 0.0
 	var span: float = vhalf + ahalf
 	if span <= 1e-6:

@@ -92,8 +92,15 @@ fired inside Rule 1 — see below.
 **11. Named interrupt classes.** `Brain.Ix` labels every branch of the ladder
 (INVOLUNTARY / RULE / WEAPON / ENGAGE / REACT / MAINTAIN / TASK / EYES). The ladder is
 still evaluated top to bottom — that is the right call at this size, and a real BT
-stays a trap unless the game becomes a command game. But a branch now declares what it
-is, so a caller can ask "is this operator available?" without parsing `o.dbg`.
+stays a trap unless the game becomes a command game. But every rung now writes its
+class to `o.ix` through a single `_ix()` helper, so a caller can ask "is this operator
+available?" without parsing `o.dbg`.
+
+The split matters: `o.dbg` is a display string and gets edited freely; `o.ix` is the
+ladder's public shape and does not. The one place the two could fight is the eyes,
+which run last and can pull the operator's gaze off its task. `Ix.EYES` is therefore
+only claimed when nothing else is driving (`o.ix == Ix.TASK`), so a contact or a
+rule-one engagement never has its class overwritten by a glance.
 
 **12. Intent boundary.** Every decision that changes the world already went through
 `move_to` / `stop` / `start_action` / `engage`, so those four now record into
@@ -142,6 +149,49 @@ change.
 
 ---
 
+## What is actually verified, and what is not
+
+**Nothing in this branch has been executed.** Godot is not installed in this workspace
+and cannot be: the engine binary is served from a host outside the sandbox's
+allowlist, and building from source is out too — no X11 or ALSA headers, no
+`pkg-config`, no `scons`, and `apt` has no package lists. So the code has been read
+and linted, not run. Treat every balance number in Tier 1 as unvalidated.
+
+What *is* checked, without Godot:
+
+```
+python3 tools/gdlint.py              # 63 files, 0 issues, 65 ticker keys, 59/62 habits live
+python3 tools/verify_attention.py    # 25 assertions, all passing
+```
+
+`verify_attention.py` is the narrow but honest part. It re-implements `Memory.boost()`
+in Python and asserts the mechanic's spec directly: 35% with the two centre lines
+aligned, 7.5% where the cones just touch, linear and monotonic in between, 0.2125 at
+the midpoint, and zero outside either cone — plus the two places the boost is spent
+(`tt *= 1 - boost` on acquisition, `ATT_REC_SHARE` on recognition). It parses the
+constants out of `habits.gd` instead of hard-coding them, so retuning cannot silently
+invalidate it.
+
+Because the port is a hand transcription, it carries a drift guard: it greps
+`memory.gd` for the four expressions it depends on and refuses to run if any have
+changed. That guard was tested against three mutations (span changed, lerp arguments
+swapped, a gate deleted) and caught all three.
+
+**One real bug it found.** The cone gates were exclusive (`> vhalf`), and
+`angle_difference()` round-trips through a modulo that can land a single ULP the wrong
+side of the boundary. A target sitting exactly on a cone edge therefore sometimes
+scored zero — which in particular made the "two cones just touching" case, the very
+case `ATT_BOOST_MIN` is defined at, unreachable in principle. The gates are now
+inclusive with a `1e-9` tolerance (`Memory.EDGE_EPS`). In practice a bearing from a
+real vector is never exactly on the boundary, so this changed no observable
+behaviour; it makes the documented edge case actually hold.
+
+What that leaves unverified is everything the harnesses were built to answer: the
+determinism fixture does not exist yet, and §5.3's H1–H5 are still open questions
+rather than measurements.
+
+---
+
 ## Deferred, and why
 
 - **Tier 2 #9 in full** — the remaining 60 ticker keys are declared and enforced but
@@ -159,7 +209,8 @@ change.
 Everything in §5.3 of the analysis is now answerable. In order:
 
 ```bash
-python3 tools/gdlint.py
+python3 tools/gdlint.py                                                   # lint
+python3 tools/verify_attention.py                                         # the only thing checked so far
 godot --headless --path . -s res://tests/determinism_test.gd -- --write   # baseline
 godot --headless --path . -s res://tests/habits_test.gd -- --strict
 godot --headless --path . -s res://tests/stall_test.gd                    # watchdogs
