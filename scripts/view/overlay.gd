@@ -14,6 +14,9 @@ var tracers: Array = []   # {a, b, age}
 var flashes: Array = []   # {p, dir, age}
 var floats: Array = []    # {p, text, age}
 var puffs: Array = []     # {p, age}
+var ears: Array = []      # {id, dir, age}: someone just heard an enemy
+var view := Rect2()       # city: only draw what is in view
+var zoom := 1.0
 
 
 func setup(w) -> void:
@@ -22,6 +25,7 @@ func setup(w) -> void:
 	flashes.clear()
 	floats.clear()
 	puffs.clear()
+	ears.clear()
 
 
 func handle(ev: Dictionary) -> void:
@@ -37,6 +41,10 @@ func handle(ev: Dictionary) -> void:
 			puffs.append({"p": ev["p"], "age": 0.0})
 		"plate":
 			_float(ev["p"], "plate")
+		"heard":
+			var o2 = world.op_by_id(ev["id"])
+			if o2 != null:
+				ears.append({"id": ev["id"], "dir": (ev["p"] - o2.pos).angle(), "age": 0.0})
 
 
 ## Stack labels that appear near the same spot so they never print over each other.
@@ -58,13 +66,14 @@ func _float(p: Vector2, text: String) -> void:
 
 
 func tick_real(dt: float) -> void:
-	for arr in [tracers, flashes, floats, puffs]:
+	for arr in [tracers, flashes, floats, puffs, ears]:
 		for it in arr:
 			it["age"] += dt
 	tracers = tracers.filter(func(x): return x["age"] < 0.18)
 	flashes = flashes.filter(func(x): return x["age"] < 0.07)
 	floats = floats.filter(func(x): return x["age"] < 1.8)
 	puffs = puffs.filter(func(x): return x["age"] < 0.4)
+	ears = ears.filter(func(x): return x["age"] < 1.2)
 	queue_redraw()
 
 
@@ -72,10 +81,14 @@ func _draw() -> void:
 	if world == null:
 		return
 	var font: Font = ThemeDB.fallback_font
+	var cull: bool = world.city
+	var vr := view.grow(300.0)
 	for o in world.ops:
-		if not o.alive():
+		if not o.alive() or o.mounted != null:
 			continue
 		var p: Vector2 = o.pos * PX
+		if cull and (not vr.has_point(p) or zoom < 0.3 or o.medic):
+			continue
 		if show_cones:
 			var half: float = world.cone_half(o)
 			var r := 7.0 * PX
@@ -108,20 +121,35 @@ func _draw() -> void:
 				else:
 					draw_dashed_line(p + Vector2.from_angle(o.muzzle_dir) * 20.0, ep, Color(0, 0, 0, 0.28), 1.0, 3.0)
 	if show_rec:
+		# one bar per target: the enemy closest to recognizing it, plus how many others are on it
+		var best_on := {}
 		for o in world.ops:
 			if not o.alive():
 				continue
-			var k := 0
-			for e in world.enemies_of(o):
-				var rv: float = o.rec.get(e.id, 0.0)
-				if rv <= 0.02 or not e.alive():
+			for eid in o.rec:
+				var rv: float = o.rec[eid]
+				if rv <= 0.02:
 					continue
-				var base: Vector2 = e.pos * PX + Vector2(-14, -40 - 7 * k)
-				draw_rect(Rect2(base, Vector2(28, 4)), Color(1, 1, 1, 0.9))
-				draw_rect(Rect2(base, Vector2(28 * minf(rv, 1.0), 4)), INK if rv >= 1.0 else Color("#6a6a6a"))
-				draw_rect(Rect2(base, Vector2(28, 4)), INK, false, 1.0)
-				draw_string(font, base + Vector2(30, 5), o.id, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, INK)
-				k += 1
+				var cur: Array = best_on.get(eid, [null, 0.02, 0])
+				cur[2] += 1
+				if rv > cur[1]:
+					cur[0] = o
+					cur[1] = rv
+				best_on[eid] = cur
+		for eid2 in best_on:
+			var e = world.op_by_id(eid2)
+			var bo: Array = best_on[eid2]
+			if e == null or not e.alive() or bo[0] == null:
+				continue
+			if cull and (zoom < 0.3 or not vr.has_point(e.pos * PX)):
+				continue
+			var bv: float = bo[1]
+			var base: Vector2 = e.pos * PX + Vector2(-14, -40)
+			draw_rect(Rect2(base, Vector2(28, 4)), Color(1, 1, 1, 0.9))
+			draw_rect(Rect2(base, Vector2(28 * minf(bv, 1.0), 4)), INK if bv >= 1.0 else Color("#6a6a6a"))
+			draw_rect(Rect2(base, Vector2(28, 4)), INK, false, 1.0)
+			var tag: String = bo[0].id + ("" if bo[2] <= 1 else " +%d" % (bo[2] - 1))
+			draw_string(font, base + Vector2(30, 5), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, INK)
 	for tr in tracers:
 		var al: float = 1.0 - tr["age"] / 0.18
 		draw_line(tr["a"] * PX, tr["b"] * PX, Color(0.1, 0.1, 0.1, 0.55 * al), 1.0, true)
@@ -134,6 +162,13 @@ func _draw() -> void:
 		draw_colored_polygon(pts2, Color(1, 1, 1))
 		pts2.append(pts2[0])
 		draw_polyline(pts2, INK, 1.0)
+	for ea in ears:
+		var lo = world.op_by_id(ea["id"])
+		if lo == null or not lo.alive():
+			continue
+		var al: float = 1.0 - ea["age"] / 1.2
+		for k2 in 3:
+			draw_arc(lo.pos * PX, 16.0 + 5.0 * k2, ea["dir"] - 0.45, ea["dir"] + 0.45, 6, Color(0.15, 0.15, 0.15, 0.55 * al), 1.0)
 	for pf in puffs:
 		draw_arc(pf["p"] * PX, 3.0 + 14.0 * pf["age"], 0, TAU, 14, Color(0.3, 0.3, 0.3, 0.5 * (1.0 - pf["age"] / 0.4)), 1.0)
 	for fl in floats:

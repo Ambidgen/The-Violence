@@ -3,14 +3,14 @@ extends RefCounted
 ## mask and differ only in their cost layers:
 ##   profile 0: shortest path          profile 1: + PF01 doorway cost (x8)
 ##   profile 2: + PF02 exposure cost   profile 3: both
-## Exposure is static for this slice: each cell pays +3 per door or window that can
-## see it (cap +9). Precomputed once and cached across matches.
+## Exposure is static: each cell pays +3 per door or window that can see it (cap +9).
+## Precomputed once per map (on a 1 m lattice for big maps) and cached across matches.
 
 const Geom = preload("res://scripts/sim/geom.gd")
 const CS := 0.25            # cell size, metres
 const RADIUS := 0.30        # body radius + margin
 
-static var _cache := {}     # shared between World instances (the level never changes)
+static var _cache := {}     # map id -> layers and grids, shared between World instances
 
 var level
 var geom: Geom
@@ -28,29 +28,29 @@ var _spot_cells := {}           # Vector2i (2 m cell) -> Array of spots
 func build(lv) -> void:
 	level = lv
 	geom = lv.geom
-	nx = int(lv.W / CS)
-	ny = int(lv.H / CS)
-	if _cache.has("solid"):
-		solid = _cache["solid"]
-		reach = _cache["reach"]
-		w_door = _cache["w_door"]
-		w_expo = _cache["w_expo"]
-		cover_spots = _cache["cover"]
-	else:
-		_build_layers()
-		_flood()
-		var kept: Array = []
-		for c in cover_spots:
-			var cc := cell_of(c["p"])
-			if reach[cc.y * nx + cc.x] == 1:
-				kept.append(c)
-		cover_spots = kept
-		_cache["solid"] = solid
-		_cache["reach"] = reach
-		_cache["w_door"] = w_door
-		_cache["w_expo"] = w_expo
-		_cache["cover"] = cover_spots
-	grids.clear()
+	nx = int(ceil(lv.W / CS))
+	ny = int(ceil(lv.H / CS))
+	var key: String = lv.id
+	if _cache.has(key):
+		var c: Dictionary = _cache[key]
+		solid = c["solid"]
+		reach = c["reach"]
+		w_door = c["w_door"]
+		w_expo = c["w_expo"]
+		cover_spots = c["cover"]
+		grids = c["grids"]
+		_spot_cells = c["spot_cells"]
+		lv.snap_posts(self)
+		return
+	_build_layers()
+	_flood()
+	var kept: Array = []
+	for c in cover_spots:
+		var cc := cell_of(c["p"])
+		if reach[cc.y * nx + cc.x] == 1:
+			kept.append(c)
+	cover_spots = kept
+	grids = []
 	for prof in 4:
 		var g := AStarGrid2D.new()
 		g.region = Rect2i(0, 0, nx, ny)
@@ -73,12 +73,15 @@ func build(lv) -> void:
 					if w != 1.0:
 						g.set_point_weight_scale(Vector2i(x, y), w)
 		grids.append(g)
-	_spot_cells.clear()
+	_spot_cells = {}
 	for c in cover_spots:
 		var k := Vector2i(int(c["p"].x / 2.0), int(c["p"].y / 2.0))
 		if not _spot_cells.has(k):
 			_spot_cells[k] = []
 		_spot_cells[k].append(c)
+	_cache[key] = {"solid": solid, "reach": reach, "w_door": w_door, "w_expo": w_expo, "cover": cover_spots,
+		"grids": grids, "spot_cells": _spot_cells}
+	lv.snap_posts(self)
 
 
 ## Cover spots within r of p, as [distance_squared, spot] pairs sorted nearest first.
@@ -102,6 +105,10 @@ func spots_near(p: Vector2, r: float) -> Array:
 	return out
 
 
+func lv_area() -> float:
+	return level.W * level.H
+
+
 func _build_layers() -> void:
 	var n := nx * ny
 	solid.resize(n)
@@ -116,20 +123,26 @@ func _build_layers() -> void:
 	# PF01: doorway (threshold) cells within 1.5 m of every door
 	for id in level.doors:
 		var c: Vector2 = level.doors[id]["c"]
-		for y in ny:
-			for x in nx:
+		var c0 := cell_of(c - Vector2(1.6, 1.6))
+		var c1 := cell_of(c + Vector2(1.6, 1.6))
+		for y in range(c0.y, c1.y + 1):
+			for x in range(c0.x, c1.x + 1):
 				if cell_centre(Vector2i(x, y)).distance_to(c) <= 1.5:
 					w_door[y * nx + x] = 7.0
 	# PF02: exposure from each opening's viewpoints, on a 0.5 m coarse grid within 14 m
-	var step := 2
+	var step := 2 if lv_area() <= 1200.0 else 4
 	var reach := 14.0
 	for o in level.openings:
 		for vp in o["vps"]:
 			if geom.blocked_disc(vp, 0.05):
 				continue
-			for y in range(0, ny, step):
-				for x in range(0, nx, step):
-					var p := cell_centre(Vector2i(x, y)) + Vector2(CS, CS) * 0.5
+			var y0 := maxi(0, int((vp.y - reach) / CS) / step * step)
+			var x0 := maxi(0, int((vp.x - reach) / CS) / step * step)
+			var y1 := mini(ny, int((vp.y + reach) / CS) + 1)
+			var x1 := mini(nx, int((vp.x + reach) / CS) + 1)
+			for y in range(y0, y1, step):
+				for x in range(x0, x1, step):
+					var p := cell_centre(Vector2i(x, y)) + Vector2(CS, CS) * 0.5 * (step - 1)
 					if p.distance_to(vp) > reach:
 						continue
 					if not geom.sight_clear(vp, 1.65, p, 1.3):
@@ -199,6 +212,12 @@ func cell_of(p: Vector2) -> Vector2i:
 
 func cell_centre(c: Vector2i) -> Vector2:
 	return Vector2((c.x + 0.5) * CS, (c.y + 0.5) * CS)
+
+
+## Free and in the main connected region.
+func reachable(p: Vector2) -> bool:
+	var c := cell_of(p)
+	return reach[c.y * nx + c.x] == 1
 
 
 func is_free(p: Vector2) -> bool:

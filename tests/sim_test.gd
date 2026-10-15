@@ -2,7 +2,7 @@ extends SceneTree
 ## Headless batch test: runs seeded matches for several matchups and prints outcomes.
 ##   godot --headless --path . -s res://tests/sim_test.gd
 const Habits = preload("res://scripts/data/habits.gd")
-const Level = preload("res://scripts/sim/level.gd")
+const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
 
@@ -38,8 +38,11 @@ func run(lv, nav, a: String, b: String, n: int, verbose := false, extra_a := [],
 	print("%-10s (assault) vs %-10s (hold): A %d  B %d  draw %d   mean %.1f s   [%d ms]" % [a, b, wins[0], wins[1], wins[2], dur / n, Time.get_ticks_msec() - t0])
 
 func _init() -> void:
-	var lv = Level.new()
-	lv.build()
+	var map_i := 0
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--map="):
+			map_i = Maps.index_of(a.trim_prefix("--map="))
+	var lv = Maps.get_level(map_i)
 	var nav = Nav.new()
 	nav.build(lv)
 	var args := OS.get_cmdline_user_args()

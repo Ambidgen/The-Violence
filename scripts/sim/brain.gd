@@ -20,18 +20,101 @@ func _init(world) -> void:
 
 
 # ================================================================== team level
+## Teams of more than five split into elements (fire teams) of up to five: balanced,
+## contiguous blocks of slots (6 = 3+3, 7 = 4+3, 11 = 4+4+3, 20 = 5x4). Each element
+## picks its own room, stacks, enters, holds its own sectors and bounds on its own; the
+## team shares what is cleared, which rooms are claimed, and every callout. A team of
+## five or fewer is a single element and behaves exactly as before.
 func init_teams() -> void:
 	for tm in w.teams:
+		init_team(tm)
+
+
+## Form a unit's elements and start it on its posture (also for units created mid-match).
+func init_team(tm: Dictionary) -> void:
+	_form_elements(tm)
+	if tm["posture"] == "hold":
+		# squads already gathered in one room claim it first
+		var order: Array = tm["elements"].duplicate()
+		order.sort_custom(func(a, b): return _concentration(a) > _concentration(b))
+		for el in order:
+			_set_mode(tm, el, "hold")
+	else:
 		_set_posture(tm, tm["posture"])
+
+
+func _concentration(el: Dictionary) -> int:
+	var counts := {}
+	var best := 0
+	for m in el["members"]:
+		var rm: String = w.level.room_at(m.pos)
+		if w.level.is_exterior(rm):
+			continue
+		counts[rm] = counts.get(rm, 0) + 1
+		best = maxi(best, counts[rm])
+	return best
+
+
+func _form_elements(tm: Dictionary) -> void:
+	var ms: Array = tm["members"].duplicate()
+	ms.sort_custom(func(a, b): return a.slot < b.slot)
+	var n := ms.size()
+	var n_el := maxi(1, int(ceil(n / 5.0)))
+	tm["elements"] = []
+	var k := 0
+	var sizes: Array = []
+	for i in n_el:
+		var size := n / n_el + (1 if i < n % n_el else 0)
+		var el := _new_element(i)
+		for j in size:
+			var m = ms[k]
+			k += 1
+			m.el = i
+			m.eslot = j
+			el["members"].append(m)
+		tm["elements"].append(el)
+		sizes.append(str(size))
+	if n_el > 1:
+		w.say("%s forms %d elements (%s)" % [tm["tag"], n_el, " + ".join(sizes)], "info")
+
+
+func _new_element(i: int) -> Dictionary:
+	return {"i": i, "members": [], "mode": "", "task": {}, "phase": "", "phase_t": 0.0, "entry": {}, "ctl": {},
+		"geo": {}, "sectors": {}, "sector_half": deg_to_rad(80.0), "sector_pending": {}, "bound": -1,
+		"bound_from": Vector2.ZERO, "bound_t": 0.0, "hunt_i": 0, "hunt_done_t": -1.0, "sweep": [],
+		"sweep_target": null, "last_room": "", "retask_t": 0.0}
 
 
 func _set_posture(tm: Dictionary, p: String) -> void:
 	tm["posture"] = p
-	if p == "assault":
-		_start_assault(tm)
-	elif p == "hunt":
-		tm["hunt_i"] = 0
-		tm["hunt_done_t"] = -1.0
+	for el in tm["elements"]:
+		if not _alive(el).is_empty():
+			_set_mode(tm, el, p)
+
+
+func _set_mode(tm: Dictionary, el: Dictionary, mode: String) -> void:
+	if el["mode"] == "hold" and mode != "hold":
+		_release_hold(tm, el)
+	el["mode"] = mode
+	for m0 in el["members"]:
+		w.wake(m0)
+	# taskings that go looking for the enemy keep weapons drawn
+	var floor_lvl: int = Op.YELLOW if mode in ["assault", "hunt", "support"] else int(tm.get("base_alert", -1))
+	if floor_lvl >= 0:
+		for m in el["members"]:
+			m.alert_floor = floor_lvl
+			if m.alert < floor_lvl and m.alive():
+				w.raise_alert(m, floor_lvl)
+	if mode == "assault":
+		_next_task(tm, el)
+	elif mode == "hold":
+		_consolidate(tm, el)
+	elif mode == "hunt":
+		_release(tm, el)
+		el["task"] = {}
+		var n_el: int = tm["elements"].size()
+		el["hunt_i"] = int(el["i"] * tm.get("patrol", w.level.patrol).size() / maxi(1, n_el))
+		el["hunt_done_t"] = -1.0
 
 
 func alive_members(tm: Dictionary) -> Array:
@@ -42,6 +125,32 @@ func alive_members(tm: Dictionary) -> Array:
 	return out
 
 
+func _alive(el: Dictionary) -> Array:
+	var out: Array = []
+	for m in el["members"]:
+		if m.alive():
+			out.append(m)
+	return out
+
+
+func _el(o) -> Dictionary:
+	return w.teams[o.team]["elements"][o.el]
+
+
+func _el_mates(o) -> Array:
+	var out: Array = []
+	for m in _el(o)["members"]:
+		if m != o and m.alive():
+			out.append(m)
+	return out
+
+
+func _tag(tm: Dictionary, el: Dictionary) -> String:
+	if tm["elements"].size() <= 1:
+		return tm["tag"]
+	return "%s-%d" % [tm["tag"], el["i"] + 1]
+
+
 func _any_has(tm: Dictionary, gid: String) -> bool:
 	for m in alive_members(tm):
 		if m.has(gid):
@@ -49,56 +158,135 @@ func _any_has(tm: Dictionary, gid: String) -> bool:
 	return false
 
 
-func _start_assault(tm: Dictionary) -> void:
-	var al := alive_members(tm)
+func _release(tm: Dictionary, el: Dictionary) -> void:
+	var into: String = el["task"].get("into", "")
+	if into != "" and tm["claimed"].get(into, -1) == el["i"]:
+		tm["claimed"].erase(into)
+
+
+## Pick the element's next room: any uncleared interior room reachable through a door
+## from outside or from a cleared room, not claimed by another element. Nearest by
+## path wins; a small room off the room just cleared goes first (no open door left
+## behind). Small rooms (PF10 check rooms) are looked into by someone with PF10, or
+## skipped if nobody on the team has it.
+func _next_task(tm: Dictionary, el: Dictionary) -> void:
+	_release(tm, el)
+	el["task"] = {}
+	var al := _alive(el)
 	if al.is_empty():
 		return
-	var c := Vector2.ZERO
+	var lv = w.level
+	var c := _centre(al)
+	var pf10_team := _any_has(tm, "PF10")
+	var pf10_el := false
 	for m in al:
-		c += m.pos
-	c /= al.size()
-	var key := "front" if c.x < 18.5 else "back"
-	tm["plan"] = w.level.plans[key].duplicate(true)
-	tm["step"] = 0
-	w.say("Team %s assaults through the %s door" % ["AB"[tm["id"]], key], "info")
-	_skip_steps(tm)
-	if tm["posture"] == "assault":
-		_begin_step(tm)
-
-
-func _skip_steps(tm: Dictionary) -> void:
-	while tm["step"] < tm["plan"].size():
-		var st: Dictionary = tm["plan"][tm["step"]]
-		if st.get("check", false) and not _any_has(tm, "PF10"):
-			tm["step"] += 1
+		if m.has("PF10"):
+			pf10_el = true
+	var cands: Array = []
+	var bi: int = tm.get("bldg", -1)
+	var door_ids: Array = lv.building_doors(bi) if bi >= 0 else lv.doors.keys()
+	for did in door_ids:
+		var D: Dictionary = lv.doors[did]
+		for into in [D["a"], D["b"]]:
+			if lv.is_exterior(into) or tm["cleared"].has(into) or tm["skipped"].has(into):
+				continue
+			if tm["claimed"].has(into) and tm["claimed"][into] != el["i"]:
+				continue
+			var frm: String = lv.from_room(did, into)
+			if not (lv.is_exterior(frm) or tm["cleared"].has(frm) or tm["skipped"].has(frm) or _held_hall(tm, frm)):
+				continue
+			var check: bool = lv.is_check_room(into)
+			if check and not pf10_team:
+				tm["skipped"][into] = true
+				continue
+			if check and not pf10_el:
+				continue
+			var bonus := -4.0 if (check and frm == el["last_room"]) else 0.0
+			cands.append([c.distance_to(D["c"]) + bonus, did, into, check, bonus])
+	cands.sort_custom(func(a, b): return a[0] < b[0])
+	var best = null
+	var best_s := INF
+	var start: Vector2 = w.nav.snap(c)
+	for k in mini(4, cands.size()):
+		var cd: Array = cands[k]
+		var D2: Dictionary = lv.doors[cd[1]]
+		var app: Vector2 = D2["c"] - lv.inward(cd[1], cd[2]) * 1.2
+		var pth: PackedVector2Array = w.nav.find_path(0, start, app)
+		var L: float = w.nav.path_length(pth) if not pth.is_empty() else 999.0
+		var sc: float = L + cd[4]
+		if sc < best_s:
+			best_s = sc
+			best = cd
+	if best != null:
+		el["task"] = {"door": best[1], "into": best[2], "check": best[3]}
+		tm["claimed"][best[2]] = el["i"]
+		el["mode"] = "assault"
+		_begin_task(tm, el)
+		return
+	# nothing open to this element: wait behind another element, or hunt if all clear
+	var remaining := false
+	for name in (lv.building_rooms(bi) if bi >= 0 else lv.rooms.keys()):
+		if lv.is_exterior(name) or tm["cleared"].has(name) or tm["skipped"].has(name):
 			continue
-		if tm["cleared"].has(st["into"]):
-			tm["step"] += 1
+		if lv.adj.get(name, []).is_empty():
 			continue
-		break
-	if tm["step"] >= tm["plan"].size():
-		w.say("Team %s: house clear, hunting" % "AB"[tm["id"]], "info")
-		_set_posture(tm, "hunt")
+		remaining = true
+	var others_busy := false
+	for other in tm["elements"]:
+		if other != el and not other["task"].is_empty() and not _alive(other).is_empty():
+			others_busy = true
+	if remaining and others_busy:
+		if el["mode"] != "support":
+			w.say("%s waits on the next room" % _tag(tm, el), "info")
+		el["mode"] = "support"
+		el["retask_t"] = w.t + 1.0
+		return
+	if bi >= 0:
+		# a building search: report done and wait for the next tasking
+		if not tm["clear_said"]:
+			tm["clear_said"] = true
+			tm["done_t"] = w.t
+			w.say("%s: building %s" % [tm["tag"], "clear" if not remaining else "searched (rooms out of reach)"], "info")
+		el["mode"] = "done"
+		return
+	if not tm["clear_said"]:
+		tm["clear_said"] = true
+		if remaining:
+			w.say("%s: no room left it can reach, hunting" % tm["tag"], "info")
+		else:
+			w.say("%s: building clear, hunting" % tm["tag"], "info")
+	tm["posture"] = "hunt"
+	for other in tm["elements"]:
+		if other == el or other["mode"] == "support" or (other["mode"] == "assault" and other["task"].is_empty()):
+			_set_mode(tm, other, "hunt")
 
 
-func _advance(tm: Dictionary) -> void:
-	tm["step"] += 1
-	_skip_steps(tm)
-	if tm["posture"] == "assault":
-		_begin_step(tm)
+## A corridor or stair hall that an element has entered and is clearing or sweeping is
+## held: other elements may peel off it into the rooms along it.
+func _held_hall(tm: Dictionary, name: String) -> bool:
+	if not w.level.rooms.has(name) or not w.level.rooms[name]["hall"]:
+		return false
+	var ei: int = tm["claimed"].get(name, -1)
+	if ei < 0:
+		return false
+	var el: Dictionary = tm["elements"][ei]
+	return el["phase"] == "clear" or el["phase"] == "sweep"
 
 
-func _begin_step(tm: Dictionary) -> void:
-	var st: Dictionary = tm["plan"][tm["step"]]
+func _begin_task(tm: Dictionary, el: Dictionary) -> void:
+	var st: Dictionary = el["task"]
 	var lv = w.level
 	var D: Dictionary = lv.doors[st["door"]]
 	var n_in: Vector2 = lv.inward(st["door"], st["into"])
 	var c: Vector2 = D["c"]
 	var tdir: Vector2 = D["t"]
-	tm["phase"] = "check" if st.get("check", false) else "approach"
-	tm["phase_t"] = w.t
-	tm["entry"] = {}
-	var al := alive_members(tm)
+	el["phase"] = "check" if st.get("check", false) else "approach"
+	el["phase_t"] = w.t
+	el["entry"] = {}
+	el["ctl"] = {}
+	el["sweep"] = []
+	el["sweep_target"] = null
+	var al := _alive(el)
 	al.sort_custom(func(a, b): return a.pos.distance_to(c) < b.pos.distance_to(c))
 	for i in range(al.size()):
 		if al[i].hb("BH11") and i > 0:
@@ -118,51 +306,72 @@ func _begin_step(tm: Dictionary) -> void:
 			free_neg += 1
 	if free_neg > free_pos:
 		side = -tdir
-	var slots := _stack_slots(c, n_in, side, D["half"], from_room)
-	# entry geometry inside the room
+	# entry geometry inside the room (runs are capped at 4.5 m in big rooms)
 	var inside := c + n_in * 0.7
-	var ext_p: float = lv.extent_along(inside, tdir)
-	var ext_n: float = lv.extent_along(inside, -tdir)
+	var ext_p: float = minf(lv.extent_along(inside, tdir), 4.5)
+	var ext_n: float = minf(lv.extent_along(inside, -tdir), 4.5)
 	var s1 := tdir if ext_p >= ext_n else -tdir
-	var e1 := maxf(ext_p, ext_n)
-	var e2 := minf(ext_p, ext_n)
-	var depth: float = lv.extent_along(inside, n_in)
-	var cap: int = lv.room_capacity(st["into"])
+	el["geo"] = {"c": c, "n_in": n_in, "tdir": tdir, "side": side, "from": from_room, "inside": inside,
+		"s1": s1, "e1": maxf(ext_p, ext_n), "e2": minf(ext_p, ext_n),
+		"depth": minf(lv.extent_along(inside, n_in), 4.5), "cap": lv.room_capacity(st["into"]),
+		"slots": _stack_slots(c, n_in, side, D["half"], from_room)}
 	for k in range(al.size()):
-		var m = al[k]
-		var enters: bool = k < cap
-		var d := {"order": k, "wi": 0, "at_stack": false, "ready": false, "looked": 0.0,
-			"checked": not m.has("WD04"), "arrived": false, "paused": false, "swept": false, "enters": enters}
-		var stack: Vector2
-		if m.has("GD01"):
-			stack = slots[k] if k < slots.size() else _cluster_point(c, n_in, tdir, k, from_room)
-		else:
-			stack = _cluster_point(c, n_in, tdir, k, from_room)
-		var wps: Array = []
-		if m.has("PF03"):
-			for arc_side in [-side, side]:
-				var arc: Array = []
-				for a_deg in [70.0, 45.0, 20.0]:
-					var a := deg_to_rad(a_deg)
-					var q: Vector2 = c - n_in * 2.0 * cos(a) + arc_side * 2.0 * sin(a)
-					if _near_side_ok(q, from_room) and w.geom.sight_clear(q, 1.6, c + n_in * 0.6, 1.6):
-						arc.append(q)
-				if arc.size() >= 2:
-					wps = arc
-					break
-		wps.append(stack)
-		d["wps"] = wps
-		d["stack"] = stack
-		var tgt: Array = _entry_target(m, k, c, n_in, inside, s1, e1, e2, depth)
-		var my_side: Vector2 = tgt[1]
-		d["target"] = _inside_room(w.nav.snap(tgt[0]), st["into"], c, n_in)
-		var ext := e1 if my_side == s1 else e2
-		d["corner"] = c + n_in * 0.25 + my_side * maxf(ext - 0.25, 0.3)
-		tm["entry"][m.id] = d
-	if tm["phase"] == "approach":
-		var held := al.size() - cap
-		w.say("Team %s moves on the %s%s" % ["AB"[tm["id"]], lv.rooms[st["into"]]["title"].to_lower(),
+		el["entry"][al[k].id] = _entry_record(el, al[k], k, true)
+	if el["phase"] == "approach":
+		var cap: int = el["geo"]["cap"]
+		var held: int = al.size() - cap
+		w.say("%s moves on the %s%s" % [_tag(tm, el), lv.rooms[st["into"]]["title"].to_lower(),
 			(" (%d enter, %d hold rear security)" % [cap, held]) if held > 0 else ""], "info")
+
+
+## One member's part in an entry: wait point (stack, or a loose clump without GD01),
+## optional pie-slicing arc (PF03), point of domination and corner to clear.
+func _entry_record(el: Dictionary, m, k: int, may_enter: bool) -> Dictionary:
+	var g: Dictionary = el["geo"]
+	var c: Vector2 = g["c"]
+	var n_in: Vector2 = g["n_in"]
+	var tdir: Vector2 = g["tdir"]
+	var side: Vector2 = g["side"]
+	var from_room: String = g["from"]
+	var slots: Array = g["slots"]
+	var enters: bool = may_enter and k < g["cap"]
+	var d := {"order": k, "wi": 0, "at_stack": false, "ready": false, "looked": 0.0,
+		"checked": not m.has("WD04"), "arrived": false, "paused": false, "swept": false, "enters": enters}
+	var stack: Vector2
+	if m.has("GD01"):
+		stack = slots[k] if k < slots.size() else _cluster_point(c, n_in, tdir, k, from_room)
+	else:
+		stack = _cluster_point(c, n_in, tdir, k, from_room)
+	var wps: Array = []
+	if m.has("PF03"):
+		for arc_side in [-side, side]:
+			var arc: Array = []
+			for a_deg in [70.0, 45.0, 20.0]:
+				var a := deg_to_rad(a_deg)
+				var q: Vector2 = c - n_in * 2.0 * cos(a) + arc_side * 2.0 * sin(a)
+				if _near_side_ok(q, from_room) and w.geom.sight_clear(q, 1.6, c + n_in * 0.6, 1.6):
+					arc.append(q)
+			if arc.size() >= 2:
+				wps = arc
+				break
+	wps.append(stack)
+	d["wps"] = wps
+	d["stack"] = stack
+	var tgt: Array = _entry_target(m, k, c, n_in, g["inside"], g["s1"], g["e1"], g["e2"], g["depth"])
+	var my_side: Vector2 = tgt[1]
+	d["target"] = _inside_room(w.nav.snap(tgt[0]), el["task"]["into"], c, n_in)
+	var ext: float = g["e1"] if my_side == g["s1"] else g["e2"]
+	d["corner"] = c + n_in * 0.25 + my_side * maxf(ext - 0.25, 0.3)
+	return d
+
+
+## A member who joins mid-task (from a merged element) enters if the stack has not gone
+## yet and there is room; otherwise holds rear security.
+func _add_to_entry(el: Dictionary, m) -> void:
+	if el["geo"].is_empty():
+		return
+	var k: int = el["entry"].size()
+	el["entry"][m.id] = _entry_record(el, m, k, el["phase"] == "approach" or el["phase"] == "check")
 
 
 ## Stack positions along the wall beside the door: up to five on the near wall, then a
@@ -238,35 +447,101 @@ func _near_side_ok(q: Vector2, from_room: String) -> bool:
 	if not w.nav.is_free(q):
 		return false
 	var rm: String = w.level.room_at(q)
-	if from_room == "OUT":
-		return rm == "OUT" or rm == "PORCH"
+	if w.level.is_exterior(from_room):
+		return w.level.is_exterior(rm)
 	return rm == from_room
 
 
 func update_teams() -> void:
 	tick += 1
 	for tm in w.teams:
+		if tm["free"] or tm["sleep"]:
+			continue
+		if w.dormancy and not tm.get("hot", true) and (tick + tm["id"]) % 4 != 0:
+			continue
 		var al := alive_members(tm)
 		if al.is_empty():
 			continue
-		_sectors(tm, al)
-		_bounding(tm, al)
-		match tm["posture"]:
-			"assault":
-				_assault_tick(tm, al)
-			"hold":
-				var quiet: float = w.t - maxf(tm["last_contact"], 0.0)
-				if quiet > 60.0:
-					w.say("Team %s: no contact for a minute, hunting" % "AB"[tm["id"]], "info")
-					_set_posture(tm, "hunt")
+		_merge_elements(tm)
+		for el in tm["elements"]:
+			var eal := _alive(el)
+			if eal.is_empty():
+				continue
+			_sectors(el, eal)
+			_bounding(el, eal)
+			match el["mode"]:
+				"assault":
+					_assault_tick(tm, el, eal)
+				"support":
+					if w.t >= el["retask_t"]:
+						el["retask_t"] = w.t + 1.0
+						_next_task(tm, el)
+		if tm["posture"] == "hold" and not tm.get("stay", false):
+			var quiet: float = w.t - maxf(tm["last_contact"], 0.0)
+			if quiet > 60.0:
+				w.say("%s: no contact for a minute, hunting" % tm["tag"], "info")
+				_set_posture(tm, "hunt")
 
 
-## GD02 sector ownership for any team size. Moving teams split the arc around their
-## direction of advance (110 deg each for two or three, 360/N for four or five), left to
-## right by position. Holders own the arc they were placed facing. After a casualty,
-## GD09 members re-sector within 1 s; anyone without GD09 keeps the old arcs, so the
-## casualty's arc stays dark.
-func _sectors(tm: Dictionary, al: Array) -> void:
+## An element cut down to one joins the nearest element that still has people; an
+## element wiped out releases the room it had claimed.
+func _merge_elements(tm: Dictionary) -> void:
+	var els: Array = tm["elements"]
+	if els.size() < 2:
+		return
+	for el in els:
+		var al := _alive(el)
+		if al.is_empty():
+			if el["mode"] == "lost":
+				continue
+			if not el["task"].is_empty():
+				_release(tm, el)
+				el["task"] = {}
+			_release_hold(tm, el)
+			el["mode"] = "lost"
+			continue
+		if al.size() != 1:
+			continue
+		var lone = al[0]
+		var best = null
+		var bd := INF
+		for other in els:
+			if other == el:
+				continue
+			var oal := _alive(other)
+			if oal.is_empty():
+				continue
+			var d: float = _centre(oal).distance_to(lone.pos) + (25.0 if oal.size() >= 5 else 0.0)
+			if d < bd:
+				bd = d
+				best = other
+		if best == null:
+			continue
+		_release(tm, el)
+		_release_hold(tm, el)
+		el["task"] = {}
+		el["mode"] = "merged"
+		el["members"].erase(lone)
+		var top := -1
+		for m in best["members"]:
+			top = maxi(top, m.eslot)
+		lone.el = best["i"]
+		lone.eslot = top + 1
+		best["members"].append(lone)
+		best["sector_key"] = "?"
+		w.say("%s, last of %s, joins %s" % [lone.id, _tag(tm, el), _tag(tm, best)], "comms")
+		if best["mode"] == "assault" and not best["task"].is_empty():
+			_add_to_entry(best, lone)
+		elif best["mode"] == "hold" and best.get("hold_room", "") != "":
+			_post_member(best, lone, {})
+
+
+## GD02 sector ownership for any element size. Moving elements split the arc around
+## their direction of advance (110 deg each for two or three, 360/N for four or five),
+## left to right by position. Holders own the arc they were placed facing. After a
+## casualty, GD09 members re-sector within 1 s; anyone without GD09 keeps the old arcs,
+## so the casualty's arc stays dark.
+func _sectors(el: Dictionary, al: Array) -> void:
 	var gd2: Array = []
 	for m in al:
 		if m.has("GD02"):
@@ -274,23 +549,23 @@ func _sectors(tm: Dictionary, al: Array) -> void:
 	var key := ""
 	for m in gd2:
 		key += m.id
-	var fwd := _team_forward(tm, al)
-	var holding: bool = tm["posture"] == "hold"
-	var first: bool = not tm.has("sector_key") or tm.get("sector_posture", "") != tm["posture"]
-	if not holding and not first and absf(angle_difference(fwd, tm["sector_fwd"])) > 0.3:
+	var fwd := _team_forward(el, al)
+	var holding: bool = el["mode"] == "hold"
+	var first: bool = not el.has("sector_key") or el.get("sector_posture", "") != el["mode"]
+	if not holding and not first and absf(angle_difference(fwd, el["sector_fwd"])) > 0.3:
 		first = true
-	if key == tm.get("sector_key", "") and not first:
-		_adopt_sectors(tm)
+	if key == el.get("sector_key", "") and not first:
+		_adopt_sectors(el)
 		return
-	var layout := _sector_layout(tm, gd2, fwd)
+	var layout := _sector_layout(el, gd2, fwd)
 	if first:
-		tm["sectors"] = layout
-		tm["sector_pending"] = {}
+		el["sectors"] = layout
+		el["sector_pending"] = {}
 	else:
 		var pend := {}
 		if holding:
-			for x in tm["members"]:
-				if x.alive() or not tm["sectors"].has(x.id):
+			for x in el["members"]:
+				if x.alive() or not el["sectors"].has(x.id):
 					continue
 				var best = null
 				for m in al:
@@ -298,29 +573,29 @@ func _sectors(tm: Dictionary, al: Array) -> void:
 						if best == null or m.pos.distance_to(x.pos) < best.pos.distance_to(x.pos):
 							best = m
 				if best != null:
-					var own: float = tm["sectors"].get(best.id, best.spawn_face)
-					pend[best.id] = {"dir": lerp_angle(own, tm["sectors"][x.id], 0.5), "at": w.t + 1.0}
+					var own: float = el["sectors"].get(best.id, best.spawn_face)
+					pend[best.id] = {"dir": lerp_angle(own, el["sectors"][x.id], 0.5), "at": w.t + 1.0}
 		else:
 			for m in al:
 				if m.has("GD09"):
 					pend[m.id] = {"dir": layout.get(m.id, null), "at": w.t + 1.0}
-		tm["sector_pending"] = pend
-	for oid in tm["sectors"].keys():
+		el["sector_pending"] = pend
+	for oid in el["sectors"].keys():
 		var x = w.op_by_id(oid)
 		if x == null or not x.alive():
-			tm["sectors"].erase(oid)
-	tm["sector_key"] = key
-	tm["sector_fwd"] = fwd
-	tm["sector_posture"] = tm["posture"]
+			el["sectors"].erase(oid)
+	el["sector_key"] = key
+	el["sector_fwd"] = fwd
+	el["sector_posture"] = el["mode"]
 
 
-func _sector_layout(tm: Dictionary, members: Array, fwd: float) -> Dictionary:
+func _sector_layout(el: Dictionary, members: Array, fwd: float) -> Dictionary:
 	var out := {}
 	var n := members.size()
-	if tm["posture"] == "hold":
+	if el["mode"] == "hold":
 		for m in members:
 			out[m.id] = m.spawn_face
-		tm["sector_half"] = deg_to_rad(80.0)
+		el["sector_half"] = deg_to_rad(80.0)
 		return out
 	if n < 2:
 		return out
@@ -332,14 +607,14 @@ func _sector_layout(tm: Dictionary, members: Array, fwd: float) -> Dictionary:
 	var sorted := members.duplicate()
 	sorted.sort_custom(func(a, b): return f.cross(a.pos - c) < f.cross(b.pos - c))
 	var spacing := minf(deg_to_rad(110.0), TAU / n)
-	tm["sector_half"] = clampf(spacing / 2.0 + deg_to_rad(15.0), deg_to_rad(50.0), deg_to_rad(80.0))
+	el["sector_half"] = clampf(spacing / 2.0 + deg_to_rad(15.0), deg_to_rad(50.0), deg_to_rad(80.0))
 	for i in n:
 		out[sorted[i].id] = fwd + (i - (n - 1) / 2.0) * spacing
 	return out
 
 
-func _adopt_sectors(tm: Dictionary) -> void:
-	var pend: Dictionary = tm["sector_pending"]
+func _adopt_sectors(el: Dictionary) -> void:
+	var pend: Dictionary = el["sector_pending"]
 	for oid in pend.keys():
 		var p: Dictionary = pend[oid]
 		if w.t < p["at"]:
@@ -349,52 +624,51 @@ func _adopt_sectors(tm: Dictionary) -> void:
 		if x == null or not x.alive():
 			continue
 		if p["dir"] == null:
-			tm["sectors"].erase(oid)
+			el["sectors"].erase(oid)
 		else:
-			tm["sectors"][oid] = p["dir"]
+			el["sectors"][oid] = p["dir"]
 		w.say("%s re-sectors after the casualty" % oid, "comms")
 
 
-func _team_forward(tm: Dictionary, al: Array) -> float:
-	if tm["posture"] == "assault" and tm["step"] < tm["plan"].size():
-		var st: Dictionary = tm["plan"][tm["step"]]
-		return w.level.inward(st["door"], st["into"]).angle()
+func _team_forward(el: Dictionary, al: Array) -> float:
+	if el["mode"] == "assault" and not el["task"].is_empty():
+		return w.level.inward(el["task"]["door"], el["task"]["into"]).angle()
 	var v := Vector2.ZERO
 	for m in al:
-		v += Vector2.from_angle(m.spawn_face if tm["posture"] == "hold" else m.body_dir)
+		v += Vector2.from_angle(m.spawn_face if el["mode"] == "hold" else m.body_dir)
 	return v.angle()
 
 
-## GD05 bounding overwatch by elements: odd slots (1, 3, 5) and even slots (2, 4)
-## alternate. One element moves while the other is static and covering.
-func _bounding(tm: Dictionary, al: Array) -> void:
+## GD05 bounding overwatch inside each element: odd slots (1, 3, 5) and even slots (2, 4)
+## alternate. One half moves while the other is static and covering.
+func _bounding(el: Dictionary, al: Array) -> void:
 	var movers: Array = [[], []]
 	for m in al:
-		if m.has("GD05") and w.level.room_at(m.pos) in ["OUT", "PORCH"]:
-			movers[m.slot % 2].append(m)
-	var phase_ok: bool = tm["posture"] == "hunt" or (tm["posture"] == "assault" and tm["phase"] == "approach")
+		if m.has("GD05") and w.level.is_exterior(w.level.room_at(m.pos)):
+			movers[m.eslot % 2].append(m)
+	var phase_ok: bool = el["mode"] == "hunt" or el["mode"] == "support" or (el["mode"] == "assault" and el["phase"] == "approach")
 	if movers[0].is_empty() or movers[1].is_empty() or not phase_ok:
-		tm["bound"] = -1
+		el["bound"] = -1
 		return
-	var cur: int = tm["bound"]
+	var cur: int = el["bound"]
 	if cur < 0:
-		tm["bound"] = 0
-		tm["bound_from"] = _centre(movers[0])
-		tm["bound_t"] = w.t
+		el["bound"] = 0
+		el["bound_from"] = _centre(movers[0])
+		el["bound_t"] = w.t
 		return
-	var el: Array = movers[cur]
+	var grp: Array = movers[cur]
 	var any_moving := false
-	for m in el:
+	for m in grp:
 		if m.moving:
 			any_moving = true
-	var done: bool = _centre(el).distance_to(tm["bound_from"]) > 4.5 or w.t - tm["bound_t"] > 4.0
-	if w.t - tm["bound_t"] > 0.8 and not any_moving:
+	var done: bool = _centre(grp).distance_to(el["bound_from"]) > 4.5 or w.t - el["bound_t"] > 4.0
+	if w.t - el["bound_t"] > 0.8 and not any_moving:
 		done = true
 	if done:
 		var nxt := 1 - cur
-		tm["bound"] = nxt
-		tm["bound_from"] = _centre(movers[nxt])
-		tm["bound_t"] = w.t
+		el["bound"] = nxt
+		el["bound_from"] = _centre(movers[nxt])
+		el["bound_t"] = w.t
 
 
 func _centre(ms: Array) -> Vector2:
@@ -404,23 +678,34 @@ func _centre(ms: Array) -> Vector2:
 	return c / maxf(1.0, ms.size())
 
 
-func _assault_tick(tm: Dictionary, al: Array) -> void:
-	if tm["step"] >= tm["plan"].size():
+func _room_done(tm: Dictionary, el: Dictionary, what: String) -> void:
+	var into: String = el["task"]["into"]
+	tm["cleared"][into] = true
+	w.say("%s: %s %s" % [_tag(tm, el), w.level.rooms[into]["title"].to_lower(), what], "info")
+	el["last_room"] = into
+	_next_task(tm, el)
+
+
+func _assault_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
+	if el["task"].is_empty():
+		if w.t >= el["retask_t"]:
+			el["retask_t"] = w.t + 1.0
+			_next_task(tm, el)
 		return
-	var st: Dictionary = tm["plan"][tm["step"]]
-	var entry: Dictionary = tm["entry"]
+	var st: Dictionary = el["task"]
+	var entry: Dictionary = el["entry"]
+	var ctl: Dictionary = el["ctl"]
 	for m in al:
 		if not entry.has(m.id):
-			_begin_step(tm)
-			return
-	match tm["phase"]:
+			_add_to_entry(el, m)
+	match el["phase"]:
 		"check":
-			if entry.has("check_done_t") and w.t >= entry["check_done_t"]:
-				tm["cleared"][st["into"]] = true
-				w.say("Team %s: bathroom checked" % "AB"[tm["id"]], "info")
-				_advance(tm)
-			elif w.t - tm["phase_t"] > 12.0:
-				_advance(tm)
+			if ctl.has("check_done_t") and w.t >= ctl["check_done_t"]:
+				_room_done(tm, el, "checked")
+			elif w.t - el["phase_t"] > 12.0:
+				el["last_room"] = st["into"]
+				tm["skipped"][st["into"]] = true
+				_next_task(tm, el)
 		"approach":
 			var all_ready := true
 			var any_ready := false
@@ -440,39 +725,96 @@ func _assault_tick(tm: Dictionary, al: Array) -> void:
 			if rusher:
 				go = true
 			elif all_gd01 and al.size() > 1:
-				go = all_ready or (any_ready and w.t - entry.get("first_ready_t", w.t) > 6.0)
+				go = all_ready or (any_ready and w.t - ctl.get("first_ready_t", w.t) > 6.0)
 			else:
 				go = any_ready
-			if w.t - tm["phase_t"] > 45.0:
+			if w.t - el["phase_t"] > 45.0:
 				go = true
 			if go:
-				tm["phase"] = "entry"
-				tm["phase_t"] = w.t
-				w.say("Team %s enters the %s" % ["AB"[tm["id"]], w.level.rooms[st["into"]]["title"].to_lower()], "info")
+				el["phase"] = "entry"
+				el["phase_t"] = w.t
+				w.say("%s enters the %s" % [_tag(tm, el), w.level.rooms[st["into"]]["title"].to_lower()], "info")
 		"entry":
 			var done := true
 			for m in al:
 				if entry[m.id]["enters"] and not entry[m.id]["arrived"]:
 					done = false
-			if done or w.t - tm["phase_t"] > 9.0:
-				tm["phase"] = "clear"
-				tm["phase_t"] = w.t
+			if done or w.t - el["phase_t"] > 9.0:
+				el["phase"] = "clear"
+				el["phase_t"] = w.t
 		"clear":
 			var quiet := true
 			for m in al:
 				if not w.visible_enemies(m).is_empty():
 					quiet = false
-			if quiet and w.t - tm["phase_t"] > 1.2:
-				tm["cleared"][st["into"]] = true
-				w.say("Team %s: %s clear" % ["AB"[tm["id"]], w.level.rooms[st["into"]]["title"].to_lower()], "info")
-				_advance(tm)
+			if quiet and w.t - el["phase_t"] > 1.2:
+				if w.level.needs_sweep(st["into"]):
+					el["phase"] = "sweep"
+					el["phase_t"] = w.t
+					el["sweep"] = _sweep_points(st["into"])
+					w.say("%s sweeps the %s" % [_tag(tm, el), w.level.rooms[st["into"]]["title"].to_lower()], "info")
+				else:
+					_room_done(tm, el, "clear")
+		"sweep":
+			if tick % 15 == 0:
+				_prune_sweep(el, al)
+			if el["sweep"].is_empty() or w.t - el["phase_t"] > 120.0:
+				_room_done(tm, el, "clear")
 
+
+## Big rooms are swept: a lattice of points about 5 m apart that each must be seen from
+## within 12 m by someone in the element before the room counts as clear.
+func _sweep_points(into: String) -> Array:
+	var pts: Array = []
+	for rv in w.level.rooms[into]["rects"]:
+		var r: Rect2 = rv
+		var nx := maxi(1, int(round(r.size.x / 5.0)))
+		var ny := maxi(1, int(round(r.size.y / 5.0)))
+		for i in nx:
+			for j in ny:
+				var p := r.position + Vector2((i + 0.5) * r.size.x / nx, (j + 0.5) * r.size.y / ny)
+				var q: Vector2 = w.nav.snap(p)
+				if w.level.room_at(q) == into:
+					pts.append(q)
+	return pts
+
+
+func _prune_sweep(el: Dictionary, al: Array) -> void:
+	var keep: Array = []
+	for p in el["sweep"]:
+		var seen := false
+		for m in al:
+			if m.pos.distance_to(p) < 12.0 and w.geom.sight_clear(m.pos, m.eye(), p, 1.0):
+				seen = true
+				break
+		if not seen:
+			keep.append(p)
+	el["sweep"] = keep
+	var tg = el["sweep_target"]
+	if tg != null and not keep.has(tg):
+		el["sweep_target"] = null
 
 # ================================================================== individual
+var fine := false   # fine-grained profiling into w.prof
+
+
 func think(o) -> void:
+	if not fine:
+		_think(o)
+		return
+	var t0 := Time.get_ticks_usec()
+	var tm0: Dictionary = w.teams[o.team]
+	var md: String = tm0["elements"][o.el]["mode"] if o.el >= 0 and o.el < tm0["elements"].size() else "?"
+	_think(o)
+	var k: String = "th_" + md + ("_" + o.dbg.split(" ")[0] if o.dbg != "" else "")
+	w.prof[k] = w.prof.get(k, 0) + Time.get_ticks_usec() - t0
+
+
+func _think(o) -> void:
 	o.dbg = ""
 	o.stance_goal = Op.STAND if not o.leg_hit or o.stance_goal != Op.CROUCH else Op.CROUCH
 	var tm: Dictionary = w.teams[o.team]
+	var el: Dictionary = tm["elements"][o.el]
 	# PF09: keep a fallback cover point cached while threats are known
 	if o.has("PF09") and w.t >= o.ticker.get("cover_next", 0.0):
 		o.ticker["cover_next"] = w.t + 0.5
@@ -514,6 +856,17 @@ func think(o) -> void:
 	if close != null:
 		_rule1(o, close)
 		return
+	# retreat (city): a gang member who broke on seeing the police runs for safety
+	var rt: Dictionary = o.ticker.get("retreat", {})
+	if not rt.is_empty():
+		if w.t > rt["until"] or w.at(o, rt["p"], 1.5):
+			o.ticker.erase("retreat")
+		else:
+			o.dbg = "RETREATING"
+			o.aim = {}
+			w.move_to(o, rt["p"], "sprint")
+			_finish_look(o)
+			return
 	# P2: Rule 2
 	var s: Dictionary = o.ws()
 	if s["mag"] <= 0 or s["lost"]:
@@ -552,13 +905,20 @@ func think(o) -> void:
 		_finish_look(o)
 		return
 	# P7 task
-	match tm["posture"]:
+	match el["mode"]:
 		"assault":
-			_task_assault(o, tm)
+			_task_assault(o, tm, el)
 		"hold":
 			_task_hold(o)
 		"hunt":
-			_task_hunt(o, tm)
+			_task_hunt(o, tm, el)
+		"support":
+			_task_support(o, tm, el)
+		"transit":
+			_task_transit(o, el)
+		_:
+			w.stop(o)
+			o.dbg = "waiting"
 	_finish_look(o)
 
 
@@ -568,9 +928,7 @@ func _close_threat(o):
 	var best_d := 10.0001
 	var cur: String = o.aim.get("tid", "")
 	var cur_d := INF
-	for e in w.enemies_of(o):
-		if not w.visible(o, e):
-			continue
+	for e in w.visible_tracked(o):
 		if not e.alive():
 			var until: float = o.ticker.get("confirm_" + e.id, -1.0)
 			if until < 0.0 and cur == e.id:
@@ -763,15 +1121,23 @@ func _stoppage(o) -> void:
 	_clear(o)
 
 
+## Positions of the threats an operator knows about: seen now, or last seen within 15 s.
+## Only the nearest five within 40 m count (cover is chosen against what matters).
 func _threats(o) -> Array:
 	var out: Array = []
-	for e in w.enemies_of(o):
-		if not e.alive():
+	for eid in o.lkp:
+		var e = w.by_id.get(eid, null)
+		if e == null or not e.alive():
 			continue
 		if w.visible(o, e):
 			out.append(e.pos)
-		elif o.lkp.has(e.id) and w.t - o.lkp[e.id]["t"] < 15.0:
-			out.append(o.lkp[e.id]["p"])
+		elif w.t - o.lkp[eid]["t"] < 15.0:
+			out.append(o.lkp[eid]["p"])
+	if out.size() > 1:
+		out = out.filter(func(p): return o.pos.distance_to(p) <= 40.0)
+		if out.size() > 5:
+			out.sort_custom(func(a, b): return o.pos.distance_squared_to(a) < o.pos.distance_squared_to(b))
+			out.resize(5)
 	return out
 
 
@@ -843,8 +1209,9 @@ func _route_exposure(a: Vector2, b: Vector2, threats: Array) -> float:
 func _jumpy(o) -> bool:
 	if not o.usable(o.active) or not o.action.is_empty():
 		return false
-	for e in w.enemies_of(o):
-		if not e.alive() or w.visible(o, e):
+	for eid in o.vis:
+		var e = w.by_id.get(eid, null)
+		if e == null or not e.alive() or w.visible(o, e) or not w.hostile(o, e):
 			continue
 		var p: float = o.rec.get(e.id, 0.0)
 		if p >= 0.5 and o.vis.get(e.id, {}).get("los", false) and o.pos.distance_to(e.pos) <= 10.0 and e.vel.length() > 0.3:
@@ -853,7 +1220,7 @@ func _jumpy(o) -> bool:
 			w.stop(o)
 			w.engage(o, e, "chest", true)
 			return true
-	for m in w.mates_of(o):
+	for m in w.mates_near(o, 4.0):
 		var d: Vector2 = m.pos - o.pos
 		if d.length() < 4.0 and m.vel.length() > 0.5 and absf(angle_difference(o.look_dir, d.angle())) < deg_to_rad(40.0):
 			if w.rng.randf() < 0.05 * DT and o.ws()["mag"] > 0:
@@ -1024,7 +1391,7 @@ func _react(o, tm: Dictionary) -> bool:
 		return true
 	if o.hb("BH15"):
 		var tl = _team_lkp(tm, 15.0, o.pos)
-		if tl != null and o.pos.distance_to(tl) > 1.5:
+		if tl != null and o.pos.distance_to(tl) > 1.5 and not _stuck_on(o, tl):
 			o.dbg = "lone wolf push"
 			w.move_to(o, tl, "walk")
 			return true
@@ -1033,10 +1400,11 @@ func _react(o, tm: Dictionary) -> bool:
 
 func _latest_lkp(o):
 	var best = null
-	for e in w.enemies_of(o):
-		if not e.alive() or not o.lkp.has(e.id):
+	for eid in o.lkp:
+		var e2 = w.by_id.get(eid, null)
+		if e2 == null or not e2.alive():
 			continue
-		var l: Dictionary = o.lkp[e.id]
+		var l: Dictionary = o.lkp[eid]
 		if best == null or l["t"] > best["t"]:
 			best = l
 	return best
@@ -1062,7 +1430,6 @@ func _maintain(o) -> bool:
 		o.dbg = o.action["type"]
 		return true
 	var lull: float = w.t - o.last_enemy_seen_t
-	var threats := _threats(o)
 	var s: Dictionary = o.ws()
 	var cap: int = o.wpn()["mag"]
 	var want := ""
@@ -1079,6 +1446,7 @@ func _maintain(o) -> bool:
 		want = o.active
 	if want == "":
 		return false
+	var threats := _threats(o)
 	if o.has("WD03") and not threats.is_empty() and not _hidden(o.pos, threats, 0.82):
 		o.dbg = "to cover to reload"
 		_seek_cover(o, threats)
@@ -1090,9 +1458,9 @@ func _maintain(o) -> bool:
 
 # ------------------------------------------------------------------ P7 tasks
 func _go(o, p: Vector2, mode: String, group := true) -> void:
-	var tm: Dictionary = w.teams[o.team]
-	var mates: Array = w.mates_of(o)
-	var outside: bool = o.room == "OUT" or o.room == "PORCH"
+	var el := _el(o)
+	var mates: Array = _el_mates(o)
+	var outside: bool = w.level.is_exterior(o.room)
 	if group and not mates.is_empty():
 		var near = mates[0]
 		for m in mates:
@@ -1102,7 +1470,7 @@ func _go(o, p: Vector2, mode: String, group := true) -> void:
 			o.dbg = "waiting (tether)"
 			w.stop(o)
 			return
-		if tm["bound"] >= 0 and o.slot % 2 != tm["bound"] and outside and o.has("GD05"):
+		if el["bound"] >= 0 and o.eslot % 2 != el["bound"] and outside and o.has("GD05"):
 			o.dbg = "overwatch"
 			w.stop(o)
 			_task_look(o, (p - o.pos).angle())
@@ -1111,11 +1479,11 @@ func _go(o, p: Vector2, mode: String, group := true) -> void:
 			p = near.pos + (o.pos - near.pos).limit_length(0.8)
 		elif o.has("GD07"):
 			var ahead: Vector2 = near.pos - o.pos
-			if ahead.length() < 1.5 and ahead.dot(p - o.pos) > 0.0 and near.moving:
+			if ahead.length() < 1.5 and ahead.dot(p - o.pos) > 0.0 and near.vel.length() > 0.2:
 				o.dbg = "keeping spacing"
 				w.stop(o)
 				return
-		if o.has("GD03") and _in_line_of_fire(o, mates):
+		if o.has("GD03") and _in_line_of_fire(o, w.mates_near(o, 7.0)):
 			if o.ticker.get("gd03_wait", -1.0) < 0.0:
 				o.ticker["gd03_wait"] = w.t
 			if w.t - o.ticker["gd03_wait"] < 1.0:
@@ -1167,9 +1535,8 @@ func _open_ground(o) -> bool:
 
 
 func _near_window(p: Vector2) -> bool:
-	for win in w.level.windows:
-		var r: Rect2 = win["r"]
-		if r.get_center().distance_to(p) < 1.4 and not w.level.is_inside(p):
+	for i in w.level.openings_near(p, 1.4):
+		if w.level.openings[i]["kind"] == "window" and not w.level.is_inside(p):
 			return true
 	return false
 
@@ -1179,36 +1546,38 @@ func _task_look(o, dir: float) -> void:
 	o.ticker["task_look_tick"] = tick
 
 
-func _task_assault(o, tm: Dictionary) -> void:
-	if tm["step"] >= tm["plan"].size():
+func _task_assault(o, tm: Dictionary, el: Dictionary) -> void:
+	if el["task"].is_empty():
+		w.stop(o)
 		return
-	var st: Dictionary = tm["plan"][tm["step"]]
+	var st: Dictionary = el["task"]
 	var D: Dictionary = w.level.doors[st["door"]]
 	var c: Vector2 = D["c"]
 	var n_in: Vector2 = w.level.inward(st["door"], st["into"])
-	var entry: Dictionary = tm["entry"]
+	var entry: Dictionary = el["entry"]
+	var ctl: Dictionary = el["ctl"]
 	if not entry.has(o.id):
 		return
 	var d: Dictionary = entry[o.id]
-	match tm["phase"]:
+	match el["phase"]:
 		"check":
-			if not entry.has("checker"):
+			if not ctl.has("checker"):
 				var best = null
-				for m in alive_members(tm):
+				for m in _alive(el):
 					if m.has("PF10") and (best == null or m.pos.distance_to(c) < best.pos.distance_to(c)):
 						best = m
-				entry["checker"] = best.id if best != null else ""
-			if entry["checker"] == o.id:
+				ctl["checker"] = best.id if best != null else ""
+			if ctl["checker"] == o.id:
 				var cp: Vector2 = w.nav.snap(c - n_in * 1.1 + D["t"] * 0.35)
-				o.dbg = "checking the bathroom"
+				o.dbg = "checking the " + w.level.rooms[st["into"]]["title"].to_lower()
 				if not w.at(o, cp, 0.3):
 					_go(o, cp, "clear", false)
 					_task_look(o, (c - o.pos).angle())
 				else:
 					w.stop(o)
 					_task_look(o, (c + n_in * 1.6 - o.pos).angle())
-					if not entry.has("check_done_t"):
-						entry["check_done_t"] = w.t + 1.0
+					if not ctl.has("check_done_t"):
+						ctl["check_done_t"] = w.t + 1.0
 			else:
 				o.dbg = "covering the check"
 				w.stop(o)
@@ -1245,9 +1614,11 @@ func _task_assault(o, tm: Dictionary) -> void:
 					if absf(angle_difference(o.look_dir, look_in)) < 0.3:
 						d["looked"] += DT
 				d["ready"] = d["checked"] and o.action.is_empty() and (not o.has("ED10") or d["looked"] >= 0.5)
-				if d["ready"] and not entry.has("first_ready_t"):
-					entry["first_ready_t"] = w.t
+				if d["ready"] and not ctl.has("first_ready_t"):
+					ctl["first_ready_t"] = w.t
 				o.dbg = "stacked" if o.has("GD01") else "waiting at the door"
+		"sweep":
+			_task_sweep(o, el)
 		"entry", "clear":
 			if not d["enters"]:
 				var sp: Vector2 = d["stack"]
@@ -1264,7 +1635,7 @@ func _task_assault(o, tm: Dictionary) -> void:
 			if d["order"] > 0:
 				var lead = null
 				var lead_order := -1
-				for m in alive_members(tm):
+				for m in _alive(el):
 					if entry.has(m.id) and entry[m.id]["enters"] and entry[m.id]["order"] < d["order"] and entry[m.id]["order"] > lead_order:
 						lead = m
 						lead_order = entry[m.id]["order"]
@@ -1309,11 +1680,20 @@ func _task_assault(o, tm: Dictionary) -> void:
 				elif o.has("ED03") and since < 0.9:
 					_task_look(o, (d["corner"] - o.pos).angle())
 					o.dbg = "hard corner"
-				elif since < 2.5 and tm["phase"] == "entry":
+				elif since < 2.5 and el["phase"] == "entry":
 					_task_look(o, (w.level.rooms[st["into"]]["label"] - o.pos).angle())
 
 
 func _task_hold(o) -> void:
+	var inv: Dictionary = o.ticker.get("investigate", {})
+	if not inv.is_empty():
+		if w.t > inv["until"] or w.at(o, inv["p"], 1.5):
+			o.ticker.erase("investigate")
+		else:
+			o.dbg = "going after a sound"
+			_go(o, inv["p"], "walk", false)
+			_task_look(o, (inv["p"] - o.pos).angle())
+			return
 	if not w.at(o, o.spawn, 0.6):
 		_go(o, o.spawn, "walk", false)
 		o.dbg = "returning to post"
@@ -1322,9 +1702,26 @@ func _task_hold(o) -> void:
 		o.dbg = "holding"
 
 
-func _task_hunt(o, tm: Dictionary) -> void:
+## Progress watchdog for operators who should be closing on a point: true once they have
+## gained less than 0.4 m on it for 8 s (blocked, unreachable, or circling), so the
+## caller can give the point up.
+func _stuck_on(o, p: Vector2) -> bool:
+	var key := p.snapped(Vector2(0.5, 0.5))
+	var d: float = o.pos.distance_to(p)
+	var g: Dictionary = o.ticker.get("prog", {})
+	if g.get("key", Vector2.INF) != key:
+		o.ticker["prog"] = {"key": key, "best": d, "t": w.t}
+		return false
+	if d < g["best"] - 0.4:
+		g["best"] = d
+		g["t"] = w.t
+		return false
+	return w.t - g["t"] > 8.0
+
+
+func _task_hunt(o, tm: Dictionary, el: Dictionary) -> void:
 	var target = null
-	var best_t: float = tm.get("hunt_done_t", -1.0)
+	var best_t: float = el["hunt_done_t"]
 	var lk = _latest_lkp(o)
 	if lk != null and lk["t"] > best_t:
 		target = lk["p"]
@@ -1338,16 +1735,19 @@ func _task_hunt(o, tm: Dictionary) -> void:
 	var snd: Dictionary = tm["sound"]
 	if not snd.is_empty() and snd["t"] > best_t and w.t - snd["t"] < 40.0:
 		target = snd["p"]
-	var al := alive_members(tm)
-	al.sort_custom(func(a, b): return a.slot < b.slot)
+	var al := _alive(el)
+	al.sort_custom(func(a, b): return a.eslot < b.eslot)
 	var k := al.find(o)
 	if target == null:
-		var pts: Array = w.level.patrol
-		target = pts[tm.get("hunt_i", 0) % pts.size()]
-		if k == 0 and w.at(o, target, 1.2):
-			tm["hunt_i"] = tm.get("hunt_i", 0) + 1
-	elif k == 0 and w.at(o, target, 1.5):
-		tm["hunt_done_t"] = w.t
+		var pts: Array = tm.get("patrol", w.level.patrol)
+		if pts.is_empty():
+			w.stop(o)
+			return
+		target = pts[el["hunt_i"] % pts.size()]
+		if k == 0 and (w.at(o, target, 1.2) or _stuck_on(o, target)):
+			el["hunt_i"] += 1
+	elif k == 0 and (w.at(o, target, 1.5) or _stuck_on(o, target)):
+		el["hunt_done_t"] = w.t
 	o.dbg = "hunting"
 	if k > 0:
 		# followers take wedge slots behind the leader's objective: 1.5 m apart with GD07,
@@ -1368,6 +1768,15 @@ func _task_hunt(o, tm: Dictionary) -> void:
 
 # ------------------------------------------------------------------ P8 eyes
 func _finish_look(o) -> void:
+	if fine:
+		var t0 := Time.get_ticks_usec()
+		_finish_look2(o)
+		w.prof["look"] = w.prof.get("look", 0) + Time.get_ticks_usec() - t0
+		return
+	_finish_look2(o)
+
+
+func _finish_look2(o) -> void:
 	var tm: Dictionary = w.teams[o.team]
 	if o.hb("BH04"):
 		var lk = _latest_lkp(o)
@@ -1398,8 +1807,8 @@ func _finish_look(o) -> void:
 		o.ticker["salient_next"] = w.t + 2.0
 		var best = null
 		var bd := INF
-		for op in w.level.openings:
-			var p: Vector2 = op["c"]
+		for oi in w.level.openings_near(o.pos, 15.0):
+			var p: Vector2 = w.level.openings[oi]["c"]
 			var d: float = o.pos.distance_to(p)
 			if d > 0.8 and d < bd and w.geom.sight_clear(o.pos, o.eye(), p, 1.2):
 				bd = d
@@ -1409,11 +1818,11 @@ func _finish_look(o) -> void:
 	if sal != null:
 		o.look_goal = (sal - o.pos).angle()
 	else:
-		o.look_goal = o.spawn_face if tm["posture"] == "hold" else o.look_goal
+		o.look_goal = o.spawn_face if _el(o)["mode"] == "hold" else o.look_goal
 
 
 func _is_rear(o) -> bool:
-	var mates: Array = w.mates_of(o)
+	var mates: Array = _el_mates(o)
 	if mates.is_empty():
 		return false
 	var dir: Vector2 = o.vel.normalized()
@@ -1424,28 +1833,27 @@ func _is_rear(o) -> bool:
 
 
 func _scan(o, tm: Dictionary) -> void:
-	var sector = tm["sectors"].get(o.id, null)
-	var half: float = tm["sector_half"]
+	var el := _el(o)
+	var sector = el["sectors"].get(o.id, null)
+	var half: float = el["sector_half"]
 	if w.t < o.ticker.get("scan_next", 0.0):
 		if sector != null and absf(angle_difference(o.look_goal, sector)) > half:
 			o.look_goal = sector
 		return
 	o.ticker["scan_next"] = w.t + w.rng.randf_range(0.9, 1.5)
 	var cands: Array = []
-	var i := 0
-	for op in w.level.openings:
+	for i in w.level.openings_near(o.pos, 24.0):
+		var op: Dictionary = w.level.openings[i]
 		var wt := 2.5
 		if op["kind"] == "door":
 			var D: Dictionary = w.level.doors[op["id"]]
-			if tm["posture"] == "assault" and tm["cleared"].has(D["a"]) and tm["cleared"].has(D["b"]):
+			if el["mode"] == "assault" and _cleared_side(tm, D["a"]) and _cleared_side(tm, D["b"]):
 				wt = 1.0
 			else:
 				wt = 3.0
 		cands.append({"p": op["c"], "w": wt, "k": "o%d" % i})
-		i += 1
-	for cr in w.level.corners:
-		if cr["room"] == o.room:
-			cands.append({"p": cr["p"], "w": 2.0, "k": "c%s" % str(cr["p"])})
+	for cp in w.level.corners_by_room.get(o.room, []):
+		cands.append({"p": cp, "w": 2.0, "k": "c%s" % str(cp)})
 	for eid in o.lkp:
 		var l: Dictionary = o.lkp[eid]
 		if w.t - l["t"] < 30.0:
@@ -1474,3 +1882,270 @@ func _scan(o, tm: Dictionary) -> void:
 		o.look_goal = sector
 	elif o.moving and o.vel.length() > 0.3:
 		o.look_goal = o.vel.angle()
+
+
+## A door side counts as cleared for scanning when the team has cleared that room.
+func _cleared_side(tm: Dictionary, rm: String) -> bool:
+	return tm["cleared"].has(rm)
+
+
+## Sweeping a big room: the element's lead walks to the nearest unseen sweep point, the
+## rest follow in a wedge (1.5 m apart with GD07, bunched without it).
+func _task_sweep(o, el: Dictionary) -> void:
+	var al := _alive(el)
+	al.sort_custom(func(a, b): return a.eslot < b.eslot)
+	var k := al.find(o)
+	var lead = al[0]
+	var tg = el["sweep_target"]
+	if tg == null:
+		var bd := INF
+		for p in el["sweep"]:
+			var dd: float = lead.pos.distance_to(p)
+			if dd < bd:
+				bd = dd
+				tg = p
+		el["sweep_target"] = tg
+	if tg == null:
+		w.stop(o)
+		return
+	o.dbg = "sweeping"
+	var target: Vector2 = tg
+	if k > 0:
+		var key := str(target.snapped(Vector2(1, 1)))
+		if o.ticker.get("form_key", "") != key:
+			o.ticker["form_key"] = key
+			var to_t: Vector2 = target - lead.pos
+			var dir: Vector2 = to_t.normalized() if to_t.length() > 0.5 else Vector2.from_angle(lead.body_dir)
+			var sp := 1.5 if o.has("GD07") else 0.6
+			var row := int((k + 1) / 2)
+			var lat := 1.0 if k % 2 == 1 else -1.0
+			o.ticker["form_p"] = w.nav.snap(target - dir * sp * row + dir.orthogonal() * sp * 0.8 * lat)
+		target = o.ticker["form_p"]
+	if w.at(o, target, 0.5):
+		w.stop(o)
+	else:
+		_go(o, target, "clear")
+
+
+## An element with no room of its own waits a few metres behind the nearest element that
+## is working a door, watching that door.
+func _task_support(o, tm: Dictionary, el: Dictionary) -> void:
+	var best = null
+	var bd := INF
+	for other in tm["elements"]:
+		if other == el or other["task"].is_empty() or _alive(other).is_empty():
+			continue
+		var dc: Vector2 = w.level.doors[other["task"]["door"]]["c"]
+		var dd: float = o.pos.distance_to(dc)
+		if dd < bd:
+			bd = dd
+			best = other
+	if best == null:
+		w.stop(o)
+		o.dbg = "waiting"
+		return
+	var st: Dictionary = best["task"]
+	var D: Dictionary = w.level.doors[st["door"]]
+	var n_in: Vector2 = w.level.inward(st["door"], st["into"])
+	var key: String = st["door"] + str(o.eslot)
+	if o.ticker.get("support_key", "") != key:
+		o.ticker["support_key"] = key
+		var lat: float = (o.eslot - 2) * 1.2
+		var q: Vector2 = D["c"] - n_in * (4.5 + 0.6 * (o.eslot % 2)) + D["t"] * lat
+		o.ticker["support_p"] = w.nav.snap(q)
+	var sp: Vector2 = o.ticker["support_p"]
+	o.dbg = "supporting " + _tag(tm, best)
+	if w.at(o, sp, 0.5):
+		w.stop(o)
+		_task_look(o, (D["c"] - o.pos).angle())
+	else:
+		_go(o, sp, "walk")
+
+
+# ================================================================== defence and sound
+## Defensive squads consolidate: one squad per room. A squad takes the free room where
+## most of its members already are (ties: the nearest, then the bigger), big enough for
+## all of it; members already inside keep their posts, the rest move in to posts covering
+## the room's doors and windows. A squad with no room left holds where it stands.
+func _consolidate(tm: Dictionary, el: Dictionary) -> void:
+	var al := _alive(el)
+	if al.is_empty():
+		return
+	var lv = w.level
+	var held: Dictionary = tm["held"]
+	var counts := {}
+	for m in al:
+		var rm: String = lv.room_at(m.pos)
+		if not lv.is_exterior(rm):
+			counts[rm] = counts.get(rm, 0) + 1
+	var c := _centre(al)
+	var best := ""
+	var best_s := -INF
+	var fixed: String = el.get("fixed_room", tm.get("fixed_room", ""))
+	var bi: int = tm.get("bldg", -1)
+	for name in ([fixed] if fixed != "" else (lv.building_rooms(bi) if bi >= 0 else lv.rooms.keys())):
+		if lv.is_exterior(name) or (held.has(name) and fixed == ""):
+			continue
+		var n_in: int = counts.get(name, 0)
+		if lv.room_area(name) < 3.5 * al.size() and n_in < al.size() and fixed == "":
+			continue
+		var sc: float = n_in * 100.0 - c.distance_to(lv.rooms[name]["label"]) + minf(lv.room_area(name), 40.0) * 0.1
+		if lv.rooms[name]["hall"]:
+			sc -= 8.0
+		if sc > best_s:
+			best_s = sc
+			best = name
+	el["hold_room"] = best
+	el["cover_open"] = -1
+	if best == "":
+		return
+	held[best] = el["i"]
+	var moved: Array = []
+	for m in al:
+		if lv.room_at(m.spawn) != best:
+			moved.append(m)
+	for m in moved:
+		_post_member(el, m, {})
+	if not moved.is_empty() or tm["elements"].size() > 1:
+		w.say("%s consolidates in the %s" % [_tag(tm, el), lv.rooms[best]["title"].to_lower()], "info")
+	el["sector_posture"] = ""
+
+
+func _release_hold(tm: Dictionary, el: Dictionary) -> void:
+	var hr: String = el.get("hold_room", "")
+	if hr != "" and tm["held"].get(hr, -1) == el["i"]:
+		tm["held"].erase(hr)
+	el["hold_room"] = ""
+
+
+## Give one member a post in the squad's room covering an opening (or the given one).
+func _post_member(el: Dictionary, m, only: Dictionary) -> void:
+	var taken: Array = []
+	for x in _alive(el):
+		if x != m:
+			taken.append(x.spawn)
+	var ops: Array = w.level.room_openings(el["hold_room"])
+	var op: Dictionary = only
+	if op.is_empty() and not ops.is_empty():
+		op = ops[m.eslot % ops.size()]
+	var posts: Array = w.level.cover_posts(el["hold_room"], 1, taken, w.nav, op)
+	if posts.is_empty():
+		return
+	m.spawn = posts[0]["p"]
+	m.spawn_face = posts[0]["face"]
+
+
+## Somebody heard an enemy. Aggressive operators (a hunting team, or the Aggression
+## personality) go after the sound; a defensive squad re-posts to cover the opening of
+## its room closest to the sound.
+func on_heard(o, p: Vector2, kind: String) -> void:
+	var tm: Dictionary = w.teams[o.team]
+	if o.el < 0 or o.el >= tm["elements"].size():
+		return
+	var el: Dictionary = tm["elements"][o.el]
+	if el["mode"] != "hold":
+		return
+	if o.hb("BH11") or o.hb("BH12"):
+		var inv: Dictionary = o.ticker.get("investigate", {})
+		if inv.is_empty():
+			w.say("%s hears %s and goes after it (aggression)" % [o.id, _sound_name(kind)], "bad")
+		o.ticker["investigate"] = {"p": p, "until": w.t + 25.0}
+		return
+	_cover_sound(tm, el, p, kind)
+
+
+func _sound_name(kind: String) -> String:
+	match kind:
+		"rifle", "pistol":
+			return "gunfire"
+		"reload":
+			return "a reload"
+	return "footsteps"
+
+
+func _cover_sound(tm: Dictionary, el: Dictionary, p: Vector2, kind: String) -> void:
+	var al := _alive(el)
+	var hr: String = el.get("hold_room", "")
+	if hr == "":
+		# no room: face the sound where they stand
+		for m in al:
+			if w.visible_enemies(m).is_empty():
+				m.spawn_face = (p - m.spawn).angle()
+		el["sector_posture"] = ""
+		return
+	var ops: Array = w.level.room_openings(hr)
+	if ops.is_empty():
+		return
+	var bi := 0
+	for i in ops.size():
+		if (ops[i]["c"] as Vector2).distance_to(p) < (ops[bi]["c"] as Vector2).distance_to(p):
+			bi = i
+	if el.get("cover_open", -1) == bi and w.t - el.get("cover_t", -99.0) < 8.0:
+		return
+	el["cover_open"] = bi
+	el["cover_t"] = w.t
+	var op: Dictionary = ops[bi]
+	# everyone covers that opening, except one rear watcher (ED09 first) in squads of 3+
+	var watcher = null
+	if al.size() >= 3:
+		for m in al:
+			if m.has("ED09"):
+				watcher = m
+				break
+		if watcher == null:
+			watcher = al[-1]
+	var taken: Array = []
+	if watcher != null:
+		taken.append(watcher.spawn)
+	for m in al:
+		if m == watcher or not w.visible_enemies(m).is_empty():
+			continue
+		var posts: Array = w.level.cover_posts(hr, 1, taken, w.nav, op)
+		if posts.is_empty():
+			continue
+		m.spawn = posts[0]["p"]
+		m.spawn_face = posts[0]["face"]
+		taken.append(m.spawn)
+	el["sector_posture"] = ""
+	var what: String = "door" if op["kind"] == "door" else "window"
+	var where: String = ""
+	if op["kind"] == "door":
+		where = " to outside" if w.level.is_exterior(op["other"]) else " to the " + w.level.rooms[op["other"]]["title"].to_lower()
+	w.say("%s hears %s: covers the %s %s%s" % [_tag(tm, el), _sound_name(kind), w.level.rooms[hr]["title"].to_lower(), what, where], "comms")
+
+
+## Travelling across the city as a squad: the leader heads for the destination, the rest
+## follow in a loose file behind. The director watches for arrival.
+func _task_transit(o, el: Dictionary) -> void:
+	var al := _alive(el)
+	al.sort_custom(func(a, b): return a.eslot < b.eslot)
+	var k := al.find(o)
+	var dv = el.get("dest", w.teams[o.team].get("dest", null))
+	if dv == null:
+		w.stop(o)
+		return
+	var dest: Vector2 = dv
+	o.dbg = "moving"
+	if k <= 0:
+		if w.at(o, dest, 2.0):
+			w.stop(o)
+			if not el.has("arrived_t"):
+				el["arrived_t"] = w.t
+			return
+		_go(o, dest, el.get("pace", w.teams[o.team].get("pace", "run")), false)
+		return
+	var lead = al[0]
+	var gap := 1.6 * k
+	if lead.pos.distance_to(o.pos) < gap and lead.pos.distance_to(dest) > 2.5:
+		w.stop(o)
+		return
+	var key := str(dest.snapped(Vector2(1, 1)))
+	if o.ticker.get("form_key", "") != key:
+		o.ticker["form_key"] = key
+		var off := Vector2.from_angle(TAU * k / maxf(1.0, al.size())) * 1.3
+		o.ticker["form_p"] = w.nav.snap(dest + off)
+	var fp: Vector2 = o.ticker["form_p"]
+	if w.at(o, fp, 0.8):
+		w.stop(o)
+	else:
+		_go(o, fp, el.get("pace", "run"), false)

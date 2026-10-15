@@ -8,7 +8,7 @@ extends SceneTree
 ## --set=followup runs the second round of single-habit variations.
 
 const Teams = preload("res://tests/teams.gd")
-const Level = preload("res://scripts/sim/level.gd")
+const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
 
@@ -100,8 +100,11 @@ func _init() -> void:
 			sel = a.trim_prefix("--cells=")
 		elif a.begins_with("--out="):
 			out = a.trim_prefix("--out=")
-	var lv = Level.new()
-	lv.build()
+	var map_i := 0
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--map="):
+			map_i = Maps.index_of(a.trim_prefix("--map="))
+	var lv = Maps.get_level(map_i)
 	var nav = Nav.new()
 	nav.build(lv)
 	var all := cells()

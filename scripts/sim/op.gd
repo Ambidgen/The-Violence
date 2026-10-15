@@ -4,6 +4,8 @@ extends RefCounted
 const Habits = preload("res://scripts/data/habits.gd")
 
 enum {STAND, CROUCH, DUCK, DOWN}
+enum {GREEN, YELLOW, RED}
+const ALERT_NAMES := ["GREEN", "YELLOW", "RED"]
 ## Eye height and body zones [name, z_lo, z_hi, plan radius] per stance (bible 1.1).
 ## DUCK is "fully behind half cover": the eye sits below a 0.9 m sill or wall.
 const STANCES := {
@@ -22,8 +24,21 @@ var ech: Dictionary = {}
 var good := {}          # id -> bool (has the habit)
 var bad := {}           # id -> bool (habit present)
 var plates_max := 0
+var traits := {}        # id -> bool (physical traits such as Tinnitus)
+var exp := 1            # Experience tier 1-5: enemies tracked at once
+var hear := 1.0         # hearing range multiplier (static; traits change it)
 var spawn := Vector2.ZERO
 var spawn_face := 0.0
+var el := -1            # element index within the team (fire teams of up to five)
+var eslot := 0          # position within the element
+var faction := 0        # who this operator fights for (team = the unit within the faction)
+var name := ""          # full name, for the ledger
+var rank := ""          # rank or role, for the ledger
+var medic := false      # paramedic: nobody targets them, bullets still hit them
+var sidearm_only := false  # untrained carry only a pistol
+var alert := 1          # GREEN relaxed (weapon low or holstered), YELLOW drawn, RED engaging
+var alert_t := 0.0      # when the current alert level was last raised or refreshed
+var alert_floor := 0    # never relaxes below this (a tasking or the team's starting state)
 
 # ---------------------------------------------------------------- runtime
 var pos := Vector2.ZERO
@@ -50,13 +65,18 @@ var last_aim_t := -99.0
 var rec := {}           # enemy id -> recognition progress 0..1+
 var vis := {}           # enemy id -> {los, head_only, ecc, dist}
 var first_rec := {}     # enemy id -> time first recognized
+var tracked := {}       # enemy id -> {lost_t, ready_t}: the enemies held in attention
 var cue := {}           # enemy id -> expiry time of a teammate callout
 var lkp := {}           # enemy id -> {p, t}
+var heard := {}         # last enemy sound heard {p, t, kind}
 var perc_phase := 0.0
+var n_los := 0          # enemies in line of sight at the last perception update
 
 var active_bad := {}    # id -> true while active
 var suspended := {}     # good id -> true while overridden
 var m_h := 1.0          # habit multiplier on reaction times
+var bad_lo := -INF      # effective-stress band inside which no bad habit can switch
+var bad_hi := -INF
 
 var action := {}        # current blocking action {type, left, ...}
 var aim := {}           # aiming state
@@ -85,6 +105,22 @@ var room := "OUT"
 var stall_done := {}    # door ids where the doorway stall/pause already happened
 var ticker := {}        # misc timers keyed by name
 
+# ---------------------------------------------------------------- city (endless battle)
+var assault := false    # gang expansion team: may fire on rival gangs and police at will
+var clearing := false   # QRF member while the QRF is clearing its search buildings
+var flag_t := -999.0    # last time police saw this gang member targeting someone
+var armed_t := -999.0   # last time this operator was aiming at or firing on someone
+var mounted = null      # vehicle carrying this operator (out of the simulation while aboard)
+var carried := false    # a casualty on a stretcher or aboard an ambulance (no bleed-out clock)
+var saved := false      # reached an ambulance alive
+var hot := true         # a potential enemy is near (dormancy)
+var hot_next := 0.0
+var dormant := false
+var idle_next := 0.0
+var gid := 0            # serial number in the world
+var gang := false       # city: a gang member (cached from the faction)
+var police := false     # city: a police officer (paramedics included)
+
 
 func configure(cfg: Dictionary) -> void:
 	id = cfg["id"]
@@ -95,8 +131,17 @@ func configure(cfg: Dictionary) -> void:
 	good = cfg["good"].duplicate()
 	bad = cfg["bad"].duplicate()
 	plates_max = cfg["plates"]
+	traits = cfg.get("traits", {}).duplicate()
+	hear = Habits.hearing(traits)
+	exp = clampi(int(cfg.get("exp", Habits.PRESET_EXP[echelon])), 1, Habits.EXP_MAX)
 	spawn = cfg["pos"]
 	spawn_face = cfg["face"]
+	faction = int(cfg.get("faction", team))
+	name = cfg.get("name", "")
+	rank = cfg.get("rank", "")
+	medic = cfg.get("medic", false)
+	sidearm_only = cfg.get("sidearm_only", echelon == "untrained")
+	alert_floor = clampi(int(cfg.get("alert", 1)), 0, 2)
 
 
 func reset() -> void:
@@ -112,6 +157,12 @@ func reset() -> void:
 		"pistol": {"mag": Habits.WEAPONS["pistol"]["mag"], "spare": Habits.WEAPONS["pistol"]["spare"], "jam": false, "lost": false},
 	}
 	active = "rifle"
+	if sidearm_only:
+		weapons["rifle"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
+		weapons["pistol"]["spare"] += 1
+		active = "pistol"
+	alert = alert_floor
+	alert_t = 0.0
 
 
 ## A good habit counts only if the operator has it and no active bad habit overrides it.

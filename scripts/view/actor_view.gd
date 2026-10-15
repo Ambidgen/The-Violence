@@ -4,6 +4,7 @@ extends Node2D
 
 const Op = preload("res://scripts/sim/op.gd")
 const Decals = preload("res://scripts/view/decals.gd")
+const Palette = preload("res://scripts/view/palette.gd")
 const PX := 40.0
 
 var op
@@ -17,13 +18,14 @@ var stains: Array = []
 var rng := RandomNumberGenerator.new()
 var was_down := false
 var gun_key := ""
+var pip: Pip
 
 
 func setup(o, w) -> void:
 	op = o
 	world = w
 	rng.seed = hash(o.id)
-	var team := "a" if o.team == 0 else "b"
+	var team: String = Palette.look(o, w)
 	gun = Sprite2D.new()
 	gun.centered = false
 	add_child(gun)
@@ -36,6 +38,9 @@ func setup(o, w) -> void:
 	down_body.scale = Vector2.ONE * 0.5
 	down_body.visible = false
 	add_child(down_body)
+	pip = Pip.new()
+	pip.op = o
+	add_child(pip)
 	label = Label.new()
 	label.text = o.id
 	label.add_theme_font_size_override("font_size", 11)
@@ -84,10 +89,14 @@ func sync(force := false) -> void:
 			down_body.add_child(st)
 		label.modulate.a = 0.55
 		tag.text = "KIA" if op.state == "dead" else "DOWN"
+		pip.refresh()
 		return
 	if down:
+		if op.state == "dead" and tag.text == "DOWN":
+			tag.text = "KIA"
 		return
 	body.rotation = op.body_dir
+	pip.refresh()
 	var sc := 0.5
 	if op.stance == Op.CROUCH:
 		sc = 0.45
@@ -95,9 +104,17 @@ func sync(force := false) -> void:
 		sc = 0.40
 	body.scale = Vector2.ONE * sc
 	_set_gun()
-	gun.rotation = op.muzzle_dir
-	gun.position = Vector2.from_angle(op.muzzle_dir) * 4.0
-	gun.modulate.a = 1.0 if op.weapon_up or not op.aim.is_empty() else 0.65
+	if op.alert == Op.GREEN and op.aim.is_empty() and not op.weapon_up:
+		# low carry: rifle slung across the body, muzzle down and to the side; pistol holstered
+		gun.visible = op.active == "rifle" and not op.weapons["rifle"]["lost"]
+		gun.rotation = op.body_dir + 1.15
+		gun.position = Vector2.from_angle(op.body_dir - 1.2) * 9.0
+		gun.modulate.a = 0.55
+	else:
+		gun.visible = not (op.active == "rifle" and op.weapons["rifle"]["lost"])
+		gun.rotation = op.muzzle_dir
+		gun.position = Vector2.from_angle(op.muzzle_dir) * 4.0
+		gun.modulate.a = 1.0 if op.weapon_up or not op.aim.is_empty() else 0.65
 	var t := ""
 	if not op.action.is_empty():
 		var a: String = op.action["type"]
@@ -108,6 +125,24 @@ func sync(force := false) -> void:
 	elif world != null and op.ticker.get("flinch_until", -1.0) > world.t:
 		t = "FLINCH"
 	tag.text = t
+
+
+## The alert pip beside the figure: green relaxed, yellow ready, red engaging.
+class Pip extends Node2D:
+	var op
+	var lvl := -1
+
+	func refresh() -> void:
+		var want: int = -1 if (op == null or op.medic or not op.alive()) else clampi(op.alert, 0, 2)
+		if want != lvl:
+			lvl = want
+			queue_redraw()
+
+	func _draw() -> void:
+		if lvl < 0:
+			return
+		draw_circle(Vector2(-14, 14), 4.6, Color(1, 1, 1, 0.95))
+		draw_circle(Vector2(-14, 14), 3.4, Palette.ALERT[lvl])
 
 
 ## A hit on a standing operator: stain the figure where the round went in.

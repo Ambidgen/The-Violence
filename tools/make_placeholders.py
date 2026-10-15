@@ -362,6 +362,226 @@ def shed_roof(w_m=3.5, h_m=3.0):
     return svg(w_m, h_m, "".join(b))
 
 
+# ------------------------------------------------------------- furniture added for the ten maps
+def bunk(w_m=2.0, h_m=0.9):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, WHITE, 2), rect(8, 8, w - 16, h - 16, "none", 2, FAINT, 1.2),
+         rect(4, 4, 16, h - 8, GREY_L, 2, LINE, 1.4), rect(26, 12, 26, h - 24, PAPER, 5, LINE, 1.3),
+         line(w - 6, 2, w - 6, h - 2, INK, 2.4), line(6, 2, 6, h - 2, INK, 2.4)]
+    return svg(w_m, h_m, "".join(b))
+
+
+def desk(w_m=1.4, h_m=0.7):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h * 0.62, WHITE, 1), rect(w - 34, 6, 26, h * 0.62 - 10, "none", 1, FAINT, 1.2),
+         rect(w * 0.18, 10, w * 0.34, 8, PAPER, 1, LINE, 1.2),
+         path(f"M{w * 0.32},{h * 0.66} A{h * 0.3},{h * 0.3} 0 0 0 {w * 0.62},{h * 0.66}", "none", LINE, 1.5),
+         rect(w * 0.36, h * 0.66, w * 0.22, h * 0.26, PAPER, 6, LINE, 1.4)]
+    return svg(w_m, h_m, "".join(b))
+
+
+def chair(s=0.5):
+    w = s * PPM
+    return svg(s, s, rect(4, 4, w - 8, w - 8, WHITE, 6, LINE, 1.6) + rect(4, 4, w - 8, 9, GREY_L, 4, LINE, 1.4))
+
+
+def table(w_m=2.4, h_m=1.0):
+    w, h = w_m * PPM, h_m * PPM
+    return svg(w_m, h_m, rect(2, 2, w - 4, h - 4, WHITE, 3) + rect(10, 10, w - 20, h - 20, "none", 2, FAINT, 1.0))
+
+
+def shelving(w_m=4.0, h_m=1.0):
+    """Store gondola: double-sided shelving seen from above."""
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, WHITE, 1, INK, 2), line(2, h / 2, w - 2, h / 2, LINE, 1.6)]
+    x = 2
+    while x < w - 4:
+        b.append(rect(x + 3, 6, 14, h / 2 - 10, PAPER, 1, FAINT, 1.0))
+        b.append(rect(x + 3, h / 2 + 4, 14, h / 2 - 10, PAPER, 1, FAINT, 1.0))
+        x += 20
+    return svg(w_m, h_m, "".join(b))
+
+
+def rack(w_m=6.0, h_m=1.1):
+    """Pallet racking bay run: uprights, beams and loaded pallets with the X of an overhead."""
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, GREY_L, 0, INK, 2.2)]
+    bay = 2.7 * PPM / 1.0 * (w_m / max(1, round(w_m / 2.7))) / w_m
+    nb = max(1, round(w_m / 2.7))
+    bw = (w - 4) / nb
+    for i in range(nb):
+        x0 = 2 + i * bw
+        b.append(rect(x0 + 6, 8, bw - 12, h - 16, WHITE, 1, LINE, 1.4))
+        b.append(line(x0 + 6, 8, x0 + bw - 6, h - 8, FAINT, 1.0))
+        b.append(line(x0 + bw - 6, 8, x0 + 6, h - 8, FAINT, 1.0))
+        b.append(rect(x0 - 2, 2, 5, h - 4, INK, 0, None))
+    b.append(rect(w - 6, 2, 5, h - 4, INK, 0, None))
+    return svg(w_m, h_m, "".join(b))
+
+
+def crate(s=1.2):
+    w = s * PPM
+    return svg(s, s, rect(3, 3, w - 6, w - 6, PAPER, 0, INK, 2) + rect(10, 10, w - 20, w - 20, "none", 0, LINE, 1.2)
+               + line(10, 10, w - 10, w - 10, LINE, 1.2) + line(w - 10, 10, 10, w - 10, LINE, 1.2))
+
+
+def pallet(w_m=1.2, h_m=1.0):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, "none", 0, LINE, 1.6)]
+    for i in range(5):
+        y = 4 + i * (h - 8) / 5
+        b.append(rect(4, y + 1, w - 8, (h - 8) / 5 - 4, PAPER, 0, FAINT, 1.0))
+    return svg(w_m, h_m, "".join(b))
+
+
+def cabinet(w_m=0.5, h_m=0.6):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, WHITE, 1, INK, 1.8)]
+    for i in range(1, 4):
+        b.append(line(5, i * h / 4, w - 5, i * h / 4, FAINT, 1.1))
+    return svg(w_m, h_m, "".join(b))
+
+
+def stove(w_m=0.7, h_m=0.65):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, WHITE, 2, INK, 1.8)]
+    for (fx, fy) in ((0.3, 0.32), (0.7, 0.32), (0.3, 0.72), (0.7, 0.72)):
+        b.append(circle(w * fx, h * fy, 8, "none", LINE, 1.4))
+    return svg(w_m, h_m, "".join(b))
+
+
+def washer(s=0.65):
+    w = s * PPM
+    return svg(s, s, rect(2, 2, w - 4, w - 4, WHITE, 3, INK, 1.8) + circle(w / 2, w / 2 + 3, w * 0.3, PAPER, LINE, 1.5)
+               + line(6, 9, w - 6, 9, FAINT, 1.1))
+
+
+def stairs(w_m=1.2, h_m=3.0):
+    """Stair run in plan: treads, a break line and the up arrow (runs toward +y)."""
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, WHITE, 0, INK, 2)]
+    n = int(h_m / 0.28)
+    for i in range(1, n):
+        y = 2 + i * (h - 4) / n
+        b.append(line(2, y, w - 2, y, LINE, 1.2))
+    b.append(line(w / 2, h - 10, w / 2, 16, INK, 1.6))
+    b.append(path(f"M{w / 2 - 7},{28} L{w / 2},{14} L{w / 2 + 7},{28}", "none", INK, 1.6))
+    b.append(line(2, h * 0.55, w - 2, h * 0.45, INK, 1.4))
+    return svg(w_m, h_m, "".join(b))
+
+
+def lockers(w_m=2.4, h_m=0.5):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, WHITE, 0, INK, 1.8)]
+    n = int(w_m / 0.4)
+    for i in range(1, n):
+        b.append(line(2 + i * (w - 4) / n, 4, 2 + i * (w - 4) / n, h - 4, LINE, 1.1))
+    return svg(w_m, h_m, "".join(b))
+
+
+def checkout(w_m=2.0, h_m=0.8):
+    w, h = w_m * PPM, h_m * PPM
+    return svg(w_m, h_m, rect(2, 2, w - 4, h - 4, WHITE, 2, INK, 2) + rect(w - 46, 8, 34, 26, PAPER, 2, LINE, 1.4)
+               + line(10, h - 12, w - 60, h - 12, FAINT, 1.1, "6 4"))
+
+
+def cooler(w_m=3.0, h_m=0.8):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, WHITE, 1, INK, 2), line(2, h - 14, w - 2, h - 14, LINE, 1.2)]
+    n = int(w_m / 0.75)
+    for i in range(1, n):
+        b.append(line(2 + i * (w - 4) / n, 4, 2 + i * (w - 4) / n, h - 4, FAINT, 1.1))
+    return svg(w_m, h_m, "".join(b))
+
+
+def dumpster(w_m=1.9, h_m=1.1):
+    w, h = w_m * PPM, h_m * PPM
+    return svg(w_m, h_m, rect(3, 3, w - 6, h - 6, GREY_L, 3, INK, 2.2) + line(w / 2, 4, w / 2, h - 4, LINE, 1.4)
+               + rect(-1, h * 0.3, 6, h * 0.4, GREY_D, 1, None) + rect(w - 5, h * 0.3, 6, h * 0.4, GREY_D, 1, None))
+
+
+def van(w_m=5.0, h_m=2.0):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(4, 4, w - 8, h - 8, WHITE, 22, INK, 2.2), rect(w * 0.06, 12, w * 0.16, h - 24, GREY_L, 10, LINE, 1.5),
+         rect(w * 0.26, 10, w * 0.68, h - 20, "none", 4, FAINT, 1.2), line(w * 0.6, 10, w * 0.6, h - 10, FAINT, 1.0),
+         rect(w * 0.14, 0, 30, 6, GREY_D, 2, None), rect(w * 0.76, 0, 30, 6, GREY_D, 2, None),
+         rect(w * 0.14, h - 6, 30, 6, GREY_D, 2, None), rect(w * 0.76, h - 6, 30, 6, GREY_D, 2, None)]
+    return svg(w_m, h_m, "".join(b))
+
+
+def truck(w_m=7.5, h_m=2.5):
+    w, h = w_m * PPM, h_m * PPM
+    cab = w * 0.24
+    b = [rect(4, 6, cab - 8, h - 12, WHITE, 16, INK, 2.2), rect(16, 14, cab * 0.4, h - 28, GREY_L, 8, LINE, 1.4),
+         rect(cab, 2, w - cab - 4, h - 4, PAPER, 2, INK, 2.4)]
+    for i in range(1, 9):
+        x = cab + i * (w - cab - 4) / 9
+        b.append(line(x, 6, x, h - 6, FAINT, 1.0))
+    return svg(w_m, h_m, "".join(b))
+
+
+def container(w_m=6.1, h_m=2.44):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(2, 2, w - 4, h - 4, GREY_L, 0, INK, 2.4)]
+    x = 10
+    while x < w - 10:
+        b.append(line(x, 6, x, h - 6, GREY_D, 1.0))
+        x += 10
+    b.append(rect(w - 14, 4, 10, h - 8, WHITE, 0, LINE, 1.2))
+    return svg(w_m, h_m, "".join(b))
+
+
+def sandbags(w_m=2.4, h_m=0.6):
+    w, h = w_m * PPM, h_m * PPM
+    b = []
+    rw = 0.55 * PPM
+    for row in range(2):
+        x = 2 + (rw / 2 if row else 0)
+        while x + rw <= w - 2 + 1:
+            b.append(rect(x, 2 + row * (h - 4) / 2, rw - 2, (h - 4) / 2 - 1, PAPER, 9, LINE, 1.4))
+            x += rw
+    return svg(w_m, h_m, "".join(b))
+
+
+def tank(d_m=2.2):
+    w = d_m * PPM
+    c = w / 2
+    return svg(d_m, d_m, circle(c, c, c - 3, WHITE, INK, 2.4) + circle(c, c, c * 0.62, "none", FAINT, 1.2)
+               + circle(c, c, 6, GREY_D, None))
+
+
+def generator(w_m=1.6, h_m=0.9):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(3, 3, w - 6, h - 6, WHITE, 3, INK, 2), rect(10, 10, w * 0.3, h - 20, PAPER, 2, LINE, 1.2)]
+    for i in range(5):
+        b.append(line(w * 0.5 + i * 9, 10, w * 0.5 + i * 9, h - 10, FAINT, 1.1))
+    return svg(w_m, h_m, "".join(b))
+
+
+def bench(w_m=1.6, h_m=0.5):
+    w, h = w_m * PPM, h_m * PPM
+    return svg(w_m, h_m, rect(2, 4, w - 4, h - 8, WHITE, 2, LINE, 1.6) + line(6, h / 2, w - 6, h / 2, FAINT, 1.0))
+
+
+def planter(s=1.2):
+    w = s * PPM
+    rng = random.Random(13)
+    return svg(s, s, rect(3, 3, w - 6, w - 6, PAPER, 2, INK, 2) + path(blob_path(w / 2, w / 2, w * 0.3, rng, 7, 0.2), "none", FAINT, 1.4))
+
+
+def barrier(w_m=3.0, h_m=0.6):
+    w, h = w_m * PPM, h_m * PPM
+    return svg(w_m, h_m, rect(2, 2, w - 4, h - 4, GREY_L, 4, INK, 2) + rect(10, h / 2 - 5, w - 20, 10, WHITE, 3, LINE, 1.2))
+
+
+def forklift(w_m=2.6, h_m=1.2):
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(w * 0.3, 4, w * 0.68, h - 8, WHITE, 8, INK, 2.2), rect(w * 0.42, 14, w * 0.3, h - 28, GREY_L, 4, LINE, 1.4),
+         rect(2, h * 0.2, w * 0.3, 7, GREY_D, 1, None), rect(2, h * 0.8 - 7, w * 0.3, 7, GREY_D, 1, None),
+         rect(w * 0.28, 4, 6, h - 8, INK, 0, None)]
+    return svg(w_m, h_m, "".join(b))
+
+
 # ------------------------------------------------------------- blood and residue
 def splat(seed, size_m=1.4):
     rng = random.Random(seed)
@@ -500,10 +720,157 @@ ASSETS = {
     "fx/stain1.svg": lambda: stain(21), "fx/stain2.svg": lambda: stain(22), "fx/stain3.svg": lambda: stain(23),
     "fx/smear1.svg": lambda: wall_smear(31), "fx/smear2.svg": lambda: wall_smear(32),
     "ui/north.svg": north_arrow,
+    "furn/bunk.svg": bunk, "furn/desk.svg": desk, "furn/chair.svg": chair, "furn/table.svg": table,
+    "furn/shelving.svg": shelving, "furn/rack.svg": rack, "furn/crate.svg": crate, "furn/pallet.svg": pallet,
+    "furn/cabinet.svg": cabinet, "furn/stove.svg": stove, "furn/washer.svg": washer, "furn/stairs.svg": stairs,
+    "furn/lockers.svg": lockers, "furn/checkout.svg": checkout, "furn/cooler.svg": cooler,
+    "yard/dumpster.svg": dumpster, "yard/van.svg": van, "yard/truck.svg": truck, "yard/container.svg": container,
+    "yard/sandbags.svg": sandbags, "yard/tank.svg": tank, "yard/generator.svg": generator, "yard/bench.svg": bench,
+    "yard/planter.svg": planter, "yard/barrier.svg": barrier, "yard/forklift.svg": forklift,
 }
 for i in range(1, 5):
     ASSETS[f"fx/splat{i}.svg"] = (lambda i=i: splat(100 + i))
     ASSETS[f"fx/spray{i}.svg"] = (lambda i=i: spray(200 + i))
+
+
+# ------------------------------------------------------------- city factions and vehicles
+# Greyscale like everything else: factions differ by tone and by the mark on the
+# shoulders (the same mark hatches their territory on the city plan).
+FACTION_LOOK = {
+    # body fill, head fill, mark
+    "pd": ("#5c5c5c", WHITE, "cap"),
+    "qrf": ("#2a2a2a", "#6a6a6a", "helmet"),
+    "g1": ("#ececec", WHITE, "dots"),
+    "g2": ("#c4c4c4", WHITE, "bands"),
+    "g3": ("#a3a3a3", WHITE, "hatch"),
+    "g4": ("#d6d6d6", WHITE, "check"),
+    "med": (WHITE, WHITE, "cross"),
+    "pmed": (GREY_L, WHITE, "cross"),
+}
+
+
+def _marks(mark, cx, cy):
+    b = []
+    if mark == "dots":
+        for k in range(-2, 3):
+            b.append(circle(cx - 3, cy + k * 8, 2.0, INK, None))
+    elif mark == "bands":
+        for k in (-12, 0, 12):
+            b.append(line(cx - 11, cy + k, cx + 7, cy + k, INK, 2.0))
+    elif mark == "hatch":
+        for k in range(-3, 4):
+            b.append(line(cx - 9, cy + k * 6 - 3, cx + 5, cy + k * 6 + 3, INK, 1.2))
+    elif mark == "check":
+        for k in range(-3, 4):
+            b.append(line(cx - 9, cy + k * 6 - 3, cx + 5, cy + k * 6 + 3, INK, 1.0))
+            b.append(line(cx - 9, cy + k * 6 + 3, cx + 5, cy + k * 6 - 3, INK, 1.0))
+    elif mark == "cross":
+        b.append(rect(cx - 10, cy - 3, 14, 6, INK, 0, None))
+        b.append(rect(cx - 6, cy - 10, 6, 20, INK, 0, None))
+    return b
+
+
+def operator_f(key):
+    """Faction figure, facing +x. 0.8 x 0.8 m canvas."""
+    body, head, mark = FACTION_LOOK[key]
+    w = h = 0.8 * PPM
+    cx, cy = w / 2, h / 2
+    b = [ellipse(cx - 2, cy, 11, 23, body, INK, 2.2)]
+    b += _marks(mark, cx, cy)
+    b.append(ellipse(cx - 2, cy, 11, 23, "none", INK, 2.2))
+    b.append(path(f"M{cx - 2},{cy - 19} Q{cx + 12},{cy - 14} {cx + 22},{cy - 2}", "none", INK, 2.0))
+    b.append(path(f"M{cx - 2},{cy + 19} Q{cx + 10},{cy + 12} {cx + 16},{cy + 2}", "none", INK, 2.0))
+    b.append(circle(cx + 1, cy, 8.5, head, INK, 2.2))
+    if mark == "cap":
+        b.append(path(f"M{cx + 3},{cy - 8} A8.5 8.5 0 0 1 {cx + 3},{cy + 8} L{cx + 12},{cy + 5} L{cx + 12},{cy - 5} Z", INK, INK, 1.0))
+    elif mark == "helmet":
+        b.append(circle(cx + 1, cy, 10.5, "none", INK, 2.6))
+    b.append(line(cx + 9, cy, cx + 12, cy, INK, 2.0))
+    return svg(0.8, 0.8, "".join(b))
+
+
+def operator_f_down(key):
+    body, head, mark = FACTION_LOOK[key]
+    w, h = 1.9 * PPM, 0.9 * PPM
+    cy = h / 2
+    b = [path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", INK, 7),
+         path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", body, 4),
+         rect(58, cy - 20, 54, 40, body, 10, INK, 2.2)]
+    if mark == "cross":
+        b.append(rect(76, cy - 4, 18, 8, INK, 0, None))
+        b.append(rect(81, cy - 10, 8, 20, INK, 0, None))
+    elif mark == "bands":
+        for x in (68, 85, 102):
+            b.append(line(x, cy - 18, x, cy + 18, INK, 2.0))
+    elif mark == "dots":
+        for x in range(66, 108, 9):
+            b.append(circle(x, cy, 2.2, INK, None))
+    elif mark in ("hatch", "check"):
+        for k in range(0, 8):
+            b.append(line(62 + k * 6, cy - 16, 68 + k * 6, cy + 16, INK, 1.0))
+            if mark == "check":
+                b.append(line(68 + k * 6, cy - 16, 62 + k * 6, cy + 16, INK, 1.0))
+    b.append(rect(58, cy - 20, 54, 40, "none", 10, INK, 2.2))
+    b.append(path(f"M{100},{cy - 18} Q{112},{cy - 34} {96},{cy - 32}", "none", INK, 2.2))
+    b.append(path(f"M{100},{cy + 18} Q{120},{cy + 30} {108},{cy + 34}", "none", INK, 2.2))
+    b.append(circle(124, cy - 2, 10, head, INK, 2.2))
+    if mark == "helmet":
+        b.append(circle(124, cy - 2, 12, "none", INK, 2.4))
+    elif mark == "cap":
+        b.append(path(f"M{126},{cy - 11} A10 10 0 0 1 {126},{cy + 7} L{136},{cy + 4} L{136},{cy - 8} Z", INK, INK, 1.0))
+    return svg(1.9, 0.9, "".join(b))
+
+
+def _wheels(w, h, f1, f2):
+    return [rect(w * f1, 0, 30, 6, GREY_D, 2, None), rect(w * f2, 0, 30, 6, GREY_D, 2, None),
+            rect(w * f1, h - 6, 30, 6, GREY_D, 2, None), rect(w * f2, h - 6, 30, 6, GREY_D, 2, None)]
+
+
+def police_car(w_m=4.6, h_m=1.9):
+    """Patrol car in plan, nose toward +x: white body, dark doors and roof bar."""
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(4, 4, w - 8, h - 8, WHITE, 34, INK, 2.2),
+         rect(w * 0.30, 6, w * 0.34, h - 12, "#3a3a3a", 6, None),
+         rect(w * 0.33, 14, w * 0.30, h - 28, GREY_L, 14, LINE, 1.6),
+         rect(w * 0.45, 12, 12, h - 24, INK, 3, None),
+         line(w * 0.12, 20, w * 0.12, h - 20, FAINT, 1.2),
+         rect(w * 0.70, 18, w * 0.12, h - 36, "none", 8, LINE, 1.4)] + _wheels(w, h, 0.18, 0.70)
+    return svg(w_m, h_m, "".join(b))
+
+
+def police_van(w_m=5.6, h_m=2.1):
+    """Tactical van: dark grey box, cab forward."""
+    w, h = w_m * PPM, h_m * PPM
+    b = [rect(4, 4, w - 8, h - 8, "#3e3e3e", 20, INK, 2.2), rect(w * 0.72, 12, w * 0.13, h - 24, GREY_L, 10, LINE, 1.5),
+         rect(w * 0.06, 10, w * 0.6, h - 20, "none", 4, GREY_M, 1.2), rect(w * 0.64, 10, 12, h - 20, INK, 3, None),
+         line(w * 0.10, h / 2, w * 0.58, h / 2, GREY_M, 1.2)] + _wheels(w, h, 0.14, 0.76)
+    return svg(w_m, h_m, "".join(b))
+
+
+def ambulance(police=False, w_m=6.0, h_m=2.2):
+    w, h = w_m * PPM, h_m * PPM
+    band = "#3e3e3e" if police else GREY_M
+    b = [rect(4, 4, w - 8, h - 8, WHITE, 18, INK, 2.2), rect(w * 0.76, 12, w * 0.12, h - 24, GREY_L, 10, LINE, 1.5),
+         rect(8, h * 0.5 - 5, w * 0.66, 10, band, 0, None),
+         rect(w * 0.30 - 24, h * 0.5 - 8, 48, 16, INK, 0, None), rect(w * 0.30 - 8, h * 0.5 - 24, 16, 48, INK, 0, None),
+         rect(w * 0.70, 10, 12, h - 20, INK, 3, None)] + _wheels(w, h, 0.14, 0.78)
+    return svg(w_m, h_m, "".join(b))
+
+
+def stretcher(w_m=2.0, h_m=0.6):
+    w, h = w_m * PPM, h_m * PPM
+    return svg(w_m, h_m, rect(6, 4, w - 12, h - 8, WHITE, 4, INK, 1.8) + line(0, 6, w, 6, INK, 2.4)
+               + line(0, h - 6, w, h - 6, INK, 2.4))
+
+
+for _k in FACTION_LOOK:
+    ASSETS[f"op/{_k}_stand.svg"] = (lambda k=_k: operator_f(k))
+    ASSETS[f"op/{_k}_down.svg"] = (lambda k=_k: operator_f_down(k))
+ASSETS["veh/police_car.svg"] = police_car
+ASSETS["veh/police_van.svg"] = police_van
+ASSETS["veh/ambulance.svg"] = lambda: ambulance(False)
+ASSETS["veh/police_ambulance.svg"] = lambda: ambulance(True, 5.6, 2.1)
+ASSETS["fx/stretcher.svg"] = stretcher
 
 
 def main():

@@ -4,6 +4,7 @@ extends CanvasLayer
 ## whole UI lives in one readable file. Greyscale, drafting-table style.
 
 const Habits = preload("res://scripts/data/habits.gd")
+const Maps = preload("res://scripts/maps/registry.gd")
 const PANEL_W := 460.0
 const INK := Color("#1c1c1c")
 const SPEEDS := [0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0]
@@ -18,7 +19,12 @@ var banner_label: Label
 var sel_buttons := {}
 var size_spins: Array = []
 var posture_opts: Array = []
+var alert_opts: Array = []
 var cfg_title: Label
+var sub: Label
+var map_opt: OptionButton
+var exp_spin: SpinBox
+var exp_label: Label
 var ech_opt: OptionButton
 var plate_spin: SpinBox
 var habit_buttons := {}
@@ -32,6 +38,8 @@ var roster: RichTextLabel
 var log_box: RichTextLabel
 var log_shown := 0
 var speed_note: Label
+var gang_cap_spin: SpinBox
+var police_cap_spin: SpinBox
 var _updating := false
 
 
@@ -50,10 +58,10 @@ func build(m) -> void:
 	title.text = "T H E   V I O L E N C E"
 	title.add_theme_font_size_override("font_size", 20)
 	v.add_child(title)
-	var sub := Label.new()
-	sub.text = "Test Range 01  ·  shotgun house  ·  vertical slice"
+	sub = Label.new()
 	sub.add_theme_color_override("font_color", Color("#666666"))
 	v.add_child(sub)
+	set_map_title(main.level)
 	v.add_child(HSeparator.new())
 	setup_box = VBoxContainer.new()
 	setup_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -77,7 +85,7 @@ func build(m) -> void:
 
 
 # ================================================================== theme
-func _sb(bg: Color, border: Color, bw := 1, margin := 6.0) -> StyleBoxFlat:
+static func _sb(bg: Color, border: Color, bw := 1, margin := 6.0) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
 	s.border_color = border
@@ -87,6 +95,10 @@ func _sb(bg: Color, border: Color, bw := 1, margin := 6.0) -> StyleBoxFlat:
 
 
 func _theme() -> Theme:
+	return make_theme()
+
+
+static func make_theme() -> Theme:
 	var th := Theme.new()
 	th.default_font_size = 13
 	th.set_stylebox("panel", "PanelContainer", _sb(Color("#f3f3f1"), INK, 1, 12.0))
@@ -162,9 +174,27 @@ func _heading(parent: Control, text: String) -> Label:
 	return l
 
 
+func set_map_title(lv) -> void:
+	sub.text = "%s  ·  %d x %d m  ·  up to 20 a side" % [lv.map_name, int(lv.W), int(lv.H)]
+	if map_opt != null:
+		map_opt.select(main.map_i)
+
+
 func _build_setup() -> void:
 	var s := setup_box
-	s.add_theme_constant_override("separation", 6)
+	s.add_theme_constant_override("separation", 5)
+	var hm := _h(s)
+	var ml := Label.new()
+	ml.text = "Map"
+	ml.custom_minimum_size = Vector2(56, 0)
+	hm.add_child(ml)
+	map_opt = OptionButton.new()
+	for nm in Maps.names():
+		map_opt.add_item(nm)
+	map_opt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	map_opt.select(main.map_i)
+	map_opt.item_selected.connect(func(i): main.set_map(i))
+	hm.add_child(map_opt)
 	_heading(s, "1  PLACE  ·  click the plan to place the selected operator; right-click sets facing; wheel zooms, middle-drag pans")
 	var group := ButtonGroup.new()
 	for k in 2:
@@ -175,7 +205,7 @@ func _build_setup() -> void:
 		h.add_child(l)
 		var sp := SpinBox.new()
 		sp.min_value = 1
-		sp.max_value = 5
+		sp.max_value = 20
 		sp.suffix = "operators"
 		sp.custom_minimum_size = Vector2(132, 0)
 		sp.value_changed.connect(func(v): _size(k, v))
@@ -189,12 +219,25 @@ func _build_setup() -> void:
 		o.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		h.add_child(o)
 		posture_opts.append(o)
-		var hb := _h(s)
-		for slot in 5:
+		var ao := OptionButton.new()
+		ao.custom_minimum_size = Vector2(86, 0)
+		for an in ["Green", "Yellow"]:
+			ao.add_item(an)
+		ao.tooltip_text = "Starting alert state.\nGreen: relaxed, rifles at low carry and pistols holstered (slower to fire, slower to notice).\nYellow: weapons drawn and ready.\nRed (engaging) and the step down to green after a quiet minute happen on their own."
+		ao.item_selected.connect(func(i): main.set_alert(k, i))
+		h.add_child(ao)
+		alert_opts.append(ao)
+		var grid := GridContainer.new()
+		grid.columns = 10
+		grid.add_theme_constant_override("h_separation", 2)
+		grid.add_theme_constant_override("v_separation", 2)
+		s.add_child(grid)
+		for slot in 20:
 			var id := "%s%d" % ["AB"[k], slot + 1]
-			var b := _btn(hb, id, func(on): _sel(id, on), true)
+			var b := _btn(grid, id, func(on): _sel(id, on), true)
 			b.button_group = group
-			b.custom_minimum_size = Vector2(60, 0)
+			b.custom_minimum_size = Vector2(41, 0)
+			b.add_theme_font_size_override("font_size", 11)
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			sel_buttons[id] = b
 	s.add_child(HSeparator.new())
@@ -264,6 +307,35 @@ func _build_setup() -> void:
 			bb.tooltip_text = "%s %s (%s)\n%s\nOverrides: %s" % [bid, b0["name"], trig, b0["desc"], ", ".join(b0["over"])]
 			bb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			habit_buttons[bid] = bb
+	var sct := ScrollContainer.new()
+	sct.name = "Traits"
+	sct.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tabs.add_child(sct)
+	var colt := VBoxContainer.new()
+	colt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sct.add_child(colt)
+	_heading(colt, "Experience: how many enemies the operator tracks at once. Tracked enemies are recognized and aimed for in parallel; switching to one already acquired takes under a tenth of a second. Tier 1 takes one enemy at a time, from scratch.")
+	var hx := _h(colt)
+	var xl := Label.new()
+	xl.text = "Experience tier"
+	hx.add_child(xl)
+	exp_spin = SpinBox.new()
+	exp_spin.min_value = 1
+	exp_spin.max_value = Habits.EXP_MAX
+	exp_spin.custom_minimum_size = Vector2(72, 0)
+	exp_spin.value_changed.connect(func(v): _exp(v))
+	hx.add_child(exp_spin)
+	exp_label = Label.new()
+	exp_label.add_theme_color_override("font_color", Color("#555555"))
+	hx.add_child(exp_label)
+	_heading(colt, "Hearing: every operator hears the same (shots, footsteps, reloads; walls halve it) unless a trait changes it.")
+	for tr in Habits.TRAITS:
+		var tid: String = tr["id"]
+		var tb := _btn(colt, "", func(on): _trait(tid, on), true)
+		tb.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		tb.tooltip_text = "%s %s (%s)\n%s" % [tid, tr["name"], tr["kind"], tr["desc"]]
+		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		habit_buttons[tid] = tb
 	summary = Label.new()
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	s.add_child(summary)
@@ -283,6 +355,30 @@ func _build_setup() -> void:
 	var run := _btn(s, "RUN   >   auto-resolve", func(): main.start_run(int(seed_spin.value)))
 	run.custom_minimum_size = Vector2(0, 40)
 	run.add_theme_font_size_override("font_size", 16)
+	s.add_child(HSeparator.new())
+	_heading(s, "ENDLESS BATTLE  ·  a city of four gangs, six police precincts and three hospitals that fights on for as long as you watch (uses the seed above)")
+	var he2 := _h(s)
+	var gl := Label.new()
+	gl.text = "Gang cap"
+	he2.add_child(gl)
+	gang_cap_spin = SpinBox.new()
+	gang_cap_spin.min_value = 20
+	gang_cap_spin.max_value = 120
+	gang_cap_spin.value = 60
+	gang_cap_spin.tooltip_text = "Most members a gang can have at once"
+	he2.add_child(gang_cap_spin)
+	var pl2 := Label.new()
+	pl2.text = "Police cap"
+	he2.add_child(pl2)
+	police_cap_spin = SpinBox.new()
+	police_cap_spin.min_value = 40
+	police_cap_spin.max_value = 200
+	police_cap_spin.value = 108
+	police_cap_spin.tooltip_text = "No new officers are hired while on duty + recovering + already hired reach this.\nFull strength is 108: six ten-man QRFs and twelve four-officer patrol convoys."
+	he2.add_child(police_cap_spin)
+	var eb := _btn(s, "ENDLESS BATTLE   >   Port Carrick", func(): main.start_city(int(seed_spin.value), int(gang_cap_spin.value), int(police_cap_spin.value)))
+	eb.custom_minimum_size = Vector2(0, 34)
+	eb.add_theme_font_size_override("font_size", 14)
 
 
 func _size(k: int, v: float) -> void:
@@ -303,6 +399,16 @@ func _plates(v: float) -> void:
 func _habit(hid: String, on: bool) -> void:
 	if not _updating:
 		main.set_habit(hid, on)
+
+
+func _trait(tid: String, on: bool) -> void:
+	if not _updating:
+		main.set_trait(tid, on)
+
+
+func _exp(v: float) -> void:
+	if not _updating:
+		main.set_exp(int(v))
 
 
 func _speed(sp: float, on: bool) -> void:
@@ -330,6 +436,7 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		size_spins[k].set_value_no_signal(sizes[k])
 	for k in 2:
 		posture_opts[k].select(["assault", "hold", "hunt"].find(postures[k]))
+		alert_opts[k].select(clampi(main.alerts[k], 0, 1))
 	var c: Dictionary = cfgs[sel]
 	cfg_title.text = "2  CONFIGURE %s   ·   team %s" % [sel, "AB"[c["team"]]]
 	ech_opt.select(Habits.ECHELON_ORDER.find(c["echelon"]))
@@ -349,9 +456,22 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		bb.set_pressed_no_signal(on2)
 		var trig: String = ("stress %.2f" % b0["t"]) if b0["kind"] == "stress" else b0["trait"]
 		bb.text = "%s  %s   %s   (%s)" % ["[x]" if on2 else "[  ]", b0["id"], b0["name"], trig]
+	var xp: int = c.get("exp", 1)
+	exp_spin.set_value_no_signal(xp)
+	exp_label.text = "  %s: tracks %d enem%s" % [Habits.EXP_NAMES[xp], xp, "y" if xp == 1 else "ies"]
+	var traits: Dictionary = c.get("traits", {})
+	var tnames: Array = []
+	for tr in Habits.TRAITS:
+		var on3: bool = traits.get(tr["id"], false)
+		var tb: Button = habit_buttons[tr["id"]]
+		tb.set_pressed_no_signal(on3)
+		tb.text = "%s  %s   %s   (hearing x%s)" % ["[x]" if on3 else "[  ]", tr["id"], tr["name"], str(tr["hear"])]
+		if on3:
+			tnames.append(tr["name"])
 	var e: Dictionary = Habits.ECHELONS[c["echelon"]]
-	summary.text = "%s: %d good habits (reaction time x%.3f), %d bad habits present. Recognition base %.2f s, stress resistance %.2f, %d plate%s." % [
-		sel, n_good, 1.0 - 0.005 * n_good, n_bad, e["t_rec0"], e["resist"], c["plates"], "" if c["plates"] == 1 else "s"]
+	summary.text = "%s: %d good habits (reaction time x%.3f), %d bad habits present, experience %d. Recognition base %.2f s, stress resistance %.2f, %d plate%s, hearing x%.2f%s." % [
+		sel, n_good, 1.0 - 0.005 * n_good, n_bad, xp, e["t_rec0"], e["resist"], c["plates"], "" if c["plates"] == 1 else "s",
+		Habits.hearing(traits), (" (" + ", ".join(tnames) + ")") if not tnames.is_empty() else ""]
 	_updating = false
 
 
@@ -385,7 +505,8 @@ func _build_run() -> void:
 		b2.set_pressed_no_signal(nm != "Paths")
 	roster = RichTextLabel.new()
 	roster.bbcode_enabled = true
-	roster.custom_minimum_size = Vector2(0, 360)
+	roster.scroll_active = true
+	roster.custom_minimum_size = Vector2(0, 380)
 	roster.add_theme_font_size_override("normal_font_size", 11)
 	roster.add_theme_font_size_override("bold_font_size", 11)
 	r.add_child(roster)
@@ -425,38 +546,47 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 	clock.text = "%02d:%04.1f" % [mm, fmod(w.t, 60.0)]
 	speed_note.text = "Simulation runs at %.1fx real time (target %sx). 30 ticks per simulated second." % [actual_speed, str(target_speed)]
 	var txt_all := ""
-	for o in w.ops:
-		var st := "OK"
-		if o.state == "dead":
-			st = "KIA"
-		elif o.state == "down":
-			st = "DOWN"
-		elif o.wounds > 0 or o.arm_hit or o.leg_hit:
-			st = "WOUNDED"
-		var s: Dictionary = o.ws()
-		var bad: Array = []
-		for b in o.active_bad:
-			bad.append(b)
-		var n_good := 0
-		for gid in o.good:
-			if o.has(gid):
-				n_good += 1
-		var bar := ""
-		for i in 10:
-			bar += "|" if i < int(o.stress * 10.0) else "."
-		var head := "[b]%s[/b]  %s  ·  %s" % [o.id, SHORT.get(o.echelon, o.echelon), st]
-		if st == "KIA" or st == "DOWN":
-			head = "[color=#7d0a0a]%s[/color]" % head
-		txt_all += "%s  ·  %s %d/%d +%d  ·  plates %d/%d  ·  %d habits\n" % [head,
-			"Rifle" if o.active == "rifle" else "Pistol", s["mag"], o.wpn()["mag"], s["spare"], o.plates, o.plates_max, n_good]
-		if o.alive():
-			var line2 := "     stress %s %.2f" % [bar, o.stress]
+	var many: bool = w.ops.size() > 10
+	for k in 2:
+		var tm: Dictionary = w.teams[k]
+		var n_alive := 0
+		for o in tm["members"]:
+			if o.alive():
+				n_alive += 1
+		txt_all += "[b]TEAM %s[/b]  %d / %d standing  ·  %s  ·  %d element%s\n" % ["AB"[k], n_alive, tm["members"].size(),
+			tm["posture"], tm["elements"].size(), "" if tm["elements"].size() == 1 else "s"]
+		for o in tm["members"]:
+			var st := "OK"
+			if o.state == "dead":
+				st = "KIA"
+			elif o.state == "down":
+				st = "DOWN"
+			elif o.wounds > 0 or o.arm_hit or o.leg_hit:
+				st = "WND"
+			var s: Dictionary = o.ws()
+			var bad: Array = []
+			for b in o.active_bad:
+				bad.append(b)
+			var bar := ""
+			for i in 10:
+				bar += "|" if i < int(o.stress * 10.0) else "."
+			var head := "[hint=\"%s\"][b]%s[/b][/hint] %s %s" % [quirks(o).replace("\"", "'"), o.id, SHORT.get(o.echelon, o.echelon), st]
+			if st == "KIA" or st == "DOWN":
+				txt_all += "[color=#7d0a0a]%s[/color]\n" % head
+				continue
+			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s" % [head, ["[color=#3d7a46]G[/color]", "[color=#a8861c]Y[/color]", "[color=#9b2a27]R[/color]"][o.alert],
+				"R" if o.active == "rifle" else "P", s["mag"], s["spare"], o.plates, o.plates_max, o.exp, bar]
 			if not bad.is_empty():
-				line2 += "  [b]%s[/b]" % " ".join(bad)
-			txt_all += "[color=#555555]%s  ·  %s[/color]\n" % [line2, o.dbg.replace("[", "(")]
+				line += "  [b]%s[/b]" % " ".join(bad)
+			txt_all += line + "\n"
+			if not many:
+				txt_all += "[color=#555555]      %s[/color]\n" % quirks(o)
+			if not many or o.dbg != "":
+				txt_all += "[color=#555555]      %s[/color]\n" % o.dbg.replace("[", "(")
 	roster.text = txt_all
-	while log_shown < w.log_lines.size():
-		var ln: Dictionary = w.log_lines[log_shown]
+	log_shown = maxi(log_shown, w.log_base)
+	while log_shown < w.log_base + w.log_lines.size():
+		var ln: Dictionary = w.log_lines[log_shown - w.log_base]
 		var txt: String = ln["text"].replace("[", "(").replace("]", ")")
 		match ln["kind"]:
 			"kill":
@@ -474,6 +604,17 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 			_:
 				log_box.append_text("[color=#444444]%s[/color]\n" % txt)
 		log_shown += 1
+
+
+## An operator's roll for this match: form and named strengths and weaknesses.
+static func quirks(o) -> String:
+	var e: Dictionary = o.ech
+	var parts: Array = ["%s, form %+d%%" % [o.name, int(round((1.0 - float(e.get("form", 1.0))) * 100.0))]]
+	for q in e.get("plus", []):
+		parts.append("+" + q)
+	for q2 in e.get("minus", []):
+		parts.append("-" + q2)
+	return "  ".join(parts)
 
 
 func show_banner(text: String) -> void:

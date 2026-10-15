@@ -85,8 +85,8 @@ const GOOD := [
 		"with": "Stress narrows the vision cone half as much (never below 48 deg).",
 		"without": "Narrows to 36 deg at full stress."},
 	{"id": "ED07", "name": "Sound cueing", "group": "Eye discipline",
-		"with": "Turns eyes to gunfire within 0.3 s when not engaged.",
-		"without": "1.0 s, and ignores it while engaged."},
+		"with": "Turns eyes to any sound it hears (shots, footsteps, reloads) within 0.3 s when not engaged.",
+		"without": "Turns only to gunfire, after 1.0 s, and ignores it while engaged."},
 	{"id": "ED08", "name": "Hold the last-known position", "group": "Eye discipline",
 		"with": "Eyes and muzzle stay where contact broke for 3 s.",
 		"without": "Drops the angle at once."},
@@ -206,14 +206,129 @@ const PRESET_GOOD := {
 }
 const PRESET_PLATES := {"untrained": 0, "militia": 0, "regular": 2, "police": 2, "sof": 3}
 
+## Experience (a trait, tiers 1-5): how many enemies an operator tracks at once. Only
+## tracked enemies are recognized, and every tracked enemy is recognized and set up for
+## aiming in parallel, so switching to one already acquired is nearly instant. Tier 1
+## takes one enemy at a time, from scratch.
+const EXP_MAX := 5
+const PRESET_EXP := {"untrained": 1, "militia": 1, "regular": 2, "police": 3, "sof": 4}
+const EXP_NAMES := ["", "Green", "Blooded", "Seasoned", "Veteran", "Exceptional"]
+const SWITCH_PER_PLATE := 0.004   # extra seconds to swing onto an acquired target, per plate
+
 ## One main weapon and one sidearm for everyone (section 3.1). Stoppage rates are
 ## raised above the bible's values so stoppage drills are visible in a short test.
 const WEAPONS := {
 	"rifle": {"name": "Carbine, red dot", "a_w": 0.06, "b_w": 0.80, "s_w": 1.0, "kappa": 4.0,
-		"mag": 30, "spare": 3, "reload": 2.6, "stop": 0.004, "cadence": 0.10, "snap": 0.18},
+		"mag": 30, "spare": 3, "reload": 2.6, "stop": 0.004, "cadence": 0.10, "snap": 0.18, "switch": 0.08},
 	"pistol": {"name": "Service pistol", "a_w": 0.00, "b_w": 1.00, "s_w": 2.5, "kappa": 9.0,
-		"mag": 15, "spare": 2, "reload": 2.0, "stop": 0.003, "cadence": 0.15, "snap": 0.22},
+		"mag": 15, "spare": 2, "reload": 2.0, "stop": 0.003, "cadence": 0.15, "snap": 0.22, "switch": 0.06},
 }
+
+
+## Individual variation within an echelon: every operator is rolled once per match.
+## A form factor (about +-6 %) moves every time-based stat together, each stat gets a
+## little jitter, and one or two named strengths and weaknesses push single stats further.
+## mul: stat multipliers; add: stat offsets (resist).
+const QUIRKS_PLUS := [
+	{"name": "Quick eyes", "grp": "eyes", "mul": {"t_rec0": 0.8}},
+	{"name": "Fast hands", "grp": "hands", "mul": {"reload": 0.8, "transition": 0.8}},
+	{"name": "Steady aim", "grp": "aim", "mul": {"s_snap": 0.8, "s_min": 0.8}},
+	{"name": "Snap shooter", "grp": "target", "mul": {"a": 0.8, "b": 0.85}},
+	{"name": "Cool head", "grp": "nerve", "add": {"resist": 0.15}},
+	{"name": "Recoil master", "grp": "recoil", "mul": {"tr": 0.8, "flinch": 0.6}},
+	{"name": "Quick to settle", "grp": "settle", "mul": {"tau": 0.8}},
+]
+const QUIRKS_MINUS := [
+	{"name": "Slow eyes", "grp": "eyes", "mul": {"t_rec0": 1.2}},
+	{"name": "Fumbles reloads", "grp": "hands", "mul": {"reload": 1.25, "transition": 1.25}},
+	{"name": "Shaky aim", "grp": "aim", "mul": {"s_snap": 1.2, "s_min": 1.2}},
+	{"name": "Slow on target", "grp": "target", "mul": {"a": 1.2, "b": 1.15}},
+	{"name": "Jittery", "grp": "nerve", "add": {"resist": -0.15}},
+	{"name": "Flincher", "grp": "recoil", "mul": {"tr": 1.2, "flinch": 1.6}},
+	{"name": "Slow to settle", "grp": "settle", "mul": {"tau": 1.2}},
+]
+const FORM_STATS := ["t_rec0", "a", "b", "reload", "transition", "s_snap", "s_min", "tau"]
+
+
+## A per-operator copy of an echelon's stats with form, jitter and quirks applied.
+static func vary(base: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
+	var e := base.duplicate()
+	var form := clampf(1.0 + rng.randfn(0.0, 0.03), 0.94, 1.06)
+	for k in FORM_STATS:
+		e[k] = float(e[k]) * form * clampf(1.0 + rng.randfn(0.0, 0.035), 0.9, 1.1)
+	e["resist"] = clampf(float(e["resist"]) + (1.0 - form) * 0.5 + rng.randfn(0.0, 0.02), 0.0, 0.95)
+	e["turn"] = float(e["turn"]) / form
+	var plus: Array = []
+	var minus: Array = []
+	var used := {}
+	for k in (1 if rng.randf() < 0.6 else 2):
+		var q: Dictionary = QUIRKS_PLUS[rng.randi() % QUIRKS_PLUS.size()]
+		if used.has(q["grp"]):
+			continue
+		used[q["grp"]] = true
+		plus.append(q)
+	for k in (1 if rng.randf() < 0.6 else 2):
+		var q2: Dictionary = QUIRKS_MINUS[rng.randi() % QUIRKS_MINUS.size()]
+		if used.has(q2["grp"]):
+			continue
+		used[q2["grp"]] = true
+		minus.append(q2)
+	var names_p: Array = []
+	var names_m: Array = []
+	for q3 in plus + minus:
+		var sc := rng.randf_range(0.75, 1.25)
+		for st in q3.get("mul", {}):
+			e[st] = float(e[st]) * (1.0 + (float(q3["mul"][st]) - 1.0) * sc)
+		for st2 in q3.get("add", {}):
+			e[st2] = clampf(float(e[st2]) + float(q3["add"][st2]) * sc, 0.0, 0.95)
+		if plus.has(q3):
+			names_p.append(q3["name"])
+		else:
+			names_m.append(q3["name"])
+	e["form"] = form
+	e["plus"] = names_p
+	e["minus"] = names_m
+	return e
+
+
+## Physical traits (not habits, not overridden by stress). Hearing is a static attribute:
+## every operator hears the same unless one of these changes it.
+const TRAITS := [
+	{"id": "TR01", "name": "Tinnitus", "kind": "negative", "hear": 0.5,
+		"desc": "Ringing ears: hears every sound at half the normal range."},
+	{"id": "TR02", "name": "Elephant Ears", "kind": "positive", "hear": 1.5,
+		"desc": "Sharp hearing: hears every sound at 1.5 times the normal range."},
+]
+
+## Sound is a gameplay mechanic (nothing is played yet). Each kind of sound has a fixed
+## loudness: the range in metres at which normal hearing picks it up in the open.
+## Walls between source and listener halve it. Footsteps depend on the pace; creeping,
+## slicing the pie and side-stepping are silent.
+const SOUND := {"rifle": 45.0, "pistol": 35.0, "sprint": 8.0, "run": 5.0, "walk": 3.0, "entry": 3.5,
+	"clear": 2.0, "reload": 4.0}
+
+
+static func trait_ids() -> Array:
+	var out: Array = []
+	for tr in TRAITS:
+		out.append(tr["id"])
+	return out
+
+
+static func trait_info(id: String) -> Dictionary:
+	for tr in TRAITS:
+		if tr["id"] == id:
+			return tr
+	return {}
+
+
+## Hearing multiplier from traits (1.0 = normal).
+static func hearing(traits: Dictionary) -> float:
+	var h := 1.0
+	for tr in TRAITS:
+		if traits.get(tr["id"], false):
+			h *= tr["hear"]
+	return h
 
 
 static func good_ids() -> Array:

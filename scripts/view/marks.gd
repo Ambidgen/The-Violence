@@ -20,7 +20,7 @@ func _draw() -> void:
 		var r: Rect2 = Rect2(o["r"].position * PX, o["r"].size * PX)
 		if o["kind"] == Geom.COVER:
 			_hatch(r, Color(0, 0, 0, 0.22))
-		elif o["kind"] == Geom.CONCEAL and o["name"] != "porch rail":
+		elif o["kind"] == Geom.CONCEAL and not o["name"].ends_with("rail") and o["name"] != "chain-link":
 			var p := [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]
 			for k in 4:
 				draw_dashed_line(p[k], p[(k + 1) % 4], Color(0, 0, 0, 0.45), 1.0, 2.5)

@@ -20,5 +20,5 @@ func _draw() -> void:
 		if id == main.sel:
 			draw_arc(p, 24.0, 0, TAU, 32, Color("#1c1c1c"), 2.0)
 			draw_string(font, p + Vector2(26, -14), "selected", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#1c1c1c"))
-	var hint := "Team A forms up on the front walk; team B holds the house and back yard. Up to five each. Click to place, right-click to face."
+	var hint: String = main.level.stage_hint + " Up to twenty each. Click to place, right-click to face."
 	draw_string(font, Vector2(0, -16), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("#444444"))

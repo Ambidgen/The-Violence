@@ -2,7 +2,7 @@ extends SceneTree
 ## Debug trace: prints team A every TR_STEP sim seconds, plus the event log.
 ##   TR_STEP=0.5 godot --headless --path . -s res://tests/trace.gd -- --t=60 --a=sof --na=5 --b=militia --nb=5
 const Teams = preload("res://tests/teams.gd")
-const Level = preload("res://scripts/sim/level.gd")
+const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
 
@@ -14,8 +14,11 @@ func _init() -> void:
 		if kv.size() == 2:
 			opt[kv[0]] = kv[1]
 	var step := float(OS.get_environment("TR_STEP")) if OS.get_environment("TR_STEP") != "" else 1.0
-	var lv = Level.new()
-	lv.build()
+	var map_i := 0
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--map="):
+			map_i = Maps.index_of(a.trim_prefix("--map="))
+	var lv = Maps.get_level(map_i)
 	var nav = Nav.new()
 	nav.build(lv)
 	var w = World.new()
@@ -28,7 +31,10 @@ func _init() -> void:
 		w.step()
 		if w.t >= next and step > 0.0:
 			next += step
-			var line := "%5.1f %-8s|" % [w.t, w.teams[0]["phase"]]
+			var ph := ""
+			for el in w.teams[0]["elements"]:
+				ph += "%s:%s " % [el["mode"].substr(0, 3), el["phase"].substr(0, 5)]
+			var line := "%5.1f %s|" % [w.t, ph]
 			for o in w.ops:
 				if o.team != 0:
 					continue

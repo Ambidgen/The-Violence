@@ -1,10 +1,10 @@
 extends Node2D
-## The Violence - vertical slice. Setup: place up to two operators per team and
-## edit their 40 good / 20 bad habits. Run: the simulation auto-resolves at up to
+## The Violence - vertical slice. Setup: pick a map, place up to twenty operators per
+## team and edit their habits and traits. Run: the simulation auto-resolves at up to
 ## 20x while the plan collects the evidence.
 
 const Habits = preload("res://scripts/data/habits.gd")
-const Level = preload("res://scripts/sim/level.gd")
+const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
 const Op = preload("res://scripts/sim/op.gd")
@@ -15,15 +15,18 @@ const Overlay = preload("res://scripts/view/overlay.gd")
 const Marks = preload("res://scripts/view/marks.gd")
 const SetupMarks = preload("res://scripts/view/setup_marks.gd")
 const UI = preload("res://scripts/ui/ui.gd")
+const Ledger = preload("res://scripts/view/ledger.gd")
 const PX := 40.0
 const DT := 1.0 / 30.0
 
 var level
 var nav
+var map_i := 0
 var cfgs := {}
 var postures := ["assault", "hold"]
+var alerts := [1, 1]                # starting alert per team: 0 green, 1 yellow
 var sizes := [3, 5]
-const IDS := ["A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5"]
+var IDS: Array = []
 var sel := "A1"
 var world = null
 var mode := "setup"
@@ -46,6 +49,8 @@ var canopy_layer: Node2D
 var overlay
 var setup_marks
 var ui
+var ledger_layer: CanvasLayer
+var ledger
 var views := {}
 var preview_ops := {}
 var _panning := false
@@ -55,14 +60,17 @@ var _args := {}
 
 
 func _ready() -> void:
-	get_window().title = "The Violence - vertical slice"
+	get_window().title = "The Violence"
 	RenderingServer.set_default_clear_color(Color("#d6d6d3"))
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	for a in OS.get_cmdline_user_args():
 		var kv := a.trim_prefix("--").split("=")
 		_args[kv[0]] = kv[1] if kv.size() > 1 else "1"
-	level = Level.new()
-	level.build()
+	for t in ["A", "B"]:
+		for k in range(1, 21):
+			IDS.append("%s%d" % [t, k])
+	map_i = Maps.index_of(_args.get("map", "0"))
+	level = Maps.get_level(map_i)
 	nav = Nav.new()
 	nav.build(level)
 	cam = Camera2D.new()
@@ -93,6 +101,12 @@ func _ready() -> void:
 	ui = UI.new()
 	add_child(ui)
 	ui.build(self)
+	ledger_layer = CanvasLayer.new()
+	ledger_layer.layer = 2
+	add_child(ledger_layer)
+	ledger = Ledger.new()
+	ledger.position = Vector2(10, 10)
+	ledger_layer.add_child(ledger)
 	_fit_camera()
 	get_viewport().size_changed.connect(_fit_camera)
 	if _args.has("tab"):
@@ -109,12 +123,15 @@ func _ready() -> void:
 		speed = float(_args["speed"])
 	if _args.has("autorun"):
 		start_run(int(_args.get("seed", "1001")))
+	if _args.has("city"):
+		start_city.call_deferred(int(_args.get("seed", "1001")), 60, 108)
 
 
 # ------------------------------------------------------------------ configuration
 func _cfg_for(id: String, team: int, slot: int, echelon: String) -> Dictionary:
 	var c := {"id": id, "team": team, "slot": slot, "echelon": echelon, "good": {}, "bad": {},
-		"plates": 0, "pos": level.spawns[id]["p"], "face": level.spawns[id]["face"], "enabled": true}
+		"plates": 0, "exp": 1, "traits": {}, "pos": level.spawns[id]["p"], "face": level.spawns[id]["face"], "enabled": true,
+		"alert": alerts[team]}
 	_apply_preset(c, echelon)
 	return c
 
@@ -132,13 +149,14 @@ func _apply_preset(c: Dictionary, echelon: String) -> void:
 	for b in Habits.stress_bad_ids():
 		c["bad"][b] = true
 	c["plates"] = Habits.PRESET_PLATES[echelon]
+	c["exp"] = Habits.PRESET_EXP[echelon]
 
 
 ## Default: an outnumbered special-operations team assaults a house held by militia.
 func _default_cfgs() -> void:
 	var ea: String = _args.get("a", "sof")
 	var eb: String = _args.get("b", "militia")
-	sizes = [clampi(int(_args.get("na", "3")), 1, 5), clampi(int(_args.get("nb", "5")), 1, 5)]
+	sizes = [clampi(int(_args.get("na", str(level.default_sizes[0]))), 1, 20), clampi(int(_args.get("nb", str(level.default_sizes[1]))), 1, 20)]
 	cfgs = {}
 	for id in IDS:
 		var team := 0 if id.begins_with("A") else 1
@@ -166,7 +184,7 @@ func select_op(id: String) -> void:
 
 
 func set_team_size(k: int, n: int) -> void:
-	sizes[k] = clampi(n, 1, 5)
+	sizes[k] = clampi(n, 1, 20)
 	_apply_sizes()
 	if not cfgs[sel]["enabled"]:
 		sel = "AB"[k] + "1"
@@ -176,6 +194,21 @@ func set_team_size(k: int, n: int) -> void:
 
 func set_posture(k: int, p: String) -> void:
 	postures[k] = p
+
+
+func set_alert(k: int, lvl: int) -> void:
+	alerts[k] = lvl
+	for id in IDS:
+		if cfgs[id]["team"] == k:
+			cfgs[id]["alert"] = lvl
+	_rebuild_previews()
+
+
+## Leave for the endless battle (its own scene); options travel in a static.
+func start_city(seed_val: int, gang_cap: int, police_cap: int) -> void:
+	var CityMain = load("res://scripts/city_main.gd")
+	CityMain.opts = {"seed": seed_val, "gang_cap": gang_cap, "police_cap": police_cap, "speed": speed}
+	get_tree().change_scene_to_file("res://scenes/city.tscn")
 
 
 func set_echelon(e: String, apply: bool) -> void:
@@ -189,6 +222,43 @@ func set_echelon(e: String, apply: bool) -> void:
 func set_plates(n: int) -> void:
 	cfgs[sel]["plates"] = n
 	_refresh()
+
+
+func set_exp(n: int) -> void:
+	cfgs[sel]["exp"] = clampi(n, 1, Habits.EXP_MAX)
+	_refresh()
+
+
+func set_trait(tid: String, on: bool) -> void:
+	cfgs[sel]["traits"][tid] = on
+	_refresh()
+
+
+## Switch maps: rebuild the plan, keep everyone's habits, move them to the new posts.
+func set_map(i: int) -> void:
+	if i == map_i:
+		return
+	map_i = i
+	level = Maps.get_level(i)
+	nav = Nav.new()
+	nav.build(level)
+	plan.setup(level)
+	marks.setup(level)
+	for ch in props_layer.get_children():
+		ch.queue_free()
+	for ch2 in canopy_layer.get_children():
+		ch2.queue_free()
+	_build_props()
+	for id in IDS:
+		cfgs[id]["pos"] = level.spawns[id]["p"]
+		cfgs[id]["face"] = level.spawns[id]["face"]
+	sizes = [level.default_sizes[0], level.default_sizes[1]]
+	_apply_sizes()
+	if not cfgs[sel]["enabled"]:
+		sel = "A1"
+	ui.set_map_title(level)
+	_fit_camera()
+	_enter_setup()
 
 
 func set_habit(hid: String, on: bool) -> void:
@@ -223,6 +293,8 @@ func copy_to_team() -> void:
 		m["good"] = c["good"].duplicate()
 		m["bad"] = c["bad"].duplicate()
 		m["plates"] = c["plates"]
+		m["exp"] = c["exp"]
+		m["traits"] = c["traits"].duplicate()
 	_refresh()
 
 
@@ -281,6 +353,7 @@ func _enter_setup() -> void:
 		world = null
 	decals.setup_empty()
 	overlay.setup(null)
+	ledger.setup(null)
 	overlay.queue_redraw()
 	_rebuild_previews()
 	ui.show_setup()
@@ -291,9 +364,10 @@ func start_run(seed_val: int) -> void:
 	if world != null:
 		world.dispose()
 	world = World.new()
-	world.setup(level, nav, cfg_list(), postures, seed_val)
+	world.setup(level, nav, cfg_list(), postures, seed_val, alerts)
 	decals.setup(world)
 	overlay.setup(world)
+	ledger.setup(world, 8)
 	_clear_views()
 	for o in world.ops:
 		var v = ActorView.new()
@@ -350,7 +424,7 @@ func _process(delta: float) -> void:
 				world.step()
 				acc -= DT
 				steps += 1
-				if Time.get_ticks_usec() - t0 > 20000:
+				if Time.get_ticks_usec() - t0 > 33000:
 					break
 			acc = minf(acc, DT * 3.0)
 		_meas_real += delta
@@ -368,6 +442,7 @@ func _process(delta: float) -> void:
 		for v in views.values():
 			v.sync()
 		overlay.tick_real(delta)
+		ledger.tick(delta)
 		_ui_t -= delta
 		if _ui_t <= 0.0:
 			_ui_t = 0.1
