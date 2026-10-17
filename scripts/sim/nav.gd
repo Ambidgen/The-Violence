@@ -23,6 +23,10 @@ var w_expo := PackedFloat32Array()
 var grids: Array = []
 var cover_spots: Array = []     # [{p: Vector2, gap: float}] candidate cover positions
 var _spot_cells := {}           # Vector2i (2 m cell) -> Array of spots
+## Door leaves: `solid` and the four grids are shared through the static cache,
+## so anything blocked during a match has to be put back when a map is reloaded.
+var _base_solid := PackedByteArray()
+var _blocked := {}              # Vector2i -> true, cells blocked by a closed door
 
 
 func build(lv) -> void:
@@ -40,6 +44,9 @@ func build(lv) -> void:
 		cover_spots = c["cover"]
 		grids = c["grids"]
 		_spot_cells = c["spot_cells"]
+		_base_solid = c["base_solid"]
+		reset_blocks()
+		sync_doors(lv)
 		lv.snap_posts(self)
 		return
 	_build_layers()
@@ -79,9 +86,59 @@ func build(lv) -> void:
 		if not _spot_cells.has(k):
 			_spot_cells[k] = []
 		_spot_cells[k].append(c)
+	_base_solid = solid.duplicate()
 	_cache[key] = {"solid": solid, "reach": reach, "w_door": w_door, "w_expo": w_expo, "cover": cover_spots,
-		"grids": grids, "spot_cells": _spot_cells}
+		"grids": grids, "spot_cells": _spot_cells, "base_solid": _base_solid}
+	sync_doors(lv)
 	lv.snap_posts(self)
+
+
+## Put every cell a door leaf blocked back the way it was.
+func reset_blocks() -> void:
+	if _blocked.is_empty():
+		return
+	for c in _blocked.keys():
+		var i: int = c.y * nx + c.x
+		solid[i] = _base_solid[i]
+		for g in grids:
+			g.set_point_solid(c, solid[i] == 1)
+	_blocked.clear()
+	_flood()
+
+
+## Close every door the level says is closed, and reopen the rest.
+func sync_doors(lv) -> void:
+	reset_blocks()
+	for did in lv.doors:
+		var D: Dictionary = lv.doors[did]
+		if D.get("state", "open") == "open":
+			continue
+		if D.has("leaf_rect"):
+			block_rect(D["leaf_rect"])
+
+
+## Mark every cell of a rectangle solid, remembering them so reset_blocks() undoes it.
+func block_rect(r: Rect2) -> void:
+	if _base_solid.is_empty():
+		_base_solid = solid.duplicate()
+	var x0 := clampi(int(floor(r.position.x / CS)), 0, nx - 1)
+	var x1 := clampi(int(floor(r.end.x / CS)), 0, nx - 1)
+	var y0 := clampi(int(floor(r.position.y / CS)), 0, ny - 1)
+	var y1 := clampi(int(floor(r.end.y / CS)), 0, ny - 1)
+	var any := false
+	for y in range(y0, y1 + 1):
+		for x in range(x0, x1 + 1):
+			var c := Vector2i(x, y)
+			var i: int = y * nx + x
+			if solid[i] == 1:
+				continue
+			_blocked[c] = true
+			solid[i] = 1
+			any = true
+			for g in grids:
+				g.set_point_solid(c, true)
+	if any:
+		_flood()
 
 
 ## Cover spots within r of p, as [distance_squared, spot] pairs sorted nearest first.

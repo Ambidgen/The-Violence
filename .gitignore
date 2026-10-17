@@ -1,3 +1,7 @@
 .godot/
 *.tmp
 build/
+
+# Python bytecode (tools/*.py)
+__pycache__/
+*.pyc

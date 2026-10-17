@@ -33,6 +33,119 @@ var _sill := PackedFloat32Array()
 var _lintel := PackedFloat32Array()
 var _mv := PackedByteArray()
 
+## Obstacles that appear and disappear during a match: door leaves. They are
+## outside the CSR index and tested with a short linear scan, which is only paid
+## for when at least one is closed -- a map with every door open pays nothing.
+var dyn_rect: Array[Rect2] = []
+var dyn_kind := PackedInt32Array()
+var dyn_h := PackedFloat32Array()
+var dyn_sill := PackedFloat32Array()
+var dyn_lintel := PackedFloat32Array()
+var dyn_on := PackedByteArray()
+var dyn_active := 0
+
+
+func add_dynamic(r: Rect2, kind: int, h: float = 2.1, sill: float = 0.0,
+		lintel: float = 2.1) -> int:
+	dyn_rect.append(r)
+	dyn_kind.append(kind)
+	dyn_h.append(h)
+	dyn_sill.append(sill)
+	dyn_lintel.append(lintel)
+	dyn_on.append(0)
+	return dyn_rect.size() - 1
+
+
+func set_dynamic(idx: int, on: bool) -> void:
+	if idx < 0 or idx >= dyn_on.size():
+		return
+	var v := 1 if on else 0
+	if int(dyn_on[idx]) == v:
+		return
+	dyn_on[idx] = v
+	dyn_active += 1 if on else -1
+
+
+## Every door open again: used when a map is reloaded or the nav cache is reused.
+func reset_dynamic() -> void:
+	dyn_on.fill(0)
+	dyn_active = 0
+
+
+## Apply the closed door leaves to a sight result. Only ever removes bits.
+func _dyn_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float, mask: int) -> int:
+	var d := b - a
+	var L := d.length()
+	for i in dyn_rect.size():
+		if dyn_on[i] == 0:
+			continue
+		var kind: int = dyn_kind[i]
+		if kind == LOW:
+			continue
+		var r: Rect2 = dyn_rect[i]
+		if r.has_point(a) or r.has_point(b):
+			continue
+		var tt := seg_rect(a, d, r)
+		if tt.x < 0.0:
+			continue
+		if kind == WALL:
+			return 0
+		for k in 2:
+			if mask & (1 << k) == 0:
+				continue
+			var zb: float = zb1 if k == 0 else zb2
+			var z0 := lerpf(za, zb, tt.x)
+			var z1 := lerpf(za, zb, tt.y)
+			var stop := false
+			if kind == WINDOW:
+				stop = minf(z0, z1) < dyn_sill[i] or maxf(z0, z1) > dyn_lintel[i]
+			else:
+				var h: float = dyn_h[i]
+				if h <= LOW_COVER_H and za > h:
+					h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
+				stop = minf(z0, z1) < h
+			if stop:
+				mask &= ~(1 << k)
+		if mask == 0:
+			return 0
+	return mask
+
+
+## The nearest closed leaf on a->b, or -1.
+func _dyn_trace(a: Vector2, za: float, b: Vector2, zb: float, best_t: float) -> Array:
+	var d := b - a
+	var L := d.length()
+	var out := [-1, best_t, -1]
+	for i in dyn_rect.size():
+		if dyn_on[i] == 0:
+			continue
+		var kind: int = dyn_kind[i]
+		if kind == LOW or kind == CONCEAL:
+			continue
+		var r: Rect2 = dyn_rect[i]
+		if r.has_point(a):
+			continue
+		var tt := seg_rect(a, d, r)
+		if tt.x < 0.0 or tt.x >= out[1]:
+			continue
+		var z0 := lerpf(za, zb, tt.x)
+		var z1 := lerpf(za, zb, tt.y)
+		var stop := false
+		if kind == WALL:
+			stop = true
+		elif kind == WINDOW:
+			stop = minf(z0, z1) < dyn_sill[i] or maxf(z0, z1) > dyn_lintel[i]
+		else:
+			var h: float = dyn_h[i]
+			if h <= LOW_COVER_H and za > h:
+				h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
+			stop = minf(z0, z1) < h
+		if stop:
+			out[0] = i
+			out[1] = tt.x
+			out[2] = int(tt.z)
+	return out
+
 
 func setup(w: float, h: float) -> void:
 	width = w
@@ -260,10 +373,10 @@ func sight_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float) -> in
 						if h <= LOW_COVER_H and za > h:
 							h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
 						stop = zlo < h
-					if stop:
-						mask &= ~(1 << k)
-				if mask == 0:
-					return 0
+				if stop:
+					mask &= ~(1 << k)
+			if mask == 0:
+				return 0
 		if (x == xe and y == ye) or guard > 512:
 			break
 		if t_max_x < t_max_y:
@@ -273,6 +386,8 @@ func sight_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float) -> in
 			t_max_y += t_dy
 			y += step_y
 		guard += 1
+	if mask != 0 and dyn_active > 0:
+		mask = _dyn_mask(a, za, b, zb1, zb2, mask)
 	return mask
 
 
@@ -310,14 +425,22 @@ func trace_shot(a: Vector2, za: float, b: Vector2, zb: float) -> Dictionary:
 			best_t = tt.x
 			best_idx = idx
 			best_face = int(tt.z)
-	if best_idx < 0:
+	var best_kind: int = _kind[best_idx] if best_idx >= 0 else -1
+	if dyn_active > 0:
+		var dd: Array = _dyn_trace(a, za, b, zb, best_t)
+		if dd[0] >= 0:
+			best_t = float(dd[1])
+			best_face = int(dd[2])
+			best_idx = -1 - int(dd[0])
+			best_kind = dyn_kind[int(dd[0])]
+	if best_idx < 0 and best_kind < 0:
 		return {"hit": false, "t": 1.0, "p": b, "n": Vector2.ZERO, "idx": -1, "kind": -1, "z": zb}
 	var n := Vector2.ZERO
 	if best_face == 0:
 		n = Vector2(-signf(d.x), 0)
 	elif best_face == 1:
 		n = Vector2(0, -signf(d.y))
-	return {"hit": true, "t": best_t, "p": a + d * best_t, "n": n, "idx": best_idx, "kind": _kind[best_idx],
+	return {"hit": true, "t": best_t, "p": a + d * best_t, "n": n, "idx": best_idx, "kind": best_kind,
 		"z": lerpf(za, zb, best_t)}
 
 
@@ -340,6 +463,14 @@ func blocked_disc(p: Vector2, rad: float) -> bool:
 				var q := Vector2(clampf(p.x, r.position.x, r.end.x), clampf(p.y, r.position.y, r.end.y))
 				if q.distance_squared_to(p) < rad * rad:
 					return true
+	if dyn_active > 0:
+		for i in dyn_rect.size():
+			if dyn_on[i] == 0:
+				continue
+			var rd: Rect2 = dyn_rect[i]
+			var qd := Vector2(clampf(p.x, rd.position.x, rd.end.x), clampf(p.y, rd.position.y, rd.end.y))
+			if qd.distance_squared_to(p) < rad * rad:
+				return true
 	return false
 
 

@@ -7,6 +7,7 @@ const INK := Color("#1c1c1c")
 
 var world
 var show_cones := true
+var show_att := true      # the cone of attention (short-term memory)
 var show_rec := true
 var show_aim := true
 var show_paths := false
@@ -103,6 +104,24 @@ func _draw() -> void:
 				if a2 < half:
 					for sgn in [-1.0, 1.0]:
 						draw_dashed_line(p, p + Vector2.from_angle(o.look_dir + a2 * sgn) * r * 0.6, Color(0, 0, 0, 0.12), 1.0, 4.0)
+		# the cone of attention: what the operator remembers and is watching for,
+		# drawn in red. Where it overlaps the cone of vision, acquisition is faster.
+		if show_att and not o.att.is_empty():
+			var ad: float = float(o.att["dir"])
+			var ah: float = float(o.att["half"])
+			var ar: float = 5.0 * PX
+			var ap: PackedVector2Array = PackedVector2Array([p])
+			for k in 21:
+				var aa: float = ad - ah + 2.0 * ah * k / 20.0
+				ap.append(p + Vector2.from_angle(aa) * ar)
+			var solid: float = clampf(float(o.att["str"]), 0.15, 1.0)
+			draw_colored_polygon(ap, Color("#b0241c").darkened(0.15) * Color(1, 1, 1, 0.05 * solid))
+			for k in [0, 20]:
+				draw_line(p, ap[k + 1], Color("#b0241c").darkened(0.15) * Color(1, 1, 1, 0.28 * solid), 1.0)
+			# the remembered point itself
+			var mp: Vector2 = o.att["p"] * PX
+			draw_arc(mp, 4.0, 0, TAU, 10,
+				Color("#b0241c").darkened(0.15) * Color(1, 1, 1, 0.55 * solid), 1.0)
 		if show_paths and o.moving and o.path.size() > 0:
 			var last := p
 			for k in range(o.path_i, o.path.size()):

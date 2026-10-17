@@ -125,6 +125,66 @@ Bad habits present on an operator:
 - Stress habits switch on when stress x (1 - resistance) passes their threshold.
 - Personality habits are always on.
 
+## Attention, suppression, wounds and doors
+
+**The cone of attention (short-term memory).** An operator carries a handful of
+*attention entries*: things that have recently demanded their attention and whose
+position is only approximate.
+
+| Learned by | Cone | Lasts |
+|---|---|---|
+| a figure that was recognized, lost, and never watched die | 25 deg | 20 s |
+| a team-mate's contact callout | 30 deg | 25 s |
+| a sound (gunfire, footsteps, a breach) | 35 deg | 18 s |
+| incoming fire: a near miss or a round into cover beside you | 40 deg | 12 s |
+
+The strongest entry still live is the operator's *focus*, and they attend to it
+through a second cone that is independent of where the eyes are pointing. Where
+the cone of vision and the cone of attention overlap, acquisition is faster:
+
+- eyes dead on the focus: **35% off the time on target**
+- the two cones just touching at one edge: **7.5%**
+- no overlap, or the target outside the intersection: nothing
+
+scaled linearly in between. A 35% boost removes 35% of the time. Recognition gets
+the same boost at half strength (`ATT_REC_SHARE`), because spotting a figure and
+swinging onto it are two halves of the same effect.
+
+So the mechanic is a reward for acting on awareness: an operator who keeps looking
+back at the corner the man disappeared behind gets on target a third faster when he
+comes back. One who lets their attention go, or whose eyes are somewhere else, gets
+almost nothing. Memories fade, faster in green, slower with ED02/ED07/ED08, slower
+still with Tinnitus or a fixed scan pattern (BH20). Anyone who *watches* a figure
+die drops the memory at once; the rest keep covering a man who is already dead.
+
+With nothing else asking for the eyes, they come back to the remembered bearing for
+about 0.6 s in every 1.2-2.2 s. That is enough to be looking the right way when it
+matters, without ever locking the eyes up.
+
+**Suppression.** Incoming fire you are not answering degrades everything at once.
+A round passing within a metre, or striking cover within 2 m, raises `suppress`; it
+fades at 0.55/s. Suppression widens the group (x1.6 at full), slows recognition
+(x1.35), costs 15% of movement speed, knocks the sights off every time a burst
+lands so the group has to be rebuilt, and past 0.55 an unsteady hand fires a stray
+shot without being told to (WD09 stops that). Only the echelon's composure blunts
+it. This is what makes covering fire worth anything: GD05 bounding overwatch, GD08
+covering a reloader and WD07 controlled pairs all had no purpose before, because
+there was nothing to suppress the enemy *with*.
+
+**Wounds bleed.** Every round that gets through starts or adds to a bleed, by zone.
+Blood lost is a clock of its own (at 1.0 the operator goes down) and pain gathers
+stress. A wounded operator cannot sprint, and a downed one with blood already gone
+has less than the five minutes.
+
+**Doors are state.** Open, closed or locked. A shut leaf is a real obstacle: it
+blocks sight, bullets and movement at the same time, and it has to be opened before
+anyone goes through it. Opening takes 1.2 s; forcing a locked one takes 2.6 s with
+an 85% + 0.15 x composure chance on the first attempt, and both are loud (6 m and
+30 m). An element halted at a shut door works it with the number one man while the
+rest cover it. Every map except **01 Lone Cabin** starts with every door open, so
+the rest of the game is unchanged; map 01's single door starts shut, which is the
+whole problem of that map.
+
 ## Teams of up to twenty
 
 A team of more than five splits into elements (fire teams) of up to five, as balanced contiguous blocks of slots: 6 = 3+3, 7 = 4+3, 11 = 4+4+3, 20 = 5x4.
@@ -236,7 +296,7 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
 ## Simplifications in this slice
 
 - **The original house:** it is the 14 x 32 ft sketch scaled up to 5 x 13 m and turned on its side so two-person teams fit through it.
-- **Doors:** every door opening is at least 0.9 m, the narrowest gap a body fits on the 0.25 m navigation grid. Doors are always open. Roll-up, dock and garage doors are open arches.
+- **Doors:** every door opening is at least 0.9 m, the narrowest gap a body fits on the 0.25 m navigation grid. Doors default to open; only map 01 starts with one shut. Roll-up, dock and garage doors are open arches. A shut leaf blocks everything at once -- nothing passes part-way through a door.
 - **Path exposure (PF02):** counts doors and windows only. It is precomputed per map (on a 1 m lattice for the big maps), not updated live.
 - **Perception:** pairs more than 15 m apart re-trace sight every 0.2 s, and pairs more than 30 m apart every 0.4 s.
 - **Stoppages:** rates are raised (4 per 1,000 rounds for the rifle, 3 for the pistol) so stoppage drills show up in a short test.
@@ -256,8 +316,10 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
 ## Files
 
 ```
-scripts/data/habits.gd    habits, traits, Experience, sound, echelons, weapons, individual variation
+scripts/data/habits.gd    habits, traits, Experience, sound, echelons, weapons, individual variation,
+                          the effect registry and all tuning constants
 scripts/data/names.gd     the name bank (18 cultures)
+scripts/sim/memory.gd     short-term memory and the cone of attention
 scripts/city/*.gd         the city: generator, templates (police, hospital, school, parks), navigation, roads and vehicles, the director
 scripts/city_main.gd      the Endless Battle scene
 scripts/sim/geom.gd       obstacles, sight lines (with the low-cover rule), bullet traces with height
@@ -277,7 +339,12 @@ tests/                    headless tests and an art gallery
 
 ```
 godot --headless --path . -s res://tests/maps_test.gd -- --run=1           # validate every map, then 5v5 and 20v20 on each
-godot --headless --path . -s res://tests/stall_test.gd                     # six matchups per map; flags time-limit stalls
+godot --headless --path . -s res://tests/stall_test.gd                     # six matchups per map; time-limit stalls and frozen-state watchdogs
+godot --headless --path . -s res://tests/determinism_test.gd               # 27 seeded matches against the stored digests
+godot --headless --path . -s res://tests/determinism_test.gd -- --write    # regenerate tests/fixtures/determinism.json
+godot --headless --path . -s res://tests/habits_test.gd -- --strict        # habit coverage: registry vs call sites
+godot --headless --path . -s res://tests/habits_test.gd -- --csv           # the same report, machine-readable
+godot --headless --path . -s res://tests/playtest.gd -- --n=1 --cells=all --dump-json=/tmp/tv  # per-match JSON
 godot --headless --path . -s res://tests/scale_playtest.gd -- --n=4        # Playtest 02: big fights on every map, CSV
 godot --headless --path . -s res://tests/perf.gd -- --map=10 --t=40        # where the time goes in a 20v20 fight
 godot --headless --path . -s res://tests/fuzz_test.gd -- --n=60            # random maps, sizes, habits, traits, postures
@@ -292,3 +359,22 @@ TR_STEP=1 godot --headless --path . -s res://tests/trace.gd -- --map=4 --a=sof -
 Every test takes `--map=N`. Playtest 01 results and recommended system improvements are in the second tab of the NPC CQB Bible.
 
 Regenerate the art with `python3 tools/make_placeholders.py`. All art is original and project-owned.
+
+Two checks run without Godot at all:
+
+```
+python3 tools/gdlint.py              # lint: indentation, bracket balance, ticker keys, habit coverage
+python3 tools/verify_attention.py    # the cone of attention, checked against its spec
+```
+
+`gdlint.py` checks indentation, bracket balance, that every `ticker` key used is
+declared in `op.gd`, that every habit id referenced exists, and that every declared
+habit has a call site.
+
+`verify_attention.py` re-implements `Memory.boost()` and asserts the properties the
+mechanic was specified with: 35% with the two centre lines aligned, 7.5% where the
+cones just touch, linear and monotonic between them, and zero outside either cone.
+It reads the tuning constants out of `habits.gd` rather than hard-coding them, and it
+greps `memory.gd` for the shape it ported — so if the formula is edited, the script
+stops and says so instead of quietly testing a stale copy. Pass `--verbose` for the
+curve.

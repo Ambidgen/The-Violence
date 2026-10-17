@@ -65,7 +65,7 @@ var last_aim_t := -99.0
 var rec := {}           # enemy id -> recognition progress 0..1+
 var vis := {}           # enemy id -> {los, head_only, ecc, dist}
 var first_rec := {}     # enemy id -> time first recognized
-var tracked := {}       # enemy id -> {lost_t, ready_t}: the enemies held in attention
+var tracked := {}       # enemy id -> {lost_t, ready_dur, ready_at}: held in attention
 var cue := {}           # enemy id -> expiry time of a teammate callout
 var lkp := {}           # enemy id -> {p, t}
 var heard := {}         # last enemy sound heard {p, t, kind}
@@ -77,6 +77,25 @@ var suspended := {}     # good id -> true while overridden
 var m_h := 1.0          # habit multiplier on reaction times
 var bad_lo := -INF      # effective-stress band inside which no bad habit can switch
 var bad_hi := -INF
+
+# ---------------------------------------------------------------- attention (short-term memory)
+## The cone of attention: short-term memory of threats that are not currently in
+## sight. `mem` maps a key (an enemy id, or "@n" for a noise with no known owner)
+## to a record -- see scripts/sim/memory.gd for the shape. The strongest live
+## record is the operator's focus and sets the direction of the attention cone.
+var mem := {}
+var mem_seq := 0
+var vision_half := 1.0472     # cached cone of vision half-angle (rad, 60 deg), set by world.step()
+var att := {}                 # resolved attention cone for this tick {dir, half, kind, ...}
+var att_boost := 0.0          # acquisition boost on the current target, 0 .. 0.35
+var watched := {}             # enemy id -> true once watched die (drops the memory)
+
+# ---------------------------------------------------------------- suppression and wounds
+var suppress := 0.0           # 0..1, incoming fire you cannot answer
+var suppress_t := -99.0       # when it last spiked
+var bleed := 0.0              # blood lost per second
+var blood := 0.0              # accumulated blood loss, 0..1 (1.0 = down)
+var attacker = null           # the last operator who hit this one
 
 var action := {}        # current blocking action {type, left, ...}
 var aim := {}           # aiming state
@@ -97,6 +116,7 @@ var last_shot_t := -99.0
 var last_enemy_seen_t := -99.0
 var reloaded_after_contact := true
 var dbg := ""           # short text describing what the brain is doing
+var ix := 0             # which class of interrupt fired last tick (Brain.Ix)
 var events_bad := []    # for UI: recently activated bad habits
 var shots := 0
 var hits := 0
@@ -104,6 +124,41 @@ var kills := 0
 var room := "OUT"
 var stall_done := {}    # door ids where the doorway stall/pause already happened
 var ticker := {}        # misc timers keyed by name
+
+## The ticker namespace, declared. Every key used anywhere in the simulation must
+## appear here; tools/gdlint.py and tests/habits_test.gd both fail on an
+## undeclared key. Keys ending in "_" are id-prefixed and matched by prefix.
+## Per-*enemy* bookkeeping no longer lives here at all: it moved to `mem`
+## (scripts/sim/memory.gd), which is pruned with the memory it belongs to.
+const TICKER_KEYS := [
+	# --- movement (owner: world._move2 / world.move_to)
+	"step_d", "jam_t", "ghost_until", "prog_p", "repath_t", "prof",
+	"path_fail_until", "drip_d", "sprint_s", "open_t", "open", "prog",
+	"loud_t", "loud_kind",
+	# --- aiming and firing (owner: world._aim_update / _start_acquire)
+	"clicked", "reengage", "hold_pos_until", "stance_t", "crouch", "task_look",
+	"task_look_tick", "far_dest", "far_until", "form_key", "form_p", "support_key",
+	"support_p",
+	# --- reactions (owner: brain._think)
+	"freeze_until", "flinch_until", "last_flinch", "stagger_until", "near_t",
+	"fixate_until", "fixate_p", "sweep_until", "sweep_from", "sweep_t0",
+	"salient", "salient_next", "duck_action", "retreat", "investigate",
+	# --- cover (owner: brain._cover_point / _find_cover)
+	"cover_next", "cover_cache", "cover_dest", "cover_dest_t", "cover_wait",
+	"in_cover_check", "in_cover_t",
+	# --- scanning (owner: brain._scan)
+	"scan_next", "ll_",
+	# --- attention (owner: brain._finish_look2 / on_heard)
+	"att_next", "att_until", "heard_bearing", "heard_until",
+	# --- group discipline (owner: brain._go)
+	"gd03_wait",
+	# --- survival (owner: world._hit / _down / _passive)
+	"down_t", "down_where", "down_by", "down_by_name", "down_by_fac", "melee_until",
+	# --- city (owner: brain / director)
+	"flag_said", "claimed_by",
+	# --- tests only (owner: tests/*)
+	"no_bonus",
+]
 
 # ---------------------------------------------------------------- city (endless battle)
 var assault := false    # gang expansion team: may fire on rival gangs and police at will
@@ -163,6 +218,17 @@ func reset() -> void:
 		active = "pistol"
 	alert = alert_floor
 	alert_t = 0.0
+	mem = {}
+	mem_seq = 0
+	watched = {}
+	att = {}
+	att_boost = 0.0
+	vision_half = 1.0472
+	suppress = 0.0
+	suppress_t = -99.0
+	bleed = 0.0
+	blood = 0.0
+	attacker = null
 
 
 ## A good habit counts only if the operator has it and no active bad habit overrides it.
@@ -231,6 +297,27 @@ func any_loaded() -> bool:
 
 func busy() -> bool:
 	return not action.is_empty()
+
+
+## Carrying capacity left: a wounded operator cannot sprint.
+func cap_mode(mode: String) -> String:
+	if mode == "sprint" and (wounds > 0 or blood > 0.35):
+		return "run"
+	return mode
+
+
+func bleeding() -> bool:
+	return bleed > 0.0
+
+
+func suppressed() -> bool:
+	return suppress > 0.05
+
+
+## Does this operator have something in short-term memory worth glancing at?
+## True when a live attention entry exists and no enemy is currently in sight.
+func att_alert() -> bool:
+	return (not att.is_empty()) and n_los == 0
 
 
 func moving_speed() -> float:

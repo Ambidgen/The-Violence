@@ -7,6 +7,7 @@ const Geom = preload("res://scripts/sim/geom.gd")
 const Op = preload("res://scripts/sim/op.gd")
 const Brain = preload("res://scripts/sim/brain.gd")
 const Names = preload("res://scripts/data/names.gd")
+const Memory = preload("res://scripts/sim/memory.gd")
 
 const DT := 1.0 / 30.0
 const SPEEDS := {"walk": 1.6, "entry": 2.0, "clear": 1.2, "slice": 1.0, "creep": 0.8, "run": 3.0, "sprint": 4.0, "step": 1.2}
@@ -159,6 +160,11 @@ func add_op(o) -> void:
 	o.cue = {}
 	o.heard = {}
 	o.aim = {}
+	o.mem = {}
+	o.watched = {}
+	o.suppress = 0.0
+	o.blood = 0.0
+	o.bleed = 0.0
 	_attach(o)
 	_update_bad(o, true)
 
@@ -186,19 +192,38 @@ func remove_op(o) -> void:
 		x.tracked.erase(oid)
 		x.first_rec.erase(oid)
 		x.cue.erase(oid)
+		x.watched.erase(oid)
 		if x.aim.get("tid", "") == oid:
 			x.aim = {}
-		for pre in ["confirm_", "tot_", "froze_", "assessed_", "pf07_", "farcover_", "callout_"]:
+		# per-enemy memory (and the bookkeeping that used to be id-prefixed
+		# ticker keys) is one record, so it goes with one call
+		x.mem.erase(oid)
+		for pre in ["farcover_"]:
 			x.ticker.erase(pre + oid)
 	for tm2 in teams:
 		tm2["lkps"].erase(oid)
 	o.mounted = null
+	o.attacker = null
 
 
 # ================================================================== main loop
 var profiling := false
 var prof := {}
 var prof_n := {}
+
+## The intent boundary (Tier 2 #12). Every decision the brain makes that changes
+## the world goes through move_to / stop / start_action / engage, so those four
+## are the only places that need to notice when a decision is recorded. Nothing
+## reads `commands` yet -- it is there so a match can be introspected decision by
+## decision, and so a player-issued command has somewhere to go.
+var record := false
+var commands: Array = []
+
+
+func _cmd(kind: String, o, data: Dictionary) -> void:
+	if not record:
+		return
+	commands.append({"t": t, "k": kind, "id": o.id, "d": data})
 
 
 func _pf(key: String, t0: int) -> int:
@@ -219,6 +244,15 @@ func step() -> void:
 		_update_dormancy()
 	if profiling:
 		t0 = _pf("dormancy", t0)
+	# attention: cache the cone of vision, drop memories that have faded, and
+	# resolve this tick's cone of attention before anything looks at anything
+	for o in ops:
+		if o.alive() and not o.dormant and not o.medic and o.mounted == null:
+			o.vision_half = cone_half(o)
+			Memory.prune(o, t)
+			o.att = Memory.focus(o, t)
+	if profiling:
+		t0 = _pf("attention", t0)
 	var bad_tick: bool = not city or int(round(t / DT)) % 3 == 0
 	for o in ops:
 		if o.alive() and not o.dormant and not o.medic and o.mounted == null:
@@ -739,6 +773,10 @@ func _perceive(o) -> void:
 	o.n_los = n
 
 
+## Recognition is faster where the cone of vision and the cone of attention
+## overlap, at Habits.ATT_REC_SHARE of the full strength: spotting a figure and
+## swinging onto it are two halves of the same "I was already looking for it".
+## Suppression slows it, and only the composure of the echelon resists that.
 func t_rec(o, e, ecc: float, head_only: bool) -> float:
 	var ed := rad_to_deg(ecc) / 60.0
 	var E := 1.0 + 2.5 * ed * ed
@@ -748,9 +786,11 @@ func t_rec(o, e, ecc: float, head_only: bool) -> float:
 	if e.vel.length() > 0.3:
 		X *= 0.8
 	var S: float = 1.0 + 0.5 * o.stress * (1.0 - o.ech["resist"])
+	S *= 1.0 + Habits.SUPP_REC * o.suppress * (1.0 - 0.5 * float(o.ech["resist"]))
 	var C := 0.6 if o.cue.get(e.id, -1.0) > t else 1.0
 	var G := 1.3 if o.alert == Op.GREEN else 1.0
-	return o.ech["t_rec0"] * o.m_h * E * X * S * C * G
+	var A: float = 1.0 - Habits.ATT_REC_SHARE * Memory.boost_on(o, e, t)
+	return o.ech["t_rec0"] * o.m_h * E * X * S * C * G * A
 
 
 ## Experience: an operator holds up to `exp` enemies in attention. A tracked enemy is
@@ -764,8 +804,14 @@ func _update_tracking(o, half: float) -> void:
 			continue
 		var tr: Dictionary = o.tracked[eid]
 		if not e.alive():
-			var until: float = o.ticker.get("confirm_" + eid, e.ticker.get("down_t", t) + 0.15)
+			var until: float = Memory.field(o, eid, "confirm_t", e.ticker.get("down_t", t) + 0.15)
 			if t > until:
+				# watched him go down: let the memory go with him. Otherwise he
+				# is still out there as far as this operator knows.
+				if o.watched.has(eid):
+					Memory.forget(o, eid)
+				else:
+					Memory.note_lost(o, eid, t)
 				o.tracked.erase(eid)
 			continue
 		var v: Dictionary = o.vis.get(eid, {})
@@ -778,6 +824,9 @@ func _update_tracking(o, half: float) -> void:
 		elif tr["lost_t"] < 0.0:
 			tr["lost_t"] = t
 		elif t - tr["lost_t"] > 0.3:
+			# contact broken on a figure this operator never saw die: that is
+			# exactly what short-term memory is for
+			Memory.note_lost(o, eid, t)
 			o.tracked.erase(eid)
 	if o.tracked.size() >= o.exp or o.n_los == 0:
 		return
@@ -799,7 +848,10 @@ func _update_tracking(o, half: float) -> void:
 	for c in cands:
 		if o.tracked.size() >= o.exp:
 			break
-		o.tracked[c[1]] = {"lost_t": -1.0, "ready_t": INF}
+		# ready_dur / ready_at: the parallel set-up started at recognition, kept as
+		# a duration so the attention boost can be applied at the moment of the
+		# switch rather than frozen at the moment of recognition
+		o.tracked[c[1]] = {"lost_t": -1.0, "ready_dur": INF, "ready_at": 0.0}
 
 
 func _recognize(o) -> void:
@@ -838,8 +890,9 @@ func _recognize(o) -> void:
 				o.last_enemy_seen_t = t
 				# aim set up in parallel from the moment of recognition
 				var tr: Dictionary = o.tracked[e.id]
-				if tr["ready_t"] == INF:
-					tr["ready_t"] = t + _acquire_time(o, e, "chest", false)
+				if float(tr.get("ready_dur", INF)) == INF:
+					tr["ready_dur"] = _acquire_time(o, e, "chest", false, false)
+					tr["ready_at"] = t
 			if not was:
 				_on_recognized(o, e)
 
@@ -880,13 +933,13 @@ func _on_recognized(o, e) -> void:
 	if director != null:
 		director.on_recognized(o, e)
 	teams[o.team]["last_contact"] = t
-	if o.hb("BH01") and not o.ticker.has("froze_" + e.id):
-		o.ticker["froze_" + e.id] = true
+	if o.hb("BH01") and not Memory.has_field(o, e.id, "froze"):
+		Memory.set_field(o, e.id, "froze", true)
 		o.freeze_add = rng.randf_range(0.4, 1.0)
 		o.ticker["freeze_until"] = t + o.freeze_add
 		say("%s freezes for %.1f s" % [o.id, o.freeze_add], "bad")
-	if o.has("GD04") and t - o.ticker.get("callout_" + e.id, -99.0) > 5.0:
-		o.ticker["callout_" + e.id] = t
+	if o.has("GD04") and t - float(Memory.field(o, e.id, "callout_t", -99.0)) > 5.0:
+		Memory.set_field(o, e.id, "callout_t", t)
 		for m in mates_near(o, 30.0):
 			raise_alert(m, Op.YELLOW)
 			if m.has("GD04"):
@@ -904,6 +957,7 @@ func start_action(o, type: String, dur: float, extra := {}) -> void:
 	for k in extra:
 		o.action[k] = extra[k]
 	o.aim = {}
+	_cmd("act", o, {"type": type, "dur": dur})
 	if type == "reload" or type == "clear":
 		emit_sound(o, "reload")
 	if (type == "reload" or type == "clear") and o.has("GD08"):
@@ -944,6 +998,24 @@ func _finish_action(o) -> void:
 				start_action(o, "clear", a["total"], {"p_ok": a["p_ok"]})
 		"click":
 			o.ticker["clicked"] = true
+		"open", "breach":
+			var did: String = a.get("did", "")
+			if did == "":
+				break
+			var was_locked: bool = bool(a.get("locked", false))
+			var ok := true
+			if was_locked:
+				# forcing a door is a composure problem, not a weapons problem
+				ok = rng.randf() < Habits.DOOR_BREACH_P + 0.15 * float(o.ech["resist"])
+			if ok:
+				level.set_door(did, Habits.DOOR_STATE_OPEN)
+				nav.sync_doors(level)
+				emit_sound(o, "breach" if was_locked else "door")
+				say("%s %s the door" % [o.id, "breaches" if was_locked else "opens"], "info")
+				emit({"type": "door", "id": did, "p": level.doors[did]["c"], "open": true})
+			else:
+				say("%s: the door holds, again" % o.id, "info")
+				start_action(o, "breach", a["total"], {"did": did, "locked": true})
 
 
 func blocks_move(o) -> bool:
@@ -951,16 +1023,19 @@ func blocks_move(o) -> bool:
 		return true
 	if o.action.is_empty():
 		return false
-	return o.action["type"] in ["reload", "clear", "check", "stall", "click", "melee"]
+	return o.action["type"] in ["reload", "clear", "check", "stall", "click", "melee", "open", "breach"]
 
 
 # ================================================================== movement
 func move_to(o, p: Vector2, mode: String, prof := -1) -> void:
 	if prof < 0:
 		prof = (1 if o.has("PF01") else 0) | (2 if o.has("PF02") else 0)
-	o.goal_mode = mode
-	var spd: float = SPEEDS.get(mode, 1.6)
+	# a wounded or badly bleeding operator cannot sprint; suppression costs pace
+	var pace: String = o.cap_mode(mode)
+	o.goal_mode = pace
+	var spd: float = SPEEDS.get(pace, 1.6)
 	spd *= 1.0 - 0.04 * o.plates_max
+	spd *= 1.0 - Habits.SUPP_SPEED * o.suppress
 	if o.wounds > 0:
 		spd *= 0.7
 	if o.leg_hit:
@@ -991,11 +1066,13 @@ func move_to(o, p: Vector2, mode: String, prof := -1) -> void:
 		o.path_i = 1
 		o.ticker["prof"] = prof
 	o.moving = true
+	_cmd("move", o, {"p": p, "mode": pace, "prof": prof})
 
 
 ## Pause movement but keep the path, so resuming toward the same goal costs nothing.
 func stop(o) -> void:
 	o.moving = false
+	_cmd("stop", o, {})
 
 
 func at(o, p: Vector2, tol := 0.35) -> bool:
@@ -1051,7 +1128,13 @@ func _move2(o) -> void:
 		o.ticker["step_d"] = o.ticker.get("step_d", 0.0) + moved
 		if o.ticker["step_d"] >= 1.2:
 			o.ticker["step_d"] = 0.0
-			emit_sound(o, o.goal_mode)
+			# what the pace sounds like is declared in one table: sprinting and
+			# running are heard, creeping and slicing the pie are not
+			var loud: String = Habits.mode_loud(o.goal_mode)
+			if loud != "":
+				emit_sound(o, loud)
+				o.ticker["loud_t"] = t
+				o.ticker["loud_kind"] = loud
 	if o.moving and o.sidestep.is_empty() and moved < 0.005:
 		o.ticker["jam_t"] = o.ticker.get("jam_t", 0.0) + DT
 		if o.ticker["jam_t"] > 1.0:
@@ -1071,7 +1154,10 @@ func _move2(o) -> void:
 
 # ================================================================== aiming and firing
 func sigma_shooter(o, settle: float) -> float:
-	return o.ech["s_min"] + (o.ech["s_snap"] - o.ech["s_min"]) * exp(-settle / o.ech["tau"])
+	var s: float = o.ech["s_min"] + (o.ech["s_snap"] - o.ech["s_min"]) * exp(-settle / o.ech["tau"])
+	s *= 1.0 + Habits.SUPP_SIGMA * o.suppress
+	s *= 1.0 + Habits.WOUND_SIGMA * o.wounds
+	return s
 
 
 func engage(o, e, zone: String, fire := true) -> void:
@@ -1084,10 +1170,16 @@ func engage(o, e, zone: String, fire := true) -> void:
 			teams[e.team]["police_t"] = t
 	o.aim["want_t"] = t
 	o.aim["fire"] = fire
+	_cmd("engage", o, {"tid": e.id, "zone": zone, "fire": fire})
 
 
 ## Fitts-law time on target from the current muzzle direction (bible section 2.3).
-func _acquire_time(o, e, zone: String, arm := true) -> float:
+## `boosted` applies the cone-of-attention overlap: where the eyes and the
+## attention are both already pointed at the target, up to Habits.ATT_BOOST_MAX
+## (35%) of the time on target disappears. Pass false when the number is being
+## stored for later (the parallel set-up at recognition), because attention can
+## still move between then and the shot.
+func _acquire_time(o, e, zone: String, arm := true, boosted := true) -> float:
 	var to: Vector2 = e.pos - o.pos
 	var d := maxf(to.length(), 0.5)
 	var dth := absf(angle_difference(o.muzzle_dir, to.angle()))
@@ -1101,6 +1193,8 @@ func _acquire_time(o, e, zone: String, arm := true) -> float:
 	tt = maxf(tt, dth / deg_to_rad(o.ech["turn"]))
 	if arm and o.arm_hit:
 		tt += 0.2
+	if boosted:
+		tt *= 1.0 - Memory.boost_on(o, e, t)
 	return tt
 
 
@@ -1110,11 +1204,14 @@ func _start_acquire(o, e, zone: String) -> void:
 	var dth := absf(angle_difference(o.muzzle_dir, bearing))
 	var tt: float = _acquire_time(o, e, zone, false)
 	# Experience: a target already acquired in parallel is switched to almost at once
-	# (weapon and plates make a few milliseconds of difference)
+	# (weapon and plates make a few milliseconds of difference). The set-up was
+	# stored as a duration, so today's attention boost applies to what is left.
 	var tr = o.tracked.get(e.id, null)
-	if tr != null and tr["ready_t"] != INF and (o.aim.get("tid", "") != e.id or o.aim.get("weapon", "") != o.active):
+	if tr != null and float(tr.get("ready_dur", INF)) != INF \
+			and (o.aim.get("tid", "") != e.id or o.aim.get("weapon", "") != o.active):
 		var sw: float = o.wpn()["switch"] + Habits.SWITCH_PER_PLATE * o.plates_max
-		tt = maxf(tr["ready_t"] - t, sw)
+		var left: float = float(tr["ready_at"]) + float(tr["ready_dur"]) * (1.0 - Memory.boost_on(o, e, t)) - t
+		tt = maxf(left, sw)
 	if o.arm_hit:
 		tt += 0.2
 	if o.freeze_add > 0.0:
@@ -1146,8 +1243,8 @@ func _aim_update(o) -> void:
 		if o.aim["acq_left"] <= 0.0:
 			o.aim["on"] = true
 			o.aim["settle"] = 0.0
-			if not o.ticker.has("tot_" + e.id) and e.alive():
-				o.ticker["tot_" + e.id] = true
+			if not Memory.has_field(o, e.id, "tot") and e.alive():
+				Memory.set_field(o, e.id, "tot", true)
 				say("%s on target %s after %.2f s (%.0f deg traverse)" % [o.id, e.id, o.aim["acq_total"], rad_to_deg(o.aim["dth"])], "info")
 		return
 	o.muzzle_dir = bearing
@@ -1278,13 +1375,25 @@ func _fire(o, bearing: float, aim_z: float, dist: float, settle: float) -> void:
 			continue
 		var rel2: Vector2 = a.pos - o.pos
 		var sa2 := rel2.dot(u)
-		if sa2 > 0.3 and sa2 < best + 1.0 and absf(rel2.cross(u)) < 1.0:
+		var lat2: float = absf(rel2.cross(u))
+		if sa2 > 0.3 and sa2 < best + 1.0 and lat2 < Habits.SUPP_LATERAL:
 			add_stress(a, 0.15, "near miss")
 			a.ticker["near_t"] = t
+			# the closer it passed, the harder it pins
+			add_suppress(a, Habits.SUPP_GAIN * (1.0 - lat2 / Habits.SUPP_LATERAL), "near miss")
 	if hit_op != null:
 		_hit(hit_op, hit_zone, hit_lat, u, o)
 	elif mh["hit"]:
 		emit({"type": "impact", "p": mh["p"], "n": mh["n"], "kind": mh["kind"]})
+		# a round into the wall beside you suppresses you too -- this is what
+		# makes covering fire, bounding overwatch and covering a reloader worth doing
+		var ip: Vector2 = mh["p"]
+		for a in near(ip, Habits.SUPP_IMPACT_R):
+			if a == o or not a.alive() or a.medic:
+				continue
+			if a.pos.distance_to(ip) <= Habits.SUPP_IMPACT_R:
+				add_suppress(a, Habits.SUPP_IMPACT, "round into cover")
+				add_stress(a, Habits.SUPP_MIN_STRESS_BOOST, "impact")
 	var pj: float = w["stop"] * (0.5 if o.has("WD04") else 1.0)
 	if rng.randf() < pj:
 		s["jam"] = true
@@ -1354,6 +1463,21 @@ func in_sector(m, dir: float) -> bool:
 	return absf(angle_difference(dir, sec)) <= el["sector_half"] + deg_to_rad(20.0)
 
 
+## Suppression: incoming fire you are not answering. It widens the group, slows
+## recognition and movement, knocks the sights off every time a burst lands, and
+## eventually makes the trigger finger twitch. There is no habit for it -- only
+## the echelon's composure (resist) blunts it, and WD09 stops the stray shot.
+func add_suppress(a, amt: float, _why: String) -> void:
+	if amt <= 0.0 or not a.alive():
+		return
+	a.suppress = minf(1.0, a.suppress + amt * (1.0 - 0.5 * float(a.ech["resist"])))
+	a.suppress_t = t
+	if not a.aim.is_empty():
+		a.aim["settle"] = 0.0
+	if a.suppress > 0.35:
+		raise_alert(a, Op.YELLOW)
+
+
 func add_stress(a, amt: float, _why: String) -> void:
 	a.stress = minf(1.0, a.stress + amt)
 	a.last_stress_t = t
@@ -1394,6 +1518,9 @@ func _hit(a, zn: Array, lat: float, u: Vector2, shooter) -> void:
 		return
 	shooter.hits += 1
 	stat["hits"] += 1
+	a.attacker = shooter
+	# every round that gets through starts or adds to a bleed
+	a.bleed += float(Habits.BLEED_RATE.get(zone, 0.0))
 	var power := 1.0
 	match zone:
 		"head":
@@ -1439,6 +1566,7 @@ func _wound(a, where: String) -> void:
 
 
 func _down(a, shooter, killed: bool, where: String) -> void:
+	var self_inflicted: bool = a == shooter
 	a.state = "dead" if killed else "down"
 	a.stance = Op.DOWN
 	a.stance_goal = Op.DOWN
@@ -1453,11 +1581,26 @@ func _down(a, shooter, killed: bool, where: String) -> void:
 	a.ticker["down_by"] = shooter.id
 	a.ticker["down_by_name"] = shooter.name
 	a.ticker["down_by_fac"] = shooter.faction
-	shooter.kills += 1
-	say("%s %s (%s, by %s)" % [a.id, "KILLED" if killed else "DOWN", where, shooter.id], "kill")
+	if not self_inflicted:
+		shooter.kills += 1
+	say("%s %s (%s%s)" % [a.id, "KILLED" if killed else "DOWN", where,
+		"" if self_inflicted else ", by " + shooter.id], "kill")
 	emit({"type": "down", "id": a.id, "killed": killed, "p": a.pos})
 	if killed:
 		_record_death(a, "killed")
+	# who watched it happen? Those who did can let go of the memory; the rest
+	# keep a cone of attention on a man they never saw fall.
+	for m in near(a.pos, 30.0):
+		if m == a or not m.alive() or m.medic:
+			continue
+		if not potential(m, a):
+			continue
+		if m.vis.get(a.id, {}).get("los", false) or geom.sight_clear(m.pos, m.eye(), a.pos, 0.9):
+			m.watched[a.id] = true
+			if m.faction != a.faction:
+				Memory.forget(m, a.id)
+		elif m.faction != a.faction and m.mem.has(a.id):
+			Memory.note_lost(m, a.id, t)
 	for m in mates_near(a, 25.0):
 		if geom.sight_clear(m.pos, m.eye(), a.pos, 0.3):
 			add_stress(m, 0.10, "friend down")
@@ -1596,10 +1739,14 @@ func _integrate2(o) -> void:
 func _passive(o) -> void:
 	if o.recoil > 0.01:
 		o.recoil *= exp(-DT / o.ech["tr"])
+	if o.suppress > 0.0:
+		o.suppress = maxf(0.0, o.suppress - Habits.SUPP_DECAY * DT)
 	if o.dormant and o.stress <= 0.0:
 		return
 	if not o.alive():
-		if o.state == "down" and not o.carried and t - o.ticker.get("down_t", t) >= BLEED_OUT:
+		# the five-minute clock runs faster the more blood is already gone
+		var clock: float = BLEED_OUT * (1.0 - Habits.BLEEDOUT_WOUND_MUL * minf(o.blood, 1.0))
+		if o.state == "down" and not o.carried and t - o.ticker.get("down_t", t) >= clock:
 			o.state = "dead"
 			say("%s dies of wounds" % o.id, "kill")
 			emit({"type": "bled_out", "id": o.id, "p": o.pos})
@@ -1607,6 +1754,23 @@ func _passive(o) -> void:
 			if director != null:
 				director.on_bled_out(o)
 		return
+	# wounds bleed: blood lost is a clock of its own, and pain is stress
+	if o.bleed > 0.0:
+		o.blood += o.bleed * DT
+		if o.wounds > 0:
+			o.stress = minf(1.0, o.stress + Habits.BLEED_DOWN_STRESS * o.wounds * DT)
+		if o.blood >= 1.0:
+			say("%s goes down having bled out" % o.id, "hit")
+			_down(o, o.attacker if o.attacker != null else o, true, "blood loss")
+			return
+	# suppressed badly enough, an unsteady hand fires without being told to
+	if o.suppress > Habits.SUPP_STRAY_T and not o.has("WD09") and o.action.is_empty() \
+			and o.ws()["mag"] > 0:
+		var over: float = (o.suppress - Habits.SUPP_STRAY_T) / (1.0 - Habits.SUPP_STRAY_T)
+		if rng.randf() < Habits.SUPP_STRAY * over * DT:
+			say("%s fires a suppressed stray shot" % o.id, "bad")
+			stat["stray"] += 1
+			_fire(o, o.muzzle_dir, 1.0, 8.0, 0.0)
 	if t - o.last_stress_t > 1.0 and t - o.last_enemy_seen_t > 1.0:
 		o.stress = maxf(0.0, o.stress - 0.1 * DT)
 

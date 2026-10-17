@@ -500,9 +500,11 @@ func _build_run() -> void:
 	speed_note.add_theme_font_size_override("font_size", 11)
 	r.add_child(speed_note)
 	var ho := _h(r)
-	for nm in ["Cones", "Recognition", "Aim", "Paths"]:
+	for nm in ["Cones", "Attention", "Recognition", "Aim", "Paths"]:
 		var b2 := _btn(ho, nm, func(on): main.set_overlay(nm, on), true)
 		b2.set_pressed_no_signal(nm != "Paths")
+		if nm == "Attention":
+			b2.tooltip_text = "The cone of attention: what each operator remembers and is watching for. Where it overlaps the cone of vision, target acquisition is up to 35% faster."
 	roster = RichTextLabel.new()
 	roster.bbcode_enabled = true
 	roster.scroll_active = true
