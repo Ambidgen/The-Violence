@@ -373,8 +373,8 @@ func sight_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float) -> in
 						if h <= LOW_COVER_H and za > h:
 							h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
 						stop = zlo < h
-				if stop:
-					mask &= ~(1 << k)
+					if stop:
+						mask &= ~(1 << k)
 			if mask == 0:
 				return 0
 		if (x == xe and y == ye) or guard > 512:
@@ -445,7 +445,10 @@ func trace_shot(a: Vector2, za: float, b: Vector2, zb: float) -> Dictionary:
 
 
 ## Does a disc of radius rad at p overlap any movement-blocking obstacle?
-func blocked_disc(p: Vector2, rad: float) -> bool:
+## `with_dyn` includes the dynamic set (shut door leaves). Pass false to ask
+## about the static map alone -- nav's cost layers must, or a leaf that starts
+## shut gets baked into the grid and can never be reopened (map 01).
+func blocked_disc(p: Vector2, rad: float, with_dyn := true) -> bool:
 	if p.x < rad or p.y < rad or p.x > width - rad or p.y > height - rad:
 		return true
 	var x0 := clampi(int(floor(p.x - rad)), 0, _cw - 1)
@@ -463,7 +466,7 @@ func blocked_disc(p: Vector2, rad: float) -> bool:
 				var q := Vector2(clampf(p.x, r.position.x, r.end.x), clampf(p.y, r.position.y, r.end.y))
 				if q.distance_squared_to(p) < rad * rad:
 					return true
-	if dyn_active > 0:
+	if with_dyn and dyn_active > 0:
 		for i in dyn_rect.size():
 			if dyn_on[i] == 0:
 				continue

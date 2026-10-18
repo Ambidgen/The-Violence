@@ -1001,7 +1001,7 @@ func _finish_action(o) -> void:
 		"open", "breach":
 			var did: String = a.get("did", "")
 			if did == "":
-				break
+				return
 			var was_locked: bool = bool(a.get("locked", false))
 			var ok := true
 			if was_locked:
@@ -1286,6 +1286,11 @@ func _aim_update(o) -> void:
 		return
 	o.aim["hold"] = 0.0
 	fire_at(o, e, o.aim["zone"], o.aim["settle"])
+	if o.aim.is_empty():
+		# fire_at is re-entrant: a hit victim's reaction fire (add_stress >= 0.15)
+		# or a near-miss stray can fire _fire() inside this shot, and that nested
+		# fire can down this operator -- _down clears o.aim. Nothing to count.
+		return
 	o.aim["pair"] += 1
 	o.aim["settle"] = 0.0
 	if o.hb("BH19"):
@@ -1601,6 +1606,9 @@ func _down(a, shooter, killed: bool, where: String) -> void:
 				Memory.forget(m, a.id)
 		elif m.faction != a.faction and m.mem.has(a.id):
 			Memory.note_lost(m, a.id, t)
+	for x in ops:
+		if x != a and x.mem.has(a.id):
+			Memory.fade(x, a.id)
 	for m in mates_near(a, 25.0):
 		if geom.sight_clear(m.pos, m.eye(), a.pos, 0.3):
 			add_stress(m, 0.10, "friend down")

@@ -372,7 +372,11 @@ const EFFECTS := {
 	"BH14": ["movement_mode", "entry_geometry"],
 	"BH15": ["movement_mode", "eyes", "team_task"],
 	"BH16": ["target_selection", "fire_cadence"],
-	"BH17": ["fire_cadence", "reload_policy"],
+	# BH17 is pure suspension: it only disables WD01/WD02/WD04, and everything its
+	# description promises ("no function checks, no round count, reloads only when
+	# dry") is exactly what those three habits add. Declaring hooks here was a
+	# promise of call sites that do not exist -- habits_test --strict caught it.
+	"BH17": [],
 	"BH18": ["acquisition", "eyes"],
 	"BH19": ["fire_cadence", "target_selection"],
 	"BH20": ["eyes", "sound_reaction", "entry_geometry"],
