@@ -176,7 +176,7 @@ func _build_layers() -> void:
 	for y in ny:
 		for x in nx:
 			var p := cell_centre(Vector2i(x, y))
-			solid[y * nx + x] = 1 if geom.blocked_disc(p, RADIUS) else 0
+			solid[y * nx + x] = 1 if geom.blocked_disc(p, RADIUS, false) else 0
 	# PF01: doorway (threshold) cells within 1.5 m of every door
 	for id in level.doors:
 		var c: Vector2 = level.doors[id]["c"]

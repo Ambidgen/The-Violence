@@ -350,9 +350,11 @@ godot --headless --path . -s res://tests/perf.gd -- --map=10 --t=40        # whe
 godot --headless --path . -s res://tests/fuzz_test.gd -- --n=60            # random maps, sizes, habits, traits, postures
 godot --headless --path . -s res://tests/sim_test.gd -- --n=12             # matchups by echelon (map 00, 2v2)
 godot --headless --path . -s res://tests/sim_test.gd -- --ablation         # 40 habits vs none, same reflexes
+godot --headless --path . -s res://tests/sim_test.gd -- --exp-sweep --n=20 # H1: only Experience moves (5v5 hunt)
 godot --headless --path . -s res://tests/playtest.gd -- --n=40 --cells=all # Playtest 01 matrix (map 00), CSV rows
 godot --headless --path . -s res://tests/city_test.gd -- --seed=3          # build the city, check every room is reachable
 godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10  # the endless battle headless, with timings
+godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10 --gangs=sof   # H5: all gangs one echelon
 TR_STEP=1 godot --headless --path . -s res://tests/trace.gd -- --map=4 --a=sof --na=8 --b=militia --nb=8   # step-by-step trace
 ```
 
@@ -365,6 +367,13 @@ Two checks run without Godot at all:
 ```
 python3 tools/gdlint.py              # lint: indentation, bracket balance, ticker keys, habit coverage
 python3 tools/verify_attention.py    # the cone of attention, checked against its spec
+```
+
+And one that reads what a playtest dumped:
+
+```
+python3 tools/aggregate_playtest.py /tmp/tv        # aggregate playtest --dump-json output
+python3 tools/aggregate_playtest.py /tmp/tv --csv   # the same, machine-readable
 ```
 
 `gdlint.py` checks indentation, bracket balance, that every `ticker` key used is

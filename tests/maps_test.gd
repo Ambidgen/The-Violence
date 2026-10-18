@@ -35,6 +35,14 @@ func _init() -> void:
 		var t1 := Time.get_ticks_msec()
 		var nav = Nav.new()
 		nav.build(lv)
+		# Topology is validated with every door openable. A door that starts shut
+		# (map 01's whole point) is a gameplay state, not a map defect -- but the
+		# matches below must still start from the map's own door states.
+		var door0 := {}
+		for did in lv.doors:
+			door0[did] = lv.doors[did]["state"]
+			lv.set_door(did, "open")
+		nav.sync_doors(lv)
 		var t2 := Time.get_ticks_msec()
 		var n_int := 0
 		for name in lv.rooms:
@@ -43,6 +51,9 @@ func _init() -> void:
 		print("map %02d %-40s %dx%d m  rooms %d  doors %d  windows %d  obstacles %d  build %d ms  nav %d ms" % [
 			i, lv.map_name, int(lv.W), int(lv.H), n_int, lv.doors.size(), lv.windows.size(), lv.geom.obs.size(), t1 - t0, t2 - t1])
 		problems += _check(lv, nav)
+		for did in door0:
+			lv.set_door(did, door0[did])
+		nav.sync_doors(lv)
 		for r in runs:
 			for sz in sizes:
 				_match(lv, nav, sz[0], sz[1], ech, 9100 + r)
