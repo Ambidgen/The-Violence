@@ -84,10 +84,11 @@ Three more were found by running the suites:
    empty, and `reset_blocks()`/`sync_doors` never re-flooded — `nav.reach` said
    map 01's cabin was unreachable **even after a breach**. The nav layer now
    builds from static geometry alone (`blocked_disc(..., false)`); door leaves
-   live only in the reversible block path. And `snap_posts` no longer moves a
-   post just because its room is currently sealed: a post is wrong only inside a
-   wall, a shut door is the *attacker's* problem. Together these fix map 01's
-   silent breakage: its defenders were being snapped out of the cabin.
+   live only in the reversible block path.
+6. **`snap_posts` ejected defenders from legitimately sealed rooms**
+   (`level.gd`). A post is wrong only inside a wall; a shut door is the
+   *attacker's* problem. Together with #5 this explains map 01's silent
+   breakage: its defenders were being snapped out of the cabin.
 
 All fixes change behaviour, so the determinism fixture was regenerated after
 them and is the baseline from here on.
