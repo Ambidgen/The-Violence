@@ -1,0 +1,193 @@
+{
+  "cases": {
+    "m00_2v2_sof_untrained_1001": {
+      "digest": "225954077",
+      "hits": 2,
+      "shots": 2,
+      "t": 40.5000000000003,
+      "winner": 0
+    },
+    "m00_2v2_sof_untrained_2002": {
+      "digest": "773287848",
+      "hits": 3,
+      "shots": 3,
+      "t": 41.0000000000002,
+      "winner": 0
+    },
+    "m00_2v2_sof_untrained_3003": {
+      "digest": "2703946888",
+      "hits": 3,
+      "shots": 3,
+      "t": 41.0666666666669,
+      "winner": 0
+    },
+    "m00_3v5_police_militia_1001": {
+      "digest": "3122979039",
+      "hits": 9,
+      "shots": 12,
+      "t": 38.1000000000004,
+      "winner": 0
+    },
+    "m00_3v5_police_militia_2002": {
+      "digest": "2815099956",
+      "hits": 8,
+      "shots": 19,
+      "t": 37.8666666666671,
+      "winner": 0
+    },
+    "m00_3v5_police_militia_3003": {
+      "digest": "4286754992",
+      "hits": 8,
+      "shots": 18,
+      "t": 38.2000000000004,
+      "winner": 0
+    },
+    "m00_5v5_regular_regular_1001": {
+      "digest": "391583899",
+      "hits": 17,
+      "shots": 92,
+      "t": 63.7333333333323,
+      "winner": 1
+    },
+    "m00_5v5_regular_regular_2002": {
+      "digest": "3722267169",
+      "hits": 8,
+      "shots": 38,
+      "t": 40.6333333333336,
+      "winner": 1
+    },
+    "m00_5v5_regular_regular_3003": {
+      "digest": "587824405",
+      "hits": 15,
+      "shots": 57,
+      "t": 46.4999999999999,
+      "winner": 1
+    },
+    "m01_2v2_sof_militia_1001": {
+      "digest": "2226957187",
+      "hits": 2,
+      "shots": 2,
+      "t": 8.29999999999998,
+      "winner": 0
+    },
+    "m01_2v2_sof_militia_2002": {
+      "digest": "1893041447",
+      "hits": 2,
+      "shots": 2,
+      "t": 5.33333333333332,
+      "winner": 0
+    },
+    "m01_2v2_sof_militia_3003": {
+      "digest": "744964106",
+      "hits": 2,
+      "shots": 2,
+      "t": 3.83333333333333,
+      "winner": 0
+    },
+    "m01_4v4_regular_untrained_1001": {
+      "digest": "1729383638",
+      "hits": 8,
+      "shots": 14,
+      "t": 7.36666666666665,
+      "winner": 0
+    },
+    "m01_4v4_regular_untrained_2002": {
+      "digest": "3648676523",
+      "hits": 6,
+      "shots": 13,
+      "t": 8.83333333333331,
+      "winner": 0
+    },
+    "m01_4v4_regular_untrained_3003": {
+      "digest": "3547742124",
+      "hits": 7,
+      "shots": 20,
+      "t": 9.16666666666664,
+      "winner": 0
+    },
+    "m04_5v5_police_regular_1001": {
+      "digest": "3956830698",
+      "hits": 8,
+      "shots": 28,
+      "t": 21.4333333333336,
+      "winner": 1
+    },
+    "m04_5v5_police_regular_2002": {
+      "digest": "3063825149",
+      "hits": 9,
+      "shots": 25,
+      "t": 22.6000000000003,
+      "winner": 1
+    },
+    "m04_5v5_police_regular_3003": {
+      "digest": "1794085631",
+      "hits": 10,
+      "shots": 30,
+      "t": 23.1333333333336,
+      "winner": 1
+    },
+    "m04_8v8_regular_militia_1001": {
+      "digest": "2145942269",
+      "hits": 21,
+      "shots": 121,
+      "t": 20.4666666666668,
+      "winner": 0
+    },
+    "m04_8v8_regular_militia_2002": {
+      "digest": "3423442887",
+      "hits": 24,
+      "shots": 71,
+      "t": 20.4333333333335,
+      "winner": 0
+    },
+    "m04_8v8_regular_militia_3003": {
+      "digest": "1791633383",
+      "hits": 25,
+      "shots": 55,
+      "t": 17.3,
+      "winner": 0
+    },
+    "m07_12v12_sof_regular_1001": {
+      "digest": "3446236170",
+      "hits": 25,
+      "shots": 191,
+      "t": 22.766666666667,
+      "winner": 0
+    },
+    "m07_12v12_sof_regular_2002": {
+      "digest": "1745556964",
+      "hits": 19,
+      "shots": 104,
+      "t": 17.1666666666667,
+      "winner": 0
+    },
+    "m07_12v12_sof_regular_3003": {
+      "digest": "3835439524",
+      "hits": 34,
+      "shots": 209,
+      "t": 122.333333333329,
+      "winner": 0
+    },
+    "m10_6v6_police_militia_1001": {
+      "digest": "1115745564",
+      "hits": 17,
+      "shots": 90,
+      "t": 140.799999999995,
+      "winner": 0
+    },
+    "m10_6v6_police_militia_2002": {
+      "digest": "2526000658",
+      "hits": 16,
+      "shots": 34,
+      "t": 76.0333333333316,
+      "winner": 0
+    },
+    "m10_6v6_police_militia_3003": {
+      "digest": "2962186384",
+      "hits": 11,
+      "shots": 16,
+      "t": 107.566666666663,
+      "winner": 0
+    }
+  }
+}

@@ -5,6 +5,7 @@ extends SceneTree
 const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
+const Memory = preload("res://scripts/sim/memory.gd")
 const Teams = preload("res://tests/teams.gd")
 
 const CASES := [
@@ -45,12 +46,20 @@ func _watch(w, ticks: int) -> void:
 		rec["no_progress"] = (float(rec.get("no_progress", 0.0)) + dt) if stuck else 0.0
 		# pinned
 		rec["pinned"] = (float(rec.get("pinned", 0.0)) + dt) if o.suppress > 0.9 else 0.0
-		# memory that never lets go
-		rec["memory"] = (float(rec.get("memory", 0.0)) + dt) if o.mem.size() > 20 else 0.0
+		# memory that never lets go: a record of the DEAD whose salience has run
+		# out but is still there. fade() strips the keeper fields at death, so
+		# prune() must drop it on the next tick; TTLs run up to ~36 s for living
+		# entries, so only "expired and present" is a leak signal.
+		var stale := 0
+		for eid in o.mem:
+			var eo = w.op_by_id(eid)
+			if eo != null and not eo.alive() and Memory.salience(o, o.mem[eid], w.t) <= 0.0:
+				stale += 1
+		rec["memory"] = (float(rec.get("memory", 0.0)) + dt) if stale > 2 else 0.0
 		_wd[o.id] = rec
 		for k in ["aim_hold", "no_progress", "pinned", "memory"]:
 			var lim: float = 10.0 if k == "aim_hold" else (5.0 if k == "no_progress" \
-				else (20.0 if k == "pinned" else 30.0))
+				else (20.0 if k == "pinned" else 5.0))
 			if float(rec[k]) > lim:
 				_flagged["%s:%s" % [k, o.id]] = "%s held %s for %.1f s (%s, %s)" % [
 					o.id, k, float(rec[k]), o.dbg, o.room]
