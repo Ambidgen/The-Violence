@@ -2,6 +2,7 @@ extends SceneTree
 ## Endless battle headless: build the city, run the director and the fight for a while,
 ## print what happens and where the time goes.
 ##   godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=6
+##   godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=6 --gangs=sof   # H5: quality vs the clock
 const CityLevel = preload("res://scripts/city/city_level.gd")
 const CityNav = preload("res://scripts/city/city_nav.gd")
 const World = preload("res://scripts/sim/world.gd")
@@ -12,11 +13,14 @@ func _init() -> void:
 	var sd := 3
 	var mins := 6.0
 	var quiet := false
+	var gangs := ""
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--seed="):
 			sd = int(a.trim_prefix("--seed="))
 		elif a.begins_with("--min="):
 			mins = float(a.trim_prefix("--min="))
+		elif a.begins_with("--gangs="):
+			gangs = a.trim_prefix("--gangs=")
 		elif a == "--quiet":
 			quiet = true
 	var t0 := Time.get_ticks_msec()
@@ -30,6 +34,9 @@ func _init() -> void:
 	w.log_kinds = {"city": true}
 	var d = Director.new(w, lv, nav, sd)
 	w.director = d
+	if gangs != "":
+		d.gang_ech_override = gangs
+		print("gang recruits forced to: ", gangs)
 	d.setup()
 	print("ready in %d ms: %d ops, %d units" % [Time.get_ticks_msec() - t0, w.ops.size(), w.teams.size()])
 	var shown := 0

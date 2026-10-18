@@ -45,6 +45,10 @@ const BODY_CAP := 70
 var w
 var lv
 var nav
+## Tests only (H5, analysis 5.3): when set, every gang recruit gets this echelon
+## instead of the ECH_MIX roll. Lets city_sim compare territorial outcomes with
+## all-sof vs all-untrained gangs to see whether fighting or the clock owns the map.
+var gang_ech_override := ""
 var roads
 var rng := RandomNumberGenerator.new()
 var names
@@ -253,6 +257,8 @@ func _next_id(prefix: String) -> String:
 
 
 func _gang_echelon() -> String:
+	if gang_ech_override != "":
+		return gang_ech_override
 	var r := rng.randf()
 	for e in ECH_MIX:
 		r -= e[1]

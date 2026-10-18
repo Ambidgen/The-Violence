@@ -665,15 +665,18 @@ func _find_buildings() -> void:
 ## in a pocket (behind furniture, too close to a wall for the grid) moves to the
 ## nearest reachable cell.
 func snap_posts(nav) -> void:
+	# A post is only wrong if it is inside a wall. A post whose cell is walkable
+	# but currently cut off (map 01's defenders inside the shut cabin) is fine:
+	# the room is theirs, the door being shut is the attacker's problem.
 	for k in spawns:
 		var p: Vector2 = spawns[k]["p"]
 		var c: Vector2i = nav.cell_of(p)
-		if nav.reach[c.y * nav.nx + c.x] != 1:
+		if nav.solid[c.y * nav.nx + c.x] == 1:
 			spawns[k]["p"] = nav.cell_centre(nav.nearest_free(p))
 	for i in patrol.size():
 		var q: Vector2 = patrol[i]
 		var cq: Vector2i = nav.cell_of(q)
-		if nav.reach[cq.y * nav.nx + cq.x] != 1:
+		if nav.solid[cq.y * nav.nx + cq.x] == 1:
 			patrol[i] = nav.cell_centre(nav.nearest_free(q))
 
 

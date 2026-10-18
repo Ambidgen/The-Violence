@@ -112,6 +112,19 @@ static func forget(o, eid: String) -> void:
 	o.mem.erase(eid)
 
 
+## The enemy died out of sight. The entry is NOT dropped -- the operator keeps
+## covering a man who is already dead, for as long as the entry would have
+## lived. But the keeper fields (confirm_t, tot, ...) that keep a record alive
+## "until the enemy does" lose their job here: the enemy already has. Strip them
+## so the entry fades on its TTL like every other entry ("entries fade").
+static func fade(o, eid: String) -> void:
+	if eid == "" or not o.mem.has(eid):
+		return
+	var r: Dictionary = o.mem[eid]
+	for k in KEEPERS:
+		r.erase(k)
+
+
 ## Bookkeeping fields that keep a record alive on their own: they describe an
 ## enemy, and they must survive until the enemy does (or is forgotten).
 const KEEPERS := ["confirm_t", "tot", "froze", "pf07", "assessed", "callout_t"]
