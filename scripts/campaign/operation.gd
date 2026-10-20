@@ -17,7 +17,7 @@ static func civilians(level, nav, n: int, seed_val: int) -> Array:
 	var out: Array = []
 	var taken: Array = []
 	var a_posts: Array = []
-	for k in 20:
+	for k in 30:
 		a_posts.append(level.spawns["A%d" % (k + 1)]["p"])
 	var tries := 0
 	while out.size() < n and tries < n * 400:
@@ -56,7 +56,7 @@ static func build(base_cfgs: Array, level, nav, spec: Dictionary, dept = null) -
 	var officers: Array = spec.get("officers", [])
 	var alert_a: int = int(spec.get("alert_a", 1))
 	if dept != null and not officers.is_empty():
-		for k in mini(officers.size(), 20):
+		for k in mini(officers.size(), 30):
 			out.append(dept.to_cfg(officers[k], k, level, alert_a))
 		for c in base_cfgs:
 			if c["team"] != 0:
@@ -323,6 +323,8 @@ static func build_planned(sit: Dictionary, plan: Dictionary, dept, level, nav) -
 		var back: Vector2 = (st["r"] as Rect2).get_center() - Vector2.from_angle(st["face"]) * 1.0
 		vehicles.append(nav.snap(back))
 		var od: Dictionary = _orders_runtime(sq.get("orders", {}), level, nav, sit, ids, members.size())
+		# cohesion (v0.8): the pairs' shared operations and the leader's experience
+		od["cohesion"] = dept.squad_cohesion(members)
 		orders_rt.append(od)
 		var ak: String = nav.avoid_key(od.get("avoid", []))
 		for k in members.size():

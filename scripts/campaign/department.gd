@@ -11,9 +11,10 @@ extends RefCounted
 
 const Habits = preload("res://scripts/data/habits.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
+const Squads = preload("res://scripts/data/squads.gd")
 const Names = preload("res://scripts/data/names.gd")
 
-const VERSION := 3        # 3: v0.7.5, every officer has a kit
+const VERSION := 4        # 3: v0.7.5, every officer has a kit; 4: v0.8, pair bonds
 const SAVE_PATH := "user://department.json"
 ## Experience points needed for tiers 1-5 (Green, Blooded, Seasoned, Veteran, Exceptional).
 const XP_TIERS := [0, 6, 18, 40, 80]
@@ -44,6 +45,7 @@ var history: Array = []       # [{week, op, map, summary, lines}] one per operat
 var notes: Array = []         # [{week, text}] department log
 var ops_run := 0
 var bodycams := false
+var bonds := {}               # "id|id" (sorted) -> operations the pair came back from in the same squad (v0.8)
 var rng := RandomNumberGenerator.new()
 var names
 
@@ -271,6 +273,19 @@ func apply_result(w, map_name: String) -> Array:
 		for f in data.get("findings", []):
 			if f["by"] == o.id and f["kind"] in ["civilian_hit_by_police", "excessive_force", "misjudgment", "friendly_fire", "jumpy_fire"]:
 				r["file"].append({"week": week, "text": "Finding: %s (%s; evidence: %s)." % [f["text"], f["place"], f["strength"]]})
+	# shared experience (v0.8): every pair that came back alive from the same squad
+	var by_squad := {}
+	for o2 in w.ops:
+		if o2.officer_id != "" and o2.state != "dead" and o2.squad >= 0:
+			if not by_squad.has(o2.squad):
+				by_squad[o2.squad] = []
+			by_squad[o2.squad].append(o2.officer_id)
+	for sq in by_squad:
+		var ids: Array = by_squad[sq]
+		for i in ids.size():
+			for j in range(i + 1, ids.size()):
+				var key := bond_key(ids[i], ids[j])
+				bonds[key] = int(bonds.get(key, 0)) + 1
 	var s: Dictionary = data.get("summary", {})
 	history.append({"week": week, "op": ops_run, "map": map_name, "seed": w.seed_used, "summary": s.duplicate(true)})
 	if history.size() > 200:
@@ -295,11 +310,37 @@ func next_week() -> Array:
 	return lines
 
 
+## Operations two officers have come back from together in the same squad.
+static func bond_key(a: String, b: String) -> String:
+	return a + "|" + b if a < b else b + "|" + a
+
+
+func bond(a: String, b: String) -> int:
+	return int(bonds.get(bond_key(a, b), 0))
+
+
+## Cohesion of a squad of department officers (records): their pair bonds and the
+## leader's experience (the highest rank, then the most experienced, leads).
+func squad_cohesion(members: Array) -> float:
+	var vals: Array = []
+	for i in members.size():
+		for j in range(i + 1, members.size()):
+			vals.append(bond(members[i]["id"], members[j]["id"]))
+	var lead_exp := 1
+	var best_rank := -1
+	for r in members:
+		var ri: int = Squads.RANKS.find(String(r.get("rank", "")))
+		if ri > best_rank or (ri == best_rank and int(r.get("exp", 1)) > lead_exp):
+			best_rank = ri
+			lead_exp = int(r.get("exp", 1))
+	return Squads.cohesion_from(vals, lead_exp)
+
+
 # ================================================================== saving
 func to_data() -> Dictionary:
 	return {"version": VERSION, "seed": seed_val, "week": week, "serial": serial, "ops_run": ops_run,
 		"bodycams": bodycams, "rng_state": str(rng.state), "officers": officers.duplicate(true),
-		"history": history.duplicate(true), "notes": notes.duplicate(true)}
+		"history": history.duplicate(true), "notes": notes.duplicate(true), "bonds": bonds.duplicate()}
 
 
 func from_data(d: Dictionary) -> bool:
@@ -331,6 +372,10 @@ func from_data(d: Dictionary) -> bool:
 		for fe in r["file"]:
 			fe["week"] = int(fe["week"])
 		officers.append(r)
+	# version 3 and earlier (before v0.8) had no pair bonds: everyone starts as strangers
+	bonds = {}
+	for bk in d.get("bonds", {}):
+		bonds[bk] = int(d["bonds"][bk])
 	history = d.get("history", [])
 	notes = d.get("notes", [])
 	for n in notes:

@@ -1,6 +1,6 @@
 extends CanvasLayer
 ## The operations screens (v0.7, Loop B): the week's board, then for one situation the
-## briefing, the force (squads of up to five) and the orders, then Run (fog of war,
+## briefing, the force (up to five squads of up to six) and the orders, then Run (fog of war,
 ## pause, slow motion, rewind as viewing tools, and Abort), then the debrief with a full
 ## replay. Built in code, in the drafting-table style of the setup panel.
 
@@ -316,7 +316,7 @@ func _briefing(s: Dictionary) -> void:
 func _force(s: Dictionary) -> void:
 	var plan: Dictionary = main.plan
 	var squads: Array = plan.get("squads", [])
-	_text(box, "Pick squads of up to five. The highest rank leads; the leader's experience sets the squad's order points.", GREY, 11)
+	_text(box, "Up to five squads of up to six (30 officers). Suggest a plan forms them: as many threes as it can, then evens them out. The highest rank leads; the leader's experience sets the squad's order points.", GREY, 11)
 	var stages: Array = Operation.stages(main.level)
 	for si in squads.size():
 		var sq: Dictionary = squads[si]

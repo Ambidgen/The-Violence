@@ -1,5 +1,5 @@
 extends Node2D
-## The Violence - vertical slice. Setup: pick a map, place up to twenty operators per
+## The Violence - vertical slice. Setup: pick a map, place up to thirty operators per
 ## team and edit their habits and traits. Run: the simulation auto-resolves at up to
 ## 20x while the plan collects the evidence.
 
@@ -7,6 +7,7 @@ const Habits = preload("res://scripts/data/habits.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
+const Level = preload("res://scripts/sim/level.gd")
 const World = preload("res://scripts/sim/world.gd")
 const Op = preload("res://scripts/sim/op.gd")
 const FloorPlan = preload("res://scripts/view/floor_plan.gd")
@@ -110,7 +111,7 @@ func _ready() -> void:
 		var kv := a.trim_prefix("--").split("=")
 		_args[kv[0]] = kv[1] if kv.size() > 1 else "1"
 	for t in ["A", "B"]:
-		for k in range(1, 21):
+		for k in range(1, Level.MAX_TEAM + 1):
 			IDS.append("%s%d" % [t, k])
 	map_i = Maps.index_of(_args.get("map", "0"))
 	level = Maps.get_level(map_i)
@@ -227,7 +228,7 @@ func _apply_preset(c: Dictionary, echelon: String) -> void:
 func _default_cfgs() -> void:
 	var ea: String = _args.get("a", "sof")
 	var eb: String = _args.get("b", "militia")
-	sizes = [clampi(int(_args.get("na", str(level.default_sizes[0]))), 1, 20), clampi(int(_args.get("nb", str(level.default_sizes[1]))), 1, 20)]
+	sizes = [clampi(int(_args.get("na", str(level.default_sizes[0]))), 1, Level.MAX_TEAM), clampi(int(_args.get("nb", str(level.default_sizes[1]))), 1, Level.MAX_TEAM)]
 	cfgs = {}
 	for id in IDS:
 		var team := 0 if id.begins_with("A") else 1
@@ -265,7 +266,7 @@ func select_op(id: String) -> void:
 
 
 func set_team_size(k: int, n: int) -> void:
-	sizes[k] = clampi(n, 1, 20)
+	sizes[k] = clampi(n, 1, Level.MAX_TEAM)
 	_apply_sizes()
 	if not cfgs[sel]["enabled"]:
 		sel = "AB"[k] + "1"
@@ -528,7 +529,7 @@ func _sync_dept_cfgs() -> void:
 	var picked: Array = []
 	for oid in dept_sel:
 		picked.append(dept.get_officer(oid))
-	for k in 20:
+	for k in Level.MAX_TEAM:
 		var id := "A%d" % (k + 1)
 		if k < picked.size():
 			var c: Dictionary = dept.to_cfg(picked[k], k, level, alerts[0])
@@ -538,13 +539,13 @@ func _sync_dept_cfgs() -> void:
 		else:
 			cfgs[id]["enabled"] = false
 	sizes[0] = maxi(1, picked.size())
-	for k2 in 20:
+	for k2 in Level.MAX_TEAM:
 		var id2 := "A%d" % (k2 + 1)
 		cfgs[id2]["enabled"] = k2 < picked.size()
 
 
 func toggle_officer(oid: String, on: bool) -> void:
-	if on and not dept_sel.has(oid) and dept_sel.size() < 20:
+	if on and not dept_sel.has(oid) and dept_sel.size() < Level.MAX_TEAM:
 		dept_sel.append(oid)
 	elif not on:
 		dept_sel.erase(oid)

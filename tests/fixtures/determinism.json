@@ -22,45 +22,45 @@
       "winner": 0
     },
     "m00_3v5_police_militia_assault_1001": {
-      "digest": "d8c8aa3f34147018",
-      "hits": 4,
-      "shots": 7,
-      "t": 38.87,
+      "digest": "1b1daa12d6e0d023",
+      "hits": 5,
+      "shots": 16,
+      "t": 56.23,
       "winner": 0
     },
     "m00_3v5_police_militia_assault_2002": {
-      "digest": "7ac8e0ee6240508d",
-      "hits": 6,
-      "shots": 8,
-      "t": 38.63,
+      "digest": "98f44e0d80d7747c",
+      "hits": 9,
+      "shots": 15,
+      "t": 50.97,
       "winner": 0
     },
     "m00_3v5_police_militia_assault_3003": {
-      "digest": "a336dfc84f6693d8",
-      "hits": 8,
-      "shots": 12,
-      "t": 38.57,
+      "digest": "985263fec6e84c7f",
+      "hits": 4,
+      "shots": 11,
+      "t": 51.7,
       "winner": 0
     },
     "m00_5v5_regular_regular_assault_1001": {
-      "digest": "f2c2028691c552fc",
-      "hits": 16,
-      "shots": 64,
+      "digest": "7d98a80dc5736ce9",
+      "hits": 13,
+      "shots": 36,
       "t": 23.37,
       "winner": 1
     },
     "m00_5v5_regular_regular_assault_2002": {
-      "digest": "af2f38fb96ded6e3",
-      "hits": 9,
-      "shots": 24,
-      "t": 40.57,
+      "digest": "0cf76f4579964b12",
+      "hits": 11,
+      "shots": 37,
+      "t": 53.17,
       "winner": 0
     },
     "m00_5v5_regular_regular_assault_3003": {
-      "digest": "4bb33565ac663cde",
-      "hits": 26,
-      "shots": 66,
-      "t": 51.27,
+      "digest": "1de338e0c8c69ed4",
+      "hits": 16,
+      "shots": 79,
+      "t": 62.7,
       "winner": 0
     },
     "m01_2v2_sof_militia_assault_1001": {
@@ -85,108 +85,108 @@
       "winner": 0
     },
     "m01_4v4_regular_untrained_assault_1001": {
-      "digest": "bcc2379fcf727b95",
-      "hits": 6,
-      "shots": 20,
-      "t": 7.7,
+      "digest": "8bc8801c7f7daf7c",
+      "hits": 7,
+      "shots": 35,
+      "t": 10.87,
       "winner": 0
     },
     "m01_4v4_regular_untrained_assault_2002": {
-      "digest": "dd4d8c9b57b18383",
-      "hits": 7,
-      "shots": 17,
-      "t": 8.93,
+      "digest": "510571aea5112fd1",
+      "hits": 8,
+      "shots": 23,
+      "t": 12.43,
       "winner": 0
     },
     "m01_4v4_regular_untrained_assault_3003": {
-      "digest": "72dd212ec4209696",
-      "hits": 5,
-      "shots": 17,
-      "t": 7.23,
+      "digest": "46c3b4db18383f89",
+      "hits": 6,
+      "shots": 21,
+      "t": 11.6,
       "winner": 0
     },
     "m04_5v5_police_regular_assault_1001": {
-      "digest": "ee91a81583cbc0b6",
-      "hits": 7,
-      "shots": 29,
-      "t": 25.47,
+      "digest": "7e12f21ae72ec3e8",
+      "hits": 15,
+      "shots": 46,
+      "t": 44.43,
       "winner": 1
     },
     "m04_5v5_police_regular_assault_2002": {
-      "digest": "2d35a99bb2cf2713",
-      "hits": 7,
-      "shots": 24,
-      "t": 21.3,
+      "digest": "a6c9b5a95925f32a",
+      "hits": 8,
+      "shots": 45,
+      "t": 20.0,
       "winner": 1
     },
     "m04_5v5_police_regular_assault_3003": {
-      "digest": "cfe786fb8ae24c5b",
-      "hits": 9,
-      "shots": 25,
-      "t": 22.93,
-      "winner": 1
+      "digest": "52ded909ddfb6e32",
+      "hits": 13,
+      "shots": 43,
+      "t": 24.7,
+      "winner": 0
     },
     "m04_8v8_regular_militia_hunt_1001": {
-      "digest": "197d29f4e4729fc0",
+      "digest": "1fff789c3585cc39",
       "hits": 16,
-      "shots": 34,
-      "t": 9.07,
+      "shots": 30,
+      "t": 13.77,
       "winner": 0
     },
     "m04_8v8_regular_militia_hunt_2002": {
-      "digest": "79a0c75f1f4773df",
-      "hits": 19,
-      "shots": 44,
-      "t": 9.47,
+      "digest": "be722c98a8b8c299",
+      "hits": 25,
+      "shots": 79,
+      "t": 32.77,
       "winner": 0
     },
     "m04_8v8_regular_militia_hunt_3003": {
-      "digest": "f528b62938ea027d",
-      "hits": 16,
-      "shots": 35,
-      "t": 13.23,
+      "digest": "49dc610e8cfd5cf6",
+      "hits": 20,
+      "shots": 42,
+      "t": 16.13,
       "winner": 0
     },
     "m07_12v12_sof_regular_assault_1001": {
-      "digest": "240767e1356deca9",
-      "hits": 28,
-      "shots": 161,
-      "t": 124.53,
+      "digest": "dbff9ece74e17f08",
+      "hits": 33,
+      "shots": 191,
+      "t": 107.87,
       "winner": 0
     },
     "m07_12v12_sof_regular_assault_2002": {
-      "digest": "ba48066bc26a63ec",
-      "hits": 28,
-      "shots": 142,
-      "t": 26.97,
+      "digest": "4244e04a345db6a3",
+      "hits": 30,
+      "shots": 134,
+      "t": 120.5,
       "winner": 0
     },
     "m07_12v12_sof_regular_assault_3003": {
-      "digest": "f08a7d1cde35ae69",
-      "hits": 27,
-      "shots": 174,
-      "t": 132.83,
+      "digest": "3ed050ca53013ffe",
+      "hits": 24,
+      "shots": 131,
+      "t": 29.07,
       "winner": 0
     },
     "m10_6v6_police_militia_assault_1001": {
-      "digest": "33fe3cab4b28d9c1",
-      "hits": 8,
-      "shots": 8,
-      "t": 68.0,
+      "digest": "a88556678c3bd600",
+      "hits": 9,
+      "shots": 12,
+      "t": 68.77,
       "winner": 0
     },
     "m10_6v6_police_militia_assault_2002": {
-      "digest": "0f2f4c29a7467206",
-      "hits": 12,
-      "shots": 20,
-      "t": 7.97,
+      "digest": "4c2b4271b97a705a",
+      "hits": 9,
+      "shots": 16,
+      "t": 69.63,
       "winner": 0
     },
     "m10_6v6_police_militia_assault_3003": {
-      "digest": "1a6d4af700b674dc",
-      "hits": 8,
-      "shots": 11,
-      "t": 68.67,
+      "digest": "244fef928f3fb637",
+      "hits": 7,
+      "shots": 9,
+      "t": 67.93,
       "winner": 0
     },
     "op1001_W1-1_barricade_m00": {
@@ -204,14 +204,14 @@
       "winner": 0
     },
     "op1001_W1-3_warrant_m02": {
-      "digest": "2a5b80f48b7e9d17",
-      "hits": 2,
-      "shots": 10,
-      "t": 120.7,
+      "digest": "2a769881d192aaba",
+      "hits": 1,
+      "shots": 6,
+      "t": 77.0,
       "winner": 0
     },
     "op1001_W1-4_event_m11": {
-      "digest": "87edb9d5e8df22cf",
+      "digest": "52c3147739cd397a",
       "hits": 5,
       "shots": 13,
       "t": 590.6,
@@ -246,5 +246,5 @@
       "winner": 0
     }
   },
-  "version": "0.7.7"
+  "version": "0.7.8"
 }

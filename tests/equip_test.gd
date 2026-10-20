@@ -68,7 +68,7 @@ func _init() -> void:
 const GATES := {
 	"compact_pistol": {"measure": "s to the first shot from the holster (less)", "dir": -1, "margin": 0.08, "range": true},
 	"heavy_pistol": {"measure": "targets killed outright per hit, 6 m (more)", "dir": 1, "margin": 0.03, "range": true},
-	"smg": {"measure": "share of police rounds through a wall (less)", "dir": -1, "margin": 0.03, "pooled": true},
+	"smg": {"measure": "police rounds that met a wall and went through (less)", "dir": -1, "margin": 0.05, "pooled": true},
 	"sbr": {"measure": "s on target per acquisition, 6 m (less)", "dir": -1, "margin": 0.01, "range": true},
 	"assault_rifle": {"measure": "targets killed outright per hit, 15 m (more)", "dir": 1, "margin": 0.02, "range": true},
 	"battle_rifle": {"measure": "targets killed outright per hit, 15 m (more)", "dir": 1, "margin": 0.04, "range": true},
@@ -184,6 +184,10 @@ func _range(kit: Dictionary, dist: float, sd: int, alert := 1, opts := {}, t_max
 	var w = World.new()
 	w.keep_events = false
 	w.setup(lv, _nav(11), cfgs, ["hold", "hold"], sd, [alert, 0], o2)
+	# the targets are dummies (v0.7.9): no reflex to run for cover when shot at
+	w.brain.features["lizard"] = false
+	w.brain.features["lion"] = false
+	w.brain.features["wolf"] = false
 	while not w.over and w.t < t_max:
 		w.step()
 		w.events.clear()
@@ -509,15 +513,19 @@ func _barricade(sd: int, point_gear: Dictionary, all_gear: Dictionary, each := C
 
 func t_smg(on: bool, sd: int):
 	var w = _op(5, _police_kits(5, {}, {}, "smg" if on else "carbine"), sd, {"police_rules": true})
-	var shots := 0
+	# of the police rounds that met a wall, how many went through it (v0.7.9: the share
+	# of all rounds swung with how many rounds reach a wall at all)
+	var met := 0
 	var through := 0
 	for rec in w.incident.shots:
 		if rec.get("pol", false):
-			shots += 1
 			if int(rec.get("walls", 0)) > 0:
 				through += 1
+				met += 1
+			elif rec.get("wall_stop", false):
+				met += 1
 	w.dispose()
-	return [through, shots]
+	return [through, met]
 
 
 # ------------------------------------------------------------------ the helmet

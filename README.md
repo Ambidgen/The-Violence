@@ -1,9 +1,9 @@
-# The Violence - vertical slice (v0.7.8)
+# The Violence - vertical slice (v0.7.9)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
 - **Operations (v0.7):** the police command game's first playable loop. Each week the board shows two or three situations. Pick one, read the briefing, choose who goes, split them into squads and give each squad orders, then press RUN and watch. You can pause, slow down, rewind to look again, or abort. Nothing you do during the run changes what the officers do, except the abort. The debrief scores the operation and replays it with the fog lifted.
-- **Matches and operations:** eleven maps, from a one-room cabin to an apartment block. Two teams of one to twenty operators each carry what their kit says: by default a rifle and a pistol (the untrained carry only a pistol). New in v0.7.5: an equipment database, with ten weapons, three sights, armour, a special operations helmet and eight tools, and doors that can be shut and locked. You place everyone, set every operator's habits and traits, and press RUN. The fight resolves itself at up to 20x speed. New in v0.6: put civilians on the map, put team A under police rules, and send officers from your department, whose experience, wounds and files carry over from one operation to the next.
+- **Matches and operations:** eleven maps, from a one-room cabin to an apartment block. Two teams of one to thirty operators each carry what their kit says: by default a rifle and a pistol (the untrained carry only a pistol). New in v0.7.5: an equipment database, with ten weapons, three sights, armour, a special operations helmet and eight tools, and doors that can be shut and locked. You place everyone, set every operator's habits and traits, and press RUN. The fight resolves itself at up to 20x speed. New in v0.6: put civilians on the map, put team A under police rules, and send officers from your department, whose experience, wounds and files carry over from one operation to the next.
 - **Endless Battle:** Port Carrick, a 1 km city of about 250 lots. Four gangs fight over its buildings, six police precincts answer the gunfire, and three hospitals send out ambulances. It never ends.
 
 Every plan is drawn as an architectural floor plan in greyscale. Operators start as clean plan symbols. Red appears only where the shooting has been: sprays, smears on walls, drip trails, pools under the fallen, stains on the figures.
@@ -84,6 +84,72 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - `Rerun same seed` replays the fight exactly; `Rerun new seed` rolls a new one.
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small dot beside each figure is their alert state: green, yellow or red.
+
+## New in v0.7.9: squads and the four brains
+
+Every operator, on every side, now thinks through one hierarchy of four brains, and every side is broken into squads by one set of rules. The brains are hidden from the player; the radio carries the leaders' orders.
+
+**Squads.**
+- **Formation:** as many three-person squads as possible, at most five; whoever is left over joins them, and past five squads everyone is spread evenly. At most six to a squad, so 30 to a side. 4 makes one squad of 4, 5 one of 5, 7 is 4+3, 10 is 4+3+3, 20 is 4x5, 30 is 6x5.
+- **Where it applies:**
+  - On the test range, up to 30 a side (posts for 30 on every map).
+  - Suspects and gangs form squads the same way.
+  - In operations, `Suggest a plan` forms the squads, and the player can move officers between them (up to five squads of up to six). For a warrant, a barricade or hostages it splits off a two-officer containment team from a lone squad of four or more.
+- **Changing squads:** an operator who joins another squad (the last of his own, or a pair regrouping) takes its orders at once, with no lag.
+
+**The four brains**, checked top to bottom for each operator every tick:
+1. **Lizard, immediate danger.**
+   - Covers being hit or shot at, an enemy in sight or within 10 m, a stoppage, an empty weapon, a stun, gas or running for it. Acquisition and Rules 1-4 live here, as before, and override everything below.
+   - **New:** shot at by someone it cannot see, an operator gets out of that line of fire to the nearest cover from it, breaking contact.
+2. **Lion, the squad in a fight.** Enemies have been spotted and the threat is live (contact within 12 s), but this operator has no shot. The squad leader (the highest rank alive, then the most experienced) decides once a second:
+   - **push** on with the task. An entry under way is always pushed.
+   - **take cover facing the threat**, when more enemies are known near it than the squad has people.
+   - **fall back** to the last cleared room, or to the start, when the squad has lost half its people.
+   - The leader acts at once; the rest follow after a lag set by the squad's cohesion and their own experience: about 0.4-0.6 s in a tight veteran squad, 1.8-2.7 s in a green one of strangers.
+   - When the leader falls, the next takes command after 1.5 s.
+   - A holding squad's fight is the hold layer, as before.
+3. **Ape, the squad out of a fight.** The drills of earlier versions: stacks, breaches, entries, clearing, sweeps, holding, sectors, bounding, objectives. It is guided by the squad's order and its leader.
+4. **Wolf, alone.** An operator whose squad is gone and who has no squad to join fights on his own. Attacking, he goes cover to cover toward the threat (the next cover 3-9 m nearer, hidden from it); holding, he keeps the best cover he has, facing the threat. Out of a fight he carries on with the task alone.
+
+**The environment decides group or individual movement.**
+- **Pairs in tight interiors.** A squad of four or more breaks into pairs (a three when the count is odd: 4 is 2+2, 5 is 3+2, 6 is 2+2+2) when all of these hold:
+  - It is between rooms, out of a fight and inside a building.
+  - At least two small rooms (18 m2 or less) are open to it.
+  - No open room is believed occupied, meaning the briefing names it or someone was seen or heard there lately. A room like that gets the whole squad and its kit.
+  - Each pair clears rooms on its own, under the squad's orders. The squad regroups when the small rooms run out, a pair is down to one, or its objective changes.
+- **Dispersal on the defence.** A squad picks its room as before. A room that holds it (about 6 m2 a defender) takes the whole squad. A smaller one takes what fits, and the rest spread into the rooms behind it (farthest from where the attack will come first), each covering the door back into the front room: a layered defence with somewhere to fall back to.
+
+**Cohesion.**
+- Each pair of department officers who come back alive from an operation in the same squad builds a bond; six operations make a full one.
+- A squad's cohesion is its pairs' bonds plus its leader's experience: strangers about 0.25-0.5 (by the leader's experience), a squad that has served together about 0.9.
+- Sides without a history (the test range, suspects) take cohesion from their echelons, from untrained 0.15 to special operations 0.9.
+- The save is version 4. Older saves load with everyone as strangers.
+
+**Also fixed.**
+- **The v0.7.8 out-of-ammunition rule** counted someone who came in unarmed as out of rounds. That ended any fight whose suspects were all unarmed at the first tick, and every equipment test with unarmed targets. Now only those who came in with rounds run dry, and under police rules suspects out of rounds still have to be arrested.
+- **The equipment gate.** On the range the targets are dummies (no reflexes). The SMG is now measured as the share of police rounds that met a wall and went through, since the old share of all rounds swung with how many rounds reached a wall at all.
+
+**The gate** (`tests/brains_test.gd`): each part is switched on and off (`Brain.features`) in otherwise identical runs.
+
+| Part | Measure | On | Off |
+|---|---|---|---|
+| Formation | squad sizes for 1-30 that break the rules | 0 | |
+| Lizard | share of the time under unseen fire spent still in its line | 0.57 | 0.69 |
+| Lion | s from the leader's order to a subordinate acting, cohesion 0.9 against 0.15 | 1.01 | 2.46 |
+| Wolf | share of a lone fighter's unseen fight spent hidden from the threat | 0.40 | 0.24 |
+| Pairs | rooms cleared a minute, four officers searching small-room buildings | 2.88 | 1.41 |
+| Dispersal | rooms a squad of four holds: Shotgun House (20 m2 bedroom) / Bunkhouse (42 m2 hall) | 2 / 1 | 1 / 1 |
+| Bonds | cohesion of four officers after six operations together / as strangers | 0.93 | 0.43 |
+
+`TV_BRAIN_OFF=pairs,disperse` (an environment variable) switches parts off in any harness.
+
+**What it changed.**
+- Equal regulars attacking a held house (5v5) now win 12 of 20, up from 6. The brains together are worth about six wins in twenty to the attacker, mostly the Wolf: lone survivors keep fighting cover to cover instead of standing still, and in an assault they are mostly attackers.
+- The defenders' hold habits still pay: police attackers win 55% against them, 58% without; regulars 35% against 68%.
+- Police hit fewer civilians in the civilian test: patrol 32 (was 39), police tactical 21 (was 25).
+- The campaign sweep is within its noise: 12 successes (5 at a cost), 11 partial, 5 failures, 2 quiet rallies.
+- A balance pass for the attack-defence shift is queued with the rest of v0.8's balance work.
+- All other gates pass, and the determinism baseline is rewritten.
 
 ## New in v0.7.8: from the parallel line
 
@@ -289,7 +355,7 @@ The week ends with `End week`. Situations nobody went to are written down, wound
 
 **2 Force.** Tick who goes. An officer is committed to one situation a week and can't go to another. The injured are listed but can't be picked.
 
-**3 Orders.** Up to four squads of up to five. Each squad's leader is its highest rank, ties going to the most experience. The leader's experience tier sets the squad's order points: 1, 2, 3, 5 or 7 for tiers 1-5.
+**3 Orders.** Up to five squads of up to six (30 officers). Each squad's leader is its highest rank, ties going to the most experience. The leader's experience tier sets the squad's order points: 1, 2, 3, 5 or 7 for tiers 1-5.
 
 Every squad gets one objective free; a second objective (done after the first) costs a point. Objectives:
 - **Clear:** the whole building, or only the rooms you pick (plus the rooms on the way to them).
@@ -433,9 +499,9 @@ Bad habits present on an operator:
 - Stress habits switch on when stress x (1 - resistance) passes their threshold.
 - Personality habits are always on.
 
-## Teams of up to twenty
+## Teams of up to thirty
 
-A team of more than five splits into elements (fire teams) of up to five, as balanced contiguous blocks of slots: 6 = 3+3, 7 = 4+3, 11 = 4+4+3, 20 = 5x4.
+A team forms squads by the rules of v0.7.9 (see that section): 6 = 3+3, 7 = 4+3, 11 = 4+4+3, 20 = 4x5, 30 = 6x5. In the code a squad is an "element".
 
 **Elements on the attack:**
 - Each element picks its own room: the nearest uncleared room reachable through a door from outside or from a cleared room, by path length. No other element may have claimed it.
@@ -474,7 +540,7 @@ A team of more than five splits into elements (fire teams) of up to five, as bal
 **The gangs.** Kilbride Crew (dots), Corvino Family (bands), Los Halcones (diagonal hatch) and Zarya Bratva (cross-hatch). The pattern on a member's shoulders is the pattern that hatches the gang's buildings on the map.
 - Recruits are 70% untrained, 20% militia and 10% regulars ("soldiers").
 - Each gang starts with a home neighbourhood holding a school, plus one next to it. The rest of the city is unclaimed.
-- Squads of up to five hold one room each: one room in a house, up to three in the biggest buildings.
+- Squads (formed by the same rules as everyone) hold one room each, layering into the rooms behind a small one: one room in a house, up to three in the biggest buildings.
 - **Capture:** a building changes hands after a minute of domination, meaning only one gang has living members inside. Police inside, or a rival, stop the clock. Only a gang member can take a building; police clearing a building does not change its owner. Police stations can't be taken.
 - **Recruiting:**
   - The gang holding the most buildings in a neighbourhood dominates it by its share of them.
@@ -567,10 +633,11 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
 scripts/data/habits.gd    habits, traits, Experience, sound, echelons, weapons, individual variation
 scripts/data/names.gd     the name bank (18 cultures)
 scripts/data/equipment.gd the equipment database: weapons, sights, armour, the helmet, tools, kits, who may carry what
+scripts/data/squads.gd    squad formation rules, cohesion and the Lion's lag
 scripts/city/*.gd         the city: generator, templates (police, hospital, school, parks), navigation, roads and vehicles, the director
 scripts/city_main.gd      the Endless Battle scene
 scripts/sim/geom.gd       obstacles, sight lines (with the low-cover rule), bullet traces with height, door leaves
-scripts/sim/level.gd      map base: walls from room rectangles, doors and their states, room graph, posts for 20 a side
+scripts/sim/level.gd      map base: walls from room rectangles, doors and their states, room graph, posts for 30 a side
 scripts/maps/*.gd         the eleven maps and the registry
 scripts/sim/nav.gd        AStarGrid2D x4 (PF01/PF02 cost layers), cover spots, cached per map
 scripts/sim/op.gd         operator state, stances and body zones
@@ -602,6 +669,7 @@ godot --headless --path . -s res://tests/maps_test.gd -- --run=1           # val
 godot --headless --path . -s res://tests/stall_test.gd                     # six matchups per map; flags time-limit stalls
 godot --headless --path . -s res://tests/determinism_test.gd               # 35 seeded cases against the fixture (--write to reset)
 godot --headless --path . -s res://tests/habits_test.gd -- --strict        # every habit read somewhere, or a declared suspension
+godot --headless --path . -s res://tests/brains_test.gd -- --n=8           # the four brains, squads, pairs, dispersal, cohesion: each on and off
 godot --headless --path . -s res://tests/scale_playtest.gd -- --n=4        # Playtest 02: big fights on every map, CSV
 godot --headless --path . -s res://tests/perf.gd -- --map=10 --t=40        # where the time goes in a 20v20 fight
 godot --headless --path . -s res://tests/fuzz_test.gd -- --n=60            # random maps, sizes, habits, traits, postures

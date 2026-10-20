@@ -1,12 +1,13 @@
 extends RefCounted
 ## A sensible first plan for a situation (v0.7): the starting point the force and
 ## orders screens open with, and the plan the scripted chief uses in the campaign test.
-## It is only a suggestion: two squads, the obvious objectives, a constraint or two the
-## leaders can afford.
+## It is only a suggestion: squads formed by the formation rules (v0.8, Squads.sizes),
+## the obvious objectives, a constraint or two the leaders can afford.
 
 const Orders = preload("res://scripts/campaign/orders.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const Operation = preload("res://scripts/campaign/operation.gd")
+const Squads = preload("res://scripts/data/squads.gd")
 
 const WANT := {"warrant": 7, "gang": 10, "barricade": 7, "hostage": 9, "event": 10}
 
@@ -64,16 +65,32 @@ static func suggest(sit: Dictionary, available: Array, lv, bodycams := false, ca
 	var want: int = mini(WANT.get(sit["type"], 8), pool.size())
 	if cap >= 0:
 		want = mini(want, cap)
-	var n_sq := 2 if want >= 4 else 1
-	if sit["type"] == "event" and want >= 9:
-		n_sq = 3
-	# leaders first: one per squad, then the rest dealt round
+	want = mini(want, Squads.MAX_SIDE)
+	# squads by the formation rules (v0.8): threes first, at most five, evened out
+	var sizes: Array = Squads.sizes(want)
+	if sizes.is_empty():
+		sizes = [0]
+	# a situation with someone to keep in (warrant, barricade, hostages) gets a
+	# containment pair split off a lone squad of four or more
+	if sizes.size() == 1 and want >= 4 and sit["type"] in ["warrant", "barricade", "hostage"]:
+		sizes = [want - 2, 2]
+	var n_sq: int = sizes.size()
+	# leaders first: the best-ranked one per squad, then the rest dealt to fill each squad
 	var squads: Array = []
 	for k in n_sq:
 		squads.append({"members": [], "stage": k % maxi(1, lv.stage_a.size()), "orders": Orders.empty_orders()})
 	var picked := pool.slice(0, want)
-	for k2 in picked.size():
-		squads[k2 % n_sq]["members"].append(picked[k2]["id"])
+	var k2 := 0
+	for k3 in n_sq:
+		if k2 < picked.size():
+			squads[k3]["members"].append(picked[k2]["id"])
+			k2 += 1
+	var fill := 0
+	while k2 < picked.size():
+		if squads[fill]["members"].size() < int(sizes[fill]):
+			squads[fill]["members"].append(picked[k2]["id"])
+			k2 += 1
+		fill = (fill + 1) % n_sq
 	var stages: Array = Operation.stages(lv)
 	match sit["type"]:
 		"warrant", "barricade":
@@ -117,6 +134,20 @@ static func suggest(sit: Dictionary, available: Array, lv, bodycams := false, ca
 				squads[1]["orders"]["objs"] = [{"kind": "patrol", "route": [[17.0, 28.0], [17.0, 16.0], [47.5, 16.0], [47.5, 28.0], [32.0, 36.0]]}]
 			if n_sq > 2:
 				squads[2]["orders"]["objs"] = [{"kind": "post", "p": [sc.x + 6.0, sc.y + 3.5], "face": PI / 2.0}]
+	# squads beyond the ones the situation names (v0.8): search the building, or for an
+	# event share the posts and the patrol
+	for k4 in range(1, n_sq):
+		if not squads[k4]["orders"]["objs"].is_empty():
+			continue
+		match sit["type"]:
+			"event":
+				squads[k4]["orders"]["objs"] = (squads[k4 % 2]["orders"]["objs"] as Array).duplicate(true) if k4 >= 2 else []
+			"hostage":
+				var st3: Vector2 = (stages[squads[0]["stage"]]["r"] as Rect2).get_center() if not stages.is_empty() else Vector2.ZERO
+				var doors3 := exterior_doors(lv, st3)
+				squads[k4]["orders"]["objs"] = [{"kind": "contain", "openings": doors3.slice(k4 + 1, k4 + 3) if doors3.size() > k4 + 1 else doors3}]
+			_:
+				squads[k4]["orders"]["objs"] = [{"kind": "clear", "rooms": []}]
 	# kit (v0.7.5): squads going in carry the entry kit (a ram on the point man, flashbangs
 	# for those trained for them), at a barricade the gas kit (v0.8); the rest keep their own
 	if sit["type"] != "event":

@@ -105,6 +105,7 @@ var last_shot_t := -99.0
 var last_enemy_seen_t := -99.0
 var reloaded_after_contact := true
 var dbg := ""           # short text describing what the brain is doing
+var mind := ""          # which of the four brains drove it this tick (v0.8): lizard, lion, ape, wolf
 var events_bad := []    # for UI: recently activated bad habits
 var shots := 0
 var hits := 0
@@ -262,6 +263,13 @@ func reset() -> void:
 		cstate = "hostage" if hostage else "unaware"
 	gone = false
 	gone_how = ""
+	# came in with rounds (v0.7.8: only they can run dry)
+	var a0 := false
+	for wn0 in weapons:
+		var s0: Dictionary = weapons[wn0]
+		if not s0.get("lost", false) and (int(s0["mag"]) > 0 or int(s0["spare"]) > 0):
+			a0 = true
+	ticker["armed0"] = a0
 	alert = alert_floor
 	alert_t = 0.0
 	stress = clampf(float(ech.get("stress0", 0.0)), 0.0, 0.5)
@@ -414,9 +422,14 @@ func any_loaded() -> bool:
 	return usable("rifle") or usable("pistol")
 
 
-## Out of the fight for good (v0.7.8): no rounds in any weapon, no spare magazine, and no
-## top-up from a cache left (HD20 takes two). A jam can be cleared, so it does not count.
+## Out of the fight for good (v0.7.8): came in with rounds, and has no rounds left in any
+## weapon, no spare magazine and no top-up from a cache (HD20 takes two). A jam can be
+## cleared, so it does not count.
 func dry() -> bool:
+	# nobody who came in unarmed runs dry (a target, a civilian in disguise, a man the
+	# taser is for): only those who had rounds and have spent them
+	if not ticker.get("armed0", false):
+		return false
 	for wn in ["rifle", "pistol"]:
 		if not weapons.has(wn):
 			continue

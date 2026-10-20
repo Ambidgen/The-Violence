@@ -10,8 +10,25 @@ const Op = preload("res://scripts/sim/op.gd")
 const Geom = preload("res://scripts/sim/geom.gd")
 const Habits = preload("res://scripts/data/habits.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
+const Squads = preload("res://scripts/data/squads.gd")
 const DT := 1.0 / 30.0
 const GAS_WAIT := 20.0     # s a squad holds the door after gassing a room (v0.8)
+
+# ================================================================== the four brains (v0.8)
+## Every operator runs one of four brains each tick, checked top down (hidden from the
+## player; o.mind names it, for the tests):
+##   LIZARD  immediate danger: hit, shot at, an enemy in sight or close; acquisition,
+##           Rules 1-4, stoppages, and (new) getting to cover away from fire it cannot see
+##   LION    the squad in a fight: enemies spotted, threat live, no shot of its own. The
+##           squad leader decides (push on, take cover facing the threat, fall back); the
+##           rest follow after a lag set by cohesion and their experience
+##   APE     the squad out of a fight: stacks, entries, clearing, holding, sectors, bounding
+##   WOLF    alone: the squad is gone or cut off; cover to cover on its own
+const LION_WINDOW := 12.0   # s after a squad's last contact that it is still in the fight
+const LIZARD_FIRE := 2.5    # s after being shot at that the Lizard still wants cover
+const DEFENDER_M2 := 6.0    # m2 of room a defender needs: a room this size per member holds the squad
+const SMALL_ROOM_M2 := 18.0 # rooms up to this size are cleared by pairs in a tight interior
+var features := {"lizard": true, "lion": true, "wolf": true, "pairs": true, "disperse": true}
 
 # Hold-post geometry, kept as static values so the hold test can sweep them (tuned
 # 2026-10-20: the drafted 50-80 deg HD10 band cost a police defence 9 points of attacker
@@ -31,14 +48,17 @@ var tick := 0
 
 func _init(world) -> void:
 	w = world
+	# experiments: TV_BRAIN_OFF=pairs,disperse switches parts off in any harness
+	for f in OS.get_environment("TV_BRAIN_OFF").split(",", false):
+		features[f.strip_edges()] = false
 
 
 # ================================================================== team level
-## Teams of more than five split into elements (fire teams) of up to five: balanced,
-## contiguous blocks of slots (6 = 3+3, 7 = 4+3, 11 = 4+4+3, 20 = 5x4). Each element
-## picks its own room, stacks, enters, holds its own sectors and bounds on its own; the
-## team shares what is cleared, which rooms are claimed, and every callout. A team of
-## five or fewer is a single element and behaves exactly as before.
+## Squads (v0.8, Squads.sizes): as many three-person squads as possible, at most five,
+## then evened out, at most six to a squad (6 = 3+3, 7 = 4+3, 10 = 4+3+3, 20 = 4x5,
+## 30 = 6x5). Each squad (an "element" in the code) picks its own room, stacks, enters,
+## holds its own sectors and bounds on its own; the side shares what is cleared, which
+## rooms are claimed, and every callout. Five or fewer are one squad.
 func init_teams() -> void:
 	for tm in w.teams:
 		if tm.get("civ", false):
@@ -109,14 +129,28 @@ func _form_elements(tm: Dictionary) -> void:
 		for e1 in tm["elements"]:
 			parts.append(str(e1["members"].size()))
 		w.say("Police: %d squad%s (%s)" % [n_sq, "" if n_sq == 1 else "s", " + ".join(parts)], "info")
+		for e2 in tm["elements"]:
+			_squad_setup(e2, float(e2["orders"].get("cohesion", -1.0)))
 		return
 	var n := ms.size()
-	var n_el := maxi(1, int(ceil(n / 5.0)))
+	var plan: Array = Squads.sizes(n)
+	if plan.is_empty():
+		plan = [n]
+	# a unit over thirty (the city can grow one) spreads the rest over its squads
+	var extra: int = n
+	for v in plan:
+		extra -= int(v)
+	var ri := 0
+	while extra > 0:
+		plan[ri % plan.size()] += 1
+		extra -= 1
+		ri += 1
+	var n_el: int = plan.size()
 	tm["elements"] = []
 	var k := 0
 	var sizes: Array = []
 	for i in n_el:
-		var size := n / n_el + (1 if i < n % n_el else 0)
+		var size: int = plan[i]
 		var el := _new_element(i)
 		for j in size:
 			var m = ms[k]
@@ -127,7 +161,29 @@ func _form_elements(tm: Dictionary) -> void:
 		tm["elements"].append(el)
 		sizes.append(str(size))
 	if n_el > 1:
-		w.say("%s forms %d elements (%s)" % [tm["tag"], n_el, " + ".join(sizes)], "info")
+		w.say("%s forms %d squads (%s)" % [tm["tag"], n_el, " + ".join(sizes)], "info")
+	for e3 in tm["elements"]:
+		_squad_setup(e3, -1.0)
+
+
+## A squad's size at the start, its leader and its cohesion (given by the department for
+## its squads, else from the members' echelons and the leader's experience).
+func _squad_setup(el: Dictionary, coh: float) -> void:
+	el["n0"] = el["members"].size()
+	el["leader"] = ""
+	var al := _alive(el)
+	var ld = _pick_leader(al)
+	if ld != null:
+		el["leader"] = ld.id
+	if coh < 0.0:
+		var c := 0.0
+		for m in el["members"]:
+			c += float(Squads.ECHELON_COHESION.get(m.echelon, 0.4))
+		c /= maxf(1.0, el["members"].size())
+		if ld != null:
+			c += 0.04 * float(ld.exp - 1)
+		coh = clampf(c, 0.05, 1.0)
+	el["cohesion"] = coh
 
 
 func _new_element(i: int) -> Dictionary:
@@ -145,6 +201,8 @@ func _set_posture(tm: Dictionary, p: String) -> void:
 
 
 func _set_mode(tm: Dictionary, el: Dictionary, mode: String) -> void:
+	if el["mode"] == "split":
+		_rejoin(tm, el, "")
 	if el["mode"] == "hold" and mode != "hold":
 		_release_hold(tm, el)
 	el["mode"] = mode
@@ -199,6 +257,9 @@ func _el_mates(o) -> Array:
 
 
 func _tag(tm: Dictionary, el: Dictionary) -> String:
+	if el.get("child", false):
+		var par: Dictionary = tm["elements"][el["parent"]]
+		return "%s pair %s" % [_tag(tm, par), "abc"[clampi(par.get("kids", []).find(el["i"]), 0, 2)]]
 	if el.has("orders"):
 		return "Squad %d" % (el["i"] + 1)
 	if tm["elements"].size() <= 1:
@@ -230,6 +291,10 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 	var al := _alive(el)
 	if al.is_empty():
 		return
+	# a tight interior (v0.8): break into pairs for the small rooms
+	if _should_split(tm, el, al):
+		_split(tm, el, al)
+		return
 	var lv = w.level
 	var c := _centre(al)
 	var pf10_team := _any_has(tm, "PF10")
@@ -242,10 +307,10 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 	var door_ids: Array = lv.building_doors(bi) if bi >= 0 else lv.doors.keys()
 	# orders (v0.7): only the rooms the objective needs, never an avoided room, and the
 	# first entry through the ordered door while the room behind it is still to clear
-	var od: Dictionary = el.get("orders", {})
+	var od: Dictionary = el.get("orders", el.get("porders", {}))
 	var allowed: Dictionary = el.get("allowed", {})
 	var avoid: Array = od.get("avoid", [])
-	var entry: String = od.get("entry", "")
+	var entry: String = od.get("entry", "") if not el.get("child", false) else ""
 	var use_entry := false
 	if entry != "" and not el.get("entered", false) and lv.doors.has(entry):
 		for side in [lv.doors[entry]["a"], lv.doors[entry]["b"]]:
@@ -261,6 +326,9 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 			if avoid.has(into) or (not allowed.is_empty() and not allowed.has(into)):
 				continue
 			if tm["claimed"].has(into) and tm["claimed"][into] != el["i"]:
+				continue
+			# a pair leaves a room believed occupied to the regrouped squad (v0.8)
+			if el.get("child", false) and _room_hot(tm, into):
 				continue
 			var frm: String = lv.from_room(did, into)
 			if not (lv.is_exterior(frm) or tm["cleared"].has(frm) or tm["skipped"].has(frm) or _held_hall(tm, frm)):
@@ -288,6 +356,7 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 			best_s = sc
 			best = cd
 	if best != null:
+		el["idle"] = false
 		el["task"] = {"door": best[1], "into": best[2], "check": best[3]}
 		tm["claimed"][best[2]] = el["i"]
 		el["mode"] = "assault"
@@ -309,6 +378,12 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 	for other in tm["elements"]:
 		if other != el and not other["task"].is_empty() and not _alive(other).is_empty():
 			others_busy = true
+	if el.get("child", false):
+		# a pair with nothing open to it (v0.8): wait for the squad to regroup
+		el["idle"] = true
+		el["mode"] = "support"
+		el["retask_t"] = w.t + 1.0
+		return
 	if remaining and others_busy:
 		if el["mode"] != "support":
 			w.say("%s waits on the next room" % _tag(tm, el), "info")
@@ -558,9 +633,18 @@ func update_teams() -> void:
 			continue
 		_merge_elements(tm)
 		for el in tm["elements"]:
+			if el["mode"] == "rejoined":
+				continue
 			var eal := _alive(el)
 			if eal.is_empty():
 				continue
+			if el["mode"] == "split":
+				if el.has("orders") and (tick + el["i"]) % 10 == 0:
+					_orders_tick(tm, el)
+				if el["mode"] == "split" and (tick + el["i"]) % 15 == 0:
+					_split_check(tm, el)
+				continue
+			_lion_tick(tm, el, eal)
 			_sectors(el, eal)
 			_bounding(el, eal)
 			if el.has("orders") and (tick + el["i"]) % 10 == 0:
@@ -591,6 +675,8 @@ func _merge_elements(tm: Dictionary) -> void:
 	if els.size() < 2:
 		return
 	for el in els:
+		if el["mode"] in ["split", "rejoined"] or el.get("child", false):
+			continue
 		var al := _alive(el)
 		if al.is_empty():
 			if el["mode"] == "lost":
@@ -607,7 +693,7 @@ func _merge_elements(tm: Dictionary) -> void:
 		var best = null
 		var bd := INF
 		for other in els:
-			if other == el:
+			if other == el or other["mode"] in ["split", "rejoined", "lost", "merged"] or other.get("child", false):
 				continue
 			var oal := _alive(other)
 			if oal.is_empty():
@@ -628,6 +714,7 @@ func _merge_elements(tm: Dictionary) -> void:
 			top = maxi(top, m.eslot)
 		lone.el = best["i"]
 		lone.eslot = top + 1
+		lone.ticker["joined_t"] = w.t
 		best["members"].append(lone)
 		best["sector_key"] = "?"
 		w.say("%s, last of %s, joins %s" % [lone.id, _tag(tm, el), _tag(tm, best)], "comms")
@@ -1150,6 +1237,402 @@ func _prune_sweep(el: Dictionary, al: Array) -> void:
 	if tg != null and not keep.has(tg):
 		el["sweep_target"] = null
 
+# ------------------------------------------------------------------ pairs (v0.8)
+## Rooms an element could take next: not cleared or skipped, allowed by its orders, not
+## claimed by another element, entered from a cleared room or from outside.
+func _open_rooms(tm: Dictionary, el: Dictionary) -> Array:
+	var lv = w.level
+	var od: Dictionary = el.get("orders", el.get("porders", {}))
+	var allowed: Dictionary = el.get("allowed", {})
+	var avoid: Array = od.get("avoid", [])
+	var bi: int = tm.get("bldg", -1)
+	var out: Array = []
+	for did in (lv.building_doors(bi) if bi >= 0 else lv.doors.keys()):
+		var D: Dictionary = lv.doors[did]
+		for into in [D["a"], D["b"]]:
+			if lv.is_exterior(into) or tm["cleared"].has(into) or tm["skipped"].has(into) or out.has(into):
+				continue
+			if avoid.has(into) or (not allowed.is_empty() and not allowed.has(into)):
+				continue
+			if tm["claimed"].has(into) and tm["claimed"][into] != el["i"]:
+				continue
+			var frm: String = lv.from_room(did, into)
+			if not (lv.is_exterior(frm) or tm["cleared"].has(frm) or tm["skipped"].has(frm) or _held_hall(tm, frm)):
+				continue
+			out.append(into)
+	return out
+
+
+## A tight interior: a squad of four or more between rooms, out of a fight, inside the
+## building, with at least two small rooms open to it.
+func _should_split(tm: Dictionary, el: Dictionary, al: Array) -> bool:
+	if not features["pairs"] or el.get("child", false) or al.size() < 4 or el["mode"] != "assault":
+		return false
+	if w.t - float(el.get("contact_t", -99.0)) <= LION_WINDOW:
+		return false
+	if not w.level.is_inside(_centre(al)):
+		return false
+	var small := 0
+	for r in _open_rooms(tm, el):
+		# a room believed occupied gets the whole squad, kit and all
+		if _room_hot(tm, r):
+			return false
+		if w.level.room_area(r) <= SMALL_ROOM_M2:
+			small += 1
+	return small >= 2
+
+
+## Is someone believed to be in this room: the briefing says so, or someone was seen
+## there in the last 90 s or heard there in the last 60 s?
+func _room_hot(tm: Dictionary, room: String) -> bool:
+	if w.intel_rooms.has(room):
+		return true
+	for eid in tm["lkps"]:
+		var l: Dictionary = tm["lkps"][eid]
+		if w.t - float(l["t"]) < 90.0 and w.level.room_at(l["p"]) == room:
+			return true
+	var snd: Dictionary = tm.get("sound", {})
+	return not snd.is_empty() and w.t - float(snd["t"]) < 60.0 and w.level.room_at(snd["p"]) == room
+
+
+## Break the squad into pairs (a three when the count is odd): each pair clears rooms on
+## its own; the squad keeps its orders and its objective.
+func _split(tm: Dictionary, el: Dictionary, al: Array) -> void:
+	_release(tm, el)
+	el["task"] = {}
+	var ms: Array = al.duplicate()
+	var ld = leader_of(el)
+	ms.sort_custom(func(a, b):
+		if a == ld or b == ld:
+			return a == ld
+		return a.eslot < b.eslot)
+	var groups: Array = []
+	var n := ms.size()
+	var n_pairs: int = n / 2
+	for g in n_pairs:
+		groups.append([])
+	for k in n:
+		groups[mini(k / 2, n_pairs - 1)].append(ms[k])
+	el["kids"] = []
+	el["mode"] = "split"
+	for g2 in groups:
+		var idx: int = tm["elements"].size()
+		var kid := _new_element(idx)
+		kid["child"] = true
+		kid["parent"] = el["i"]
+		kid["porders"] = el.get("orders", {})
+		kid["allowed"] = el.get("allowed", {})
+		kid["last_room"] = el["last_room"]
+		kid["contact_t"] = el.get("contact_t", -99.0)
+		for j in g2.size():
+			var m = g2[j]
+			m.el = idx
+			m.eslot = j
+			m.ticker["joined_t"] = w.t
+			kid["members"].append(m)
+		tm["elements"].append(kid)
+		el["kids"].append(idx)
+		_squad_setup(kid, float(el.get("cohesion", 0.4)))
+		kid["mode"] = "assault"
+	w.say("%s breaks into %s for the small rooms" % [_tag(tm, el), " + ".join(groups.map(func(g): return str(g.size())))], "comms")
+	for idx2 in el["kids"]:
+		_next_task(tm, tm["elements"][idx2])
+
+
+## Back to one squad when the small rooms run out (every pair idle), a pair is down to
+## one, or the next rooms open are large.
+func _split_check(tm: Dictionary, el: Dictionary) -> void:
+	var why := ""
+	var all_idle := true
+	for idx in el.get("kids", []):
+		var kid: Dictionary = tm["elements"][idx]
+		if _alive(kid).size() < 2:
+			why = "a pair is down to one"
+		if not kid.get("idle", false):
+			all_idle = false
+	if why == "" and all_idle:
+		why = "the small rooms are done"
+	if why != "":
+		_rejoin(tm, el, why)
+
+
+func _rejoin(tm: Dictionary, el: Dictionary, why: String) -> void:
+	var last := ""
+	var k := 0
+	for idx in el.get("kids", []):
+		var kid: Dictionary = tm["elements"][idx]
+		_release(tm, kid)
+		kid["task"] = {}
+		if kid.get("last_room", "") != "":
+			last = kid["last_room"]
+		for m in kid["members"]:
+			m.el = el["i"]
+			m.eslot = k
+			m.ticker["joined_t"] = w.t
+			k += 1
+		kid["members"] = []
+		kid["mode"] = "rejoined"
+	el["kids"] = []
+	el["mode"] = "assault"
+	el["task"] = {}
+	el["sector_key"] = "?"
+	if last != "":
+		el["last_room"] = last
+	if why != "":
+		w.say("%s regroups: %s" % [_tag(tm, el), why], "comms")
+		el["retask_t"] = w.t
+		_next_task(tm, el)
+
+
+# ------------------------------------------------------------------ leaders and the Lion (v0.8)
+## The highest rank alive leads (department ranks), then the most experienced, then the
+## first in the squad's order.
+func _pick_leader(al: Array):
+	var best = null
+	for m in al:
+		if m.complying or m.gone:
+			continue
+		if best == null:
+			best = m
+			continue
+		var ra: int = Squads.RANKS.find(m.rank)
+		var rb: int = Squads.RANKS.find(best.rank)
+		if ra != rb:
+			if ra > rb:
+				best = m
+		elif m.exp != best.exp:
+			if m.exp > best.exp:
+				best = m
+		elif m.eslot < best.eslot:
+			best = m
+	return best
+
+
+func leader_of(el: Dictionary):
+	var ld = w.by_id.get(el.get("leader", ""), null)
+	if ld != null and ld.alive() and not ld.complying and not ld.gone and ld.el == el["i"]:
+		return ld
+	return null
+
+
+## Once a second per squad: is it in a fight, who leads, and what does the leader order.
+## Orders: "push" (carry on with the task: the Ape's drills, entries included), "cover"
+## (into cover facing the threat until the fight goes quiet), "fallback" (back to the
+## last cleared room or the start when the squad has lost half its people), "hold" (a
+## holding squad: the hold layer is its fight).
+func _lion_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
+	var contact := float(el.get("contact_t", -99.0))
+	for m in al:
+		contact = maxf(contact, maxf(m.last_enemy_seen_t, float(m.ticker.get("fire_t", -99.0))))
+	el["contact_t"] = contact
+	var ld = leader_of(el)
+	if ld == null:
+		ld = _pick_leader(al)
+		if ld != null:
+			if el.get("leader", "") != "":
+				w.say("%s takes command of %s" % [ld.id, _tag(tm, el)], "comms")
+				el["command_t"] = w.t + 1.5
+			el["leader"] = ld.id
+	if not features["lion"]:
+		return
+	if w.t - contact > LION_WINDOW:
+		if el.has("lion"):
+			if el["lion"]["order"] != "push" and ld != null:
+				w.say("%s: back to it" % _tag(tm, el), "comms")
+			el.erase("lion")
+		return
+	if ld == null or ld.stunned(w.t) or w.t < float(el.get("command_t", -1.0)) or w.t < float(el.get("lion_next", -1.0)):
+		return
+	el["lion_next"] = w.t + 1.0
+	var threat = _squad_threat(tm, el, ld)
+	var order := "push"
+	match el["mode"]:
+		"hold":
+			order = "hold"
+		"withdraw", "lost", "merged", "split", "rejoined":
+			return
+		_:
+			var n0: int = int(el.get("n0", al.size()))
+			var committed: bool = el["mode"] == "assault" and el.get("phase", "") in ["breach", "bang", "gas_wait", "entry", "clear"]
+			if al.size() * 2 < n0 and n0 >= 2 and not committed:
+				order = "fallback"
+			elif committed:
+				order = "push"
+			elif threat != null and _known_near(tm, threat, 12.0) > al.size():
+				order = "cover"
+			elif el["mode"] == "wait":
+				order = "cover"
+	var cur: Dictionary = el.get("lion", {})
+	if cur.get("order", "") == order:
+		if threat != null:
+			cur["p"] = threat
+		return
+	el["lion_serial"] = int(el.get("lion_serial", 0)) + 1
+	el["lion"] = {"order": order, "t": w.t, "p": threat, "id": el["lion_serial"], "by": ld.id,
+		"rally": _rally_point(tm, el, al)}
+	el["lion_adopt"] = {ld.id: w.t}
+	if order != "push" and order != "hold":
+		w.say("%s (%s): %s" % [_tag(tm, el), ld.id, {"cover": "take cover, face the threat", "fallback": "fall back"}[order]], "comms")
+
+
+## The threat the squad faces: the newest last-known position within 40 m of the leader,
+## else where the fire on the squad came from.
+func _squad_threat(tm: Dictionary, el: Dictionary, ld):
+	var best = null
+	var bt := -INF
+	for eid in tm["lkps"]:
+		var l: Dictionary = tm["lkps"][eid]
+		if w.t - float(l["t"]) < 15.0 and ld.pos.distance_to(l["p"]) < 40.0 and float(l["t"]) > bt:
+			bt = float(l["t"])
+			best = l["p"]
+	if best != null:
+		return best
+	for m in _alive(el):
+		if float(m.ticker.get("fire_t", -99.0)) > w.t - 5.0:
+			return m.ticker.get("fire_from", null)
+	return null
+
+
+## Enemies known to be within r of p (recent last-known positions).
+func _known_near(tm: Dictionary, p: Vector2, r: float) -> int:
+	var n := 0
+	for eid in tm["lkps"]:
+		var l: Dictionary = tm["lkps"][eid]
+		if w.t - float(l["t"]) < 15.0 and (l["p"] as Vector2).distance_to(p) <= r:
+			n += 1
+	return n
+
+
+## Where a squad falls back to: the centre of the last room it cleared, else where it
+## started.
+func _rally_point(tm: Dictionary, el: Dictionary, al: Array) -> Vector2:
+	var lr: String = el.get("last_room", "")
+	if lr != "" and w.level.rooms.has(lr) and not w.level.is_exterior(lr):
+		return w.nav.snap(w.level.rooms[lr]["label"])
+	var c := Vector2.ZERO
+	for m in al:
+		c += m.spawn
+	return w.nav.snap(c / maxf(1.0, al.size()))
+
+
+## The Lion for one member: the leader's order once this member has caught up with it.
+## True when the order drove the member this tick.
+func _lion(o, tm: Dictionary, el: Dictionary) -> bool:
+	var ln: Dictionary = el.get("lion", {})
+	if ln.is_empty() or ln["order"] in ["push", "hold"]:
+		return false
+	var adopt: Dictionary = el.get("lion_adopt", {})
+	if not adopt.has(o.id):
+		# a newcomer to the squad takes its orders at once; everyone else after the lag
+		var lag_s: float = 0.0 if o.ticker.get("joined_t", -99.0) > float(ln["t"]) - 0.01 else Squads.lag(float(el.get("cohesion", 0.4)), o.exp)
+		if w.t < float(ln["t"]) + lag_s:
+			return false
+		adopt[o.id] = w.t
+		el["lion_adopt"] = adopt
+	var threat = ln.get("p", null)
+	match ln["order"]:
+		"cover":
+			if threat == null:
+				return false
+			o.mind = "lion"
+			_cover_facing(o, threat, "taking cover, facing the threat")
+			return true
+		"fallback":
+			o.mind = "lion"
+			var rp: Vector2 = ln["rally"]
+			if o.pos.distance_to(rp) > 2.0 and not _stuck_on(o, rp):
+				w.move_to(o, rp, "run")
+				o.dbg = "falling back"
+				if threat != null:
+					_task_look(o, (threat - o.pos).angle())
+			else:
+				if threat != null:
+					_cover_facing(o, threat, "holding the rally point")
+				else:
+					w.stop(o)
+			return true
+	return false
+
+
+## Into the nearest cover from p (within 10 m), then crouch there facing it.
+func _cover_facing(o, p: Vector2, why: String) -> void:
+	var spot = o.ticker.get("cover_spot", null)
+	if spot == null or w.t > float(o.ticker.get("cover_spot_t", -99.0)) + 4.0 or not _hidden(spot, [p], 0.82):
+		spot = _find_cover(o, [p], o.has("PF09") or o.has("PF02"))
+		o.ticker["cover_spot"] = spot
+		o.ticker["cover_spot_t"] = w.t
+	if spot != null and o.pos.distance_to(spot) > 0.5 and spot.distance_to(o.pos) < 10.0:
+		w.move_to(o, spot, "run")
+		o.dbg = why + " (moving)"
+	else:
+		w.stop(o)
+		o.stance_goal = Op.CROUCH
+		o.dbg = why
+	_task_look(o, (p - o.pos).angle())
+
+
+## The Lizard's new reflex: shot at by someone it cannot see, it gets out of that line of
+## fire to the nearest cover from it. True while doing so.
+func _lizard_cover(o) -> bool:
+	var ft: float = float(o.ticker.get("fire_t", -99.0))
+	if w.t - ft > LIZARD_FIRE or not o.ticker.has("fire_from"):
+		return false
+	var ff: Vector2 = o.ticker["fire_from"]
+	var head: float = 0.82 if o.stance != Op.STAND else 1.2
+	if _hidden(o.pos, [ff], head):
+		return false
+	if o.holding and o.ticker.get("in_cover_t", -9.0) > w.t - 0.3:
+		return false
+	o.mind = "lizard"
+	_cover_facing(o, ff, "under fire: to cover")
+	return true
+
+
+## The Wolf (v0.8): alone, the squad gone. In a fight it goes cover to cover toward the
+## threat (attacking) or holds the cover it has (holding); out of one it carries on with
+## its task alone. True while it drove the operator.
+func _wolf(o, tm: Dictionary, el: Dictionary) -> bool:
+	var lk = _team_lkp(tm, 40.0, o.pos)
+	if lk == null or w.t - float(el.get("contact_t", -99.0)) > LION_WINDOW:
+		return false
+	o.mind = "wolf"
+	if el["mode"] in ["hold", "withdraw"]:
+		_cover_facing(o, lk, "holding alone")
+		return true
+	var nxt = o.ticker.get("wolf_next", null)
+	if nxt == null or w.t > float(o.ticker.get("wolf_t", -99.0)) + 6.0 or o.pos.distance_to(nxt) < 0.6:
+		nxt = _wolf_bound(o, lk)
+		o.ticker["wolf_next"] = nxt
+		o.ticker["wolf_t"] = w.t
+	if nxt == null:
+		_cover_facing(o, lk, "alone, in cover")
+		return true
+	w.move_to(o, nxt, "run")
+	o.dbg = "alone, cover to cover"
+	_task_look(o, (lk - o.pos).angle())
+	return true
+
+
+## The next cover 3-9 m toward p, hidden from it, that is nearer to it than here.
+func _wolf_bound(o, p: Vector2):
+	var best = null
+	var bs := INF
+	var here: float = o.pos.distance_to(p)
+	for item in w.nav.spots_near(o.pos, 9.0):
+		var c: Dictionary = item[1]
+		var q: Vector2 = c["p"]
+		var d: float = o.pos.distance_to(q)
+		if d < 3.0 or q.distance_to(p) > here - 1.5:
+			continue
+		if not _hidden(q, [p], 0.82):
+			continue
+		var sc: float = q.distance_to(p) + 2.0 * _route_exposure(o.pos, q, [p])
+		if sc < bs:
+			bs = sc
+			best = q
+	return best
+
+
 # ================================================================== individual
 var fine := false   # fine-grained profiling into w.prof
 
@@ -1168,6 +1651,7 @@ func think(o) -> void:
 
 func _think(o) -> void:
 	o.dbg = ""
+	o.mind = "lizard"
 	o.stance_goal = Op.STAND if not o.leg_hit or o.stance_goal != Op.CROUCH else Op.CROUCH
 	var tm: Dictionary = w.teams[o.team]
 	var el: Dictionary = tm["elements"][o.el]
@@ -1272,6 +1756,14 @@ func _think(o) -> void:
 	if far != null:
 		_engage_far(o, far)
 		return
+	# LIZARD (v0.8): shot at by someone it cannot see: out of that line of fire first
+	if features["lizard"] and _lizard_cover(o):
+		_finish_look(o)
+		return
+	# below the Lizard: the squad's brains (Lion in a fight, Ape out of one), or the
+	# operator's own (Wolf) when the squad is gone
+	var alone: bool = _alive(el).size() <= 1
+	o.mind = "wolf" if alone else ("lion" if w.t - float(el.get("contact_t", -99.0)) <= LION_WINDOW else "ape")
 	# police rules: cuff anyone close by who has given up (v0.6)
 	if o.judges and not withdrawing and _arrest(o):
 		_finish_look(o)
@@ -1281,6 +1773,12 @@ func _think(o) -> void:
 		if _task_escort(o):
 			_finish_look(o)
 			return
+	if alone and features["wolf"] and _wolf(o, tm, el):
+		_finish_look(o)
+		return
+	if not alone and features["lion"] and _lion(o, tm, el):
+		_finish_look(o)
+		return
 	# a medical kit (v0.7.5): once it is quiet, treat the downed nearby
 	if not withdrawing and _treat(o, tm):
 		_finish_look(o)
@@ -2648,20 +3146,110 @@ func _consolidate(tm: Dictionary, el: Dictionary) -> void:
 			moved.append(m)
 		else:
 			taken.append(m.spawn)
+	# room size (v0.8): a room that holds the squad (about 6 m2 a defender) takes all of
+	# it; a small one takes what fits and the rest spread into the rooms behind it,
+	# covering the door back into it: a layered defence with somewhere to fall back to
+	for m1 in al:
+		m1.ticker.erase("hold_room")
+	var spill: Array = []
+	if features["disperse"] and fixed == "":
+		var fits: int = maxi(1, int(lv.room_area(best) / DEFENDER_M2))
+		if fits < al.size():
+			var keep: Array = al.duplicate()
+			keep.sort_custom(func(a, b): return a.pos.distance_to(lv.rooms[best]["label"]) < b.pos.distance_to(lv.rooms[best]["label"]))
+			spill = keep.slice(fits)
+			if reserve != null and spill.has(reserve):
+				reserve = null
+	moved = moved.filter(func(x): return not spill.has(x))
 	for m in moved:
 		_post_member(el, m, {}, taken)
 		taken.append(m.spawn)
 	if reserve != null:
 		_reserve_post(el, reserve, taken)
-	if not moved.is_empty() or tm["elements"].size() > 1:
+	var layers: Array = _disperse(tm, el, best, spill)
+	if not layers.is_empty():
+		w.say("%s holds the %s and layers into the %s" % [_tag(tm, el), lv.rooms[best]["title"].to_lower(),
+			", ".join(layers.map(func(r): return String(lv.rooms[r]["title"]).to_lower()))], "info")
+	elif not moved.is_empty() or tm["elements"].size() > 1:
 		w.say("%s consolidates in the %s" % [_tag(tm, el), lv.rooms[best]["title"].to_lower()], "info")
 	el["sector_posture"] = ""
+
+
+## Spread the members a small front room cannot hold into the rooms next to it, the ones
+## farthest from where the attack will come first, each covering the door back into the
+## front room. Returns the rooms used.
+func _disperse(tm: Dictionary, el: Dictionary, front: String, spill: Array) -> Array:
+	if spill.is_empty():
+		return []
+	var lv = w.level
+	var held: Dictionary = tm["held"]
+	var from: Vector2 = lv.stage_centre() if not lv.stage_a.is_empty() else Vector2(lv.W / 2.0, lv.H)
+	var cands: Array = []
+	for did in lv.adj.get(front, []):
+		var D: Dictionary = lv.doors[did]
+		var other: String = D["b"] if D["a"] == front else D["a"]
+		if lv.is_exterior(other) or other == front or (held.has(other) and held[other] != el["i"]):
+			continue
+		var depth: float = (lv.rooms[other]["label"] as Vector2).distance_to(from) - (lv.rooms[front]["label"] as Vector2).distance_to(from)
+		cands.append([depth, other, did])
+	if cands.is_empty():
+		return []
+	cands.sort_custom(func(a, b): return a[0] > b[0])
+	var used: Array = []
+	var k := 0
+	var left: Array = spill.duplicate()
+	while not left.is_empty() and k < cands.size() * 3:
+		var cd: Array = cands[k % cands.size()]
+		k += 1
+		var room2: String = cd[1]
+		var fits2: int = maxi(1, int(lv.room_area(room2) / DEFENDER_M2))
+		var have := 0
+		for x in spill:
+			if x.ticker.get("hold_room", "") == room2:
+				have += 1
+		if have >= fits2:
+			continue
+		var m = left.pop_front()
+		m.ticker["hold_room"] = room2
+		var op := {}
+		for o2 in lv.room_openings(room2):
+			if o2.get("id", "") == cd[2]:
+				op = o2
+		var taken: Array = []
+		for x2 in _alive(el):
+			if x2 != m:
+				taken.append(x2.spawn)
+		var post: Dictionary = _hold_post(room2, m, op, taken)
+		if post.is_empty():
+			var posts: Array = lv.cover_posts(room2, 1, taken, w.nav, op)
+			if posts.is_empty():
+				m.ticker.erase("hold_room")
+				continue
+			post = posts[0]
+		m.spawn = post["p"]
+		m.spawn_face = post["face"]
+		m.ticker["post_op"] = op
+		m.ticker["post_kind"] = "door"
+		held[room2] = el["i"]
+		if not used.has(room2):
+			used.append(room2)
+	# whoever found no room stays in the front room after all
+	for m2 in left:
+		_post_member(el, m2, {}, [])
+	el["hold_rooms"] = used
+	return used
 
 
 func _release_hold(tm: Dictionary, el: Dictionary) -> void:
 	var hr: String = el.get("hold_room", "")
 	if hr != "" and tm["held"].get(hr, -1) == el["i"]:
 		tm["held"].erase(hr)
+	for r2 in el.get("hold_rooms", []):
+		if tm["held"].get(r2, -1) == el["i"]:
+			tm["held"].erase(r2)
+	el["hold_rooms"] = []
+	for m in el["members"]:
+		m.ticker.erase("hold_room")
 	el["hold_room"] = ""
 
 
@@ -2828,6 +3416,8 @@ func _task_transit(o, el: Dictionary) -> void:
 ## Post (a point, for the event) and Patrol (a route). Constraints shape how: Avoid,
 ## Consolidate, Phase line, Entry point, Pace, Weapons tight, Knock, Pistols only.
 func _begin_objective(tm: Dictionary, el: Dictionary) -> void:
+	if el["mode"] == "split":
+		_rejoin(tm, el, "")
 	var od: Dictionary = el.get("orders", {})
 	var objs: Array = od.get("objs", [])
 	if _alive(el).is_empty():
@@ -3437,7 +4027,7 @@ func _reserve_post(el: Dictionary, m, taken: Array) -> void:
 ## The room a holder defends: the squad's hold room, or the room they stand in.
 func _hold_room(o) -> String:
 	var el := _el(o)
-	var hr: String = el.get("hold_room", "")
+	var hr: String = o.ticker.get("hold_room", el.get("hold_room", ""))
 	if hr == "" and not w.level.is_exterior(o.room):
 		hr = o.room
 	return hr

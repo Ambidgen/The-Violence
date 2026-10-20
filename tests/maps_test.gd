@@ -1,6 +1,6 @@
 extends SceneTree
 ## Map validation: every room reachable, every door passable from both sides, every
-## post for 20 a side free and reachable, door graph connected. Optional matches.
+## post for 30 a side free and reachable, door graph connected. Optional matches.
 ##   godot --headless --path . -s res://tests/maps_test.gd                  # all maps
 ##   godot --headless --path . -s res://tests/maps_test.gd -- --map=4 --run=1
 const Maps = preload("res://scripts/maps/registry.gd")
@@ -12,7 +12,7 @@ const Teams = preload("res://tests/teams.gd")
 func _init() -> void:
 	var only := -1
 	var runs := 0
-	var sizes := [[5, 5], [20, 20]]
+	var sizes := [[5, 5], [20, 20], [30, 30]]
 	var ech := ["sof", "militia"]
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--map="):
@@ -111,7 +111,7 @@ func _check(lv, nav) -> int:
 			bad += 1
 	# posts
 	for side in ["A", "B"]:
-		for k in range(1, 21):
+		for k in range(1, 31):
 			var sid := "%s%d" % [side, k]
 			if not lv.spawns.has(sid):
 				print("  ! no post %s" % sid)

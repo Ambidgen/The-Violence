@@ -2552,10 +2552,13 @@ func _fire(o, bearing: float, aim_z: float, dist: float, settle: float, tgt = nu
 		if sa2 > 0.3 and sa2 < best + 1.0 and absf(rel2.cross(u)) < 1.0:
 			add_stress(a, 0.15, "near miss")
 			a.ticker["near_t"] = t
+			# where the fire came from (v0.8: the Lizard brain breaks contact away from it)
+			a.ticker["fire_t"] = t
+			a.ticker["fire_from"] = o.pos
 			if a.civ:
 				civ_brain.alarm(a, o.pos, "near miss")
 	if incident != null:
-		incident.on_shot(o, tgt, hit_op, walls, endp)
+		incident.on_shot(o, tgt, hit_op, walls, endp, hit_op == null and not mh.is_empty() and mh["hit"])
 	if hit_op != null:
 		_hit(hit_op, hit_zone, minf(hit_lat, hit_zone[3] * 0.99), u, o, e_at, walls)
 	elif not mh.is_empty() and mh["hit"]:
@@ -2655,6 +2658,8 @@ func add_stress(a, amt: float, _why: String) -> void:
 # ================================================================== damage
 func _hit(a, zn: Array, lat: float, u: Vector2, shooter, energy := 1.0, walls := 0) -> void:
 	var zone: String = zn[0]
+	a.ticker["fire_t"] = t
+	a.ticker["fire_from"] = shooter.pos
 	if not a.ticker.has("first_hit_t"):
 		a.ticker["first_hit_t"] = t
 	if (zone == "chest" or zone == "abd") and lat > 0.7 * zn[3] and rng.randf() < 0.5:
@@ -3017,6 +3022,9 @@ func _check_end() -> void:
 			if o4.team < 2 and o4.fighting() and not o4.dry():
 				armed[o4.team] += 1
 		for k4 in 2:
+			# under police rules suspects out of rounds still have to be arrested
+			if k4 == 1 and police_rules():
+				continue
 			if armed[k4] == 0 and armed[1 - k4] > 0:
 				say("%s: out of ammunition" % ("Team A" if k4 == 0 else "Team B"), "end")
 				_finish(1 - k4)

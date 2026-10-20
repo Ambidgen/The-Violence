@@ -9,8 +9,8 @@ const Habits = preload("res://scripts/data/habits.gd")
 
 const POINTS := [0, 1, 2, 3, 5, 7]      # by the leader's experience tier (1-5)
 const RANKS := ["Officer", "Corporal", "Sergeant", "Lieutenant", "Captain"]
-const MAX_SQUADS := 4
-const MAX_SQUAD := 5
+const MAX_SQUADS := 5
+const MAX_SQUAD := 6
 
 const OBJECTIVES := {
 	"clear": {"name": "Clear", "desc": "Clear the building, or only the rooms you pick (and the rooms on the way to them). Done when they are clear."},

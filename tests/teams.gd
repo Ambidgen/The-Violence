@@ -11,7 +11,7 @@ const Habits = preload("res://scripts/data/habits.gd")
 static func team(lv, team_i: int, spec: Dictionary) -> Array:
 	var out: Array = []
 	var letter := "AB"[team_i]
-	for slot in 20:
+	for slot in 30:
 		var id := "%s%d" % [letter, slot + 1]
 		var ech: String = spec.get("ech", "regular")
 		var good := {}
@@ -31,7 +31,7 @@ static func team(lv, team_i: int, spec: Dictionary) -> Array:
 		var bad := {}
 		for b in Habits.stress_bad_ids():
 			bad[b] = true
-		var flaw_slots: Array = spec.get("flaw_slots", range(20))
+		var flaw_slots: Array = spec.get("flaw_slots", range(30))
 		if slot in flaw_slots:
 			for b in spec.get("flaws", []):
 				bad[b] = true

@@ -6,7 +6,7 @@ extends RefCounted
 ## All units are metres; y grows downward (south).
 
 const Geom = preload("res://scripts/sim/geom.gd")
-const MAX_TEAM := 20
+const MAX_TEAM := 30
 const EXT_T := 0.22         # exterior wall thickness
 const INT_T := 0.12         # partition thickness
 const CHECK_AREA := 10.5    # rooms this small are "check" rooms (PF10): looked into, not entered

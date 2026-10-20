@@ -65,10 +65,11 @@ func _po(o) -> Dictionary:
 
 ## One round fired. tgt is the person aimed at (null for a stray), hit the person struck
 ## (null for a miss), walls how many walls the round went through before it stopped.
-func on_shot(o, tgt, hit, walls: int, endp := Vector2.INF) -> void:
+func on_shot(o, tgt, hit, walls: int, endp := Vector2.INF, wall_stop := false) -> void:
 	var verdict := verdict_for(o, tgt)
 	var rec := {"t": w.t, "by": o.id, "pol": o.judges, "tgt": tgt.id if tgt != null else "", "tkind": role(tgt) if tgt != null else "",
 		"verdict": verdict, "hit": hit.id if hit != null else "", "hkind": role(hit) if hit != null else "", "walls": walls,
+		"wall_stop": wall_stop,
 		"weapon": o.active, "att": tgt != null and w.attacking(tgt, o),
 		"end": w.place_of(endp) if endp != Vector2.INF and hit == null else ""}
 	if shots.size() < SHOTS_MAX:

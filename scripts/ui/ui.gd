@@ -206,7 +206,7 @@ func _heading(parent: Control, text: String) -> Label:
 
 
 func set_map_title(lv) -> void:
-	sub.text = "%s  ·  %d x %d m  ·  up to 20 a side" % [lv.map_name, int(lv.W), int(lv.H)]
+	sub.text = "%s  ·  %d x %d m  ·  up to 30 a side" % [lv.map_name, int(lv.W), int(lv.H)]
 	if map_opt != null:
 		map_opt.select(main.map_i)
 
@@ -267,7 +267,7 @@ func _build_setup() -> void:
 		grid.add_theme_constant_override("h_separation", 2)
 		grid.add_theme_constant_override("v_separation", 2)
 		s.add_child(grid)
-		for slot in 20:
+		for slot in 30:
 			var id := "%s%d" % ["AB"[k], slot + 1]
 			var b := _btn(grid, id, func(on): _sel(id, on), true)
 			b.button_group = group
