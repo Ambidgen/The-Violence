@@ -1299,6 +1299,13 @@ func _think(o) -> void:
 	if _maintain(o):
 		_finish_look(o)
 		return
+	# P6.5 GD03 (v0.7.8): standing in a team-mate's muzzle line and going nowhere
+	if o.has("GD03") and not o.moving and o.sidestep.is_empty() and o.aim.is_empty() \
+			and o.action.is_empty() and _in_line_of_fire(o, w.mates_near(o, 6.0)):
+		if _step_aside(o):
+			o.dbg = "stepping out of the fire lane"
+			_finish_look(o)
+			return
 	# P7 task
 	match el["mode"]:
 		"assault":
@@ -1783,6 +1790,25 @@ func _engage_far(o, e) -> void:
 			if spot != null:
 				o.ticker["far_dest"] = spot
 				return
+	# PF07 get off the X at range too (v0.7.8, from the parallel line): it fired only
+	# inside 10 m, where little of the shooting happens
+	if o.has("PF07") and o.sidestep.is_empty() and not o.ticker.has("pf07_" + e.id) and e.alive():
+		var sb: float = (e.pos - o.pos).angle()
+		var bd2 := Vector2.ZERO
+		var bs2 := INF
+		for sgn2 in [1.0, -1.0]:
+			var dv2: Vector2 = Vector2.from_angle(sb + PI / 2.0 * sgn2)
+			if not w.nav.is_free(o.pos + dv2 * 1.2):
+				continue
+			if not w.geom.sight_clear(o.pos + dv2 * 1.2, o.eye(), e.pos, e.zone_centre("chest")):
+				continue
+			var sc2: float = w.geom.dist_to_kinds(o.pos + dv2 * 1.2, [Geom.COVER, Geom.WALL], 3.0)
+			if sc2 < bs2:
+				bs2 = sc2
+				bd2 = dv2
+		if bd2 != Vector2.ZERO:
+			o.ticker["pf07_" + e.id] = true
+			o.sidestep = {"dir": bd2, "left": 0.8}
 	if o.hb("BH15") and o.pos.distance_to(e.pos) > 6.0:
 		w.move_to(o, e.pos, "walk", -1, true)
 	elif not _close_in(o, e):
@@ -1935,8 +1961,12 @@ func _maintain(o) -> bool:
 				return true
 		elif not o.weapons["rifle"]["lost"] and o.weapons["rifle"]["spare"] > 0:
 			want = "rifle"
-	elif o.has("WD02") and lull > 2.0 and s["mag"] < int(cap * 0.4) and s["spare"] > 0:
-		want = o.active
+	elif (o.has("WD02") or o.has("WD01")) and lull > 2.0 and s["spare"] > 0:
+		# WD01 always knows the count, so it tops up in a lull rather than running dry;
+		# WD02 is the habit of doing it before it gets that low (v0.7.8)
+		var floor_pct: float = 0.4 if o.has("WD02") else 0.3
+		if s["mag"] < int(cap * floor_pct):
+			want = o.active
 	if want == "":
 		return false
 	var threats := _threats(o)
@@ -2016,6 +2046,33 @@ func _in_line_of_fire(o, mates: Array) -> bool:
 		var rel: Vector2 = (o.pos + o.vel.normalized() * 0.4) - m.pos
 		var s := rel.dot(u)
 		if s > 0.3 and s < 6.0 and absf(rel.cross(u)) < 0.45:
+			return true
+	return false
+
+
+func _pos_in_line_of_fire(o, p: Vector2, mates: Array) -> bool:
+	for m in mates:
+		if m == o:
+			continue
+		if m.aim.is_empty() and w.t - m.last_shot_t > 1.5:
+			continue
+		var u := Vector2.from_angle(m.muzzle_dir)
+		var rel: Vector2 = p - m.pos
+		var s := rel.dot(u)
+		if s > 0.3 and s < 6.0 and absf(rel.cross(u)) < 0.45:
+			return true
+	return false
+
+
+## GD03: a sidestep of 0.9 m out of every team-mate's lane, if there is one.
+func _step_aside(o) -> bool:
+	var u: Vector2 = Vector2.from_angle(o.muzzle_dir)
+	var side: Vector2 = Vector2(-u.y, u.x)
+	var mates: Array = w.mates_near(o, 7.0)
+	for sgn in [1.0, -1.0]:
+		var q: Vector2 = o.pos + side * sgn * 0.9
+		if w.nav.is_free(q) and not _pos_in_line_of_fire(o, q, mates):
+			o.sidestep = {"dir": side * sgn, "left": 0.5}
 			return true
 	return false
 
@@ -2352,6 +2409,11 @@ func _finish_look2(o) -> void:
 	var h: Dictionary = o.look_hint
 	if not h.is_empty() and w.t >= h["start"] and w.t <= h["until"]:
 		o.look_goal = h["dir"]
+		return
+	# BH18 relaxed carry (v0.7.8): out of contact, the eyes go where the feet are going;
+	# it overrides the task look too, which is the point
+	if o.hb("BH18") and w.t - o.last_enemy_seen_t > 5.0 and o.moving and o.vel.length() > 0.3:
+		o.look_goal = o.vel.angle()
 		return
 	if o.ticker.get("task_look_tick", -1) == tick:
 		o.look_goal = o.ticker["task_look"]

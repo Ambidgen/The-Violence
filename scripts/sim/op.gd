@@ -414,6 +414,18 @@ func any_loaded() -> bool:
 	return usable("rifle") or usable("pistol")
 
 
+## Out of the fight for good (v0.7.8): no rounds in any weapon, no spare magazine, and no
+## top-up from a cache left (HD20 takes two). A jam can be cleared, so it does not count.
+func dry() -> bool:
+	for wn in ["rifle", "pistol"]:
+		if not weapons.has(wn):
+			continue
+		var s: Dictionary = weapons[wn]
+		if not s["lost"] and (int(s["mag"]) > 0 or int(s["spare"]) > 0):
+			return false
+	return not (has("HD20") and int(ticker.get("cache_used", 0)) < 2)
+
+
 func busy() -> bool:
 	return not action.is_empty()
 

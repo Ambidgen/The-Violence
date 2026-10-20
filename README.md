@@ -1,4 +1,4 @@
-# The Violence - vertical slice (v0.7.7)
+# The Violence - vertical slice (v0.7.8)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
@@ -11,6 +11,8 @@ Every plan is drawn as an architectural floor plan in greyscale. Operators start
 ## Run it
 
 **Standalone:** double-click `TheViolence.exe`. It is the whole game in one file (Godot 4.7.2 runtime with the game data embedded), so no Godot install is needed. The first launch may show a Windows SmartScreen warning because the file is unsigned: choose "More info", then "Run anyway".
+
+**From the folder:** double-click `Play.bat` (Windows) or run `./play.sh` (Linux). It runs the project files in the folder with a Godot editor sitting there (for example `Godot_v4.7.2-stable_win64.exe`), else a Godot on the PATH, else the standalone `TheViolence.exe` in the folder or in `build/`. Anything after it is passed on: `Play.bat -- --ops`.
 
 **From source:**
 1. Install Godot 4.4 or newer (tested on 4.4.1 and 4.7.2, standard build, no addons).
@@ -82,6 +84,24 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - `Rerun same seed` replays the fight exactly; `Rerun new seed` rolls a new one.
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small dot beside each figure is their alert state: green, yellow or red.
+
+## New in v0.7.8: from the parallel line
+
+Main on GitHub (the parallel line from v0.4) was compared with this one. Four things came across.
+
+- **Four habit fixes.** Each habit now does what its name says.
+  - **PF07 get off the X** sidesteps toward cover on first engaging an enemy at any range, not only inside 10 m.
+  - **WD01 ammo count awareness** tops up in a lull below 30%.
+  - **GD03 respect lines of fire** also steps out of a lane it is standing in.
+  - **BH18 relaxed carry** now puts the eyes on the direction of travel out of contact; it only suspended habits before.
+  - BH08 comms blackout, flagged on the parallel line, was already right here: its suspension of GD09 is the fix.
+- **Determinism test** (`tests/determinism_test.gd`, fixture `tests/fixtures/determinism.json`). It runs 35 cases, hashes the end state of each, and fails on any change. The cases are nine test-range matchups at three seeds, plus the first week's board of two campaign seeds with their suggested plans (police rules, civilians, doors, kit, orders, less-lethal). `--write` resets the baseline: do it in the same commit as a behaviour change and read the diff, which shows winner, time, shots and hits per case.
+- **Habit coverage check** (`tests/habits_test.gd -- --strict`). Every good habit must be read somewhere in the simulation. Every bad habit must have its own code or be declared a pure suspension (BH08, BH17, BH21, BH26), with a reason. Every id in a suspension list or a preset must exist. Habits read in only one place are listed for review (38, mostly hold-mode drills that belong to one branch).
+- **Folder launchers:** `Play.bat` and `play.sh` (see Run it).
+
+**One fix the regression found.** A fight in which one side has nothing left to shoot now ends: no rounds in any weapon, no spare magazine, no cache top-up. The last attacker out of ammunition used to sit in cover until the 900 s limit; with more top-ups (WD01) that became reachable on the Civic Plaza.
+
+Effect of the habit fixes: 9 of the 35 determinism cases changed, and no winner flipped. The hold test moved within its noise, and all other gates are unchanged. In the campaign sweep, 13 succeeded (6 at a cost), 11 were partial successes, 4 failed and 2 rallies passed quietly; before, 12, 11, 5 and 2.
 
 ## New in v0.7.7: the less-lethal suite
 
@@ -580,6 +600,8 @@ tests/                    headless tests and an art gallery
 ```
 godot --headless --path . -s res://tests/maps_test.gd -- --run=1           # validate every map, then 5v5 and 20v20 on each
 godot --headless --path . -s res://tests/stall_test.gd                     # six matchups per map; flags time-limit stalls
+godot --headless --path . -s res://tests/determinism_test.gd               # 35 seeded cases against the fixture (--write to reset)
+godot --headless --path . -s res://tests/habits_test.gd -- --strict        # every habit read somewhere, or a declared suspension
 godot --headless --path . -s res://tests/scale_playtest.gd -- --n=4        # Playtest 02: big fights on every map, CSV
 godot --headless --path . -s res://tests/perf.gd -- --map=10 --t=40        # where the time goes in a 20v20 fight
 godot --headless --path . -s res://tests/fuzz_test.gd -- --n=60            # random maps, sizes, habits, traits, postures

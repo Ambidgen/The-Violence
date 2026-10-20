@@ -3009,6 +3009,18 @@ func _check_end() -> void:
 				_end_wait = t + (150.0 if long_wait else 60.0)
 			if t < _end_wait:
 				return
+	# a side with nothing left to shoot is out of the fight (v0.7.8): the last attacker
+	# out of ammunition used to sit behind cover until the time limit
+	if alive[0] > 0 and alive[1] > 0 and t < time_limit:
+		var armed := [0, 0]
+		for o4 in ops:
+			if o4.team < 2 and o4.fighting() and not o4.dry():
+				armed[o4.team] += 1
+		for k4 in 2:
+			if armed[k4] == 0 and armed[1 - k4] > 0:
+				say("%s: out of ammunition" % ("Team A" if k4 == 0 else "Team B"), "end")
+				_finish(1 - k4)
+				return
 	if alive[0] > 0 and alive[1] > 0 and t < time_limit and not squad_orders.is_empty() and police_rules():
 		var done_t: float = brain.searches_done_t()
 		if done_t >= 0.0 and t - done_t > STAND_DOWN:
