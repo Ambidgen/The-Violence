@@ -4,6 +4,7 @@ extends Node2D
 ## 20x while the plan collects the evidence.
 
 const Habits = preload("res://scripts/data/habits.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
@@ -12,6 +13,7 @@ const FloorPlan = preload("res://scripts/view/floor_plan.gd")
 const Decals = preload("res://scripts/view/decals.gd")
 const ActorView = preload("res://scripts/view/actor_view.gd")
 const Overlay = preload("res://scripts/view/overlay.gd")
+const DoorsView = preload("res://scripts/view/doors_view.gd")
 const Marks = preload("res://scripts/view/marks.gd")
 const SetupMarks = preload("res://scripts/view/setup_marks.gd")
 const UI = preload("res://scripts/ui/ui.gd")
@@ -69,6 +71,7 @@ var _panning := false
 var n_civ := 0
 var police_rules := false
 var night := false
+var door_mode := "open"              # test range doors (v0.7.5): open, closed, outer, locked
 var use_dept := false
 var dept = null                     # the department (persistent, saved in user://)
 var dept_sel: Array = []            # officer ids picked for the next operation
@@ -83,6 +86,7 @@ var fog
 var replay_view
 var plan_marks
 var veh_layer: Node2D
+var doors_view                    # door states over the plan (v0.7.5)
 var cur_sit := {}
 var plan := {}
 var op_mode := false
@@ -120,6 +124,9 @@ func _ready() -> void:
 	floorplan.setup(level)
 	props_layer = Node2D.new()
 	add_child(props_layer)
+	doors_view = DoorsView.new()
+	add_child(doors_view)
+	doors_view.setup(level)
 	marks = Marks.new()
 	add_child(marks)
 	marks.setup(level)
@@ -136,6 +143,7 @@ func _ready() -> void:
 	add_child(actors_layer)
 	replay_view = ReplayView.new()
 	add_child(replay_view)
+	replay_view.doors_view = doors_view
 	replay_view.visible = false
 	canopy_layer = Node2D.new()
 	canopy_layer.modulate.a = 0.8
@@ -176,6 +184,8 @@ func _ready() -> void:
 		cam.position = Vector2(float(f[0]), float(f[1])) * PX + Vector2(UI.PANEL_W / 2.0 / cam.zoom.x, 0)
 	if _args.has("dept"):
 		set_use_dept(true)
+	if _args.has("doors"):
+		door_mode = _args["doors"]
 	_enter_setup()
 	if _args.has("speed"):
 		speed = float(_args["speed"])
@@ -198,6 +208,7 @@ func _cfg_for(id: String, team: int, slot: int, echelon: String) -> Dictionary:
 
 func _apply_preset(c: Dictionary, echelon: String) -> void:
 	c["echelon"] = echelon
+	c["kit"] = Equipment.preset(echelon)
 	c["good"] = {}
 	for g in Habits.preset_good(echelon):
 		c["good"][g] = true
@@ -281,6 +292,41 @@ func set_echelon(e: String, apply: bool) -> void:
 
 func set_plates(n: int) -> void:
 	cfgs[sel]["plates"] = n
+	var k: Dictionary = Equipment.normalize(cfgs[sel].get("kit", {}))
+	k["plates"] = n
+	if n > 0:
+		k["armour"] = "plates"
+	elif k["armour"] == "plates":
+		k["armour"] = "none"
+	cfgs[sel]["kit"] = Equipment.normalize(k)
+	_refresh()
+
+
+## The Kit tab (v0.7.5): one field of the selected operator's kit; anything their training
+## does not allow is taken out again.
+func set_kit(field: String, value) -> void:
+	var c: Dictionary = cfgs[sel]
+	var k: Dictionary = Equipment.normalize(c.get("kit", Equipment.preset(c["echelon"])))
+	k[field] = value
+	if field == "armour":
+		k["plates"] = 2 if value == "plates" else 0
+	k = Equipment.validate(k, Equipment.who_of_echelon(c["echelon"]))
+	c["kit"] = k
+	c["plates"] = int(k["plates"])
+	c["vest"] = k["armour"] == "vest"
+	_refresh()
+
+
+func set_gear(gid: String, n: int) -> void:
+	var c: Dictionary = cfgs[sel]
+	var k: Dictionary = Equipment.normalize(c.get("kit", Equipment.preset(c["echelon"])))
+	k["gear"][gid] = n
+	c["kit"] = Equipment.validate(k, Equipment.who_of_echelon(c["echelon"]))
+	_refresh()
+
+
+func set_door_mode(m: String) -> void:
+	door_mode = m
 	_refresh()
 
 
@@ -321,6 +367,7 @@ func _load_map(i: int) -> void:
 	nav = Nav.new()
 	nav.build(level)
 	floorplan.setup(level)
+	doors_view.setup(level)
 	marks.setup(level)
 	for ch in props_layer.get_children():
 		ch.queue_free()
@@ -364,12 +411,36 @@ func copy_to_team() -> void:
 		m["plates"] = c["plates"]
 		m["exp"] = c["exp"]
 		m["traits"] = c["traits"].duplicate()
+		m["kit"] = Equipment.normalize(c.get("kit", {}))
+		m["vest"] = c.get("vest", false)
 	_refresh()
 
 
 func _refresh() -> void:
 	ui.refresh_setup(sel, cfgs, postures, sizes)
 	setup_marks.queue_redraw()
+	if mode == "setup":
+		doors_view.show_states(_preview_doors(), {})
+
+
+## The test range's door setting as the doors will start (v0.7.5).
+func _preview_doors() -> Dictionary:
+	var out := {}
+	for did in level.doors:
+		var D: Dictionary = level.doors[did]
+		if not D.has("leaf"):
+			continue
+		var ext: bool = D.get("exterior", false)
+		match door_mode:
+			"closed":
+				if not ext:
+					out[did] = "closed"
+			"outer":
+				if ext:
+					out[did] = "locked"
+			"locked":
+				out[did] = "locked" if ext else "closed"
+	return out
 
 
 # ------------------------------------------------------------------ the department (v0.5)
@@ -896,7 +967,8 @@ func start_run(seed_val: int) -> void:
 		world.dispose()
 	var all: Array = Operation.build(cfg_list(), level, nav, {"civilians": n_civ, "seed": seed_val})
 	world = World.new()
-	world.setup(level, nav, all, postures, seed_val, alerts, {"police_rules": police_rules or use_dept, "night": night})
+	world.setup(level, nav, all, postures, seed_val, alerts, {"police_rules": police_rules or use_dept, "night": night,
+		"door_mode": door_mode})
 	_applied = false
 	dept_lines = []
 	decals.setup(world)
@@ -956,6 +1028,8 @@ func _process(delta: float) -> void:
 				replay_play = false
 			replay_view.show_at(replay_t)
 		ops_ui.refresh_replay(replay_t, world.t, replay_play)
+	if mode == "run" and world != null and view_t < 0.0 and not replay_on:
+		doors_view.refresh()
 	if mode == "run" and world != null:
 		var steps := 0
 		if not paused and not world.over:
@@ -1020,6 +1094,12 @@ func _test_hooks() -> void:
 		ops_replay_seek(float(_args["ops-replay-at"]))
 	if _args.has("ops-rewind-at") and op_mode and world != null and not _op_done and world.t >= float(_args.get("shot-at", "9999")) - 0.05 and view_t < 0.0:
 		ops_rewind(float(_args["ops-rewind-at"]))
+	if _args.has("setup-tab") and Engine.get_process_frames() == 4:
+		ui.tabs.current_tab = int(_args["setup-tab"])
+		if _args.has("doors"):
+			set_door_mode(_args["doors"])
+		if _args.has("sel"):
+			select_op(_args["sel"])
 	if _args.has("setup-shot") and Engine.get_process_frames() == 8:
 		_shot(_args["setup-shot"])
 		if not _args.has("autorun"):

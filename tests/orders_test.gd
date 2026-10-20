@@ -32,7 +32,9 @@ func _init() -> void:
 	for tn in tests:
 		var with_v: Array = []
 		var without_v: Array = []
-		for k in n:
+		# a yes/no measure needs more seeds than 8 to show a 0.2 difference (v0.7.5)
+		var nn := maxi(n, int(GATES[tn].get("n_min", 0)))
+		for k in nn:
 			with_v.append(call("t_" + tn, true, 500 + k))
 			without_v.append(call("t_" + tn, false, 500 + k))
 		var a := _mean(with_v)
@@ -43,14 +45,14 @@ func _init() -> void:
 		print("%-13s %-42s %7.2f  %7.2f   %s" % [tn, spec["measure"], a, b, "PASS" if ok else "FAIL"])
 		if args.has("v"):
 			print("    with: %s\n    without: %s" % [str(with_v), str(without_v)])
-	print("%d of %d orders change the outcome (%d runs each way, %d s)" % [passed, tests.size(), n, (Time.get_ticks_msec() - t0) / 1000])
+	print("%d of %d orders change the outcome (%d runs each way, 32 for arrest, %d s)" % [passed, tests.size(), n, (Time.get_ticks_msec() - t0) / 1000])
 	quit()
 
 
 ## measure, direction (+1: higher with the order), smallest difference that counts
 const GATES := {
 	"clear": {"measure": "rooms entered (fewer)", "dir": -1, "margin": 1.5},
-	"arrest": {"measure": "named suspect arrested (share)", "dir": 1, "margin": 0.2},
+	"arrest": {"measure": "named suspect arrested (share)", "dir": 1, "margin": 0.2, "n_min": 32},
 	"rescue": {"measure": "hostages walked out safe", "dir": 1, "margin": 0.75},
 	"contain": {"measure": "suspects escaped (fewer)", "dir": -1, "margin": 0.25},
 	"post": {"measure": "distance from the post at the end, m (less)", "dir": -1, "margin": 3.0},

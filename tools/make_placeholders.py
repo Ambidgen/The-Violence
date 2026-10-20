@@ -188,6 +188,149 @@ def weapon(kind):
     return svg(w_m, h_m, "".join(b))
 
 
+# ------------------------------------------------------------- the weapon roster (v0.7.5)
+# Plan view, muzzle toward +x, the canvas's left edge at the shooter's shoulder. Each
+# class has its own silhouette at a glance: length, width of the receiver, what sits on
+# top (red dot, scope, nothing), a pump or a tube under a shotgun barrel.
+DARK = "#2b2b2b"
+MID = "#4a4a4a"
+
+
+def long_gun(stock, recv, guard, barrel, rw=9.0, optic="dot", brake=False, folded=False, tube=False,
+             pump=False, scope=False, mag=False):
+    """Lengths in metres. rw: receiver width in px (at 80 px/m)."""
+    L = stock + recv + guard + barrel
+    w_m, h_m = L + 0.03, 0.18
+    w, h = w_m * PPM, h_m * PPM
+    cy = h / 2
+    b = []
+    x = 2.0
+    sw = stock * PPM
+    if folded:
+        # a folding stock lies along the receiver: two thin rails
+        b.append(line(x, cy - rw / 2 + 1, x + sw, cy - rw / 2 + 1, INK, 1.4))
+        b.append(line(x, cy + rw / 2 - 1, x + sw, cy + rw / 2 - 1, INK, 1.4))
+        b.append(line(x, cy - rw / 2 + 1, x, cy + rw / 2 - 1, INK, 1.6))
+    elif sw > 0:
+        b.append(path(f"M{x},{cy - rw / 2 + 0.5} L{x + sw},{cy - rw / 2 + 1.5} L{x + sw},{cy + rw / 2 - 1.5} L{x},{cy + rw / 2 - 0.5} Z",
+                      GREY_D, INK, 1.3))
+    x += sw
+    rl = recv * PPM
+    b.append(rect(x, cy - rw / 2, rl, rw, MID, 2, INK, 1.4))
+    if mag:
+        # a magazine seen edge-on from above: a short tab out to the side
+        b.append(rect(x + rl * 0.55, cy + rw / 2 - 0.5, 5, 3.5, DARK, 1, INK, 0.8))
+    if optic == "dot":
+        b.append(rect(x + rl * 0.35, cy - 2.6, rl * 0.28, 5.2, DARK, 1.5, None))
+        b.append(circle(x + rl * 0.35 + rl * 0.28 - 1.5, cy, 1.2, "#8a8a8a", None))
+    if scope:
+        b.append(rect(x + rl * 0.15, cy - 3.6, rl * 0.85, 7.2, DARK, 3.6, INK, 1.0))
+        b.append(rect(x + rl * 0.15 + rl * 0.85 - 4, cy - 4.6, 4, 9.2, DARK, 1.5, INK, 0.8))
+    x += rl
+    gl = guard * PPM
+    if gl > 0:
+        if pump:
+            b.append(rect(x, cy - rw / 2 + 1, gl * 0.35, rw - 2, GREY_D, 1, INK, 1.2))
+            for k in range(1, 4):
+                b.append(line(x + gl * 0.35 * k / 4, cy - rw / 2 + 2, x + gl * 0.35 * k / 4, cy + rw / 2 - 2, INK, 0.8))
+            b.append(line(x + gl * 0.35, cy, x + gl, cy, INK, 2.2))
+        else:
+            b.append(rect(x, cy - rw / 2 + 1.5, gl, rw - 3, GREY_D, 2, INK, 1.2))
+            b.append(line(x + 2, cy, x + gl - 2, cy, "#7a7a7a", 0.8))
+    x += gl
+    bl = barrel * PPM
+    if tube:
+        b.append(line(x - gl * 0.65, cy + 2.6, x + bl * 0.75, cy + 2.6, INK, 1.8))
+        b.append(line(x - gl * 0.65, cy - 1.2, x + bl, cy - 1.2, INK, 2.4))
+    else:
+        b.append(line(x, cy, x + bl, cy, INK, 2.6))
+    if brake:
+        b.append(rect(x + bl - 4, cy - 2.4, 5, 4.8, DARK, 1, INK, 0.8))
+    return svg(w_m, h_m, "".join(b))
+
+
+def handgun(slide_m, w_px=8.0, heavy=False):
+    w_m, h_m = slide_m + 0.22, 0.13
+    w, h = w_m * PPM, h_m * PPM
+    cy = h / 2
+    x0 = 14.0
+    sl = slide_m * PPM
+    b = [rect(x0 - 3, cy - w_px / 2 - 0.5, 7, w_px + 1, GREY_D, 2, INK, 1.0),            # grip and hands
+         rect(x0, cy - w_px / 2, sl, w_px, "#3a3a3a", 2.5, INK, 1.4),                    # slide
+         line(x0 + 2, cy - w_px / 2 + 1.8, x0 + sl - 3, cy - w_px / 2 + 1.8, "#7a7a7a", 0.8)]
+    if heavy:
+        b.append(line(x0 + sl * 0.15, cy + w_px / 2 - 1.8, x0 + sl - 3, cy + w_px / 2 - 1.8, "#7a7a7a", 0.8))
+    b.append(line(x0 + sl, cy, x0 + sl + 2, cy, INK, 2.0))
+    return svg(w_m, h_m, "".join(b))
+
+
+WEAPON_ART = {
+    "carbine": lambda: long_gun(0.24, 0.36, 0.18, 0.12, optic="dot"),
+    "sbr": lambda: long_gun(0.17, 0.34, 0.12, 0.06, optic="dot", brake=True),
+    "assault_rifle": lambda: long_gun(0.24, 0.36, 0.18, 0.12, rw=9.5, optic="none", brake=True, mag=True),
+    "battle_rifle": lambda: long_gun(0.26, 0.44, 0.22, 0.16, rw=10.5, optic="dot", brake=True),
+    "marksman": lambda: long_gun(0.26, 0.46, 0.22, 0.20, rw=10.0, optic="none", scope=True),
+    "smg": lambda: long_gun(0.18, 0.26, 0.06, 0.05, rw=8.5, optic="dot", folded=True, mag=True),
+    "shotgun": lambda: long_gun(0.26, 0.24, 0.30, 0.22, rw=8.0, optic="none", tube=True, pump=True),
+    "service_pistol": lambda: handgun(0.19),
+    "compact_pistol": lambda: handgun(0.16, 7.5),
+    "heavy_pistol": lambda: handgun(0.21, 9.0, True),
+}
+
+
+# ------------------------------------------------------------- kit seen from above (v0.7.5)
+# Overlays drawn on the 0.8 x 0.8 m figure canvas (same centre and facing).
+def kit_vest():
+    w = h = 0.8 * PPM
+    cx, cy = w / 2, h / 2
+    b = [path(f"M{cx - 9},{cy - 17} Q{cx + 2},{cy - 19} {cx + 6},{cy - 13} L{cx + 6},{cy + 13} "
+              f"Q{cx + 2},{cy + 19} {cx - 9},{cy + 17} Z", "#f2f2f2", INK, 1.6),
+         line(cx - 9, cy, cx + 6, cy, GREY_M, 1.0)]
+    return svg(0.8, 0.8, "".join(b))
+
+
+def kit_plates():
+    w = h = 0.8 * PPM
+    cx, cy = w / 2, h / 2
+    b = [path(f"M{cx - 8},{cy - 14} Q{cx + 2},{cy - 16} {cx + 6},{cy - 11} L{cx + 6},{cy + 11} "
+              f"Q{cx + 2},{cy + 16} {cx - 8},{cy + 14} Z", "#9a9a9a", INK, 1.6)]
+    # magazine pouches across the front, and the back panel's edge
+    for k in (-7.5, -2.5, 2.5, 7.5):
+        b.append(rect(cx + 3, cy + k - 2.0, 5, 4.0, "#6a6a6a", 1, INK, 0.7))
+    b.append(line(cx - 5, cy - 13, cx - 5, cy + 13, "#c4c4c4", 1.0))
+    return svg(0.8, 0.8, "".join(b))
+
+
+def kit_helmet():
+    w = h = 0.8 * PPM
+    cx, cy = w / 2, h / 2
+    b = [circle(cx + 1, cy, 10.5, "#7a7a7a", INK, 1.8),
+         path(f"M{cx - 5},{cy - 8} A10 10 0 0 1 {cx + 7},{cy - 7}", "none", "#8a8a8a", 1.2),
+         rect(cx + 9, cy - 2.5, 4, 5, DARK, 1, INK, 0.8),          # mount at the brow
+         line(cx - 9, cy, cx - 6, cy, "#8a8a8a", 1.2)]
+    return svg(0.8, 0.8, "".join(b))
+
+
+def shield_art():
+    """A ballistic shield carried in front, seen edge-on from above: a curved slab."""
+    w_m, h_m = 0.22, 0.74
+    w, h = w_m * PPM, h_m * PPM
+    b = [path(f"M{4},{4} Q{w - 2},{h / 2} {4},{h - 4} L{9},{h - 4} Q{w + 3},{h / 2} {9},{4} Z", "#2e2e2e", INK, 1.6),
+         line(7.5, h / 2 - 5, 9.5, h / 2 + 5, "#9a9a9a", 1.6)]    # the viewport, edge-on
+    return svg(w_m, h_m, "".join(b))
+
+
+def ram_art():
+    w_m, h_m = 0.70, 0.16
+    w, h = w_m * PPM, h_m * PPM
+    cy = h / 2
+    b = [rect(4, cy - 4.5, w - 10, 9, "#4a4a4a", 4, INK, 1.4),
+         rect(w - 9, cy - 5.5, 6, 11, DARK, 2, INK, 1.2),             # striking face
+         path(f"M{14},{cy - 4.5} Q{18},{cy - 10} {22},{cy - 4.5}", "none", INK, 1.6),
+         path(f"M{30},{cy + 4.5} Q{34},{cy + 10} {38},{cy + 4.5}", "none", INK, 1.6)]
+    return svg(w_m, h_m, "".join(b))
+
+
 # ------------------------------------------------------------- furniture (plan symbols)
 def bed(w_m=2.0, h_m=1.6):
     w, h = w_m * PPM, h_m * PPM
@@ -719,10 +862,16 @@ def north_arrow():
 
 
 def icon_app():
-    # 128 px app icon: a plan-view figure with one red stain on paper
-    body = (rect(0, 0, 128, 128, PAPER, 0, None) + rect(6, 6, 116, 116, "none", 0, INK, 6)
-            + ellipse(60, 64, 22, 40, WHITE, INK, 4) + circle(64, 64, 16, WHITE, INK, 4)
-            + path(blob_path(84, 82, 12, random.Random(3), 7, 0.4), BLOOD, None))
+    # 128 px app icon (v0.7.5): a doorway in plan, the leaf swung open on its arc, a
+    # figure in the opening, and one red stain on the floor beyond
+    body = (rect(0, 0, 128, 128, PAPER, 0, None)
+            + rect(10, 54, 36, 20, INK, 0, None) + rect(82, 54, 36, 20, INK, 0, None)     # the wall, the gap
+            + line(82, 54, 82, 18, INK, 5)                                                # the leaf, open
+            + path("M46,54 A36,36 0 0 1 82,18", "none", FAINT, 2.5)                       # its swing
+            + path(blob_path(90, 100, 12, random.Random(3), 7, 0.4), BLOOD, None)
+            + ellipse(62, 66, 10, 20, WHITE, INK, 3.5) + circle(64, 66, 8, WHITE, INK, 3.5)
+            + line(72, 66, 77, 66, INK, 3.5)
+            + rect(4, 4, 120, 120, "none", 0, INK, 4))
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">{body}</svg>\n'
 
 
@@ -900,6 +1049,13 @@ ASSETS["veh/police_van.svg"] = police_van
 ASSETS["veh/ambulance.svg"] = lambda: ambulance(False)
 ASSETS["veh/police_ambulance.svg"] = lambda: ambulance(True, 5.6, 2.1)
 ASSETS["fx/stretcher.svg"] = stretcher
+for _w in WEAPON_ART:
+    ASSETS[f"w/{_w}.svg"] = WEAPON_ART[_w]
+ASSETS["kit/vest.svg"] = kit_vest
+ASSETS["kit/plates.svg"] = kit_plates
+ASSETS["kit/helmet.svg"] = kit_helmet
+ASSETS["kit/shield.svg"] = shield_art
+ASSETS["kit/ram.svg"] = ram_art
 
 
 def main():

@@ -203,7 +203,66 @@ static func make(type: String, seed_val: int, week := 1, idx := 0) -> Dictionary
 			_fact(s, "crowd", "Expected crowd", "%d" % s["crowd"], "%d-%d" % [s["crowd"] - 10, s["crowd"] + 10], 0.5)
 			s["intel"].append({"key": "duration", "label": "Duration", "truth": "15 minutes", "est": "", "known": true, "conf": 1.0})
 	_first_tips(s, rng)
+	# v0.7.5: which long guns and handguns, vests, and the doors. A second stream, so the
+	# v0.7 situations (occupants, facts, first tips) come out the same for the same seed.
+	var rng2 := RandomNumberGenerator.new()
+	rng2.seed = seed_val * 31 + 7
+	_kit_occupants(s, rng2)
+	if type != "event":
+		_doors(s, lv, rng2)
 	return s
+
+
+## Long guns are mostly street rifles, some carbines; handguns mostly service-type; the
+## better trained sometimes wear a vest.
+static func _kit_occupants(s: Dictionary, rng: RandomNumberGenerator) -> void:
+	for oc in s["occupants"]:
+		if oc["role"] in ["civilian", "hostage"]:
+			continue
+		if oc.get("arms", "pistol") == "rifle":
+			oc["long_gun"] = "assault_rifle" if rng.randf() < 0.65 else "carbine"
+		var r := rng.randf()
+		oc["handgun"] = "service_pistol" if r < 0.6 else ("compact_pistol" if r < 0.85 else "heavy_pistol")
+		if oc.get("ech", "untrained") != "untrained" and rng.randf() < 0.25:
+			oc["vest"] = true
+
+
+## Door states (v0.7.5): outer doors mostly locked, some inner doors shut, and the room
+## a barricaded suspect or hostage takers hold more often shut or locked.
+static func _doors(s: Dictionary, lv, rng: RandomNumberGenerator) -> void:
+	var type: String = s["type"]
+	var p_ext: float = {"warrant": 0.8, "gang": 0.9, "barricade": 1.0, "hostage": 0.85}.get(type, 0.0)
+	var p_int: float = {"warrant": 0.45, "gang": 0.35, "barricade": 0.4, "hostage": 0.4}.get(type, 0.0)
+	var hot := ""
+	for oc in s["occupants"]:
+		if oc.get("named", false) or oc["role"] == "captor":
+			hot = oc.get("room", "")
+			break
+	var out := {}
+	var ids: Array = lv.doors.keys()
+	ids.sort()
+	var ext_locked := 0
+	var ext_n := 0
+	for did in ids:
+		var D: Dictionary = lv.doors[did]
+		if not D.has("leaf"):
+			continue
+		var r := rng.randf()
+		if D.get("exterior", false):
+			ext_n += 1
+			if r < p_ext:
+				out[did] = "locked"
+				ext_locked += 1
+			continue
+		var into_hot: bool = hot != "" and (D["a"] == hot or D["b"] == hot)
+		if into_hot and type == "barricade" and r < 0.6:
+			out[did] = "locked"
+		elif r < p_int + (0.3 if into_hot else 0.0):
+			out[did] = "closed"
+	s["doors"] = out
+	if ext_n > 0:
+		var truth := "every outer door locked" if ext_locked == ext_n else ("%d of %d outer doors locked" % [ext_locked, ext_n] if ext_locked > 0 else "outer doors unlocked")
+		_fact(s, "doors", "Doors", truth, "locked, probably", 0.4)
 
 
 static func _rooms(lv) -> Array:

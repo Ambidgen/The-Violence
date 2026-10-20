@@ -2,6 +2,7 @@ extends RefCounted
 ## One operator: configuration (echelon, habits, plates) plus all runtime state.
 
 const Habits = preload("res://scripts/data/habits.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 
 enum {STAND, CROUCH, DUCK, DOWN}
 enum {GREEN, YELLOW, RED}
@@ -153,6 +154,15 @@ var gone_how := ""      # "escaped" | "withdrew"
 var pistols_only := false
 var holding := false    # the squad is in Hold: hold-mode habits (HD01-HD20, BH21-BH27) apply
 
+# ---------------------------------------------------------------- equipment (v0.7.5)
+var kit := {}           # Equipment kit: primary, secondary, optic, armour, plates, head, gear
+var gear := {}          # gear id -> uses left (flashbangs, ram, breaching rounds, shots)
+var kit_speed := 1.0    # pace lost to carried weight
+var helmet := false     # the special operations helmet is on and not yet spent
+var shield := false     # carries the ballistic shield
+var light := false      # weapon light
+var defiant := false    # will not give up when covered and challenged (a taser's job)
+
 
 func configure(cfg: Dictionary) -> void:
 	id = cfg["id"]
@@ -190,6 +200,22 @@ func configure(cfg: Dictionary) -> void:
 	roe_tight = cfg.get("tight", false)
 	avoid_key = cfg.get("avoid_key", "")
 	pistols_only = cfg.get("pistols", false)
+	# equipment: a kit given with the configuration, or the v0.7 issue (carbine and
+	# pistol, armour from the plates and vest settings) when none is
+	if cfg.has("kit"):
+		kit = Equipment.normalize(cfg["kit"])
+		plates_max = int(kit["plates"])
+		vest = kit["armour"] == "vest"
+	else:
+		kit = Equipment.normalize({"primary": "" if sidearm_only else "carbine", "secondary": "service_pistol",
+			"optic": "red_dot", "armour": "plates" if plates_max > 0 else ("vest" if vest else "none"),
+			"plates": plates_max, "head": "none", "gear": {}})
+	if kit["primary"] == "" and not cfg.get("civ", false):
+		sidearm_only = true
+	kit_speed = Equipment.speed_factor(kit)
+	defiant = cfg.get("defiant", false)
+	shield = kit["gear"].has("shield")
+	light = kit["gear"].has("light")
 	flight = float(cfg.get("flight", 0.0))
 	hostage = cfg.get("hostage", false)
 	captor = cfg.get("captor", false)
@@ -211,14 +237,19 @@ func reset() -> void:
 	muzzle_dir = spawn_face
 	plates = plates_max
 	stress = 0.0
+	gear = Equipment.gear_counts(kit)
+	helmet = kit["head"] == "sof_helmet"
 	weapons = {
-		"rifle": {"mag": Habits.WEAPONS["rifle"]["mag"], "spare": Habits.WEAPONS["rifle"]["spare"], "jam": false, "lost": false},
-		"pistol": {"mag": Habits.WEAPONS["pistol"]["mag"], "spare": Habits.WEAPONS["pistol"]["spare"], "jam": false, "lost": false},
+		"rifle": {"mag": wdef("rifle")["mag"], "spare": wdef("rifle")["spare"], "jam": false, "lost": false},
+		"pistol": {"mag": wdef("pistol")["mag"], "spare": wdef("pistol")["spare"], "jam": false, "lost": false},
 	}
 	active = "rifle"
-	if sidearm_only:
+	if kit["secondary"] == "":
+		weapons["pistol"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
+	if sidearm_only or shield:
 		weapons["rifle"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
-		weapons["pistol"]["spare"] += 1
+		if not weapons["pistol"].get("none", false):
+			weapons["pistol"]["spare"] += 1
 		active = "pistol"
 	if pistols_only and not civ:
 		weapons["rifle"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
@@ -258,9 +289,13 @@ func fighting() -> bool:
 func reveal() -> void:
 	civ = false
 	cstate = ""
-	weapons["pistol"] = {"mag": Habits.WEAPONS["pistol"]["mag"], "spare": Habits.WEAPONS["pistol"]["spare"] + 1, "jam": false, "lost": false}
-	if arms == "rifle":
-		weapons["rifle"] = {"mag": Habits.WEAPONS["rifle"]["mag"], "spare": Habits.WEAPONS["rifle"]["spare"], "jam": false, "lost": false}
+	weapons["pistol"] = {"mag": wdef("pistol")["mag"], "spare": wdef("pistol")["spare"] + 1, "jam": false, "lost": false}
+	if arms == "rifle" or Equipment.WEAPONS.get(arms, {}).get("slot", "") == "primary":
+		if Equipment.WEAPONS.has(arms):
+			kit["primary"] = arms
+		elif kit["primary"] == "":
+			kit["primary"] = "carbine"
+		weapons["rifle"] = {"mag": wdef("rifle")["mag"], "spare": wdef("rifle")["spare"], "jam": false, "lost": false}
 		active = "rifle"
 	else:
 		active = "pistol"
@@ -307,8 +342,33 @@ func zone_radius(zone: String) -> float:
 	return 0.2
 
 
+## The weapon in a slot ("rifle" = primary, "pistol" = secondary). An empty slot reads
+## as the v0.7 issue so stats lookups never fail; its weapon state is marked lost.
+func wdef(slot: String) -> Dictionary:
+	var w_id: String = kit.get("primary" if slot == "rifle" else "secondary", "")
+	if w_id == "":
+		w_id = "carbine" if slot == "rifle" else "service_pistol"
+	return Equipment.WEAPONS[w_id]
+
+
+func wid(slot: String) -> String:
+	return kit.get("primary" if slot == "rifle" else "secondary", "")
+
+
 func wpn() -> Dictionary:
-	return Habits.WEAPONS[active]
+	return wdef(active)
+
+
+## The optic on the weapon in hand (pistols have plain sights, the v0.7 baseline).
+func optic() -> String:
+	if active != "rifle":
+		return "red_dot"
+	return wpn().get("optic_fixed", kit.get("optic", "red_dot"))
+
+
+## Is this person stunned (flashbang, taser, sponge round, a helmet hit)?
+func stunned(now: float) -> bool:
+	return ticker.get("stun_until", -1.0) > now
 
 
 func ws() -> Dictionary:

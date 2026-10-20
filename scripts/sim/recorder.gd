@@ -16,15 +16,20 @@ var shots: Array = []        # [t, from, to, police]
 var downs: Array = []        # [t, id, killed, p]
 var floats: Array = []       # [t, p, text]
 var know := {}               # snapshot index -> {"vis": {id: true}, "lkp": [[p, t]]} (the fog view fills it)
+var doors0 := {}             # door states at the start (v0.7.5): id -> "closed" | "locked"
+var doors: Array = []        # [t, id, state, how]: every door opened since
+var bangs: Array = []        # [t, p]: flashbangs going off
 var _n := 0
 
 
 func _init(world) -> void:
 	w = world
+	if w.level != null and w.level.has_method("door_states"):
+		doors0 = w.level.door_states()
 	for o in w.ops:
 		ids.append(o.id)
 		info.append({"team": o.team, "civ": o.civ and not o.attacker, "attacker": o.attacker, "judges": o.judges,
-			"name": o.name, "faction": o.faction})
+			"name": o.name, "faction": o.faction, "primary": o.kit.get("primary", ""), "secondary": o.kit.get("secondary", "")})
 	snap()
 
 
@@ -89,6 +94,10 @@ func on_event(ev: Dictionary) -> void:
 			downs.append([w.t, ev["id"], ev["killed"], ev["p"]])
 		"float":
 			floats.append([w.t, ev["p"], ev["text"]])
+		"door":
+			doors.append([w.t, ev["id"], ev["state"], ev.get("how", "")])
+		"flash":
+			bangs.append([w.t, ev["p"]])
 
 
 func duration() -> float:
@@ -146,6 +155,22 @@ func shots_between(t0: float, t1: float) -> Array:
 		if s[0] >= t0:
 			out.append(s)
 	return out
+
+
+## Door states at time tt: [states (id -> closed|locked), forced (id -> true)].
+func doors_at(tt: float) -> Array:
+	var st: Dictionary = doors0.duplicate()
+	var br := {}
+	for d in doors:
+		if d[0] > tt:
+			break
+		if d[2] == "open":
+			st.erase(d[1])
+		else:
+			st[d[1]] = d[2]
+		if d[3] in ["ram", "kick", "breach_shot"]:
+			br[d[1]] = true
+	return [st, br]
 
 
 func knowledge_at(tt: float) -> Dictionary:

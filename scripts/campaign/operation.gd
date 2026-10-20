@@ -71,6 +71,7 @@ static func build(base_cfgs: Array, level, nav, spec: Dictionary, dept = null) -
 
 # ================================================================== planned operations (v0.7)
 const Habits = preload("res://scripts/data/habits.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const Geom = preload("res://scripts/sim/geom.gd")
 const TIME_LIMIT := {"warrant": 600.0, "gang": 720.0, "barricade": 900.0, "hostage": 900.0, "event": 900.0}
 
@@ -237,11 +238,27 @@ static func _occupant_cfg(oc: Dictionary, id: String, team: int, slot: int, p: V
 	var c := {"id": id, "team": team, "slot": slot, "echelon": ech, "good": good, "bad": bad, "plates": 0,
 		"exp": Habits.PRESET_EXP[ech], "traits": {}, "pos": p, "face": face, "enabled": true, "alert": int(oc.get("alert", 0)),
 		"name": oc.get("name", ""), "flight": float(oc.get("flight", 0.0)), "captor": role == "captor",
-		"sidearm_only": oc.get("arms", "pistol") != "rifle"}
+		"sidearm_only": oc.get("arms", "pistol") == "pistol", "kit": occupant_kit(oc)}
 	if role == "attacker":
 		c["attacker"] = true
 		c["arms"] = oc.get("arms", "pistol")
 	return c
+
+
+## What an occupant carries (v0.7.5): "pistol" a handgun, "rifle" a long gun (the
+## situation may name which), "shotgun" a pump shotgun; a vest if the situation says so.
+static func occupant_kit(oc: Dictionary) -> Dictionary:
+	var arms: String = oc.get("arms", "pistol")
+	var prim := ""
+	if arms == "rifle":
+		prim = oc.get("long_gun", "carbine")
+	elif arms == "shotgun":
+		prim = "shotgun"
+	elif Equipment.WEAPONS.has(arms) and Equipment.WEAPONS[arms]["slot"] == "primary":
+		prim = arms
+	var sec: String = oc.get("handgun", "service_pistol")
+	return Equipment.normalize({"primary": prim, "secondary": sec, "optic": "irons" if prim != "" and oc.get("irons", false) else "red_dot",
+		"armour": "vest" if oc.get("vest", false) else "none", "plates": 0, "head": "none", "gear": {}})
 
 
 ## Everything a planned operation needs: the configurations of everyone in it, and the
@@ -325,7 +342,7 @@ static func build_planned(sit: Dictionary, plan: Dictionary, dept, level, nav) -
 	var casualty: Vector2 = vehicles[0] + Vector2(1.5, 0) if not vehicles.is_empty() else nav.snap(Vector2(2, 2))
 	var opts := {"police_rules": true, "night": bool(plan.get("night", sit.get("night", false))), "squads": orders_rt,
 		"vehicles": vehicles, "casualty": nav.snap(casualty), "b_stay": true, "b_posted": sit["type"] != "event",
-		"time_limit": TIME_LIMIT.get(sit["type"], 600.0), "escape": true}
+		"time_limit": TIME_LIMIT.get(sit["type"], 600.0), "escape": true, "doors": sit.get("doors", {}).duplicate()}
 	if sit["type"] == "hostage":
 		opts["deadline"] = float(sit.get("deadline", 420))
 	if sit["type"] == "event":

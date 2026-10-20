@@ -33,6 +33,107 @@ var _sill := PackedFloat32Array()
 var _lintel := PackedFloat32Array()
 var _mv := PackedByteArray()
 
+## Obstacles that appear and disappear during a match (v0.7.5): door leaves, ported from
+## the v0.4 line's doors-as-state work. They sit outside the bucket index and are tested
+## with a short linear scan, paid for only while at least one is shut: a map with every
+## door open costs nothing. A shut leaf blocks sight and movement; rounds go through it
+## by its material ("door" hollow-core interior, "door_ext" solid exterior).
+var dyn_rect: Array[Rect2] = []
+var dyn_kind := PackedInt32Array()
+var dyn_h := PackedFloat32Array()
+var dyn_mat: Array[String] = []
+var dyn_on := PackedByteArray()
+var dyn_active := 0
+
+
+func add_dynamic(r: Rect2, kind: int, h: float = 2.1, mat: String = "door") -> int:
+	dyn_rect.append(r)
+	dyn_kind.append(kind)
+	dyn_h.append(h)
+	dyn_mat.append(mat)
+	dyn_on.append(0)
+	return dyn_rect.size() - 1
+
+
+func set_dynamic(idx: int, on: bool) -> void:
+	if idx < 0 or idx >= dyn_on.size():
+		return
+	var v := 1 if on else 0
+	if int(dyn_on[idx]) == v:
+		return
+	dyn_on[idx] = v
+	dyn_active += 1 if on else -1
+
+
+## Every leaf open again.
+func reset_dynamic() -> void:
+	dyn_on.fill(0)
+	dyn_active = 0
+
+
+## The rectangle of an obstacle index as trace_shot returns it (negative: a leaf).
+func rect_of(idx: int) -> Rect2:
+	if idx < 0:
+		return dyn_rect[-1 - idx]
+	return _rect[idx]
+
+
+## Apply the shut leaves to a sight result. Only ever removes bits.
+func _dyn_mask(a: Vector2, b: Vector2, mask: int) -> int:
+	var d := b - a
+	for i in dyn_rect.size():
+		if dyn_on[i] == 0:
+			continue
+		var r: Rect2 = dyn_rect[i]
+		if r.has_point(a) or r.has_point(b):
+			continue
+		if seg_rect(a, d, r).x >= 0.0:
+			return 0
+	return mask
+
+
+## The nearest shut leaf on a->b before best_t: [leaf index or -1, t, face].
+func _dyn_trace(a: Vector2, b: Vector2, best_t: float) -> Array:
+	var d := b - a
+	var out := [-1, best_t, -1]
+	for i in dyn_rect.size():
+		if dyn_on[i] == 0:
+			continue
+		var r: Rect2 = dyn_rect[i]
+		if r.has_point(a):
+			continue
+		var tt := seg_rect(a, d, r)
+		if tt.x < 0.0 or tt.x >= out[1]:
+			continue
+		out[0] = i
+		out[1] = tt.x
+		out[2] = int(tt.z)
+	return out
+
+
+## The first shut leaf a body moving from a to b would walk into (radius rad), or -1.
+func leaf_in_way(a: Vector2, b: Vector2, rad := 0.25) -> int:
+	if dyn_active <= 0:
+		return -1
+	var best := -1
+	var best_t := INF
+	var d := b - a
+	for i in dyn_rect.size():
+		if dyn_on[i] == 0:
+			continue
+		var r: Rect2 = dyn_rect[i].grow(rad)
+		if r.has_point(a):
+			# already pressed against it: moving deeper into the leaf counts
+			var c: Vector2 = dyn_rect[i].get_center()
+			if (b - a).dot(c - a) > 0.0:
+				return i
+			continue
+		var tt := seg_rect(a, d, r)
+		if tt.x >= 0.0 and tt.x < best_t:
+			best_t = tt.x
+			best = i
+	return best
+
 
 func setup(w: float, h: float) -> void:
 	width = w
@@ -273,6 +374,8 @@ func sight_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float) -> in
 			t_max_y += t_dy
 			y += step_y
 		guard += 1
+	if mask != 0 and dyn_active > 0:
+		mask = _dyn_mask(a, b, mask)
 	return mask
 
 
@@ -350,6 +453,10 @@ func sight_reach(a: Vector2, za: float, b: Vector2, zb: float) -> float:
 			t_max_y += t_dy
 			y += step_y
 		guard += 1
+	if dyn_active > 0:
+		var dd: Array = _dyn_trace(a, b, best)
+		if dd[0] >= 0:
+			best = float(dd[1])
 	return best
 
 
@@ -387,14 +494,22 @@ func trace_shot(a: Vector2, za: float, b: Vector2, zb: float) -> Dictionary:
 			best_t = tt.x
 			best_idx = idx
 			best_face = int(tt.z)
-	if best_idx < 0:
+	var best_kind: int = _kind[best_idx] if best_idx >= 0 else -1
+	if dyn_active > 0:
+		var dd: Array = _dyn_trace(a, b, best_t)
+		if dd[0] >= 0:
+			best_t = float(dd[1])
+			best_face = int(dd[2])
+			best_idx = -1 - int(dd[0])
+			best_kind = dyn_kind[int(dd[0])]
+	if best_kind < 0:
 		return {"hit": false, "t": 1.0, "p": b, "n": Vector2.ZERO, "idx": -1, "kind": -1, "z": zb}
 	var n := Vector2.ZERO
 	if best_face == 0:
 		n = Vector2(-signf(d.x), 0)
 	elif best_face == 1:
 		n = Vector2(0, -signf(d.y))
-	return {"hit": true, "t": best_t, "p": a + d * best_t, "n": n, "idx": best_idx, "kind": _kind[best_idx],
+	return {"hit": true, "t": best_t, "p": a + d * best_t, "n": n, "idx": best_idx, "kind": best_kind,
 		"z": lerpf(za, zb, best_t)}
 
 
@@ -402,6 +517,8 @@ func trace_shot(a: Vector2, za: float, b: Vector2, zb: float) -> Dictionary:
 ## are drywall, exterior walls of houses (up to 0.25 m) timber frame, yard fences fence;
 ## anything thicker, tree trunks and named masonry are solid.
 func material(idx: int) -> String:
+	if idx < 0 and -1 - idx < dyn_mat.size():
+		return dyn_mat[-1 - idx]
 	if idx < 0 or idx >= obs.size():
 		return "solid"
 	var o: Dictionary = obs[idx]
@@ -421,8 +538,9 @@ func material(idx: int) -> String:
 	return "solid"
 
 
-## Does a disc of radius rad at p overlap any movement-blocking obstacle?
-func blocked_disc(p: Vector2, rad: float) -> bool:
+## Does a disc of radius rad at p overlap any movement-blocking obstacle? with_dyn
+## includes shut door leaves (the navigation grid is built without them).
+func blocked_disc(p: Vector2, rad: float, with_dyn := false) -> bool:
 	if p.x < rad or p.y < rad or p.x > width - rad or p.y > height - rad:
 		return true
 	var x0 := clampi(int(floor(p.x - rad)), 0, _cw - 1)
@@ -440,6 +558,14 @@ func blocked_disc(p: Vector2, rad: float) -> bool:
 				var q := Vector2(clampf(p.x, r.position.x, r.end.x), clampf(p.y, r.position.y, r.end.y))
 				if q.distance_squared_to(p) < rad * rad:
 					return true
+	if with_dyn and dyn_active > 0:
+		for i in dyn_rect.size():
+			if dyn_on[i] == 0:
+				continue
+			var rd: Rect2 = dyn_rect[i]
+			var qd := Vector2(clampf(p.x, rd.position.x, rd.end.x), clampf(p.y, rd.position.y, rd.end.y))
+			if qd.distance_squared_to(p) < rad * rad:
+				return true
 	return false
 
 

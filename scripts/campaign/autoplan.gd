@@ -5,6 +5,7 @@ extends RefCounted
 ## leaders can afford.
 
 const Orders = preload("res://scripts/campaign/orders.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const Operation = preload("res://scripts/campaign/operation.gd")
 
 const WANT := {"warrant": 7, "gang": 10, "barricade": 7, "hostage": 9, "event": 10}
@@ -93,6 +94,22 @@ static func suggest(sit: Dictionary, available: Array, lv, bodycams := false) ->
 				squads[1]["orders"]["objs"] = [{"kind": "patrol", "route": [[17.0, 28.0], [17.0, 16.0], [47.5, 16.0], [47.5, 28.0], [32.0, 36.0]]}]
 			if n_sq > 2:
 				squads[2]["orders"]["objs"] = [{"kind": "post", "p": [sc.x + 6.0, sc.y + 3.5], "face": PI / 2.0}]
+	# kit (v0.7.5): squads going in carry the entry kit (a ram on the point man, flashbangs
+	# for those trained for them); the rest keep their own
+	if sit["type"] != "event":
+		var by_id := {}
+		for r in available:
+			by_id[r["id"]] = r
+		for si in squads.size():
+			var kinds: Array = squads[si]["orders"]["objs"].map(func(o): return o.get("kind", ""))
+			if not (kinds.has("clear") or kinds.has("arrest") or kinds.has("rescue")):
+				continue
+			var spec: Dictionary = Equipment.SQUAD_KITS["entry"]
+			var mem: Array = squads[si]["members"]
+			for k in mem.size():
+				var r2: Dictionary = by_id.get(mem[k], {})
+				if not r2.is_empty():
+					r2["kit"] = Equipment.validate(spec["point"] if k == 0 else spec["rest"], Equipment.who_of_record(r2))
 	return {"squads": squads, "night": false, "bodycams": bodycams}
 
 

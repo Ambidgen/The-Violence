@@ -21,6 +21,10 @@ var gun_key := ""
 var pip: Pip
 var marks: Marks
 var look_key := ""
+var armour: Sprite2D      # kit (v0.7.5): vest or plate carrier over the figure
+var helmet: Sprite2D
+var shield: Sprite2D
+var ram: Sprite2D
 
 
 func setup(o, w) -> void:
@@ -36,6 +40,26 @@ func setup(o, w) -> void:
 	body.texture = Decals.tex("op/%s_stand" % team)
 	body.scale = Vector2.ONE * 0.5
 	add_child(body)
+	# what they carry, seen from above (v0.7.5)
+	var kit: Dictionary = o.kit if "kit" in o else {}
+	if not o.civ and kit.get("armour", "none") != "none":
+		armour = Sprite2D.new()
+		armour.texture = Decals.tex("kit/plates" if kit["armour"] == "plates" else "kit/vest")
+		body.add_child(armour)
+	if kit.get("head", "none") == "sof_helmet":
+		helmet = Sprite2D.new()
+		helmet.texture = Decals.tex("kit/helmet")
+		body.add_child(helmet)
+	if o.shield:
+		shield = Sprite2D.new()
+		shield.texture = Decals.tex("kit/shield")
+		shield.scale = Vector2.ONE * 0.5
+		add_child(shield)
+	if int(o.gear.get("ram", 0)) > 0:
+		ram = Sprite2D.new()
+		ram.texture = Decals.tex("kit/ram")
+		ram.scale = Vector2.ONE * 0.5
+		add_child(ram)
 	down_body = Sprite2D.new()
 	down_body.texture = Decals.tex("op/%s_down" % team)
 	down_body.scale = Vector2.ONE * 0.5
@@ -64,6 +88,9 @@ func setup(o, w) -> void:
 
 func _set_gun() -> void:
 	var key := "op/pistol" if op.active == "pistol" else "op/rifle"
+	var wid: String = op.wid(op.active) if op.has_method("wid") else ""
+	if wid != "":
+		key = "w/" + wid
 	if key == gun_key:
 		return
 	gun_key = key
@@ -81,6 +108,10 @@ func sync(force := false) -> void:
 		was_down = true
 		body.visible = false
 		gun.visible = false
+		if shield != null:
+			shield.visible = false
+		if ram != null:
+			ram.visible = false
 		down_body.visible = true
 		down_body.rotation = op.body_dir + rng.randf_range(-0.6, 0.6)
 		for s in stains:
@@ -108,6 +139,14 @@ func sync(force := false) -> void:
 		body.texture = Decals.tex("op/%s_stand" % lk)
 		down_body.texture = Decals.tex("op/%s_down" % lk)
 	body.rotation = op.body_dir
+	if helmet != null:
+		helmet.modulate.a = 1.0 if op.helmet else 0.45
+	if shield != null:
+		shield.rotation = op.body_dir
+		shield.position = Vector2.from_angle(op.body_dir) * 13.0
+	if ram != null:
+		ram.rotation = op.body_dir
+		ram.position = Vector2.from_angle(op.body_dir + PI / 2.0) * 11.0 - Vector2.from_angle(op.body_dir) * 6.0
 	pip.refresh()
 	marks.refresh(world)
 	var sc := 0.5
@@ -140,8 +179,12 @@ func sync(force := false) -> void:
 		t = "HANDS UP"
 	elif not op.action.is_empty():
 		var a: String = op.action["type"]
-		t = {"reload": "RELOADING", "transition": "> PISTOL" if op.active == "rifle" else "> RIFLE",
-			"clear": "STOPPAGE", "check": "CHECK", "stall": "STALLS", "click": "*click*", "cuff": "CUFFING"}.get(a, a.to_upper())
+		t = {"reload": "RELOADING", "transition": "> PISTOL" if op.active == "rifle" else "> LONG GUN",
+			"clear": "STOPPAGE", "check": "CHECK", "stall": "STALLS", "click": "*click*", "cuff": "CUFFING",
+			"open": "OPENING", "unlock": "UNLOCKING", "ram": "RAMMING", "kick": "KICKING", "breach_shot": "BREACHING",
+			"throw": "BANG OUT", "treat": "TREATING", "tase": "TASER", "sponge": "40 MM"}.get(a, a.to_upper())
+	elif world != null and op.stunned(world.t):
+		t = "STUNNED"
 	elif world != null and op.ticker.get("freeze_until", -1.0) > world.t:
 		t = "FROZEN"
 	elif world != null and op.ticker.get("flinch_until", -1.0) > world.t:

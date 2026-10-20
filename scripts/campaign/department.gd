@@ -10,9 +10,10 @@ extends RefCounted
 ## One save slot (ironman): the department is saved after every operation and every week.
 
 const Habits = preload("res://scripts/data/habits.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const Names = preload("res://scripts/data/names.gd")
 
-const VERSION := 2
+const VERSION := 3        # 3: v0.7.5, every officer has a kit
 const SAVE_PATH := "user://department.json"
 ## Experience points needed for tiers 1-5 (Green, Blooded, Seasoned, Veteran, Exceptional).
 const XP_TIERS := [0, 6, 18, 40, 80]
@@ -84,7 +85,8 @@ func hire(rank := "Officer", xp := 0, lateral := false, years := 0.0) -> Diction
 		"ech": Habits.vary(Habits.service_stats(years), rng), "good": [], "bad_traits": [], "traits": [],
 		"personality": "", "judgment": _trait(50.0 + 1.2 * years, 11.0), "temper": _trait(40.0, 15.0),
 		"integrity": _trait(65.0, 15.0), "exp": 1, "xp": 0, "trauma": 0.0, "ops": 0, "shots": 0, "hits": 0, "kills": 0,
-		"civ_hits": 0, "wounded": 0, "arrests": 0, "file": [], "lateral": lateral, "orders_broken": 0}
+		"civ_hits": 0, "wounded": 0, "arrests": 0, "file": [], "lateral": lateral, "orders_broken": 0,
+		"kit": Equipment.default_kit()}
 	# habits: the academy's twelve, sometimes one swapped for another Regular habit;
 	# years on the job add Regular habits, and the senior veterans some tactical ones
 	var good: Array = Habits.preset_good("patrol")
@@ -171,10 +173,11 @@ func to_cfg(r: Dictionary, slot: int, level, alert := 1) -> Dictionary:
 	var ech: Dictionary = (r["ech"] as Dictionary).duplicate(true)
 	# trauma raises the stress an officer brings into every operation
 	ech["stress0"] = minf(0.3, float(r["trauma"]) * 0.015)
+	var kit: Dictionary = Equipment.validate(r.get("kit", Equipment.default_kit()), Equipment.who_of_record(r))
 	return {"id": id, "team": 0, "slot": slot, "echelon": r["echelon"], "good": good, "bad": bad,
-		"plates": 0, "exp": int(r["exp"]), "traits": traits, "pos": level.spawns[id]["p"], "face": level.spawns[id]["face"],
+		"plates": int(kit["plates"]), "exp": int(r["exp"]), "traits": traits, "pos": level.spawns[id]["p"], "face": level.spawns[id]["face"],
 		"enabled": true, "alert": alert, "ech": ech, "officer_id": r["id"], "name": r["name"], "rank": r["rank"],
-		"vest": true, "bodycam": bodycams, "judgment": int(r["judgment"]), "temper": int(r["temper"]),
+		"vest": kit["armour"] == "vest", "kit": kit, "bodycam": bodycams, "judgment": int(r["judgment"]), "temper": int(r["temper"]),
 		"integrity": int(r["integrity"])}
 
 
@@ -319,8 +322,12 @@ func from_data(d: Dictionary) -> bool:
 				"hits", "kills", "civ_hits", "wounded", "arrests", "orders_broken"]:
 			r[k] = int(r.get(k, 0))
 		r["trauma"] = float(r.get("trauma", 0.0))
-		# version 1 (v0.5-v0.6) had no years of service
+		# version 1 (v0.5-v0.6) had no years of service, version 2 (v0.7) no kit
 		r["years"] = float(r.get("years", 0.0))
+		r["kit"] = Equipment.normalize(r.get("kit", Equipment.default_kit()))
+		r["kit"]["plates"] = int(r["kit"]["plates"])
+		for gk in r["kit"]["gear"]:
+			r["kit"]["gear"][gk] = int(r["kit"]["gear"][gk])
 		for fe in r["file"]:
 			fe["week"] = int(fe["week"])
 		officers.append(r)

@@ -8,13 +8,20 @@ func _ready() -> void:
 	var x := 16.0
 	var y := 16.0
 	var row_h := 0.0
-	for folder in ["op", "furn", "yard", "fx", "ui"]:
+	var folders := ["op", "w", "kit", "furn", "yard", "fx", "ui"]
+	var up := 1.0
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--folders="):
+			folders = Array(arg.trim_prefix("--folders=").split(","))
+		elif arg.begins_with("--up="):
+			up = float(arg.trim_prefix("--up="))
+	for folder in folders:
 		for file in DirAccess.get_files_at("%s/%s" % [ROOT, folder]):
 			if not file.ends_with(".svg"):
 				continue
 			var tex: Texture2D = load("%s/%s/%s" % [ROOT, folder, file])
 			var size := tex.get_size()
-			var scale_f := minf(1.0, 200.0 / maxf(size.x, size.y))
+			var scale_f := minf(up, 200.0 * up / maxf(size.x, size.y))
 			var cell_w := maxf(size.x * scale_f, 84.0) + 14.0
 			if x + cell_w > 1580.0:
 				x = 16.0

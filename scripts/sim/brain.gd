@@ -374,6 +374,13 @@ func _begin_task(tm: Dictionary, el: Dictionary) -> void:
 			al.remove_at(i)
 			al.insert(0, r)
 			break
+	# a ballistic shield leads the entry (v0.7.5)
+	for i2 in range(al.size()):
+		if al[i2].shield and i2 > 0:
+			var r2 = al[i2]
+			al.remove_at(i2)
+			al.insert(0, r2)
+			break
 	# stack side: the wall side with more walkable room on the near side of the door
 	var from_room: String = lv.from_room(st["door"], st["into"])
 	var side := tdir
@@ -843,9 +850,32 @@ func _assault_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
 			if el.get("knock_wait", -1.0) > w.t and not rusher:
 				go = false
 			if go:
-				el["phase"] = "entry"
-				el["phase_t"] = w.t
-				w.say("%s enters the %s" % [_tag(tm, el), w.level.rooms[st["into"]]["title"].to_lower()], "info")
+				_after_stack(tm, el, al)
+		"breach":
+			# a shut door: the breacher opens it, rams it, shoots the lock or kicks it in
+			if not w.level.door_shut(st["door"]):
+				_after_stack(tm, el, al)
+			elif w.t - el["phase_t"] > 60.0:
+				w.say("%s cannot get through the %s door" % [_tag(tm, el), w.level.rooms[st["into"]]["title"].to_lower()], "info")
+				el["last_room"] = st["into"]
+				tm["skipped"][st["into"]] = true
+				_next_task(tm, el)
+		"bang":
+			# flashbang in once nobody stands in front of the door; everyone looks away;
+			# the entry goes the moment it goes off
+			var det: float = float(ctl.get("bang_det", -1.0))
+			if det < 0.0:
+				var th = w.by_id.get(ctl.get("thrower", ""), null)
+				if th == null or not th.alive() or th.stunned(w.t) or int(th.gear.get("flashbang", 0)) <= 0:
+					_go_entry(tm, el)
+				elif _funnel_clear(el, al, _bang_point(el)) and th.action.is_empty():
+					w.throw_flash(th, _bang_point(el))
+					ctl["bang_det"] = w.t + 0.4 + w.BANG_FUSE
+				elif w.t - el["phase_t"] > 4.0:
+					# somebody cannot get out of its way: go without it
+					_go_entry(tm, el)
+			elif w.t >= det + 0.15:
+				_go_entry(tm, el)
 		"entry":
 			var done := true
 			for m in al:
@@ -872,6 +902,175 @@ func _assault_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
 				_prune_sweep(el, al)
 			if el["sweep"].is_empty() or w.t - el["phase_t"] > 120.0:
 				_room_done(tm, el, "clear")
+
+
+## The stack is ready (v0.7.5): breach a shut door first, then a flashbang if anyone
+## carries one, then the entry.
+func _after_stack(tm: Dictionary, el: Dictionary, al: Array) -> void:
+	var st: Dictionary = el["task"]
+	var ctl: Dictionary = el["ctl"]
+	if w.level.door_shut(st["door"]):
+		ctl["was_shut"] = true
+		if el["phase"] != "breach":
+			el["phase"] = "breach"
+			el["phase_t"] = w.t
+			ctl["breacher"] = _breacher(el, al)
+			var how := "opens"
+			if w.level.door_locked(st["door"]):
+				var b = w.by_id.get(ctl["breacher"], null)
+				how = "breaches" if b != null and (int(b.gear.get("ram", 0)) > 0 or int(b.gear.get("breach", 0)) > 0) else "forces"
+			w.say("%s %s the %s door" % [_tag(tm, el), how, w.level.rooms[st["into"]]["title"].to_lower()], "info")
+		return
+	if not ctl.has("bang_done") and el.get("orders", {}).get("bangs", true) and _bang_wanted(tm, el):
+		var thrower = null
+		for m in al:
+			if int(m.gear.get("flashbang", 0)) > 0 and not m.stunned(w.t) and m.pos.distance_to(st_c(el)) < 3.5:
+				if thrower == null or m.pos.distance_to(st_c(el)) < thrower.pos.distance_to(st_c(el)):
+					thrower = m
+		if thrower != null:
+			ctl["bang_done"] = true
+			ctl["thrower"] = thrower.id
+			ctl["bang_det"] = -1.0
+			el["phase"] = "bang"
+			el["phase_t"] = w.t
+			return
+	_go_entry(tm, el)
+
+
+## Is this room worth a flashbang? Someone has been seen or heard in it, its door was
+## shut (nobody has seen inside), or the orders name it.
+func _bang_wanted(tm: Dictionary, el: Dictionary) -> bool:
+	var into: String = el["task"]["into"]
+	if el["ctl"].get("was_shut", false):
+		return true
+	for eid in tm["lkps"]:
+		var l: Dictionary = tm["lkps"][eid]
+		if w.level.room_at(l["p"]) == into and w.t - float(l["t"]) < 90.0:
+			return true
+	var snd: Dictionary = tm.get("sound", {})
+	if not snd.is_empty() and w.level.room_at(snd["p"]) == into and w.t - float(snd["t"]) < 60.0:
+		return true
+	var ob: Dictionary = el.get("obj", {})
+	return ob.get("rooms", []).has(into)
+
+
+## Would the flash catch anyone of the element (in range, with a line of sight to it)?
+func _funnel_clear(el: Dictionary, al: Array, p: Vector2) -> bool:
+	for m in al:
+		if _exposed(m.pos, p):
+			return false
+	return true
+
+
+func _exposed(q: Vector2, p: Vector2) -> bool:
+	return q.distance_to(p) <= w.BANG_R + 0.5 and w.geom.sight_clear(p, 0.4, q, 1.6)
+
+
+## The nearest spot out of the flash's sight on the near side of the door.
+func _bang_safe(el: Dictionary, m, p: Vector2) -> Vector2:
+	var into: String = el["task"]["into"]
+	var best: Vector2 = m.pos
+	var bd := INF
+	for r in [0.6, 1.2, 1.8, 2.4, 3.0]:
+		for k in 16:
+			var q: Vector2 = w.nav.snap(m.pos + Vector2.from_angle(TAU * k / 16.0) * r)
+			if not w.nav.reachable(q) or w.level.room_at(q) == into or _exposed(q, p):
+				continue
+			var d: float = q.distance_to(m.pos)
+			if d < bd:
+				bd = d
+				best = q
+		if bd < INF:
+			break
+	return best
+
+
+func _bang_point(el: Dictionary) -> Vector2:
+	var g: Dictionary = el["geo"]
+	var depth: float = clampf(float(g["depth"]) * 0.6, 1.2, 3.0)
+	return w.nav.snap(g["c"] + g["n_in"] * depth)
+
+
+func st_c(el: Dictionary) -> Vector2:
+	return el["geo"].get("c", Vector2.ZERO)
+
+
+func _go_entry(tm: Dictionary, el: Dictionary) -> void:
+	el["phase"] = "entry"
+	el["phase_t"] = w.t
+	w.say("%s enters the %s" % [_tag(tm, el), w.level.rooms[el["task"]["into"]]["title"].to_lower()], "info")
+
+
+## Who breaks the door: a ram, then breaching rounds, then the point man.
+func _breacher(el: Dictionary, al: Array) -> String:
+	var best = null
+	var best_s := -INF
+	for m in al:
+		var sc := -float(el["entry"].get(m.id, {}).get("order", 9))
+		if int(m.gear.get("ram", 0)) > 0:
+			sc += 100.0
+		elif int(m.gear.get("breach", 0)) > 0 and m.wid("rifle") == "shotgun":
+			sc += 50.0
+		if m.shield:
+			sc -= 20.0
+		if sc > best_s:
+			best_s = sc
+			best = m
+	return best.id if best != null else ""
+
+
+## A medical kit (v0.7.5): six seconds after the last contact, with nobody in sight, go
+## to the nearest downed person within 20 m who is not treated (one's own side first)
+## and treat them (20 s).
+func _treat(o, tm: Dictionary) -> bool:
+	if not o.gear.has("medkit") or not o.action.is_empty():
+		return false
+	# the task first: a squad in the middle of an entry needs everyone; only a teammate
+	# down close by is treated then
+	var el := _el(o)
+	var busy: bool = el["mode"] in ["assault", "hunt"] and not el["task"].is_empty() and el.get("phase", "") in ["approach", "breach", "bang", "entry", "clear", "check"]
+	if busy and o.ticker.get("treat_tid", "") == "":
+		var near_mate := false
+		for x0 in w.ops:
+			if x0.team == o.team and x0.state == "down" and not x0.ticker.get("treated", false) and x0.pos.distance_to(o.pos) < 8.0:
+				near_mate = true
+		if not near_mate:
+			return false
+	if w.t - float(tm.get("last_contact", -99.0)) < 6.0 or not w.visible_enemies(o).is_empty():
+		o.ticker.erase("treat_tid")
+		return false
+	var pt = w.by_id.get(o.ticker.get("treat_tid", ""), null)
+	if pt == null or pt.state != "down" or pt.ticker.get("treated", false):
+		pt = null
+		var best_s := INF
+		for x in w.ops:
+			if x.state != "down" or x.ticker.get("treated", false) or x.mounted != null or x.gone:
+				continue
+			var by: String = x.ticker.get("treat_by", "")
+			if by != "" and by != o.id:
+				continue
+			var d: float = x.pos.distance_to(o.pos)
+			if d > 20.0:
+				continue
+			var sc: float = d + (0.0 if x.team == o.team else 15.0)
+			if sc < best_s:
+				best_s = sc
+				pt = x
+		if pt == null:
+			o.ticker.erase("treat_tid")
+			return false
+		o.ticker["treat_tid"] = pt.id
+		pt.ticker["treat_by"] = o.id
+	o.dbg = "treating %s" % pt.id
+	if not w.at(o, pt.pos, 0.9):
+		_go(o, pt.pos, "walk" if w.level.is_inside(o.pos) else "run", false)
+	else:
+		w.stop(o)
+		o.look_goal = (pt.pos - o.pos).angle()
+		o.stance_goal = Op.CROUCH
+		w.start_action(o, "treat", 20.0, {"tid": pt.id})
+		w.say("%s treats %s" % [o.id, pt.id], "info")
+	return true
 
 
 ## Big rooms are swept: a lattice of points about 5 m apart that each must be seen from
@@ -927,6 +1126,13 @@ func _think(o) -> void:
 	o.stance_goal = Op.STAND if not o.leg_hit or o.stance_goal != Op.CROUCH else Op.CROUCH
 	var tm: Dictionary = w.teams[o.team]
 	var el: Dictionary = tm["elements"][o.el]
+	# stunned (flashbang, taser, sponge round, a helmet hit): nothing at all (v0.7.5)
+	if o.stunned(w.t):
+		o.dbg = "STUNNED"
+		o.stance_goal = Op.CROUCH
+		o.aim = {}
+		w.stop(o)
+		return
 	# PF09: keep a fallback cover point cached while threats are known
 	if o.has("PF09") and w.t >= o.ticker.get("cover_next", 0.0):
 		o.ticker["cover_next"] = w.t + 0.5
@@ -1022,6 +1228,10 @@ func _think(o) -> void:
 		if _task_escort(o):
 			_finish_look(o)
 			return
+	# a medical kit (v0.7.5): once it is quiet, treat the downed nearby
+	if not withdrawing and _treat(o, tm):
+		_finish_look(o)
+		return
 	# fixation on a body (no ED05)
 	if o.ticker.get("fixate_until", -1.0) > w.t:
 		o.dbg = "staring at body"
@@ -1804,6 +2014,45 @@ func _task_assault(o, tm: Dictionary, el: Dictionary) -> void:
 				if d["ready"] and not ctl.has("first_ready_t"):
 					ctl["first_ready_t"] = w.t
 				o.dbg = "stacked" if o.has("GD01") else "waiting at the door"
+		"breach":
+			if ctl.get("breacher", "") == o.id:
+				# a ram, a breaching round or a boot work from in front of the door; a door
+				# that is only shut is opened from beside it, out of the doorway
+				var bp: Vector2 = w.nav.snap(c - n_in * 0.7)
+				if not w.level.door_locked(st["door"]):
+					var g2: Dictionary = el["geo"]
+					var side_p: Vector2 = c - n_in * 0.45 + (g2["side"] as Vector2) * (float(D["half"]) + 0.55)
+					if w.nav.reachable(w.nav.snap(side_p)):
+						bp = w.nav.snap(side_p)
+				o.dbg = "breaching"
+				if not w.at(o, bp, 0.45):
+					_go(o, bp, "walk", false)
+				else:
+					w.stop(o)
+					o.look_goal = (c - o.pos).angle()
+					w.work_door(o, st["door"])
+			else:
+				w.stop(o)
+				_task_look(o, (c + n_in * 2.5 - o.pos).angle())
+				o.dbg = "stacked for the breach"
+		"bang":
+			# out of the flash's sight, eyes away until it goes off
+			var bp2: Vector2 = _bang_point(el)
+			var key: String = "safe_" + o.id
+			if not ctl.has(key):
+				# back to the stack slot, or somewhere out of the flash's sight if the slot is not
+				ctl[key] = d["stack"] if not _exposed(d["stack"], bp2) else _bang_safe(el, o, bp2)
+			var sp2: Vector2 = ctl[key]
+			if not w.at(o, sp2, 0.3):
+				_go(o, sp2, "run", false)
+			else:
+				w.stop(o)
+			if float(ctl.get("bang_det", -1.0)) >= 0.0:
+				_task_look(o, (-n_in).angle())
+				o.dbg = "flashbang: eyes away"
+			else:
+				_task_look(o, (c + n_in * 2.0 - o.pos).angle())
+				o.dbg = "flashbang: clearing the throw"
 		"sweep":
 			_task_sweep(o, el)
 		"entry", "clear":
@@ -2000,6 +2249,11 @@ func _finish_look2(o) -> void:
 		return
 	if o.ticker.get("task_look_tick", -1) == tick:
 		o.look_goal = o.ticker["task_look"]
+		return
+	# a posted squad (Contain, Post, occupants where the situation put them) faces its post
+	var el0 := _el(o)
+	if el0.get("posted", false) and el0["mode"] == "hold" and w.at(o, o.spawn, 0.6):
+		o.look_goal = o.spawn_face
 		return
 	if o.has("ED09") and o.moving and _is_rear(o):
 		if fmod(w.t + o.slot * 1.7, 4.0) < 1.0:
@@ -2285,11 +2539,19 @@ func on_heard(o, p: Vector2, kind: String) -> void:
 
 
 func _sound_name(kind: String) -> String:
+	if w.GUN_SOUNDS.has(kind):
+		return "gunfire"
 	match kind:
-		"rifle", "pistol":
-			return "gunfire"
 		"reload":
 			return "a reload"
+		"ram", "kick":
+			return "a door being broken in"
+		"door":
+			return "a door"
+		"flashbang":
+			return "a flashbang"
+		"launcher":
+			return "a launcher"
 	return "footsteps"
 
 

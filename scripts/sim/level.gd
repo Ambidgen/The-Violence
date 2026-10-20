@@ -60,11 +60,84 @@ func build() -> void:
 	geom.build_index()
 	_index()
 	_annotate()
+	_make_leaves()
 
 
 ## Override: describe the map.
 func _build() -> void:
 	pass
+
+
+# ================================================================== doors as state (v0.7.5)
+## Every hinged door gets a leaf: a thin obstacle across the opening that is there only
+## while the door is shut. Arches have none. Doors start open (as before v0.7.5); a
+## world sets the states it wants when it starts.
+const DOOR_OPEN := "open"
+const DOOR_CLOSED := "closed"
+const DOOR_LOCKED := "locked"
+
+
+func _make_leaves() -> void:
+	for did in doors:
+		var D: Dictionary = doors[did]
+		if D.get("arch", false):
+			continue
+		var c: Vector2 = D["c"]
+		var t: Vector2 = D["t"]
+		var n: Vector2 = D["n"]
+		var half: float = D["half"]
+		var r := Rect2(c, Vector2.ZERO).expand(c + t * half + n * 0.04).expand(c - t * half - n * 0.04)
+		var ext: bool = is_exterior(D["a"]) or is_exterior(D["b"])
+		D["leaf"] = geom.add_dynamic(r, Geom.WALL, 2.1, "door_ext" if ext else "door")
+		D["state"] = DOOR_OPEN
+		D["exterior"] = ext
+
+
+## Every door open again (a world calls this before setting its own states).
+func reset_doors() -> void:
+	for did in doors:
+		var D: Dictionary = doors[did]
+		if D.has("leaf"):
+			D["state"] = DOOR_OPEN
+			D["broken"] = false
+	geom.reset_dynamic()
+
+
+func set_door(did: String, state: String) -> void:
+	var D: Dictionary = doors.get(did, {})
+	if not D.has("leaf"):
+		return
+	D["state"] = state
+	geom.set_dynamic(int(D["leaf"]), state != DOOR_OPEN)
+
+
+func door_state(did: String) -> String:
+	return doors.get(did, {}).get("state", DOOR_OPEN)
+
+
+func door_shut(did: String) -> bool:
+	return door_state(did) != DOOR_OPEN
+
+
+func door_locked(did: String) -> bool:
+	return door_state(did) == DOOR_LOCKED
+
+
+## The door whose leaf has this dynamic index ("" if none).
+func door_of_leaf(idx: int) -> String:
+	for did in doors:
+		if int(doors[did].get("leaf", -2)) == idx:
+			return did
+	return ""
+
+
+## The door states of the whole map, for snapshots and replays.
+func door_states() -> Dictionary:
+	var out := {}
+	for did in doors:
+		if doors[did].has("leaf") and doors[did]["state"] != DOOR_OPEN:
+			out[did] = doors[did]["state"]
+	return out
 
 
 # ================================================================== description helpers

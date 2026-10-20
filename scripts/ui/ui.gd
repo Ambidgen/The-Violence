@@ -4,6 +4,7 @@ extends CanvasLayer
 ## whole UI lives in one readable file. Greyscale, drafting-table style.
 
 const Habits = preload("res://scripts/data/habits.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const Maps = preload("res://scripts/maps/registry.gd")
 const PANEL_W := 460.0
 const INK := Color("#1c1c1c")
@@ -53,6 +54,10 @@ var dept_list: VBoxContainer
 var dept_notes: RichTextLabel
 var dept_seed: SpinBox
 var debrief: RichTextLabel
+var kit_opts := {}           # kit field -> OptionButton (v0.7.5)
+var gear_spins := {}         # gear id -> SpinBox
+var kit_label: Label
+var door_opt: OptionButton
 
 
 func build(m) -> void:
@@ -66,10 +71,19 @@ func build(m) -> void:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 6)
 	root.add_child(v)
+	var head_row := HBoxContainer.new()
+	v.add_child(head_row)
 	var title := Label.new()
 	title.text = "T H E   V I O L E N C E"
 	title.add_theme_font_size_override("font_size", 20)
-	v.add_child(title)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head_row.add_child(title)
+	var ver := Label.new()
+	ver.text = "v" + str(ProjectSettings.get_setting("application/config/version", ""))
+	ver.add_theme_font_size_override("font_size", 12)
+	ver.add_theme_color_override("font_color", Color("#8a8a8a"))
+	ver.size_flags_vertical = Control.SIZE_SHRINK_END
+	head_row.add_child(ver)
 	sub = Label.new()
 	sub.add_theme_color_override("font_color", Color("#666666"))
 	v.add_child(sub)
@@ -288,6 +302,7 @@ func _build_setup() -> void:
 	_btn(hq, "Copy to team", func(): main.copy_to_team())
 	tabs = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	tabs.custom_minimum_size = Vector2(0, 250)
 	s.add_child(tabs)
 	var names := {"Pathfinding": "Path", "Group discipline": "Group", "Eye discipline": "Eyes", "Weapon discipline": "Weapon", "Defence": "Hold"}
 	for grp in Habits.GROUPS:
@@ -358,6 +373,7 @@ func _build_setup() -> void:
 		tb.tooltip_text = "%s %s (%s)\n%s" % [tid, tr["name"], tr["kind"], tr["desc"]]
 		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		habit_buttons[tid] = tb
+	_build_kit_tab()
 	summary = Label.new()
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	s.add_child(summary)
@@ -393,7 +409,13 @@ func _build_setup() -> void:
 	police_btn.tooltip_text = "Team A judges every recognized person before firing: a threat (armed or attacking),\nunknown (challenged: Police! Show me your hands!) or a civilian. Judgment can be wrong.\nSuspects may give up; officers cuff them. Always on with the department."
 	night_btn = _btn(hc, "Night", func(on): main.set_night(on), true)
 	night_btn.set_pressed_no_signal(main.night)
-	night_btn.tooltip_text = "Darkness: recognition and judgment take longer, and civilians are misjudged more often."
+	night_btn.tooltip_text = "Darkness: recognition and judgment take longer, and civilians are misjudged more often.\nA weapon light cancels it inside its beam."
+	door_opt = OptionButton.new()
+	for dn in ["Doors open", "Inner doors shut", "Outer doors locked", "Shut and locked"]:
+		door_opt.add_item(dn)
+	door_opt.tooltip_text = "Doors (v0.7.5). A shut door blocks sight and movement until someone opens it (0.6 s).\nA locked one keeps team A out until it is rammed, shot open with a breaching round or kicked in;\nteam B and civilians hold the keys. Rounds go through doors: interior ones easily, outer ones less."
+	door_opt.item_selected.connect(func(i): main.set_door_mode(["open", "closed", "outer", "locked"][i]))
+	hc.add_child(door_opt)
 	var hd := _h(s)
 	dept_btn = _btn(hd, "Team A: department", func(on): main.set_use_dept(on), true)
 	dept_btn.set_pressed_no_signal(main.use_dept)
@@ -429,6 +451,118 @@ func _build_setup() -> void:
 	var eb := _btn(s, "ENDLESS BATTLE   >   Port Carrick", func(): main.start_city(int(seed_spin.value), int(gang_cap_spin.value), int(police_cap_spin.value)))
 	eb.custom_minimum_size = Vector2(0, 34)
 	eb.add_theme_font_size_override("font_size", 14)
+
+
+## The Kit tab (v0.7.5): weapons, sight, armour, helmet and gear for the selected operator.
+func _build_kit_tab() -> void:
+	var sc := ScrollContainer.new()
+	sc.name = "Kit"
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tabs.add_child(sc)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(col)
+	_heading(col, "What this operator carries. Some items need tactical training (Police tactical, Special operations); the helmet is for Special operations only. Apply preset sets the echelon's kit.")
+	var rows := [["Primary", "primary", [""] + Equipment.PRIMARY_ORDER], ["Sidearm", "secondary", [""] + Equipment.SECONDARY_ORDER],
+		["Sight", "optic", ["red_dot", "irons", "magnified"]], ["Armour", "armour", ["none", "vest", "plates"]],
+		["Helmet", "head", ["none", "sof_helmet"]]]
+	for r in rows:
+		var h := _h(col)
+		var l := Label.new()
+		l.text = r[0]
+		l.custom_minimum_size = Vector2(64, 0)
+		h.add_child(l)
+		var ob := OptionButton.new()
+		ob.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var field: String = r[1]
+		for item in r[2]:
+			ob.add_item(_kit_item_name(field, item))
+			ob.set_item_metadata(ob.item_count - 1, item)
+			ob.set_item_tooltip(ob.item_count - 1, _kit_item_desc(field, item))
+		ob.item_selected.connect(func(i): if not _updating: main.set_kit(field, ob.get_item_metadata(i)))
+		h.add_child(ob)
+		kit_opts[field] = ob
+	var gh := _heading(col, "Gear")
+	gh.add_theme_color_override("font_color", INK)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 6)
+	col.add_child(grid)
+	for gid in Equipment.GEAR_ORDER:
+		var spec: Dictionary = Equipment.GEAR[gid]
+		var gl := Label.new()
+		gl.text = spec["name"]
+		gl.tooltip_text = "%s (%s, %.1f kg)\n%s" % [spec["name"], Equipment.WHO_NAMES[spec["who"]], float(spec["kg"]), spec["desc"]]
+		gl.mouse_filter = Control.MOUSE_FILTER_STOP
+		gl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		grid.add_child(gl)
+		var sp := SpinBox.new()
+		sp.min_value = 0
+		sp.max_value = int(spec["max"])
+		sp.custom_minimum_size = Vector2(64, 0)
+		sp.tooltip_text = gl.tooltip_text
+		sp.value_changed.connect(func(v): if not _updating: main.set_gear(gid, int(v)))
+		grid.add_child(sp)
+		gear_spins[gid] = sp
+	kit_label = Label.new()
+	kit_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	kit_label.add_theme_color_override("font_color", Color("#444444"))
+	col.add_child(kit_label)
+
+
+func _kit_item_name(field: String, item: String) -> String:
+	match field:
+		"primary", "secondary":
+			return "(none)" if item == "" else String(Equipment.WEAPONS[item]["name"])
+		"optic":
+			return Equipment.OPTICS[item]["name"]
+		"armour":
+			return Equipment.ARMOUR[item]["name"]
+		"head":
+			return Equipment.HEAD[item]["name"]
+	return item
+
+
+func _kit_item_desc(field: String, item: String) -> String:
+	var d: Dictionary = {}
+	match field:
+		"primary", "secondary":
+			d = Equipment.WEAPONS.get(item, {})
+			if d.is_empty():
+				return "Nothing in this slot."
+			return "%s: %d rounds, %.1f kg (%s)\n%s" % [d["name"], int(d["mag"]), float(d["kg"]), Equipment.WHO_NAMES[d["who"]], d["desc"]]
+		"optic":
+			d = Equipment.OPTICS[item]
+		"armour":
+			d = Equipment.ARMOUR[item]
+		"head":
+			d = Equipment.HEAD[item]
+	return String(d.get("desc", d.get("name", "")))
+
+
+func _refresh_kit(c: Dictionary) -> void:
+	var kit: Dictionary = Equipment.normalize(c.get("kit", Equipment.preset(c["echelon"])))
+	var who: String = Equipment.who_of_echelon(c["echelon"])
+	for field in kit_opts:
+		var ob: OptionButton = kit_opts[field]
+		for i in ob.item_count:
+			var item: String = ob.get_item_metadata(i)
+			var ok := true
+			match field:
+				"primary", "secondary":
+					ok = item == "" or Equipment.allowed(Equipment.WEAPONS[item]["who"], who)
+				"head":
+					ok = Equipment.allowed(Equipment.HEAD[item]["who"], who)
+			ob.set_item_disabled(i, not ok)
+			if item == String(kit[field]):
+				ob.select(i)
+	for gid in gear_spins:
+		var spec: Dictionary = Equipment.GEAR[gid]
+		var sp: SpinBox = gear_spins[gid]
+		sp.set_value_no_signal(int(kit["gear"].get(gid, 0)))
+		var ok2: bool = Equipment.allowed(spec["who"], who) and (not spec.has("needs") or kit["primary"] == spec["needs"])
+		sp.editable = ok2
+	kit_label.text = "%s.  %.1f kg (pace x%.2f), cost %d." % [Equipment.describe(kit), Equipment.weight(kit), Equipment.speed_factor(kit), Equipment.cost(kit)]
 
 
 func _size(k: int, v: float) -> void:
@@ -506,6 +640,8 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		bb.set_pressed_no_signal(on2)
 		var trig: String = ("stress %.2f" % b0["t"]) if b0["kind"] == "stress" else b0["trait"]
 		bb.text = "%s  %s   %s   (%s)" % ["[x]" if on2 else "[  ]", b0["id"], b0["name"], trig]
+	_refresh_kit(c)
+	door_opt.select(["open", "closed", "outer", "locked"].find(main.door_mode))
 	var xp: int = c.get("exp", 1)
 	exp_spin.set_value_no_signal(xp)
 	exp_label.text = "  %s: tracks %d enem%s" % [Habits.EXP_NAMES[xp], xp, "y" if xp == 1 else "ies"]
@@ -526,6 +662,9 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 	summary.text = "%s: %d good habits, %d of them hold-mode (reaction time x%.3f from the base habits), %d bad habits present, experience %d. Recognition base %.2f s, stress resistance %.2f, %d plate%s, hearing x%.2f%s." % [
 		sel, n_good, n_good - n_base, 1.0 - 0.005 * n_base, n_bad, xp, e["t_rec0"], e["resist"], c["plates"], "" if c["plates"] == 1 else "s",
 		Habits.hearing(traits), (" (" + ", ".join(tnames) + ")") if not tnames.is_empty() else ""]
+	if c.has("kit"):
+		var kn: Dictionary = Equipment.normalize(c["kit"])
+		summary.text += " Kit %.1f kg, moves at x%.2f." % [Equipment.weight(kn), Equipment.speed_factor(kn)]
 	_updating = false
 
 
@@ -644,8 +783,15 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 			if o.complying:
 				txt_all += "%s  [b]%s[/b]\n" % [head, "CUFFED" if o.arrested else "HANDS UP"]
 				continue
-			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s" % [head, ["[color=#3d7a46]G[/color]", "[color=#a8861c]Y[/color]", "[color=#9b2a27]R[/color]"][o.alert],
-				"R" if o.active == "rifle" else "P", s["mag"], s["spare"], o.plates, o.plates_max, o.exp, bar]
+			var gun: String = Equipment.weapon(o.wid(o.active)).get("short", "R" if o.active == "rifle" else "P")
+			var kit_s := ""
+			for gid in Equipment.GEAR_ORDER:
+				var left: int = int(o.gear.get(gid, 0))
+				if left > 0 and gid in ["flashbang", "ram", "breach", "taser", "launcher", "medkit"]:
+					kit_s += " %s%s" % [Equipment.GEAR[gid]["short"], "" if left == 1 and gid in ["ram", "medkit", "breach"] else "×%d" % left]
+			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s%s" % [head, ["[color=#3d7a46]G[/color]", "[color=#a8861c]Y[/color]", "[color=#9b2a27]R[/color]"][o.alert],
+				gun, s["mag"], s["spare"], o.plates, o.plates_max, o.exp, bar,
+				"" if kit_s == "" else "  [color=#555555]%s[/color]" % kit_s.strip_edges()]
 			if not bad.is_empty():
 				line += "  [b]%s[/b]" % " ".join(bad)
 			txt_all += line + "\n"

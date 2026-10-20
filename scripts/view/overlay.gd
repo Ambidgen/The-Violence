@@ -15,6 +15,10 @@ var flashes: Array = []   # {p, dir, age}
 var floats: Array = []    # {p, text, age}
 var puffs: Array = []     # {p, age}
 var ears: Array = []      # {id, dir, age}: someone just heard an enemy
+var bursts: Array = []    # {p, age}: flashbangs going off (v0.7.5)
+var lobs: Array = []      # {a, b, age}: flashbangs in the air
+var wires: Array = []     # {a, b, hit, age}: taser darts and sponge rounds
+var stops: Array = []     # {p, dir, age}: a shield or the helmet stopping a round
 var view := Rect2()       # city: only draw what is in view
 var zoom := 1.0
 var fog = null            # v0.7: with the fog on, only officers' cones, aims and recognition show
@@ -27,6 +31,10 @@ func setup(w) -> void:
 	floats.clear()
 	puffs.clear()
 	ears.clear()
+	bursts.clear()
+	lobs.clear()
+	wires.clear()
+	stops.clear()
 
 
 func handle(ev: Dictionary) -> void:
@@ -48,6 +56,14 @@ func handle(ev: Dictionary) -> void:
 			var o2 = world.op_by_id(ev["id"])
 			if o2 != null:
 				ears.append({"id": ev["id"], "dir": (ev["p"] - o2.pos).angle(), "age": 0.0})
+		"flash":
+			bursts.append({"p": ev["p"], "age": 0.0})
+		"throw":
+			lobs.append({"a": ev["from"], "b": ev["to"], "age": 0.0})
+		"less":
+			wires.append({"a": ev["from"], "b": ev["to"], "hit": ev["hit"], "age": 0.0})
+		"shield", "helmet":
+			stops.append({"p": ev["p"], "dir": (ev["dir"] as Vector2).angle() + PI, "age": 0.0, "head": ev["type"] == "helmet"})
 
 
 ## Stack labels that appear near the same spot so they never print over each other.
@@ -69,7 +85,7 @@ func _float(p: Vector2, text: String) -> void:
 
 
 func tick_real(dt: float) -> void:
-	for arr in [tracers, flashes, floats, puffs, ears]:
+	for arr in [tracers, flashes, floats, puffs, ears, bursts, lobs, wires, stops]:
 		for it in arr:
 			it["age"] += dt
 	tracers = tracers.filter(func(x): return x["age"] < 0.18)
@@ -77,6 +93,10 @@ func tick_real(dt: float) -> void:
 	floats = floats.filter(func(x): return x["age"] < 1.8)
 	puffs = puffs.filter(func(x): return x["age"] < 0.4)
 	ears = ears.filter(func(x): return x["age"] < 1.2)
+	bursts = bursts.filter(func(x): return x["age"] < 0.6)
+	lobs = lobs.filter(func(x): return x["age"] < 1.3)
+	wires = wires.filter(func(x): return x["age"] < 1.0)
+	stops = stops.filter(func(x): return x["age"] < 0.35)
 	queue_redraw()
 
 
@@ -182,8 +202,44 @@ func _draw() -> void:
 			draw_arc(lo.pos * PX, 16.0 + 5.0 * k2, ea["dir"] - 0.45, ea["dir"] + 0.45, 6, Color(0.15, 0.15, 0.15, 0.55 * al), 1.0)
 	for pf in puffs:
 		draw_arc(pf["p"] * PX, 3.0 + 14.0 * pf["age"], 0, TAU, 14, Color(0.3, 0.3, 0.3, 0.5 * (1.0 - pf["age"] / 0.4)), 1.0)
+	_draw_kit_fx()
 	for fl in floats:
 		var a4: float = clampf(1.6 - fl["age"], 0.0, 1.0)
 		var pos: Vector2 = fl["p"] * PX + Vector2(-30, -48 - 14 * fl["slot"])
 		draw_string(font, pos + Vector2(1, 1), fl["text"], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(1, 1, 1, a4))
 		draw_string(font, pos, fl["text"], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.08, 0.08, 0.08, a4))
+
+
+## Entry tools and protection (v0.7.5), drawn above everything else.
+func _draw_kit_fx() -> void:
+	for l in lobs:
+		# the flashbang's arc, a dot travelling along it
+		var a: Vector2 = l["a"] * PX
+		var b: Vector2 = l["b"] * PX
+		var mid: Vector2 = (a + b) * 0.5 + (b - a).orthogonal().normalized() * 18.0
+		var pts := PackedVector2Array()
+		for k in 9:
+			var f: float = k / 8.0
+			pts.append(a.lerp(mid, f).lerp(mid.lerp(b, f), f))
+		draw_polyline(pts, Color(0, 0, 0, 0.35), 1.0)
+		var ft: float = clampf(l["age"] / 0.4, 0.0, 1.0)
+		draw_circle(a.lerp(mid, ft).lerp(mid.lerp(b, ft), ft), 3.5, INK)
+	for bz in bursts:
+		var c: Vector2 = bz["p"] * PX
+		var f2: float = 1.0 - bz["age"] / 0.6
+		var r: float = (0.6 + 1.6 * (1.0 - f2)) * PX
+		draw_circle(c, r, Color(1, 1, 1, 0.85 * f2))
+		draw_arc(c, r, 0.0, TAU, 32, Color(0.1, 0.1, 0.1, 0.7 * f2), 1.5)
+		for k2 in 12:
+			var an: float = TAU * k2 / 12.0 + 0.13
+			draw_line(c + Vector2.from_angle(an) * r * 0.55, c + Vector2.from_angle(an) * r * 1.25, Color(0.1, 0.1, 0.1, 0.6 * f2), 1.2)
+	for wv in wires:
+		var al: float = 1.0 - wv["age"]
+		draw_dashed_line(wv["a"] * PX, wv["b"] * PX, Color(0.1, 0.1, 0.1, 0.7 * al), 1.0, 3.0)
+		if wv["hit"]:
+			draw_circle(wv["b"] * PX, 4.0, Color(0.1, 0.1, 0.1, 0.8 * al))
+	for st in stops:
+		var p: Vector2 = st["p"] * PX
+		var al2: float = 1.0 - st["age"] / 0.35
+		var rr: float = 9.0 if st["head"] else 14.0
+		draw_arc(p, rr, st["dir"] - 0.9, st["dir"] + 0.9, 10, Color(0.1, 0.1, 0.1, 0.9 * al2), 2.5)

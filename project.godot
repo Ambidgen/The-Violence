@@ -6,7 +6,8 @@ config_version=5
 [application]
 
 config/name="The Violence - Vertical Slice"
-config/description="CQB autobattler test range: one shotgun house, two teams of up to two operators, 40 good and 20 bad habits."
+config/description="Police command and CQB autobattler: planned operations, a persistent department, an equipment database and doors, eleven maps and an endless city."
+config/version="0.7.5"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.svg"

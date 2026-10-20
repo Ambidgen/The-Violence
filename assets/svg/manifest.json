@@ -102,6 +102,21 @@
   "veh/police_van.svg",
   "veh/ambulance.svg",
   "veh/police_ambulance.svg",
-  "fx/stretcher.svg"
+  "fx/stretcher.svg",
+  "w/carbine.svg",
+  "w/sbr.svg",
+  "w/assault_rifle.svg",
+  "w/battle_rifle.svg",
+  "w/marksman.svg",
+  "w/smg.svg",
+  "w/shotgun.svg",
+  "w/service_pistol.svg",
+  "w/compact_pistol.svg",
+  "w/heavy_pistol.svg",
+  "kit/vest.svg",
+  "kit/plates.svg",
+  "kit/helmet.svg",
+  "kit/shield.svg",
+  "kit/ram.svg"
  ]
 }

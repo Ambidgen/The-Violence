@@ -1,9 +1,9 @@
-# The Violence - vertical slice (v0.7)
+# The Violence - vertical slice (v0.7.5)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
-- **Operations (new in v0.7):** the police command game's first playable loop. Each week the board shows two or three situations. Pick one, read the briefing, choose who goes, split them into squads and give each squad orders, then press RUN and watch. You can pause, slow down, rewind to look again, or abort. Nothing you do during the run changes what the officers do, except the abort. The debrief scores the operation and replays it with the fog lifted.
-- **Matches and operations:** eleven maps, from a one-room cabin to an apartment block. Two teams of one to twenty operators each carry a rifle and a pistol (the untrained carry only a pistol). You place everyone, set every operator's habits and traits, and press RUN. The fight resolves itself at up to 20x speed. New in v0.6: put civilians on the map, put team A under police rules, and send officers from your department, whose experience, wounds and files carry over from one operation to the next.
+- **Operations (v0.7):** the police command game's first playable loop. Each week the board shows two or three situations. Pick one, read the briefing, choose who goes, split them into squads and give each squad orders, then press RUN and watch. You can pause, slow down, rewind to look again, or abort. Nothing you do during the run changes what the officers do, except the abort. The debrief scores the operation and replays it with the fog lifted.
+- **Matches and operations:** eleven maps, from a one-room cabin to an apartment block. Two teams of one to twenty operators each carry what their kit says: by default a rifle and a pistol (the untrained carry only a pistol). New in v0.7.5: an equipment database, with ten weapons, three sights, armour, a special operations helmet and eight tools, and doors that can be shut and locked. You place everyone, set every operator's habits and traits, and press RUN. The fight resolves itself at up to 20x speed. New in v0.6: put civilians on the map, put team A under police rules, and send officers from your department, whose experience, wounds and files carry over from one operation to the next.
 - **Endless Battle:** Port Carrick, a 1 km city of about 250 lots. Four gangs fight over its buildings, six police precincts answer the gunfire, and three hospitals send out ambulances. It never ends.
 
 Every plan is drawn as an architectural floor plan in greyscale. Operators start as clean plan symbols. Red appears only where the shooting has been: sprays, smears on walls, drip trails, pools under the fallen, stains on the figures.
@@ -53,7 +53,8 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - The Echelon dropdown plus `Apply preset` loads the bible's base stats, typical habits, plates and Experience. `Plates` sets 0-4 chest plate segments.
 - The habit tabs toggle all 40 good habits and 20 bad habits. Hover any habit to see what it does and what overrides it.
 - The Traits tab sets Experience (tier 1-5) and the hearing traits, Tinnitus and Elephant Ears.
-- `Copy to team` gives every teammate the selected operator's echelon, habits, traits and plates.
+- The Kit tab (new in v0.7.5) sets what the selected operator carries: primary, sidearm, sight, armour, helmet and tools. `Apply preset` also loads the echelon's kit.
+- `Copy to team` gives every teammate the selected operator's echelon, habits, traits, plates and kit.
 - `Seed` makes a fight repeatable. The same seed and configuration always replay the same fight.
 
 - Each team's alert option sets how it starts: Yellow (weapons drawn) or Green (relaxed, for an ambush).
@@ -65,6 +66,7 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - `Night` slows recognition and judgment and makes misjudgments more likely.
 - `Team A: department` replaces team A with the officers you picked in the department (always under police rules). Team B becomes a gang house of four relaxed suspects, which you can change.
 - `Body cameras` equips the department: what officers see is recorded as evidence.
+- The doors list (new in v0.7.5) sets how the building is shut: Doors open, Inner doors shut, Outer doors locked, or Shut and locked. Team B (the occupants) holds the keys.
 - `Department ...` opens the roster (see "The department" below).
 - When the run ends, the panel shows the **incident record**: suspects, officers and civilians, rounds fired and rounds through walls, misjudgments, excessive force, and every finding with its evidence.
 
@@ -80,6 +82,89 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - `Rerun same seed` replays the fight exactly; `Rerun new seed` rolls a new one.
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small dot beside each figure is their alert state: green, yellow or red.
+
+## New in v0.7.5: equipment and doors
+
+Every operator now carries a kit from the equipment database (`scripts/data/equipment.gd`). Each item is there because it changes the outcome; the gate below measures that.
+
+**Who may carry what.** Each item is open to anyone, to the tactically trained, or to special operations only.
+- Tactical training means the Police tactical or Special operations echelon. A department officer counts as trained with five years on the job or Experience tier 3.
+- The special operations helmet is for Special operations only.
+
+**Weapons.** Each weapon has its own draw time, sway, rate of fire, lethality, penetration and sound.
+
+| Slot | Weapons |
+|---|---|
+| Primary | patrol carbine, short-barrel rifle, submachine gun, pump shotgun (buckshot), battle rifle, marksman rifle, assault rifle |
+| Sidearm | service pistol, compact pistol, heavy pistol |
+
+**Sights.** Iron sights are slower on target far off. A red dot is the v0.7 baseline. A magnified optic is a little slower close in and far steadier at range.
+
+**Armour.**
+- A soft vest stops pistol rounds and buckshot.
+- A plate carrier takes 0-4 plates.
+
+**The special operations helmet** stops the first round to the head. The wearer is stunned for 2.5-4 s (no recognition, no aim), deaf for 15 s and badly shaken. It never stops a second.
+
+**Tools.**
+
+| Tool | What it does |
+|---|---|
+| Flashbang | Thrown into a room before the entry, 1.2 s fuse. Within 6 m with a line of sight it stuns: 3-5 s if facing it, 1.5-2.5 s if not, plus 10 s of deafness. Stacks wait for a clear throw and look away. |
+| Door ram | A locked door opens in one to three 1.2 s blows (six in ten land). Heavy: the carrier is slower. |
+| Breaching rounds | Opens a locked door with one shotgun shot (0.8 s, nine times in ten). Needs the pump shotgun. |
+| Ballistic shield | Stops rounds across 60 degrees either side of the front: the body, nine head hits in ten, half the leg hits. Half of battle-rifle rounds go through. The carrier walks, fights with the pistol and leads the stack. |
+| Weapon light | At night, cancels the dark's penalty to recognition and judgment in its beam (30 degrees either side, 25 m). Anyone who sees the beam sees the carrier as if by day. |
+| Medical kit | Once the area is quiet, an officer treats the downed: one in three of the untreated die after the operation, against fewer than one in ten of the treated. |
+| Taser | Two cartridges, 7 m. For someone who will not give up and shows no weapon, after two challenges. |
+| 40 mm launcher | Five sponge rounds, 30 m: the same job at range, less sure. |
+
+**Doors.** Every door with a leaf can be open, shut or locked.
+- A shut door blocks sight and is opened in 0.6 s. A locked one blocks movement too.
+- Occupants (team B) carry keys and unlock in 1.6 s.
+- Police need a ram or a breaching round, or kick: up to eight kicks of 1.3 s, each with a 15% chance.
+- Bullets go through doors: a hollow inner door stops about as much as a partition, a solid outer door as much as a timber wall.
+- On the plan, a shut door is a bold leaf across the opening and a locked one carries a black bolt. A forced door shows splinters at the latch.
+- In operations, outer doors are usually locked, some inner doors are shut, and a barricaded suspect's room is often locked. The briefing gives an estimate of the doors.
+
+**The assault with doors.** A squad stacks on the door. The breacher opens, unlocks, rams or kicks it. If anyone in the stack carries a flashbang, it goes in first when the room was behind a shut door, when someone was seen or heard in it lately, or when it is an objective room. The thrower waits until nobody of the squad would see the flash, and the entry follows 0.15 s after it goes off. The shield carrier, if there is one, is first in the stack.
+
+**In operations.**
+- Every officer has a kit, kept in the save (version 3; a v0.7 save loads and gives everyone the department's issue kit: carbine, pistol, soft vest, light, medical kit, taser).
+- The Force tab has squad kits (Patrol, Entry, Shield, Less-lethal) and a `Kit` editor for each officer.
+- `Suggest a plan` gives entry squads the Entry kit.
+- The debrief lists each officer's kit and what they used.
+- Suspects carry handguns (and, where the briefing says rifles, assault rifles or carbines), and a few wear vests.
+
+**The equipment gate** (`tests/equip_test.gd`): 16 paired runs with and without each item, everything else the same.
+
+| Item | Measure | With | Without |
+|---|---|---|---|
+| Compact pistol | s to the first shot from the holster | 0.98 | 1.14 |
+| Heavy pistol | targets killed outright per hit, 6 m | 0.27 | 0.24 |
+| Submachine gun | share of police rounds through a wall | 0.09 | 0.15 |
+| Short-barrel rifle | s on target per acquisition, 6 m | 0.16 | 0.18 |
+| Assault rifle | killed outright per hit, 15 m | 0.27 | 0.24 |
+| Battle rifle | killed outright per hit, 15 m | 0.29 | 0.24 |
+| Shotgun | hits per round, 12 m | 0.90 | 0.67 |
+| Marksman rifle | hits per round, 38 m | 0.30 | 0.18 |
+| Iron sights | s on target per acquisition, 18 m (slower) | 0.28 | 0.26 |
+| Magnified optic | hits per round, 38 m | 0.34 | 0.18 |
+| Flashbang | officers hit during the entry of a room held by 3 rifles | 0.81 | 1.75 |
+| Door ram | s to the first officer inside, outer doors locked | 10.4 | 30.5 |
+| Breaching rounds | s to the first officer inside, outer doors locked | 8.4 | 30.4 |
+| Ballistic shield | rounds through to an officer facing 3 rifles, 10 m | 0.27 | 0.75 |
+| Weapon light | s for police to recognize someone, at night | 0.53 | 0.61 |
+| Medical kit | share of the downed who die after the operation | 0.09 | 0.30 |
+| Taser | s until an unarmed man who will not give up is cuffed | 58 | 228 |
+| 40 mm launcher | the same | 186 | 228 |
+| SOF helmet | head hits survived, first and second | 20/20, 0/20 | - |
+
+19 of 19 pass. One cost the table hides: across the whole flashbang scenario, officers took 2.0 hits with bangs against 1.5 without, because the stack stands at the door through the fuse. The entry itself is safer by half.
+
+**Fixed.** A team starting Green never drew its weapons on going to Yellow or Red (the draw was skipped). It now draws, which costs Green ambushers a little time.
+
+**Art.** New sprites for the ten weapons, the vest, plate carrier, helmet, shield and ram, all drawn on the figures. Door states on the plan, action labels for the new actions (RAMMING, BANG OUT, TASER, STUNNED), and the run roster shows each operator's weapon and the tools left. New app icon.
 
 ## New in v0.7: operations
 
@@ -369,7 +454,7 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
 ## Simplifications in this slice
 
 - **The original house:** it is the 14 x 32 ft sketch scaled up to 5 x 13 m and turned on its side so two-person teams fit through it.
-- **Doors:** every door opening is at least 0.9 m, the narrowest gap a body fits on the 0.25 m navigation grid. Doors are always open. Roll-up, dock and garage doors are open arches.
+- **Doors:** every door opening is at least 0.9 m, the narrowest gap a body fits on the 0.25 m navigation grid. A door is open, shut or locked; nobody closes a door behind them or locks one during a fight. Roll-up, dock and garage doors are open arches.
 - **Path exposure (PF02):** counts doors and windows only. It is precomputed per map (on a 1 m lattice for the big maps), not updated live.
 - **Perception:** pairs more than 15 m apart re-trace sight every 0.2 s, and pairs more than 30 m apart every 0.4 s.
 - **Stoppages:** rates are raised (4 per 1,000 rounds for the rifle, 3 for the pistol) so stoppage drills show up in a short test.
@@ -381,9 +466,9 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
   - Gang members go everywhere on foot.
   - Away from any possible enemy, people skip perception and think every third tick; standing posts sleep until something comes near.
 - **Civilians and the department:** the city has no civilians yet, and its police do not judge or arrest (both come with the campaign map, v0.10). The department has no budget, training or discipline yet (v0.8).
-- **Operations:** situations use the hand-built maps, not the city's lots. Doors are open, so a door ram or a flashbang has nothing to do yet (equipment is the next milestone, v0.7.5). The election, consequences and the press arrive in v0.9.
+- **Operations:** situations use the hand-built maps, not the city's lots. Kit has a cost shown in the editor but no budget yet (v0.8). The election, consequences and the press arrive in v0.9.
 - **Out of scope:**
-  - grenades;
+  - fragmentation grenades;
   - multiple floors (the apartment stairs are scenery).
 
 ## Files
@@ -391,10 +476,11 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
 ```
 scripts/data/habits.gd    habits, traits, Experience, sound, echelons, weapons, individual variation
 scripts/data/names.gd     the name bank (18 cultures)
+scripts/data/equipment.gd the equipment database: weapons, sights, armour, the helmet, tools, kits, who may carry what
 scripts/city/*.gd         the city: generator, templates (police, hospital, school, parks), navigation, roads and vehicles, the director
 scripts/city_main.gd      the Endless Battle scene
-scripts/sim/geom.gd       obstacles, sight lines (with the low-cover rule), bullet traces with height
-scripts/sim/level.gd      map base: walls from room rectangles, doors, room graph, posts for 20 a side
+scripts/sim/geom.gd       obstacles, sight lines (with the low-cover rule), bullet traces with height, door leaves
+scripts/sim/level.gd      map base: walls from room rectangles, doors and their states, room graph, posts for 20 a side
 scripts/maps/*.gd         the eleven maps and the registry
 scripts/sim/nav.gd        AStarGrid2D x4 (PF01/PF02 cost layers), cover spots, cached per map
 scripts/sim/op.gd         operator state, stances and body zones
@@ -411,7 +497,8 @@ scripts/campaign/autoplan.gd    "Suggest a plan"
 scripts/campaign/outcome.gd     the result, its score and each squad's objectives
 scripts/sim/recorder.gd   snapshots twice a second for rewind and the replay
 scripts/view/*            floor plan, blood and residue, operators, overlays, the ledger, the city's layers,
-                          the fog of war (fog.gd), the replay (replay_view.gd), the plan on the map (plan_marks.gd)
+                          the fog of war (fog.gd), the replay (replay_view.gd), the plan on the map (plan_marks.gd),
+                          door states (doors_view.gd)
 scripts/ui/ui.gd          setup, run, debrief and department panels
 scripts/ui/ops_ui.gd      operations: the board, roster, briefing, force, orders, the run and the debrief
 assets/svg/               all sprites, generated by tools/make_placeholders.py
@@ -434,6 +521,7 @@ godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10  # the
 godot --headless --path . -s res://tests/civ_test.gd -- --n=40             # v0.6 gate: operations with civilians, Patrol vs police tactical
 godot --headless --path . -s res://tests/dept_test.gd                      # v0.5 gate: save, load, carry-over, replay
 godot --headless --path . -s res://tests/orders_test.gd -- --n=8           # v0.7 gate: every order, with and without it
+godot --headless --path . -s res://tests/equip_test.gd -- --n=16           # v0.7.5 gate: every item, with and without it
 godot --headless --path . -s res://tests/op_test.gd                        # a campaign played by "Suggest a plan", week by week
 godot --headless --path . -s res://tests/hold_test.gd -- --n=30            # the hold-mode habits on and off, by matchup
 godot --headless --path . -s res://tests/hold_test.gd -- --ablate=drop --n=30   # all hold habits but one, one at a time

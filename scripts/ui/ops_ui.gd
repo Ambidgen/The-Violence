@@ -10,6 +10,7 @@ const Orders = preload("res://scripts/campaign/orders.gd")
 const Situations = preload("res://scripts/campaign/situations.gd")
 const Operation = preload("res://scripts/campaign/operation.gd")
 const Autoplan = preload("res://scripts/campaign/autoplan.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const PANEL_W := 460.0
 const INK := Color("#1c1c1c")
 const GREY := Color("#666666")
@@ -27,6 +28,7 @@ var _run_refs := {}          # widgets updated every refresh during the run
 var _log_shown := 0
 var _rewinding := false
 var _sliding := false        # the panel itself is moving a slider: not the player
+var kit_open := ""           # Force screen: the officer whose kit is being edited (v0.7.5)
 
 
 func build(m) -> void:
@@ -339,6 +341,24 @@ func _force(s: Dictionary) -> void:
 			so.item_selected.connect(func(i): main.plan["squads"][k]["stage"] = i; main.plan_changed())
 			h2.add_child(so)
 			_btn(h2, "Remove squad", func(): _remove_squad(k))
+		# kit (v0.7.5): a ready-made squad kit, then each officer's own
+		if not recs.is_empty():
+			var hk := _h(v)
+			_lab(hk, "Squad kit", GREY, 11)
+			var kk := si
+			for key in Equipment.SQUAD_KITS:
+				var kname: String = Equipment.SQUAD_KITS[key]["name"]
+				var kb := _btn(hk, kname, func(): _squad_kit(kk, key))
+				kb.tooltip_text = "%s kit. Point man: %s.\nThe rest: %s." % [kname, Equipment.describe(Equipment.SQUAD_KITS[key]["point"]),
+					Equipment.describe(Equipment.SQUAD_KITS[key]["rest"])]
+			for r0 in recs:
+				var hr := _h(v)
+				var oid0: String = r0["id"]
+				var kl := _text(hr, "%s  ·  %s" % [r0["name"], Equipment.describe(r0.get("kit", Equipment.default_kit()))], INK, 11)
+				kl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				_btn(hr, "Kit" if kit_open != oid0 else "Done", func(): kit_open = "" if kit_open == oid0 else oid0; show_plan())
+				if kit_open == oid0:
+					_kit_editor(v, r0)
 	if squads.size() < Orders.MAX_SQUADS:
 		_btn(box, "+ Add a squad", func(): _add_squad())
 	_sep()
@@ -363,6 +383,91 @@ func _force(s: Dictionary) -> void:
 			Habits.EXP_NAMES[int(r["exp"])], int(r["judgment"]), ("  ·  " + String(r["personality"]).to_lower()) if r["personality"] != "" else ""], INK, 11)
 		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		l.tooltip_text = UI.officer_file(r)
+
+
+## One officer's kit: weapons, sight, armour and gear, within their training.
+func _kit_editor(parent: Control, r: Dictionary) -> void:
+	var who: String = Equipment.who_of_record(r)
+	var kit: Dictionary = Equipment.validate(r.get("kit", Equipment.default_kit()), who)
+	var v := VBoxContainer.new()
+	parent.add_child(v)
+	var rows := [["Primary", "primary", [""] + Equipment.PRIMARY_ORDER], ["Sidearm", "secondary", [""] + Equipment.SECONDARY_ORDER],
+		["Sight", "optic", ["red_dot", "irons", "magnified"]], ["Armour", "armour", ["none", "vest", "plates"]]]
+	for row in rows:
+		var h := _h(v)
+		_lab(h, row[0], GREY, 11)
+		var ob := OptionButton.new()
+		ob.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var field: String = row[1]
+		for item in row[2]:
+			var nm: String = "(none)"
+			var ok := true
+			match field:
+				"primary", "secondary":
+					if item != "":
+						nm = Equipment.WEAPONS[item]["name"]
+						ok = Equipment.allowed(Equipment.WEAPONS[item]["who"], who)
+				"optic":
+					nm = Equipment.OPTICS[item]["name"]
+				"armour":
+					nm = Equipment.ARMOUR[item]["name"] + (" (2 plates)" if item == "plates" else "")
+			ob.add_item(nm + ("" if ok else "  (tactical training)"))
+			ob.set_item_metadata(ob.item_count - 1, item)
+			ob.set_item_disabled(ob.item_count - 1, not ok)
+			if item == String(kit[field]):
+				ob.select(ob.item_count - 1)
+		ob.item_selected.connect(func(i): _set_kit(r, field, ob.get_item_metadata(i)))
+		h.add_child(ob)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	v.add_child(grid)
+	for gid in Equipment.GEAR_ORDER:
+		var spec: Dictionary = Equipment.GEAR[gid]
+		var ok2: bool = Equipment.allowed(spec["who"], who) and (not spec.has("needs") or kit["primary"] == spec["needs"])
+		var gl := _lab(grid, spec["name"], INK if ok2 else GREY, 11)
+		gl.tooltip_text = "%s (%s)\n%s" % [spec["name"], Equipment.WHO_NAMES[spec["who"]], spec["desc"]]
+		gl.mouse_filter = Control.MOUSE_FILTER_STOP
+		var sp := SpinBox.new()
+		sp.min_value = 0
+		sp.max_value = int(spec["max"])
+		sp.value = int(kit["gear"].get(gid, 0))
+		sp.editable = ok2
+		var g2: String = gid
+		sp.value_changed.connect(func(val): _set_gear(r, g2, int(val)))
+		grid.add_child(sp)
+	_text(v, "%.1f kg (pace x%.2f), cost %d.%s" % [Equipment.weight(kit), Equipment.speed_factor(kit), Equipment.cost(kit),
+		"" if who == "tactical" else " Rams, flashbangs, the short rifle and the shield need five years on the job or Experience 3."], GREY, 10)
+
+
+func _set_kit(r: Dictionary, field: String, value) -> void:
+	var k: Dictionary = Equipment.normalize(r.get("kit", Equipment.default_kit()))
+	k[field] = value
+	if field == "armour":
+		k["plates"] = 2 if value == "plates" else 0
+	r["kit"] = Equipment.validate(k, Equipment.who_of_record(r))
+	main.plan_changed()
+	main._save()
+	show_plan()
+
+
+func _set_gear(r: Dictionary, gid: String, n: int) -> void:
+	var k: Dictionary = Equipment.normalize(r.get("kit", Equipment.default_kit()))
+	k["gear"][gid] = n
+	r["kit"] = Equipment.validate(k, Equipment.who_of_record(r))
+	main.plan_changed()
+	main._save()
+
+
+## A ready-made kit for a whole squad: the first officer listed takes the point man's.
+func _squad_kit(si: int, key: String) -> void:
+	var spec: Dictionary = Equipment.SQUAD_KITS[key]
+	var recs := _recs(main.plan["squads"][si]["members"])
+	for k in recs.size():
+		var r: Dictionary = recs[k]
+		r["kit"] = Equipment.validate(spec["point"] if k == 0 else spec["rest"], Equipment.who_of_record(r))
+	main.plan_changed()
+	main._save()
+	show_plan()
 
 
 func _recs(ids: Array) -> Array:
@@ -927,9 +1032,18 @@ func show_debrief(res: Dictionary, w, dept_lines: Array) -> void:
 			st = "[color=#7d0a0a]down[/color]"
 		elif o.wounds > 0 or o.arm_hit or o.leg_hit:
 			st = "wounded"
-		bb += "%s %s: %s; %d rounds, %d hit%s%s\n" % [o.id, o.name, st, p2["shots"], p2["hits"],
+		var used: Array = []
+		for gid in ["flashbang", "taser", "launcher"]:
+			var had: int = Equipment.gear_counts(o.kit).get(gid, 0)
+			var spent: int = had - int(o.gear.get(gid, 0))
+			if spent > 0:
+				used.append("%s x%d" % [String(Equipment.GEAR[gid]["short"]).to_lower(), spent])
+		if o.kit.get("head", "") == "sof_helmet" and not o.helmet:
+			used.append("helmet took a round")
+		bb += "%s %s: %s; %d rounds, %d hit%s%s\n    [color=#666666]%s%s[/color]\n" % [o.id, o.name, st, p2["shots"], p2["hits"],
 			("; misses: " + ", ".join(misses)) if not misses.is_empty() else "",
-			("; [b]broke orders:[/b] " + ", ".join(broken.get(o.id, []))) if broken.has(o.id) else ""]
+			("; [b]broke orders:[/b] " + ", ".join(broken.get(o.id, []))) if broken.has(o.id) else "",
+			Equipment.describe(o.kit), ("; used " + ", ".join(used)) if not used.is_empty() else ""]
 	var sm: Dictionary = w.incident.summary()
 	bb += "\n[b]CIVILIANS[/b]  %d present, %d hurt, %d killed; %d round%s from police struck a civilian.\n" % [sm["civ_total"], sm["civ_hit"],
 		sm["civ_killed"], sm["civ_hit_police"], "" if sm["civ_hit_police"] == 1 else "s"]
