@@ -4,11 +4,11 @@ extends Node2D
 ## hit, the fallen lying in place. Only what is in view; dots when zoomed far out.
 
 const Decals = preload("res://scripts/view/decals.gd")
+const Ink = preload("res://scripts/view/ink.gd")
 const Palette = preload("res://scripts/view/palette.gd")
 const Op = preload("res://scripts/sim/op.gd")
 const PX := 40.0
-const INK := Color("#1c1c1c")
-const BLOOD := Color("#7d0a0a")
+const INK := Color("#121212")
 
 var world
 var view := Rect2()
@@ -44,6 +44,8 @@ func handle(ev: Dictionary) -> void:
 				_:
 					local = Vector2(-6, float(h % 29) - 14.0)
 			lst.append([local, float(h % 628) / 100.0, 0.7 + float(h % 40) / 100.0, "fx/stain%d" % (1 + h % 3)])
+			# v0.8 red ink: figures stay pristine (the floor carries the consequence)
+			lst.clear()
 			stains[ev["id"]] = lst
 		"body_gone":
 			stains.erase(ev["id"])
@@ -88,7 +90,7 @@ func _draw() -> void:
 					at = p + Vector2.from_angle(o.body_dir - 1.2) * 9.0
 					alpha = 0.55
 				draw_set_transform(at, rot)
-				draw_texture_rect(gt, Rect2(Vector2(0, -gs.y / 2.0), gs), false, Color(1, 1, 1, alpha))
+				draw_texture_rect(gt, Rect2(Vector2(0, -gs.y / 2.0), gs), false, Color(0.93, 0.93, 0.91, alpha))
 		var bt: Texture2D = Decals.tex("op/%s_stand" % look)
 		var bs: Vector2 = bt.get_size() * sc
 		draw_set_transform(p, o.body_dir)
@@ -100,8 +102,7 @@ func _draw() -> void:
 			draw_texture_rect(stt, Rect2(-ss / 2.0, ss), false)
 		draw_set_transform(Vector2.ZERO, 0.0)
 		if not o.medic:
-			draw_circle(p + Vector2(-14, 14), 4.6, Color(1, 1, 1, 0.95))
-			draw_circle(p + Vector2(-14, 14), 3.4, Palette.ALERT[clampi(o.alert, 0, 2)])
+			Palette.alert_pip(self, p + Vector2(-14, 14), clampi(o.alert, 0, 2))
 		if o.carried:
 			continue
 		if zoom >= 0.5:
@@ -112,7 +113,7 @@ func _draw() -> void:
 			elif o.ticker.has("retreat"):
 				t = "RUNNING"
 			if t != "":
-				draw_string(font, p + Vector2(-26, 26), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#3a3a3a"))
+				draw_string(font, p + Vector2(-26, 26), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("#2b2b2b"))
 		if o.id == selected:
 			draw_arc(p, 24.0, 0.0, TAU, 28, INK, 2.0)
 	_draw_selected_down(vr)
@@ -125,7 +126,7 @@ func _draw_down(o, p: Vector2, look: String) -> void:
 	var ds: Vector2 = dt.get_size() * 0.5
 	draw_set_transform(p, rot)
 	draw_texture_rect(dt, Rect2(-ds / 2.0, ds), false)
-	var n := maxi(2, o.wounds + 2)
+	var n := 0   # v0.8: no stains on the fallen figure
 	for k in n:
 		var hk := hash(o.id + "s" + str(k))
 		var st: Texture2D = Decals.tex("fx/stain%d" % (1 + hk % 3))
@@ -135,7 +136,7 @@ func _draw_down(o, p: Vector2, look: String) -> void:
 		draw_texture_rect(st, Rect2(-ss / 2.0, ss), false)
 	draw_set_transform(Vector2.ZERO, 0.0)
 	if zoom >= 0.5 and not o.carried:
-		draw_string(font, p + Vector2(-26, 26), "KIA" if o.state == "dead" else "DOWN", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, BLOOD)
+		draw_string(font, p + Vector2(-26, 26), "KIA" if o.state == "dead" else "DOWN", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Ink.accent(0.9))
 
 
 func _draw_selected_down(vr: Rect2) -> void:
@@ -159,12 +160,15 @@ func _draw_dots(vr: Rect2) -> void:
 		if not vr.has_point(p):
 			continue
 		if not o.alive():
-			draw_circle(p, r * 0.8, Color(BLOOD, 0.85))
+			if Ink.gore_enabled:
+				draw_circle(p, r * 0.8, Ink.accent(0.85))
+			draw_line(p - Vector2(r, r) * 0.6, p + Vector2(r, r) * 0.6, Ink.INK, 1.0)
+			draw_line(p - Vector2(r, -r) * 0.6, p + Vector2(r, -r) * 0.6, Ink.INK, 1.0)
 			continue
 		if o.medic:
-			draw_circle(p, r, Color.WHITE)
+			draw_circle(p, r, Color(0.93, 0.93, 0.91))
 			draw_arc(p, r, 0.0, TAU, 10, INK, -1.0)
 			continue
 		draw_circle(p, r, Palette.faction(o.faction))
 		if o.alert == Op.RED:
-			draw_arc(p, r * 1.7, 0.0, TAU, 12, Palette.ALERT[2], -1.0)
+			draw_arc(p, r * 1.7, 0.0, TAU, 12, Ink.accent(0.9), -1.0)

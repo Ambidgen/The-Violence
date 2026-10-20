@@ -41,14 +41,14 @@ func _draw() -> void:
 		draw_texture_rect(Decals.tex(spec[0]), Rect2(-sz / 2.0, sz), false)
 		if v.get("lights", false):
 			# lights on a call: alternating strobes and a pulsing ring (greyscale, like the plan)
-			var a := Color.WHITE if blink else Color("#1c1c1c")
-			var b := Color("#1c1c1c") if blink else Color.WHITE
+			var a := Color(0.93, 0.93, 0.91) if blink else Color("#121212")
+			var b := Color("#121212") if blink else Color(0.93, 0.93, 0.91)
 			draw_circle(Vector2(0, -sz.y * 0.28), 10.0, a)
 			draw_circle(Vector2(0, sz.y * 0.28), 10.0, b)
-			draw_arc(Vector2(0, -sz.y * 0.28), 10.0, 0.0, TAU, 12, Color("#1c1c1c"), 2.0)
-			draw_arc(Vector2(0, sz.y * 0.28), 10.0, 0.0, TAU, 12, Color("#1c1c1c"), 2.0)
+			draw_arc(Vector2(0, -sz.y * 0.28), 10.0, 0.0, TAU, 12, Color("#121212"), 2.0)
+			draw_arc(Vector2(0, sz.y * 0.28), 10.0, 0.0, TAU, 12, Color("#121212"), 2.0)
 			var ring := fmod(t * 1.6, 1.0)
-			draw_arc(Vector2.ZERO, sz.x * (0.6 + 0.5 * ring), 0.0, TAU, 28, Color(0.1, 0.1, 0.1, 0.5 * (1.0 - ring)), 4.0)
+			draw_arc(Vector2.ZERO, sz.x * (0.6 + 0.5 * ring), 0.0, TAU, 28, Color(0.07, 0.07, 0.07, 0.5 * (1.0 - ring)), 4.0)
 		draw_set_transform(Vector2.ZERO, 0.0)
 	# stretchers under casualties being carried
 	if world != null:

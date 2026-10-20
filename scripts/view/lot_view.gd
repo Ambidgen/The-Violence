@@ -28,7 +28,7 @@ func _draw() -> void:
 		return
 	var font: Font = ThemeDB.fallback_font
 	# yard ground, then the plan
-	draw_rect(Rect2(0, 0, tpl_level.W * PX, tpl_level.H * PX), Color("#f6f6f4"))
+	draw_rect(Rect2(0, 0, tpl_level.W * PX, tpl_level.H * PX), Color("#edede8"))
 	FloorPlan.paint_site(self, tpl_level, font)
 	for pr in tpl_level.props:
 		if pr.get("under", false):

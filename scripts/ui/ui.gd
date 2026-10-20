@@ -4,10 +4,11 @@ extends CanvasLayer
 ## whole UI lives in one readable file. Greyscale, drafting-table style.
 
 const Habits = preload("res://scripts/data/habits.gd")
+const Ink = preload("res://scripts/view/ink.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const Maps = preload("res://scripts/maps/registry.gd")
 const PANEL_W := 460.0
-const INK := Color("#1c1c1c")
+const INK := Color("#121212")
 const SPEEDS := [0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0]
 const SHORT := {"untrained": "Untrained", "militia": "Militia", "patrol": "Patrol", "regular": "Regular", "police": "Police tac", "sof": "Spec ops"}
 
@@ -81,11 +82,11 @@ func build(m) -> void:
 	var ver := Label.new()
 	ver.text = "v" + str(ProjectSettings.get_setting("application/config/version", ""))
 	ver.add_theme_font_size_override("font_size", 12)
-	ver.add_theme_color_override("font_color", Color("#8a8a8a"))
+	ver.add_theme_color_override("font_color", Color("#737370"))
 	ver.size_flags_vertical = Control.SIZE_SHRINK_END
 	head_row.add_child(ver)
 	sub = Label.new()
-	sub.add_theme_color_override("font_color", Color("#666666"))
+	sub.add_theme_color_override("font_color", Color("#737370"))
 	v.add_child(sub)
 	set_map_title(main.level)
 	v.add_child(HSeparator.new())
@@ -113,6 +114,45 @@ func build(m) -> void:
 	banner_label.add_theme_font_size_override("font_size", 22)
 	banner_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	banner.add_child(banner_label)
+	_build_ink_strip(th)
+
+
+# ================================================================== presentation (v0.8)
+var ink_btn: Button
+var gore_btn: Button
+
+
+## Bottom left, always there: the monochrome proof (F2) and gore (F3). Presentation only.
+func _build_ink_strip(th: Theme) -> void:
+	var strip := PanelContainer.new()
+	strip.theme = th
+	strip.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	strip.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	strip.add_theme_stylebox_override("panel", _sb(Color(Ink.PAPER, 0.92), Ink.MID, 1, 4.0))
+	add_child(strip)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 4)
+	strip.add_child(h)
+	ink_btn = _btn(h, "RED INK  F2", func(on): main.set_red_ink(on), true)
+	gore_btn = _btn(h, "GORE  F3", func(on): main.set_gore(on), true)
+	for b in [ink_btn, gore_btn]:
+		b.add_theme_font_size_override("font_size", 11)
+		b.focus_mode = Control.FOCUS_NONE
+	sync_ink()
+	strip.offset_top = -44
+	strip.offset_bottom = -12
+	strip.offset_right = -PANEL_W - 12
+	strip.offset_left = -PANEL_W - 160
+
+
+func sync_ink() -> void:
+	if ink_btn == null:
+		return
+	ink_btn.set_pressed_no_signal(Ink.red_ink_enabled)
+	gore_btn.set_pressed_no_signal(Ink.gore_enabled)
+	ink_btn.text = "RED INK  F2" if Ink.red_ink_enabled else "MONOCHROME  F2"
+	gore_btn.text = "GORE  F3" if Ink.gore_enabled else "GORE OFF  F3"
 
 
 # ================================================================== theme
@@ -132,11 +172,11 @@ func _theme() -> Theme:
 static func make_theme() -> Theme:
 	var th := Theme.new()
 	th.default_font_size = 13
-	th.set_stylebox("panel", "PanelContainer", _sb(Color("#f3f3f1"), INK, 1, 12.0))
-	var normal := _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 5.0)
-	var hover := _sb(Color("#f4f4f4"), INK, 1, 5.0)
-	var pressed := _sb(Color("#d4d4d1"), INK, 1, 5.0)
-	var disabled := _sb(Color("#eeeeee"), Color("#cccccc"), 1, 5.0)
+	th.set_stylebox("panel", "PanelContainer", _sb(Color("#edede8"), INK, 1, 12.0))
+	var normal := _sb(Color("#edede8"), Color("#bfbfba"), 1, 5.0)
+	var hover := _sb(Color("#edede8"), INK, 1, 5.0)
+	var pressed := _sb(Color("#d4d4cf"), INK, 1, 5.0)
+	var disabled := _sb(Color("#edede8"), Color("#bfbfba"), 1, 5.0)
 	var focus := StyleBoxEmpty.new()
 	for t in ["Button", "OptionButton"]:
 		th.set_stylebox("normal", t, normal)
@@ -146,32 +186,32 @@ static func make_theme() -> Theme:
 		th.set_stylebox("disabled", t, disabled)
 		th.set_stylebox("focus", t, focus)
 		th.set_color("font_color", t, INK)
-		th.set_color("font_hover_color", t, Color.BLACK)
-		th.set_color("font_pressed_color", t, Color.BLACK)
-		th.set_color("font_hover_pressed_color", t, Color.BLACK)
+		th.set_color("font_hover_color", t, Color(0.07, 0.07, 0.07))
+		th.set_color("font_pressed_color", t, Color(0.07, 0.07, 0.07))
+		th.set_color("font_hover_pressed_color", t, Color(0.07, 0.07, 0.07))
 		th.set_color("font_focus_color", t, INK)
-		th.set_color("font_disabled_color", t, Color("#9a9a9a"))
+		th.set_color("font_disabled_color", t, Color("#bfbfba"))
 	th.set_color("font_color", "Label", INK)
-	th.set_stylebox("normal", "LineEdit", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 4.0))
-	th.set_stylebox("focus", "LineEdit", _sb(Color("#ffffff"), INK, 1, 4.0))
+	th.set_stylebox("normal", "LineEdit", _sb(Color("#edede8"), Color("#bfbfba"), 1, 4.0))
+	th.set_stylebox("focus", "LineEdit", _sb(Color("#edede8"), INK, 1, 4.0))
 	th.set_color("font_color", "LineEdit", INK)
 	th.set_color("default_color", "RichTextLabel", INK)
-	th.set_stylebox("normal", "RichTextLabel", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 6.0))
-	th.set_stylebox("background", "ProgressBar", _sb(Color("#e4e4e2"), Color("#9a9a9a"), 1, 0.0))
-	th.set_stylebox("fill", "ProgressBar", _sb(Color("#3a3a3a"), Color("#3a3a3a"), 0, 0.0))
-	th.set_stylebox("panel", "PopupMenu", _sb(Color("#ffffff"), INK, 1, 4.0))
-	th.set_stylebox("hover", "PopupMenu", _sb(Color("#e8e8e8"), Color("#e8e8e8"), 0, 2.0))
+	th.set_stylebox("normal", "RichTextLabel", _sb(Color("#edede8"), Color("#bfbfba"), 1, 6.0))
+	th.set_stylebox("background", "ProgressBar", _sb(Color("#d4d4cf"), Color("#bfbfba"), 1, 0.0))
+	th.set_stylebox("fill", "ProgressBar", _sb(Color("#2b2b2b"), Color("#2b2b2b"), 0, 0.0))
+	th.set_stylebox("panel", "PopupMenu", _sb(Color("#edede8"), INK, 1, 4.0))
+	th.set_stylebox("hover", "PopupMenu", _sb(Color("#edede8"), Color("#edede8"), 0, 2.0))
 	th.set_color("font_color", "PopupMenu", INK)
-	th.set_color("font_hover_color", "PopupMenu", Color.BLACK)
-	th.set_stylebox("panel", "TooltipPanel", _sb(Color("#ffffff"), INK, 1, 6.0))
+	th.set_color("font_hover_color", "PopupMenu", Color(0.07, 0.07, 0.07))
+	th.set_stylebox("panel", "TooltipPanel", _sb(Color("#edede8"), INK, 1, 6.0))
 	th.set_color("font_color", "TooltipLabel", INK)
-	th.set_stylebox("panel", "TabContainer", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 6.0))
+	th.set_stylebox("panel", "TabContainer", _sb(Color("#edede8"), Color("#bfbfba"), 1, 6.0))
 	th.set_stylebox("tab_selected", "TabContainer", _sb(INK, INK, 1, 6.0))
-	th.set_stylebox("tab_unselected", "TabContainer", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 6.0))
-	th.set_stylebox("tab_hovered", "TabContainer", _sb(Color("#eeeeee"), INK, 1, 6.0))
-	th.set_color("font_selected_color", "TabContainer", Color.WHITE)
+	th.set_stylebox("tab_unselected", "TabContainer", _sb(Color("#edede8"), Color("#bfbfba"), 1, 6.0))
+	th.set_stylebox("tab_hovered", "TabContainer", _sb(Color("#edede8"), INK, 1, 6.0))
+	th.set_color("font_selected_color", "TabContainer", Color(0.93, 0.93, 0.91))
 	th.set_color("font_unselected_color", "TabContainer", INK)
-	th.set_color("font_hovered_color", "TabContainer", Color.BLACK)
+	th.set_color("font_hovered_color", "TabContainer", Color(0.07, 0.07, 0.07))
 	return th
 
 
@@ -185,7 +225,7 @@ func _h(parent: Control) -> HBoxContainer:
 
 func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Button:
 	var b := Button.new()
-	b.text = text
+	b.text = Ink.bb(text)
 	b.toggle_mode = toggle
 	if toggle:
 		b.toggled.connect(func(on): cb.call(on))
@@ -197,9 +237,9 @@ func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Butto
 
 func _heading(parent: Control, text: String) -> Label:
 	var l := Label.new()
-	l.text = text
+	l.text = Ink.bb(text)
 	l.add_theme_font_size_override("font_size", 12)
-	l.add_theme_color_override("font_color", Color("#555555"))
+	l.add_theme_color_override("font_color", Color("#737370"))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	parent.add_child(l)
 	return l
@@ -363,7 +403,7 @@ func _build_setup() -> void:
 	exp_spin.value_changed.connect(func(v): _exp(v))
 	hx.add_child(exp_spin)
 	exp_label = Label.new()
-	exp_label.add_theme_color_override("font_color", Color("#555555"))
+	exp_label.add_theme_color_override("font_color", Color("#737370"))
 	hx.add_child(exp_label)
 	_heading(colt, "Hearing: every operator hears the same (shots, footsteps, reloads; walls halve it) unless a trait changes it.")
 	for tr in Habits.TRAITS:
@@ -506,7 +546,7 @@ func _build_kit_tab() -> void:
 		gear_spins[gid] = sp
 	kit_label = Label.new()
 	kit_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	kit_label.add_theme_color_override("font_color", Color("#444444"))
+	kit_label.add_theme_color_override("font_color", Color("#2b2b2b"))
 	col.add_child(kit_label)
 
 
@@ -689,7 +729,7 @@ func _build_run() -> void:
 		b.custom_minimum_size = Vector2(44, 0)
 		speed_buttons.append(b)
 	speed_note = Label.new()
-	speed_note.add_theme_color_override("font_color", Color("#666666"))
+	speed_note.add_theme_color_override("font_color", Color("#737370"))
 	speed_note.add_theme_font_size_override("font_size", 11)
 	r.add_child(speed_note)
 	var ho := _h(r)
@@ -778,7 +818,7 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 				bar += "|" if i < int(o.stress * 10.0) else "."
 			var head := "[hint=\"%s\"][b]%s[/b][/hint] %s %s" % [quirks(o).replace("\"", "'"), o.id, SHORT.get(o.echelon, o.echelon), st]
 			if st == "KIA" or st == "DOWN":
-				txt_all += "[color=#7d0a0a]%s[/color]\n" % head
+				txt_all += "[color=#b31f26]%s[/color]\n" % head
 				continue
 			if o.complying:
 				txt_all += "%s  [b]%s[/b]\n" % [head, "CUFFED" if o.arrested else "HANDS UP"]
@@ -790,16 +830,16 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 				if left > 0 and not gid in ["light", "shield"]:
 					var bare: bool = gid in ["baton", "gas_mask"] or (left == 1 and gid in ["ram", "medkit", "breach"])
 					kit_s += " %s%s" % [Equipment.GEAR[gid]["short"], "" if bare else "×%d" % left]
-			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s%s" % [head, ["[color=#3d7a46]G[/color]", "[color=#a8861c]Y[/color]", "[color=#9b2a27]R[/color]"][o.alert],
+			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s%s" % [head, ["[color=#737370]g[/color]", "[b]Y[/b]", "[b][color=#b31f26]R[/color][/b]"][o.alert],
 				gun, s["mag"], s["spare"], o.plates, o.plates_max, o.exp, bar,
-				"" if kit_s == "" else "  [color=#555555]%s[/color]" % kit_s.strip_edges()]
+				"" if kit_s == "" else "  [color=#737370]%s[/color]" % kit_s.strip_edges()]
 			if not bad.is_empty():
 				line += "  [b]%s[/b]" % " ".join(bad)
 			txt_all += line + "\n"
 			if not many:
-				txt_all += "[color=#555555]      %s[/color]\n" % quirks(o)
+				txt_all += "[color=#737370]      %s[/color]\n" % quirks(o)
 			if not many or o.dbg != "":
-				txt_all += "[color=#555555]      %s[/color]\n" % o.dbg.replace("[", "(")
+				txt_all += "[color=#737370]      %s[/color]\n" % o.dbg.replace("[", "(")
 	if w.teams.size() > 2 and w.teams[2].get("civ", false) and not w.teams[2]["members"].is_empty():
 		var counts := {}
 		var hit := 0
@@ -817,29 +857,29 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 				parts.append("%d %s" % [counts[st2], {"unaware": "unaware", "alarmed": "alarmed", "flee": "fleeing", "hide": "hiding",
 					"freeze": "frozen", "comply": "hands up", "film": "filming"}[st2]])
 		txt_all += "[b]CIVILIANS[/b]  %d  ·  %s%s%s\n" % [w.teams[2]["members"].size(), ", ".join(parts),
-			("  ·  [color=#7d0a0a]%d hurt[/color]" % hit) if hit > 0 else "", ("  ·  [color=#7d0a0a][b]%d dead[/b][/color]" % dead) if dead > 0 else ""]
-	roster.text = txt_all
+			("  ·  [color=#b31f26]%d hurt[/color]" % hit) if hit > 0 else "", ("  ·  [color=#b31f26][b]%d dead[/b][/color]" % dead) if dead > 0 else ""]
+	roster.text = Ink.bb(txt_all)
 	log_shown = maxi(log_shown, w.log_base)
 	while log_shown < w.log_base + w.log_lines.size():
 		var ln: Dictionary = w.log_lines[log_shown - w.log_base]
 		var txt: String = ln["text"].replace("[", "(").replace("]", ")")
 		match ln["kind"]:
 			"kill":
-				log_box.append_text("[b][color=#7d0a0a]%s[/color][/b]\n" % txt)
+				log_box.append_text(Ink.bb("[b][color=#b31f26]%s[/color][/b]\n" % txt))
 			"hit":
-				log_box.append_text("[color=#5a1a1a]%s[/color]\n" % txt)
+				log_box.append_text(Ink.bb("[color=#b31f2699]%s[/color]\n" % txt))
 			"bad":
-				log_box.append_text("[b]%s[/b]\n" % txt)
+				log_box.append_text(Ink.bb("[b]%s[/b]\n" % txt))
 			"end":
-				log_box.append_text("[b]%s[/b]\n" % txt)
+				log_box.append_text(Ink.bb("[b]%s[/b]\n" % txt))
 			"comms":
-				log_box.append_text("[i][color=#555555]%s[/color][/i]\n" % txt)
+				log_box.append_text(Ink.bb("[i][color=#737370]%s[/color][/i]\n" % txt))
 			"civ":
-				log_box.append_text("[color=#666666]%s[/color]\n" % txt)
+				log_box.append_text(Ink.bb("[color=#737370]%s[/color]\n" % txt))
 			"rule":
-				log_box.append_text("[color=#333333]%s[/color]\n" % txt)
+				log_box.append_text(Ink.bb("[color=#2b2b2b]%s[/color]\n" % txt))
 			_:
-				log_box.append_text("[color=#444444]%s[/color]\n" % txt)
+				log_box.append_text(Ink.bb("[color=#2b2b2b]%s[/color]\n" % txt))
 		log_shown += 1
 
 
@@ -855,7 +895,7 @@ static func quirks(o) -> String:
 
 
 func show_banner(text: String) -> void:
-	banner_label.text = text
+	banner_label.text = Ink.bb(text)
 	banner.visible = true
 
 
@@ -872,7 +912,7 @@ func show_debrief(w, dept_lines: Array, used_dept: bool) -> void:
 			s["suspects"], s["suspects_down"], s["suspects_killed"], s["surrendered"], s["arrested"],
 			s["officers"], s["officers_down"], s["officers_killed"]]
 	if s["civ_total"] > 0:
-		t += "Civilians: %d, [color=#7d0a0a]%d hurt, %d killed[/color]; %d police round%s struck a civilian.\n" % [
+		t += "Civilians: %d, [color=#b31f26]%d hurt, %d killed[/color]; %d police round%s struck a civilian.\n" % [
 			s["civ_total"], s["civ_hit"], s["civ_killed"], s["civ_hit_police"], "" if s["civ_hit_police"] == 1 else "s"]
 	t += "Rounds fired: %d (police %d); %d went through a wall.  Misjudgments: %d.  Shots after someone gave up or went down: %d.\n" % [
 		s["shots"], s["police_shots"], s["through_walls"], s["misjudged"], s["excessive"]]
@@ -883,12 +923,12 @@ func show_debrief(w, dept_lines: Array, used_dept: bool) -> void:
 		for ln in s["lines"]:
 			var red: bool = ln["kind"] in ["civilian_killed", "excessive_force", "civilian_hit_by_police", "misjudgment", "officer_killed"]
 			var txt: String = String(ln["text"]).replace("[", "(").replace("]", ")")
-			t += ("[color=#7d0a0a]%s[/color]\n" % txt) if red else (txt + "\n")
+			t += ("[color=#b31f26]%s[/color]\n" % txt) if red else (txt + "\n")
 	if not dept_lines.is_empty():
 		t += "\n[b]THE DEPARTMENT[/b]\n"
 		for d in dept_lines:
 			t += String(d).replace("[", "(") + "\n"
-	debrief.text = t
+	debrief.text = Ink.bb(t)
 	debrief.visible = true
 	roster.custom_minimum_size = Vector2(0, 160)
 
@@ -979,8 +1019,8 @@ func refresh_dept(dep, picked: Array) -> void:
 		b.tooltip_text = officer_file(r)
 	var nt := ""
 	for n in dep.notes.slice(maxi(0, dep.notes.size() - 30)):
-		nt += "[color=#555555]wk %d[/color]  %s\n" % [int(n["week"]), String(n["text"]).replace("[", "(")]
-	dept_notes.text = nt
+		nt += "[color=#737370]wk %d[/color]  %s\n" % [int(n["week"]), String(n["text"]).replace("[", "(")]
+	dept_notes.text = Ink.bb(nt)
 	if cam_btn != null:
 		cam_btn.set_pressed_no_signal(dep.bodycams)
 

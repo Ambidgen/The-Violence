@@ -214,9 +214,9 @@ func _draw() -> void:
 		var age: float = world.t - float(l["t"])
 		var al := clampf(1.0 - age / 120.0, 0.25, 1.0)
 		var c: Vector2 = (l["p"] as Vector2) * PX
-		var col := Color(0.08, 0.08, 0.08, al)
+		var col := Color(0.07, 0.07, 0.07, al)
 		var pts := PackedVector2Array([c + Vector2(0, -11), c + Vector2(11, 0), c + Vector2(0, 11), c + Vector2(-11, 0), c + Vector2(0, -11)])
-		draw_colored_polygon(pts, Color(1, 1, 1, 0.55 * al))
+		draw_colored_polygon(pts, Color(0.93, 0.93, 0.91, 0.55 * al))
 		draw_polyline(pts, col, 1.5)
 		draw_string(font, c + Vector2(-4, 4), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, col)
 		draw_string(font, c + Vector2(13, 4), "%ds" % int(age), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, col)

@@ -1,29 +1,59 @@
 extends Node2D
-## Draws any level as an architectural floor plan: paper, grid, site notation (roads,
-## parking, pools), floors, poche walls, window triple-lines, door swings, room
-## lettering, dimension strings and a title block. Everything here is greyscale;
-## colour is reserved for blood.
+## Draws any level as an architectural floor plan in red ink (v0.8): paper, floors, grain,
+## grid, then (on the Walls layer above the blood) poche walls, window triple-lines, door
+## swings, room lettering, dimension strings and a title block with its stamps.
+## Everything here is ink and stepped greys; red only reaches the plan through
+## Ink.accent() on the stamps of a plan that has met a room.
+##
+## Two states, one map: "theory" (the briefing: clean, sparse, certain) and "application"
+## (the live operation, the replay, the debrief: grit, scuffs, loose paper, the times and
+## the forms). The topology never changes; only the rendering does.
 ## The site painters are static so a city lot can draw its template with them.
 
 const Geom = preload("res://scripts/sim/geom.gd")
+const Ink = preload("res://scripts/view/ink.gd")
 const PX := 40.0
 
-const PAPER := Color("#f6f6f4")
-const GRID := Color("#e6e6e3")
-const GRID_MAJOR := Color("#d8d8d4")
-const INK := Color("#1c1c1c")
-const LINE := Color("#3a3a3a")
-const FAINT := Color("#8f8f8f")
-const HOUSE_FLOOR := Color("#fbfbfa")
-const DECK := Color("#f0f0ee")
-const ROAD := Color("#e7e7e4")
+const PAPER := Ink.PAPER
+const GRID := Color(0.45, 0.45, 0.44, 0.10)
+const GRID_MAJOR := Color(0.45, 0.45, 0.44, 0.20)
+const INK := Ink.INK
+const LINE := Ink.DARK
+const FAINT := Ink.MID
+const HOUSE_FLOOR := Ink.FLOOR
+const DECK := Ink.FLOOR
+const ROAD := Ink.FLOOR
 
 var level
+## "theory" or "application"
+var state := "theory"
+## Application only: {"actual": seconds, "forms": n, "mop": bool, "filed": bool}
+var stamp := {}
+var walls: Node2D
+var _rev := -1
 
 
 func setup(lv) -> void:
 	level = lv
 	queue_redraw()
+	if walls != null:
+		walls.queue_redraw()
+
+
+func set_state(st: String, info := {}) -> void:
+	state = st
+	stamp = info
+	queue_redraw()
+	if walls != null:
+		walls.queue_redraw()
+
+
+func _process(_d: float) -> void:
+	if _rev != Ink.rev:
+		_rev = Ink.rev
+		queue_redraw()
+		if walls != null:
+			walls.queue_redraw()
 
 
 func _draw() -> void:
@@ -33,63 +63,95 @@ func _draw() -> void:
 	var W: float = level.W * PX
 	var H: float = level.H * PX
 	# paper sheet with a margin for the title block
-	draw_rect(Rect2(-60, -60, W + 120, H + 170), Color("#ffffff"))
-	draw_rect(Rect2(-60, -60, W + 120, H + 170), INK, false, 2.0)
-	draw_rect(Rect2(-48, -48, W + 96, H + 146), LINE, false, 1.0)
+	draw_rect(Rect2(-60, -60, W + 120, H + 236), PAPER)
+	draw_rect(Rect2(-60, -60, W + 120, H + 236), INK, false, 2.0)
+	draw_rect(Rect2(-48, -48, W + 96, H + 212), LINE, false, 1.0)
 	draw_rect(Rect2(0, 0, W, H), PAPER)
-	# grid: 1 m faint, 5 m darker
+	paint_floor(self, level, font)
+	# grid over the floors: 1 m faint, 5 m darker
 	for x in range(0, int(level.W) + 1):
 		draw_line(Vector2(x * PX, 0), Vector2(x * PX, H), GRID_MAJOR if x % 5 == 0 else GRID, 1.0)
 	for y in range(0, int(level.H) + 1):
 		draw_line(Vector2(0, y * PX), Vector2(W, y * PX), GRID_MAJOR if y % 5 == 0 else GRID, 1.0)
 	if not level.fenced:
 		_dash_rect(self, Rect2(2, 2, W - 4, H - 4), FAINT)
-	paint_site(self, level, font)
-	paint_labels(self, level, font)
-	# dimension strings
-	if not level.dims.is_empty():
-		for dm in level.dims:
-			_dimension(dm["a"], dm["b"], dm["text"], font)
-			var horiz: bool = absf(dm["b"].x - dm["a"].x) > absf(dm["b"].y - dm["a"].y)
-			for tk in dm.get("ticks", []):
-				if horiz:
-					draw_line(Vector2(tk * PX, (dm["a"].y - 0.15) * PX), Vector2(tk * PX, (dm["a"].y + 0.15) * PX), LINE, 1.0)
-				else:
-					draw_line(Vector2((dm["a"].x - 0.15) * PX, tk * PX), Vector2((dm["a"].x + 0.15) * PX, tk * PX), LINE, 1.0)
-	else:
-		for b in level.buildings:
-			var box: Rect2 = b
-			var ytop := box.position.y - 0.9
-			var xr := box.end.x + 0.9
-			_dimension(Vector2(box.position.x, ytop), Vector2(box.end.x, ytop), "%.2f m" % box.size.x, font)
-			_dimension(Vector2(xr, box.position.y), Vector2(xr, box.end.y), "%.2f" % box.size.y, font)
-	# title block, scale bar, legend
-	var tb := Rect2(W - 560, H + 14, 560, 92)
-	draw_rect(tb, Color("#ffffff"))
-	draw_rect(tb, INK, false, 1.5)
-	draw_line(Vector2(tb.position.x, tb.position.y + 30), Vector2(tb.end.x, tb.position.y + 30), LINE, 1.0)
-	draw_line(Vector2(tb.position.x + 360, tb.position.y + 30), Vector2(tb.position.x + 360, tb.end.y), LINE, 1.0)
-	draw_string(font, tb.position + Vector2(12, 21), _spaced(level.title), HORIZONTAL_ALIGNMENT_LEFT, 536, 14, INK)
-	for i in mini(3, level.notes.size()):
-		draw_string(font, tb.position + Vector2(12, 50 + 16 * i), level.notes[i], HORIZONTAL_ALIGNMENT_LEFT, 340, 11, LINE if i < 2 else FAINT)
-	draw_string(font, tb.position + Vector2(372, 50), "COVER: solid fill / hatched", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, LINE)
-	draw_string(font, tb.position + Vector2(372, 66), "CONCEALMENT: outline only", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, LINE)
-	draw_string(font, tb.position + Vector2(372, 82), "WINDOWS: sill 0.9 m, head 2.1 m", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, LINE)
-	var sb := Vector2(0, H + 40)
-	for k in 5:
-		var seg := Rect2(sb.x + k * PX, sb.y, PX, 8)
-		draw_rect(seg, INK if k % 2 == 0 else Color("#ffffff"))
-		draw_rect(seg, INK, false, 1.0)
-	for k in [0, 1, 5]:
-		draw_string(font, sb + Vector2(k * PX - 3, 24), str(k), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, LINE)
-	draw_string(font, sb + Vector2(5 * PX + 12, 9), "m", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, LINE)
+	paint_print(self, level, state == "application")
 
 
-## Site notation, floors, walls (poche), fence posts, rails, windows and doors.
+## The print: sparse paper grain everywhere, a few halftone patches and corner hatching
+## in the rooms. Application adds grit, scuffs and loose paper. Deterministic (modulo
+## placement), so the same map always prints the same.
+static func paint_print(ci: CanvasItem, lv, applied: bool) -> void:
+	var W: float = lv.W * PX
+	var H: float = lv.H * PX
+	var n := int(lv.W * lv.H * (0.9 if not applied else 2.2))
+	for i in n:
+		var x := float((i * 73) % 1030) / 1030.0 * W
+		var y := float((i * 151 + (i / 1030) * 37) % 997) / 997.0 * H
+		ci.draw_rect(Rect2(x, y, 1.5, 1.5), Color(Ink.MID.r, Ink.MID.g, Ink.MID.b, 0.10 + 0.08 * float(i % 3)))
+	var k := 0
+	for name in lv.rooms:
+		var rm: Dictionary = lv.rooms[name]
+		if rm["exterior"]:
+			continue
+		for rv in rm["rects"]:
+			var r: Rect2 = _r(rv)
+			if r.size.x < 60.0 or r.size.y < 60.0:
+				continue
+			k += 1
+			# corner hatching: a short run of diagonals in one corner, ink at low alpha
+			var cs := minf(0.9 * PX, minf(r.size.x, r.size.y) * 0.3)
+			var corner := k % 4
+			var o := r.position + Vector2(r.size.x - cs if corner % 2 == 1 else 0.0, r.size.y - cs if corner >= 2 else 0.0)
+			var step := 5.0
+			var t := step
+			while t < cs * 2.0:
+				var a := Vector2(minf(t, cs), maxf(0.0, t - cs))
+				var b := Vector2(maxf(0.0, t - cs), minf(t, cs))
+				ci.draw_line(o + a, o + b, Color(Ink.DARK.r, Ink.DARK.g, Ink.DARK.b, 0.16), 1.0)
+				t += step
+			# a halftone patch in every third room, dots shrinking away from its corner
+			if k % 3 == 0:
+				var hp := r.position + Vector2(r.size.x * 0.62, r.size.y * 0.58)
+				for gy in 6:
+					for gx in 6:
+						var rad := 2.2 - 0.32 * float(gx + gy)
+						if rad <= 0.3:
+							continue
+						ci.draw_circle(hp + Vector2(gx, gy) * 7.0, rad, Color(Ink.DARK.r, Ink.DARK.g, Ink.DARK.b, 0.13))
+			if not applied:
+				continue
+			# grit: scuffs where people moved, and a sheet of loose paper here and there
+			for j in 5:
+				var q := r.position + Vector2(float((k * 97 + j * 61) % 89) / 89.0 * r.size.x, float((k * 53 + j * 41) % 83) / 83.0 * r.size.y)
+				var ang := float((k * 7 + j * 13) % 31) / 31.0 * PI
+				ci.draw_line(q, q + Vector2.from_angle(ang) * (6.0 + float(j % 3) * 4.0), Color(Ink.DARK.r, Ink.DARK.g, Ink.DARK.b, 0.30), 1.0)
+			if k % 2 == 1:
+				var sp := r.position + Vector2(float((k * 131) % 71) / 71.0 * r.size.x * 0.7 + 8.0, float((k * 89) % 67) / 67.0 * r.size.y * 0.7 + 8.0)
+				var rot := (float(k % 9) - 4.0) * 0.12
+				var pts := PackedVector2Array()
+				for c in [Vector2(-9, -12), Vector2(9, -12), Vector2(9, 12), Vector2(-9, 12)]:
+					pts.append(sp + (c as Vector2).rotated(rot))
+				ci.draw_colored_polygon(pts, Ink.PAPER)
+				pts.append(pts[0])
+				ci.draw_polyline(pts, Ink.LIGHT, 1.0)
+				for ln in 4:
+					var la := sp + Vector2(-6, -7 + ln * 4).rotated(rot)
+					ci.draw_line(la, la + Vector2(10 - (ln % 2) * 4, 0).rotated(rot), Color(Ink.MID.r, Ink.MID.g, Ink.MID.b, 0.6), 1.0)
+
+
+## Site notation, floors, walls (poche), fence posts, rails, windows and doors, in one
+## pass (the city lots). The plan itself draws the floor and the walls on two layers.
 static func paint_site(ci: CanvasItem, lv, font: Font) -> void:
+	paint_floor(ci, lv, font)
+	paint_walls(ci, lv, font)
+
+
+## Site notation and floors: interior rooms flat Floor, decks (porches, walkways, patios)
+## boarded.
+static func paint_floor(ci: CanvasItem, lv, font: Font) -> void:
 	for d in lv.decor:
 		_decor(ci, d, font)
-	# floors: interior rooms plain, decks (porches, walkways, patios) boarded
 	for name in lv.rooms:
 		var rm: Dictionary = lv.rooms[name]
 		for rv in rm["rects"]:
@@ -99,16 +161,19 @@ static func paint_site(ci: CanvasItem, lv, font: Font) -> void:
 				_boards(ci, r)
 			elif not rm["exterior"]:
 				ci.draw_rect(_r(r), HOUSE_FLOOR)
-	# walls
+
+
+## Walls (poche), fence posts, rails, windows and doors.
+static func paint_walls(ci: CanvasItem, lv, _font: Font) -> void:
 	for idx in lv.walls:
 		var o: Dictionary = lv.geom.obs[idx]
 		var r2: Rect2 = _r(o["r"])
 		match o["name"]:
 			"fence":
-				ci.draw_rect(r2, Color("#9a9a9a"))
+				ci.draw_rect(r2, Ink.LIGHT)
 			"perimeter":
-				ci.draw_rect(r2, Color("#5a5a5a"))
-				_hatch(ci, r2, Color("#2a2a2a"), 7.0)
+				ci.draw_rect(r2, Ink.MID)
+				_hatch(ci, r2, Ink.DARK, 7.0)
 				ci.draw_rect(r2, INK, false, 1.0)
 			_:
 				ci.draw_rect(r2, INK)
@@ -133,12 +198,12 @@ static func paint_site(ci: CanvasItem, lv, font: Font) -> void:
 		var nm: String = o3["name"]
 		if nm.ends_with("rail") or nm == "chain-link":
 			var rr: Rect2 = _r(o3["r"])
-			ci.draw_rect(rr, Color("#ffffff"))
+			ci.draw_rect(rr, Color("#edede8"))
 			ci.draw_rect(rr, LINE, false, 1.0)
 	# windows: white gap, three thin lines, jamb ticks
 	for win in lv.windows:
 		var wr: Rect2 = _r(win["r"])
-		ci.draw_rect(wr, Color("#ffffff"))
+		ci.draw_rect(wr, Color("#edede8"))
 		if win["axis"] == "h":
 			for f in [0.0, 0.5, 1.0]:
 				var y2: float = wr.position.y + wr.size.y * f
@@ -203,7 +268,7 @@ static func _decor(ci: CanvasItem, d: Dictionary, font: Font) -> void:
 			_dash_rect(ci, _r(d["r"]), FAINT)
 		"rect":
 			var r: Rect2 = _r(d["r"])
-			ci.draw_rect(r, Color("#eeeeec"))
+			ci.draw_rect(r, Color("#edede8"))
 			ci.draw_rect(r, LINE, false, 1.0)
 		"steps":
 			var rs: Rect2 = d["r"]
@@ -225,47 +290,47 @@ static func _decor(ci: CanvasItem, d: Dictionary, font: Font) -> void:
 				ci.draw_line(rr.position, Vector2(rr.end.x, rr.position.y), FAINT, 1.0)
 				ci.draw_line(Vector2(rr.position.x, rr.end.y), rr.end, FAINT, 1.0)
 				var cy := rr.get_center().y
-				ci.draw_dashed_line(Vector2(rr.position.x, cy), Vector2(rr.end.x, cy), Color("#b5b5b1"), 2.0, 18.0)
+				ci.draw_dashed_line(Vector2(rr.position.x, cy), Vector2(rr.end.x, cy), Color("#bfbfba"), 2.0, 18.0)
 			else:
 				ci.draw_line(rr.position, Vector2(rr.position.x, rr.end.y), FAINT, 1.0)
 				ci.draw_line(Vector2(rr.end.x, rr.position.y), rr.end, FAINT, 1.0)
 				var cx := rr.get_center().x
-				ci.draw_dashed_line(Vector2(cx, rr.position.y), Vector2(cx, rr.end.y), Color("#b5b5b1"), 2.0, 18.0)
+				ci.draw_dashed_line(Vector2(cx, rr.position.y), Vector2(cx, rr.end.y), Color("#bfbfba"), 2.0, 18.0)
 		"parking":
 			var pr: Rect2 = d["r"]
 			var stall: float = d.get("stall", 2.7)
 			if d.get("axis", "v") == "v":
 				var x2 := pr.position.x
 				while x2 <= pr.end.x + 0.01:
-					ci.draw_line(Vector2(x2, pr.position.y) * PX, Vector2(x2, pr.end.y) * PX, Color("#b0b0ac"), 1.5)
+					ci.draw_line(Vector2(x2, pr.position.y) * PX, Vector2(x2, pr.end.y) * PX, Color("#bfbfba"), 1.5)
 					x2 += stall
-				ci.draw_line(Vector2(pr.position.x, pr.end.y) * PX, pr.end * PX, Color("#b0b0ac"), 1.0)
+				ci.draw_line(Vector2(pr.position.x, pr.end.y) * PX, pr.end * PX, Color("#bfbfba"), 1.0)
 			else:
 				var y2 := pr.position.y
 				while y2 <= pr.end.y + 0.01:
-					ci.draw_line(Vector2(pr.position.x, y2) * PX, Vector2(pr.end.x, y2) * PX, Color("#b0b0ac"), 1.5)
+					ci.draw_line(Vector2(pr.position.x, y2) * PX, Vector2(pr.end.x, y2) * PX, Color("#bfbfba"), 1.5)
 					y2 += stall
 		"pool":
 			var pl: Rect2 = _r(d["r"])
-			ci.draw_rect(pl.grow(10.0), Color("#ebebe8"))
+			ci.draw_rect(pl.grow(10.0), Color("#edede8"))
 			ci.draw_rect(pl.grow(10.0), LINE, false, 1.0)
-			ci.draw_rect(pl, Color("#e2e4e6"))
+			ci.draw_rect(pl, Color("#d4d4cf"))
 			var y3 := pl.position.y + 8.0
 			while y3 < pl.end.y - 4.0:
 				var x3 := pl.position.x + 6.0
 				while x3 < pl.end.x - 14.0:
-					ci.draw_arc(Vector2(x3 + 6.0, y3), 6.0, PI * 1.1, PI * 1.9, 6, Color("#a9adb1"), 1.0)
+					ci.draw_arc(Vector2(x3 + 6.0, y3), 6.0, PI * 1.1, PI * 1.9, 6, Color("#bfbfba"), 1.0)
 					x3 += 22.0
 				y3 += 14.0
 			ci.draw_rect(pl, INK, false, 1.5)
 		"hatch":
 			var hr: Rect2 = _r(d["r"])
-			_hatch(ci, hr, Color(0, 0, 0, 0.12), 9.0)
+			_hatch(ci, hr, Color(0.07, 0.07, 0.07, 0.12), 9.0)
 			ci.draw_rect(hr, FAINT, false, 1.0)
 
 
 static func _boards(ci: CanvasItem, r: Rect2) -> void:
-	var col := Color("#dcdcd8")
+	var col := Color("#d4d4cf")
 	if r.size.y >= r.size.x:
 		var x := r.position.x
 		while x < r.end.x:
@@ -315,19 +380,36 @@ static func _label(ci: CanvasItem, font: Font, centre: Vector2, text: String, si
 	ci.draw_string(font, centre + Vector2(-w / 2.0, size * 0.35), text, HORIZONTAL_ALIGNMENT_LEFT, -1, size, col)
 
 
-func _dimension(a: Vector2, b: Vector2, text: String, font: Font) -> void:
+static func _dimension(ci: CanvasItem, a: Vector2, b: Vector2, text: String, font: Font) -> void:
 	var pa := a * PX
 	var pb := b * PX
-	draw_line(pa, pb, LINE, 1.0)
+	ci.draw_line(pa, pb, LINE, 1.0)
 	var n := (pb - pa).normalized().orthogonal() * 5.0
 	var t := (pb - pa).normalized() * 4.0
 	for p in [pa, pb]:
-		draw_line(p - n, p + n, LINE, 1.0)
-		draw_line(p - t - n * 0.8, p + t + n * 0.8, INK, 1.4)
+		ci.draw_line(p - n, p + n, LINE, 1.0)
+		ci.draw_line(p - t - n * 0.8, p + t + n * 0.8, INK, 1.4)
 	var mid := (pa + pb) / 2.0
 	if absf(pb.x - pa.x) > absf(pb.y - pa.y):
-		_label(self, font, mid + Vector2(0, -9), text, 10, LINE)
+		_label(ci, font, mid + Vector2(0, -9), text, 10, FAINT)
 	else:
-		draw_set_transform(mid + Vector2(10, 0), PI / 2.0)
-		_label(self, font, Vector2.ZERO, text, 10, LINE)
-		draw_set_transform(Vector2.ZERO, 0.0)
+		ci.draw_set_transform(mid + Vector2(10, 0), PI / 2.0)
+		_label(ci, font, Vector2.ZERO, text, 10, FAINT)
+		ci.draw_set_transform(Vector2.ZERO, 0.0)
+
+
+## A rubber stamp: heavy condensed caps in a double box, a little off square. Red only
+## once the plan has met the room; the box and the words carry it with red off.
+static func _stamp(ci: CanvasItem, font: Font, at: Vector2, lines: Array, col: Color, rot: float) -> float:
+	var bold: Font = font
+	var w := 0.0
+	for ln in lines:
+		w = maxf(w, font.get_string_size(ln, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x)
+	var sz := Vector2(w + 22.0, 18.0 * lines.size() + 12.0)
+	ci.draw_set_transform(at, rot)
+	ci.draw_rect(Rect2(Vector2.ZERO, sz), col, false, 2.0)
+	ci.draw_rect(Rect2(Vector2(3, 3), sz - Vector2(6, 6)), col, false, 1.0)
+	for i in lines.size():
+		ci.draw_string(bold, Vector2(11, 20 + 18 * i), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 13, col)
+	ci.draw_set_transform(Vector2.ZERO, 0.0)
+	return sz.x

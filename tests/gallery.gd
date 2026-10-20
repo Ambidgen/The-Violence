@@ -4,7 +4,7 @@ extends Node2D
 const ROOT := "res://assets/svg"
 
 func _ready() -> void:
-	RenderingServer.set_default_clear_color(Color("#ededed"))
+	RenderingServer.set_default_clear_color(Color("#d4d4cf"))
 	var x := 16.0
 	var y := 16.0
 	var row_h := 0.0

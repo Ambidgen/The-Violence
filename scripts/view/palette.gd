@@ -9,8 +9,22 @@ const TONE := {0: Color("#2e2e2e"), 1: Color("#4c4c4c"), 2: Color("#5e5e5e"), 3:
 	4: Color("#555555"), 5: Color("#8a8a8a")}
 const PATTERN := {0: "solid", 1: "dots", 2: "bands", 3: "hatch", 4: "check", 5: "cross"}
 const NEUTRAL := Color("#9a9a96")
-## Alert pips are interface, not art: the three states the rules name.
-const ALERT := [Color("#4f9d5a"), Color("#d4b13a"), Color("#b8322f")]
+const Ink = preload("res://scripts/view/ink.gd")
+
+
+## The alert pip (v0.8, red ink): the three states the rules name told apart by shape,
+## so they read without colour. GREEN a hollow ring, YELLOW a grey disc, RED a red disc
+## in a heavy ink ring.
+static func alert_pip(ci: CanvasItem, p: Vector2, lvl: int) -> void:
+	ci.draw_circle(p, 4.6, Color(Ink.PAPER, 0.95))
+	match lvl:
+		0:
+			ci.draw_arc(p, 3.0, 0.0, TAU, 14, Ink.MID, 1.2)
+		1:
+			ci.draw_circle(p, 3.4, Ink.MID)
+		_:
+			ci.draw_circle(p, 3.4, Ink.accent(0.9))
+			ci.draw_arc(p, 4.3, 0.0, TAU, 16, Ink.INK, 1.4)
 
 
 static func faction(fi: int) -> Color:

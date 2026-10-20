@@ -3,7 +3,8 @@ extends Node2D
 ## aim traverse arcs, planned paths, tracers, muzzle flashes and habit callouts.
 
 const PX := 40.0
-const INK := Color("#1c1c1c")
+const Ink = preload("res://scripts/view/ink.gd")
+const INK := Color("#121212")
 
 var world
 var show_cones := true
@@ -123,18 +124,18 @@ func _draw() -> void:
 			for k in 25:
 				var a: float = o.look_dir - half + 2.0 * half * k / 24.0
 				pts.append(p + Vector2.from_angle(a) * r)
-			draw_colored_polygon(pts, Color(0, 0, 0, 0.028 if o.team == 0 else 0.04))
+			draw_colored_polygon(pts, Color(0.07, 0.07, 0.07, 0.028 if o.team == 0 else 0.04))
 			for k in [0, 24]:
-				draw_line(p, pts[k + 1], Color(0, 0, 0, 0.18), 1.0)
+				draw_line(p, pts[k + 1], Color(0.07, 0.07, 0.07, 0.18), 1.0)
 			for a2 in [deg_to_rad(30.0), deg_to_rad(45.0)]:
 				if a2 < half:
 					for sgn in [-1.0, 1.0]:
-						draw_dashed_line(p, p + Vector2.from_angle(o.look_dir + a2 * sgn) * r * 0.6, Color(0, 0, 0, 0.12), 1.0, 4.0)
+						draw_dashed_line(p, p + Vector2.from_angle(o.look_dir + a2 * sgn) * r * 0.6, Color(0.07, 0.07, 0.07, 0.12), 1.0, 4.0)
 		if show_paths and o.moving and o.path.size() > 0:
 			var last := p
 			for k in range(o.path_i, o.path.size()):
 				var q: Vector2 = o.path[k] * PX
-				draw_dashed_line(last, q, Color(0, 0, 0, 0.35), 1.0, 5.0)
+				draw_dashed_line(last, q, Color(0.07, 0.07, 0.07, 0.35), 1.0, 5.0)
 				last = q
 		if show_aim and not o.aim.is_empty():
 			var e = world.op_by_id(o.aim["tid"])
@@ -146,7 +147,7 @@ func _draw() -> void:
 					draw_arc(p, 26.0, a0, a0 + angle_difference(a0, b), 12, INK, 1.4, true)
 					draw_string(font, p + Vector2(14, -18), "%d ms" % int(o.aim["acq_left"] * 1000.0), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, INK)
 				else:
-					draw_dashed_line(p + Vector2.from_angle(o.muzzle_dir) * 20.0, ep, Color(0, 0, 0, 0.28), 1.0, 3.0)
+					draw_dashed_line(p + Vector2.from_angle(o.muzzle_dir) * 20.0, ep, Color(0.07, 0.07, 0.07, 0.28), 1.0, 3.0)
 	if show_rec:
 		# one bar per target: the enemy closest to recognizing it, plus how many others are on it
 		var best_on := {}
@@ -176,21 +177,21 @@ func _draw() -> void:
 				continue
 			var bv: float = bo[1]
 			var base: Vector2 = e.pos * PX + Vector2(-14, -40)
-			draw_rect(Rect2(base, Vector2(28, 4)), Color(1, 1, 1, 0.9))
-			draw_rect(Rect2(base, Vector2(28 * minf(bv, 1.0), 4)), INK if bv >= 1.0 else Color("#6a6a6a"))
+			draw_rect(Rect2(base, Vector2(28, 4)), Color(0.93, 0.93, 0.91, 0.9))
+			draw_rect(Rect2(base, Vector2(28 * minf(bv, 1.0), 4)), INK if bv >= 1.0 else Color("#737370"))
 			draw_rect(Rect2(base, Vector2(28, 4)), INK, false, 1.0)
 			var tag: String = bo[0].id + ("" if bo[2] <= 1 else " +%d" % (bo[2] - 1))
 			draw_string(font, base + Vector2(30, 5), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, INK)
 	for tr in tracers:
 		var al: float = 1.0 - tr["age"] / 0.18
-		draw_line(tr["a"] * PX, tr["b"] * PX, Color(0.1, 0.1, 0.1, 0.55 * al), 1.0, true)
+		draw_line(tr["a"] * PX, tr["b"] * PX, Color(0.07, 0.07, 0.07, 0.55 * al), 1.0, true)
 	for f in flashes:
 		var c: Vector2 = f["p"] * PX
 		var pts2 := PackedVector2Array()
 		for i in 10:
 			var a3: float = f["dir"] + i * TAU / 10.0
 			pts2.append(c + Vector2.from_angle(a3) * (9.0 if i % 2 == 0 else 3.5))
-		draw_colored_polygon(pts2, Color(1, 1, 1))
+		draw_colored_polygon(pts2, Color(0.93, 0.93, 0.91))
 		pts2.append(pts2[0])
 		draw_polyline(pts2, INK, 1.0)
 	for ea in ears:
@@ -199,15 +200,15 @@ func _draw() -> void:
 			continue
 		var al: float = 1.0 - ea["age"] / 1.2
 		for k2 in 3:
-			draw_arc(lo.pos * PX, 16.0 + 5.0 * k2, ea["dir"] - 0.45, ea["dir"] + 0.45, 6, Color(0.15, 0.15, 0.15, 0.55 * al), 1.0)
+			draw_arc(lo.pos * PX, 16.0 + 5.0 * k2, ea["dir"] - 0.45, ea["dir"] + 0.45, 6, Color(0.17, 0.17, 0.17, 0.55 * al), 1.0)
 	for pf in puffs:
-		draw_arc(pf["p"] * PX, 3.0 + 14.0 * pf["age"], 0, TAU, 14, Color(0.3, 0.3, 0.3, 0.5 * (1.0 - pf["age"] / 0.4)), 1.0)
+		draw_arc(pf["p"] * PX, 3.0 + 14.0 * pf["age"], 0, TAU, 14, Color(0.17, 0.17, 0.17, 0.5 * (1.0 - pf["age"] / 0.4)), 1.0)
 	_draw_kit_fx()
 	for fl in floats:
 		var a4: float = clampf(1.6 - fl["age"], 0.0, 1.0)
 		var pos: Vector2 = fl["p"] * PX + Vector2(-30, -48 - 14 * fl["slot"])
-		draw_string(font, pos + Vector2(1, 1), fl["text"], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(1, 1, 1, a4))
-		draw_string(font, pos, fl["text"], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.08, 0.08, 0.08, a4))
+		draw_string(font, pos + Vector2(1, 1), fl["text"], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.93, 0.93, 0.91, a4))
+		draw_string(font, pos, fl["text"], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.07, 0.07, 0.07, a4))
 
 
 ## Entry tools and protection (v0.7.5), drawn above everything else.
@@ -222,7 +223,7 @@ func _draw_kit_fx() -> void:
 		for k in 9:
 			var f: float = k / 8.0
 			pts.append(a.lerp(mid, f).lerp(mid.lerp(b, f), f))
-		draw_polyline(pts, Color(0, 0, 0, 0.35), 1.0)
+		draw_polyline(pts, Color(0.07, 0.07, 0.07, 0.35), 1.0)
 		var ft: float = clampf(l["age"] / 0.4, 0.0, 1.0)
 		draw_circle(a.lerp(mid, ft).lerp(mid.lerp(b, ft), ft), 3.5, INK)
 	for bz in bursts:
@@ -233,15 +234,15 @@ func _draw_kit_fx() -> void:
 			var rs: float = (0.4 + 4.6 * (1.0 - f2)) * PX
 			for k3 in 24:
 				var an3: float = TAU * k3 / 24.0 + 0.21 * (k3 % 3)
-				draw_circle(c + Vector2.from_angle(an3) * rs * (0.8 + 0.2 * ((k3 * 7) % 5) / 4.0), 1.8, Color(0.1, 0.1, 0.1, 0.85 * f2))
-			draw_circle(c, 0.35 * PX, Color(0.1, 0.1, 0.1, 0.5 * f2))
+				draw_circle(c + Vector2.from_angle(an3) * rs * (0.8 + 0.2 * ((k3 * 7) % 5) / 4.0), 1.8, Color(0.07, 0.07, 0.07, 0.85 * f2))
+			draw_circle(c, 0.35 * PX, Color(0.07, 0.07, 0.07, 0.5 * f2))
 			continue
 		var r: float = (0.6 + 1.6 * (1.0 - f2)) * PX
-		draw_circle(c, r, Color(1, 1, 1, 0.85 * f2))
-		draw_arc(c, r, 0.0, TAU, 32, Color(0.1, 0.1, 0.1, 0.7 * f2), 1.5)
+		draw_circle(c, r, Color(0.93, 0.93, 0.91, 0.85 * f2))
+		draw_arc(c, r, 0.0, TAU, 32, Color(0.07, 0.07, 0.07, 0.7 * f2), 1.5)
 		for k2 in 12:
 			var an: float = TAU * k2 / 12.0 + 0.13
-			draw_line(c + Vector2.from_angle(an) * r * 0.55, c + Vector2.from_angle(an) * r * 1.25, Color(0.1, 0.1, 0.1, 0.6 * f2), 1.2)
+			draw_line(c + Vector2.from_angle(an) * r * 0.55, c + Vector2.from_angle(an) * r * 1.25, Color(0.07, 0.07, 0.07, 0.6 * f2), 1.2)
 	for wv in wires:
 		var al: float = 1.0 - wv["age"]
 		var tool: String = wv.get("tool", "taser")
@@ -253,26 +254,26 @@ func _draw_kit_fx() -> void:
 			for k5 in 14:
 				var f5: float = (k5 + 1) / 14.0
 				var off: Vector2 = dv.orthogonal().normalized() * sin(k5 * 2.3) * 5.0 * f5
-				draw_circle(a5 + dv * f5 + off, 1.2 + 0.6 * f5, Color(0.55, 0.12, 0.12, 0.6 * al))
+				draw_circle(a5 + dv * f5 + off, 1.2 + 0.6 * f5, Ink.accent(0.6 * al))
 			if wv["hit"]:
 				for k6 in 10:
-					draw_circle(b5 + Vector2.from_angle(k6 * 0.63) * (4.0 + 3.0 * (k6 % 3)), 2.0, Color(0.55, 0.12, 0.12, 0.35 * al))
+					draw_circle(b5 + Vector2.from_angle(k6 * 0.63) * (4.0 + 3.0 * (k6 % 3)), 2.0, Ink.accent(0.35 * al))
 			continue
 		if tool == "baton":
 			var b7: Vector2 = wv["b"] * PX
 			var an7: float = (wv["b"] - wv["a"]).angle()
-			draw_arc(wv["a"] * PX, (wv["b"] - wv["a"]).length() * PX, an7 - 0.6, an7 + 0.6, 8, Color(0.1, 0.1, 0.1, 0.8 * al), 2.0)
+			draw_arc(wv["a"] * PX, (wv["b"] - wv["a"]).length() * PX, an7 - 0.6, an7 + 0.6, 8, Color(0.07, 0.07, 0.07, 0.8 * al), 2.0)
 			if wv["hit"]:
-				draw_circle(b7, 4.0, Color(0.1, 0.1, 0.1, 0.8 * al))
+				draw_circle(b7, 4.0, Color(0.07, 0.07, 0.07, 0.8 * al))
 			continue
-		draw_dashed_line(wv["a"] * PX, wv["b"] * PX, Color(0.1, 0.1, 0.1, 0.7 * al), 1.0, 3.0)
+		draw_dashed_line(wv["a"] * PX, wv["b"] * PX, Color(0.07, 0.07, 0.07, 0.7 * al), 1.0, 3.0)
 		if wv["hit"]:
-			draw_circle(wv["b"] * PX, 4.0, Color(0.1, 0.1, 0.1, 0.8 * al))
+			draw_circle(wv["b"] * PX, 4.0, Color(0.07, 0.07, 0.07, 0.8 * al))
 	for st in stops:
 		var p: Vector2 = st["p"] * PX
 		var al2: float = 1.0 - st["age"] / 0.35
 		var rr: float = 9.0 if st["head"] else 14.0
-		draw_arc(p, rr, st["dir"] - 0.9, st["dir"] + 0.9, 10, Color(0.1, 0.1, 0.1, 0.9 * al2), 2.5)
+		draw_arc(p, rr, st["dir"] - 0.9, st["dir"] + 0.9, 10, Color(0.07, 0.07, 0.07, 0.9 * al2), 2.5)
 
 
 ## CS gas (v0.8): a halftone haze of dots over every gassed room (or a cloud in the open),
@@ -283,7 +284,7 @@ func _draw_gas() -> void:
 	for c in world.clouds:
 		var left: float = float(c["until"]) - world.t
 		var thick: float = clampf(left / 20.0, 0.0, 1.0) * clampf((world.t - float(c.get("t0", world.t))) / 2.0 + 0.3, 0.0, 1.0)
-		var col := Color(0.32, 0.32, 0.30, 0.55 * thick)
+		var col := Color(0.17, 0.17, 0.17, 0.55 * thick)
 		var rects: Array = []
 		if c["room"] != "" and world.level.rooms.has(c["room"]):
 			rects = world.level.rooms[c["room"]]["rects"]

@@ -78,12 +78,12 @@ func setup(o, w) -> void:
 	label = Label.new()
 	label.text = o.id
 	label.add_theme_font_size_override("font_size", 11)
-	label.add_theme_color_override("font_color", Color("#1c1c1c"))
+	label.add_theme_color_override("font_color", Color("#121212"))
 	label.position = Vector2(-26, -30)
 	add_child(label)
 	tag = Label.new()
 	tag.add_theme_font_size_override("font_size", 10)
-	tag.add_theme_color_override("font_color", Color("#3a3a3a"))
+	tag.add_theme_color_override("font_color", Color("#2b2b2b"))
 	tag.position = Vector2(-26, 14)
 	add_child(tag)
 	_set_gun()
@@ -121,13 +121,7 @@ func sync(force := false) -> void:
 		for s in stains:
 			s.queue_free()
 		stains.clear()
-		for k in maxi(2, op.wounds + 2):
-			var st := Sprite2D.new()
-			st.texture = Decals.tex("fx/stain%d" % rng.randi_range(1, 3))
-			st.position = Vector2(rng.randf_range(60, 125), rng.randf_range(-22, 22)) - down_body.texture.get_size() / 2.0
-			st.rotation = rng.randf() * TAU
-			st.scale = Vector2.ONE * rng.randf_range(0.9, 1.6)
-			down_body.add_child(st)
+		# v0.8: the injury is never drawn; the consequence is on the floor (Decals)
 		label.modulate.a = 0.55
 		tag.text = "KIA" if op.state == "dead" else "DOWN"
 		pip.refresh()
@@ -216,8 +210,7 @@ class Pip extends Node2D:
 	func _draw() -> void:
 		if lvl < 0:
 			return
-		draw_circle(Vector2(-14, 14), 4.6, Color(1, 1, 1, 0.95))
-		draw_circle(Vector2(-14, 14), 3.4, Palette.ALERT[lvl])
+		Palette.alert_pip(self, Vector2(-14, 14), lvl)
 
 
 ## Hands raised beside the head (someone complying, or cuffed: wrists together behind),
@@ -241,26 +234,27 @@ class Marks extends Node2D:
 			queue_redraw()
 
 	func _draw() -> void:
-		var ink := Color("#1c1c1c")
+		var ink := Color("#121212")
 		match key:
 			"hands":
 				for sgn in [-1.0, 1.0]:
 					draw_line(Vector2(-2, 16.0 * sgn), Vector2(4, 11.0 * sgn), ink, 1.6)
-					draw_circle(Vector2(5, 11.0 * sgn), 3.2, Color.WHITE)
+					draw_circle(Vector2(5, 11.0 * sgn), 3.2, Color(0.93, 0.93, 0.91))
 					draw_arc(Vector2(5, 11.0 * sgn), 3.2, 0.0, TAU, 12, ink, 1.4)
 			"cuffed":
-				draw_circle(Vector2(-12, 0), 3.0, Color.WHITE)
+				draw_circle(Vector2(-12, 0), 3.0, Color(0.93, 0.93, 0.91))
 				draw_arc(Vector2(-12, 0), 3.0, 0.0, TAU, 12, ink, 1.4)
 				draw_line(Vector2(-12, -4), Vector2(-12, 4), ink, 1.2)
 			"phone":
 				draw_rect(Rect2(Vector2(11, -3), Vector2(4, 6)), ink)
-				draw_line(Vector2(15, 0), Vector2(26, -6), Color(0, 0, 0, 0.35), 1.0)
-				draw_line(Vector2(15, 0), Vector2(26, 6), Color(0, 0, 0, 0.35), 1.0)
+				draw_line(Vector2(15, 0), Vector2(26, -6), Color(0.07, 0.07, 0.07, 0.35), 1.0)
+				draw_line(Vector2(15, 0), Vector2(26, 6), Color(0.07, 0.07, 0.07, 0.35), 1.0)
 
 
-## A hit on a standing operator: stain the figure where the round went in.
+## A hit on a standing operator (retired in v0.8: the figure is never marked).
 func stain(zone: String, side: float) -> void:
-	if was_down:
+	# v0.8 red ink: figures stay pristine; a hit shows as marks on the floor, not the body
+	if was_down or true:
 		return
 	var st := Sprite2D.new()
 	st.texture = Decals.tex("fx/stain%d" % rng.randi_range(1, 3))

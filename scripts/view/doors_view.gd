@@ -6,9 +6,9 @@ extends Node2D
 ## level; in a replay it is handed the states recorded at that moment.
 
 const PX := 40.0
-const INK := Color("#1c1c1c")
-const FLOOR := Color("#fbfbfa")
-const FAINT := Color("#8f8f8f")
+const INK := Color("#121212")
+const FLOOR := Color("#edede8")
+const FAINT := Color("#737370")
 
 var level
 var states := {}          # door id -> "closed" | "locked" (open doors are absent)
@@ -83,7 +83,7 @@ func _draw() -> void:
 			if st == "locked":
 				var lp: Vector2 = latch * PX + (hinge - latch).normalized() * 7.0 + into * 2.0
 				draw_rect(Rect2(lp - Vector2(4.5, 4.5), Vector2(9, 9)), INK)
-				draw_rect(Rect2(lp - Vector2(2.0, 2.0), Vector2(4, 4)), Color.WHITE)
+				draw_rect(Rect2(lp - Vector2(2.0, 2.0), Vector2(4, 4)), Color(0.93, 0.93, 0.91))
 				draw_line(lp + (latch - hinge).normalized() * 4.5, latch * PX + (latch - hinge).normalized() * 5.0 + into * 2.0, INK, 2.5)
 		elif forced:
 			# splinters at the latch jamb, the leaf knocked past square

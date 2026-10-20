@@ -41,13 +41,13 @@ func _draw() -> void:
 			var nm: String = FloorPlan._spaced(h["name"].to_upper())
 			var wsz := font.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 			var who := "unclaimed"
-			var col := Color("#555555")
+			var col := Color("#737370")
 			var ow: int = h.get("owner", -1)
 			if ow > 0 and director != null:
 				who = "%s  %d%%" % [director.w.factions[ow]["name"], int(round(h.get("dominance", 0.0) * 100.0))]
 				col = Palette.faction(ow).darkened(0.25)
-			draw_string(font, c + Vector2(-wsz / 2.0 + 3, 3), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, 0.8))
-			draw_string(font, c + Vector2(-wsz / 2.0, 0), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#1c1c1c"))
+			draw_string(font, c + Vector2(-wsz / 2.0 + 3, 3), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.93, 0.93, 0.91, 0.8))
+			draw_string(font, c + Vector2(-wsz / 2.0, 0), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#121212"))
 			var fs2 := int(fs * 0.62)
 			var w2 := font.get_string_size(who, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2).x
 			draw_string(font, c + Vector2(-w2 / 2.0, fs * 0.9), who, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2, col)
@@ -61,7 +61,7 @@ func _draw() -> void:
 				if vr.has_point(p):
 					var t: String = lv.STREETS_H[iy].to_upper()
 					var ww := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs3).x
-					draw_string(font, p + Vector2(-ww / 2.0, fs3 * 0.35), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs3, Color("#8a8a86"))
+					draw_string(font, p + Vector2(-ww / 2.0, fs3 * 0.35), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs3, Color("#737370"))
 		for ix in lv.NCOLS + 1:
 			var xc: float = lv.node_pos(ix, 0).x
 			for by in lv.NROWS:
@@ -70,7 +70,7 @@ func _draw() -> void:
 					var t2: String = lv.STREETS_V[ix].to_upper()
 					var ww2 := font.get_string_size(t2, HORIZONTAL_ALIGNMENT_LEFT, -1, fs3).x
 					draw_set_transform(p2, PI / 2.0)
-					draw_string(font, Vector2(-ww2 / 2.0, fs3 * 0.35), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, fs3, Color("#8a8a86"))
+					draw_string(font, Vector2(-ww2 / 2.0, fs3 * 0.35), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, fs3, Color("#737370"))
 					draw_set_transform(Vector2.ZERO, 0.0)
 	# buildings: kind and address
 	if zoom >= 0.07 and zoom < 0.6:
@@ -83,7 +83,7 @@ func _draw() -> void:
 				continue
 			var t3 := "%s  ·  %s" % [lot["tpl"]["name"].to_upper(), lot["address"]]
 			var ww3 := font.get_string_size(t3, HORIZONTAL_ALIGNMENT_LEFT, -1, fs4).x
-			draw_string(font, p3 + Vector2(-ww3 / 2.0, fs4 * (0.9 if lot["side"] == 0 else 0.0)), t3, HORIZONTAL_ALIGNMENT_LEFT, -1, fs4, Color("#555555"))
+			draw_string(font, p3 + Vector2(-ww3 / 2.0, fs4 * (0.9 if lot["side"] == 0 else 0.0)), t3, HORIZONTAL_ALIGNMENT_LEFT, -1, fs4, Color("#737370"))
 	# rooms
 	if zoom >= 0.3 and show_rooms:
 		for name in lv.rooms:
@@ -95,4 +95,4 @@ func _draw() -> void:
 				continue
 			var area: float = rm["area"]
 			var fs5 := 8 if area < 8.0 else (9 if area < 20.0 else (10 if area < 50.0 else (11 if area < 150.0 else 13)))
-			FloorPlan._label(self, font, c2, FloorPlan._spaced(rm["title"]), fs5, Color("#3a3a3a"))
+			FloorPlan._label(self, font, c2, FloorPlan._spaced(rm["title"]), fs5, Color("#2b2b2b"))

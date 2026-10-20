@@ -5,10 +5,10 @@ extends Node2D
 ## Nothing here touches the simulation.
 
 const Decals = preload("res://scripts/view/decals.gd")
+const Ink = preload("res://scripts/view/ink.gd")
 const Op = preload("res://scripts/sim/op.gd")
 const PX := 40.0
-const INK := Color("#1c1c1c")
-const BLOOD := Color("#7d0a0a")
+const INK := Color("#121212")
 
 var doors_view = null       # the door layer, shown as the doors stood (v0.7.5)
 var rec
@@ -118,7 +118,11 @@ func show_at(tt: float) -> void:
 	queue_redraw()
 
 
+var _n_marker := 0
+
+
 func _draw() -> void:
+	_n_marker = 0
 	if rec == null:
 		return
 	# blood where people fell, growing as it did
@@ -128,8 +132,27 @@ func _draw() -> void:
 		var id: String = d[1]
 		if fog_on and not _know.get("bodies", {}).has(id):
 			continue
-		var r := clampf((t - float(d[0])) / 10.0, 0.15, 1.0) * (0.55 if d[2] else 0.42)
-		draw_circle((d[3] as Vector2) * PX, r * PX, Color(BLOOD, 0.85))
+		var r := sqrt(clampf((t - float(d[0])) / 14.0, 0.06, 1.0)) * (0.6 if d[2] else 0.48)
+		var c: Vector2 = (d[3] as Vector2) * PX
+		var hs: int = absi(hash(id))
+		if Ink.gore_enabled:
+			var outer := PackedVector2Array()
+			var inner := PackedVector2Array()
+			for i in 11:
+				var a := float(hs % 628) / 100.0 + TAU * float(i) / 11.0
+				var j1 := 0.72 + 0.4 * float((hs >> (i % 20)) % 7) / 6.0
+				var j2 := 0.72 + 0.4 * float((hs >> ((i + 3) % 20)) % 7) / 6.0
+				outer.append(c + Vector2.from_angle(a) * r * PX * j1)
+				inner.append(c + Vector2.from_angle(a + 0.2) * r * PX * 0.58 * j2)
+			draw_colored_polygon(outer, Ink.accent(0.68))
+			draw_colored_polygon(inner, Ink.accent(0.9))
+		# the evidence marker stays with gore off
+		var mp := c + Vector2.from_angle(float(hs % 360) * PI / 180.0) * 0.95 * PX
+		draw_rect(Rect2(mp - Vector2(8, 7), Vector2(16, 14)), Ink.PAPER)
+		draw_rect(Rect2(mp - Vector2(8, 7), Vector2(16, 14)), Ink.INK, false, 1.2)
+		_n_marker += 1
+		var txt := str(_n_marker)
+		draw_string(ThemeDB.fallback_font, mp + Vector2(-3.5 * txt.length(), 4.5), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Ink.INK)
 	# flashbangs going off (v0.7.5)
 	for bg in rec.bangs:
 		if float(bg[0]) > t:
@@ -145,7 +168,7 @@ func _draw() -> void:
 		if fog_on and not s[3]:
 			continue
 		var al := 1.0 - (t - float(s[0])) / 0.25
-		draw_line(a * PX, b * PX, Color(0.1, 0.1, 0.1, 0.6 * al), 1.0, true)
+		draw_line(a * PX, b * PX, Color(0.07, 0.07, 0.07, 0.6 * al), 1.0, true)
 	# shouted words
 	for f in rec.floats:
 		if float(f[0]) > t:
@@ -154,13 +177,13 @@ func _draw() -> void:
 			continue
 		var p: Vector2 = (f[1] as Vector2) * PX + Vector2(-30, -48)
 		var al2 := clampf(1.6 - (t - float(f[0])), 0.0, 1.0)
-		draw_string(font, p, f[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.08, 0.08, 0.08, al2))
+		draw_string(font, p, f[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.07, 0.07, 0.07, al2))
 	# radio callouts, as known at the time
 	if fog_on:
 		for l in _know.get("lkp", []):
 			var c: Vector2 = (l[0] as Vector2) * PX
 			var age: float = t - float(l[1])
-			var col := Color(0.08, 0.08, 0.08, clampf(1.0 - age / 120.0, 0.25, 1.0))
+			var col := Color(0.07, 0.07, 0.07, clampf(1.0 - age / 120.0, 0.25, 1.0))
 			var pts := PackedVector2Array([c + Vector2(0, -11), c + Vector2(11, 0), c + Vector2(0, 11), c + Vector2(-11, 0), c + Vector2(0, -11)])
 			draw_polyline(pts, col, 1.5)
 			draw_string(font, c + Vector2(-4, 4), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, col)
@@ -170,8 +193,8 @@ func _draw() -> void:
 func _burst(c: Vector2, age: float) -> void:
 	var f: float = 1.0 - age / 0.6
 	var r: float = (0.6 + 1.6 * (1.0 - f)) * PX
-	draw_circle(c, r, Color(1, 1, 1, 0.85 * f))
-	draw_arc(c, r, 0.0, TAU, 32, Color(0.1, 0.1, 0.1, 0.7 * f), 1.5)
+	draw_circle(c, r, Color(0.93, 0.93, 0.91, 0.85 * f))
+	draw_arc(c, r, 0.0, TAU, 32, Color(0.07, 0.07, 0.07, 0.7 * f), 1.5)
 	for k in 12:
 		var a: float = TAU * k / 12.0 + 0.13
-		draw_line(c + Vector2.from_angle(a) * r * 0.55, c + Vector2.from_angle(a) * r * 1.25, Color(0.1, 0.1, 0.1, 0.6 * f), 1.2)
+		draw_line(c + Vector2.from_angle(a) * r * 0.55, c + Vector2.from_angle(a) * r * 1.25, Color(0.07, 0.07, 0.07, 0.6 * f), 1.2)

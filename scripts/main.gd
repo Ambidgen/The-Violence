@@ -11,6 +11,9 @@ const Level = preload("res://scripts/sim/level.gd")
 const World = preload("res://scripts/sim/world.gd")
 const Op = preload("res://scripts/sim/op.gd")
 const FloorPlan = preload("res://scripts/view/floor_plan.gd")
+const PlanWalls = preload("res://scripts/view/plan_walls.gd")
+const ActualRoute = preload("res://scripts/view/actual_route.gd")
+const Ink = preload("res://scripts/view/ink.gd")
 const Decals = preload("res://scripts/view/decals.gd")
 const ActorView = preload("res://scripts/view/actor_view.gd")
 const Overlay = preload("res://scripts/view/overlay.gd")
@@ -86,6 +89,7 @@ var ops_ui
 var fog
 var replay_view
 var plan_marks
+var actual_route                  # application: where the squads actually went (v0.8)
 var veh_layer: Node2D
 var doors_view                    # door states over the plan (v0.7.5)
 var cur_sit := {}
@@ -105,7 +109,7 @@ var _args := {}
 
 func _ready() -> void:
 	get_window().title = "The Violence"
-	RenderingServer.set_default_clear_color(Color("#d6d6d3"))
+	RenderingServer.set_default_clear_color(Color("#d4d4cf"))
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	for a in OS.get_cmdline_user_args():
 		var kv := a.trim_prefix("--").split("=")
@@ -122,6 +126,12 @@ func _ready() -> void:
 	cam.make_current()
 	floorplan = FloorPlan.new()
 	add_child(floorplan)
+	# red ink draw order (v0.8): floor, blood, walls, furniture, lettering, actors, markers
+	decals = Decals.new()
+	add_child(decals)
+	floorplan.walls = PlanWalls.new()
+	floorplan.walls.plan = floorplan
+	add_child(floorplan.walls)
 	floorplan.setup(level)
 	props_layer = Node2D.new()
 	add_child(props_layer)
@@ -134,8 +144,8 @@ func _ready() -> void:
 	plan_marks = PlanMarks.new()
 	add_child(plan_marks)
 	plan_marks.visible = false
-	decals = Decals.new()
-	add_child(decals)
+	actual_route = ActualRoute.new()
+	add_child(actual_route)
 	veh_layer = Node2D.new()
 	add_child(veh_layer)
 	fog = Fog.new()
@@ -159,6 +169,10 @@ func _ready() -> void:
 	_load_department()
 	n_civ = clampi(int(_args.get("civ", "0")), 0, 40)
 	police_rules = _args.has("police")
+	if _args.has("mono"):
+		Ink.set_red_ink(false)
+	if _args.has("nogore"):
+		Ink.set_gore(false)
 	night = _args.has("night")
 	ui = UI.new()
 	add_child(ui)
@@ -707,6 +721,8 @@ func ops_select(sid: String) -> void:
 	mode = "plan"
 	_clear_views()
 	plan_marks.setup(level, nav, cur_sit, plan)
+	floorplan.set_state("theory")
+	actual_route.clear()
 	ops_ui.tab = 0
 	ops_ui.sel_sq = 0
 	ops_ui.set_pick({})
@@ -760,6 +776,8 @@ func ops_run() -> void:
 	plan_marks.clear()
 	decals.setup(world)
 	decals.fog = fog
+	actual_route.setup(world, 0)
+	_stamp_t = -9.0
 	overlay.setup(world)
 	overlay.fog = fog
 	fog.setup(world, true)
@@ -847,6 +865,7 @@ func _op_finished() -> void:
 	fog.enabled = false
 	fog.visible = false
 	decals.reveal(true)
+	_update_stamp(true)
 	_views_by_fog()
 	ui.show_banner("%s   ·   %d" % [String(res["label"]).to_upper(), int(res["score"])])
 	ops_ui.show_debrief(res, world, lines)
@@ -965,6 +984,8 @@ func _enter_setup() -> void:
 		world.dispose()
 		world = null
 	decals.setup_empty()
+	actual_route.clear()
+	floorplan.set_state("theory")
 	overlay.setup(null)
 	ledger.setup(null)
 	overlay.queue_redraw()
@@ -985,6 +1006,8 @@ func start_run(seed_val: int) -> void:
 	_applied = false
 	dept_lines = []
 	decals.setup(world)
+	actual_route.setup(world, 0)
+	_stamp_t = -9.0
 	overlay.setup(world)
 	ledger.setup(world, 8)
 	_clear_views()
@@ -1055,6 +1078,9 @@ func _process(delta: float) -> void:
 				if Time.get_ticks_usec() - t0 > 33000:
 					break
 			acc = minf(acc, DT * 3.0)
+		if world.t - _stamp_t >= 1.0 or (world.over and _stamp_t < world.t):
+			_stamp_t = world.t
+			_update_stamp()
 		_meas_real += delta
 		_meas_sim += steps * DT
 		if _meas_real >= 0.5:
@@ -1100,6 +1126,51 @@ func _process(delta: float) -> void:
 	_test_hooks()
 
 
+## Application stamps on the title block (v0.8): the actual time, and the paperwork the
+## operation has generated so far. Filed once it is over.
+var _stamp_t := -9.0
+
+
+func _update_stamp(filed := false) -> void:
+	if world == null:
+		return
+	var forms := 1
+	var mop := false
+	for o in world.ops:
+		if not o.alive():
+			forms += 2
+			mop = true
+		elif o.wounds > 0:
+			forms += 1
+			mop = true
+	floorplan.set_state("application", {"actual": world.t, "forms": forms, "mop": mop, "filed": filed or world.over})
+
+
+## Presentation toggles (v0.8): the monochrome proof and gore. Neither touches the world.
+func set_red_ink(on: bool) -> void:
+	Ink.set_red_ink(on)
+	_ink_changed()
+
+
+func set_gore(on: bool) -> void:
+	Ink.set_gore(on)
+	_ink_changed()
+
+
+func _ink_changed() -> void:
+	ui.sync_ink()
+	_redraw_all(self)
+	if mode == "plan":
+		ops_ui.show_plan()
+
+
+static func _redraw_all(n: Node) -> void:
+	if n is CanvasItem:
+		(n as CanvasItem).queue_redraw()
+	for c in n.get_children():
+		_redraw_all(c)
+
+
 func _test_hooks() -> void:
 	if op_mode and world != null and _args.has("ops-abort-at") and world.t >= float(_args["ops-abort-at"]) and not world.aborted:
 		ops_abort()
@@ -1136,10 +1207,10 @@ func _shot(path: String) -> void:
 func _fit_camera() -> void:
 	var vs := get_viewport().get_visible_rect().size
 	var avail := Vector2(vs.x - UI.PANEL_W, vs.y)
-	var map_px := Vector2(level.W * PX + 140, level.H * PX + 250)
+	var map_px := Vector2(level.W * PX + 140, level.H * PX + 316)
 	var z := minf(avail.x / map_px.x, avail.y / map_px.y)
 	cam.zoom = Vector2(z, z)
-	var centre := Vector2(level.W * PX / 2.0, (level.H * PX + 90.0) / 2.0)
+	var centre := Vector2(level.W * PX / 2.0, (level.H * PX + 156.0) / 2.0)
 	cam.position = centre + Vector2(UI.PANEL_W / 2.0 / z, 0)
 
 
@@ -1187,3 +1258,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				back_to_setup()
 		if k == KEY_HOME:
 			_fit_camera()
+		elif k == KEY_F2:
+			set_red_ink(not Ink.red_ink_enabled)
+		elif k == KEY_F3:
+			set_gore(not Ink.gore_enabled)

@@ -7,7 +7,7 @@ extends Node2D
 
 const Palette = preload("res://scripts/view/palette.gd")
 const PX := 40.0
-const INK := Color("#1c1c1c")
+const INK := Color("#121212")
 
 var lv
 var director
@@ -60,7 +60,7 @@ func _draw_static() -> void:
 				# close in: a small badge of the pattern at the lot's front corner
 				var lr_px := _r(lr)
 				var badge := Rect2(lr_px.end.x - 150.0, (lr_px.position.y + 14.0) if lot["side"] == 0 else (lr_px.end.y - 70.0), 56.0, 56.0)
-				draw_rect(badge, Color(1, 1, 1, 0.9))
+				draw_rect(badge, Color(0.93, 0.93, 0.91, 0.9))
 				Palette.fill_pattern(self, badge, pat, Color(Palette.faction(ow), 1.0), 9.0)
 				draw_rect(badge, INK, false, 2.0)
 			draw_rect(_r(lr).grow(-6.0), Color(Palette.faction(ow), 0.9), false, 5.0)
@@ -69,7 +69,7 @@ func _draw_static() -> void:
 			var tw := bold.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 44).x
 			draw_string(bold, tp - Vector2(tw, 0), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 44, Color(Palette.faction(ow), 0.9))
 		else:
-			draw_rect(_r(lr).grow(-6.0), Color(0.6, 0.6, 0.6, 0.6), false, 2.0)
+			draw_rect(_r(lr).grow(-6.0), Color(0.75, 0.75, 0.73, 0.6), false, 2.0)
 		if b["spawn"]:
 			_tag(lr, lot, "SPAWN POINT" if b["kind"] == "school" else "SPAWN POINT  ·  AMBULANCE BASE")
 		elif b["kind"] == "police":
@@ -80,7 +80,7 @@ func _tag(lr: Rect2, lot: Dictionary, text: String) -> void:
 	var y: float = lr.position.y + 4.2 if lot["side"] == 0 else lr.end.y - 3.0
 	var p := Vector2(lr.position.x + 1.6, y) * PX
 	var w := bold.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 30).x
-	draw_rect(Rect2(p + Vector2(-10, -32), Vector2(w + 20, 44)), Color(1, 1, 1, 0.85))
+	draw_rect(Rect2(p + Vector2(-10, -32), Vector2(w + 20, 44)), Color(0.93, 0.93, 0.91, 0.85))
 	draw_rect(Rect2(p + Vector2(-10, -32), Vector2(w + 20, 44)), INK, false, 2.0)
 	draw_string(bold, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 30, INK)
 
@@ -95,7 +95,7 @@ func _draw_dynamic() -> void:
 			var wbar := 420.0
 			var f: float = clampf(bs["cap"] / director.CAPTURE_TIME, 0.0, 1.0)
 			var top := c + Vector2(-wbar / 2.0, -60.0)
-			draw_rect(Rect2(top - Vector2(6, 6), Vector2(wbar + 12, 46)), Color(1, 1, 1, 0.92))
+			draw_rect(Rect2(top - Vector2(6, 6), Vector2(wbar + 12, 46)), Color(0.93, 0.93, 0.91, 0.92))
 			Palette.fill_pattern(self, Rect2(top, Vector2(wbar * f, 34)), Palette.pattern(bs["cap_fac"]), INK, 9.0)
 			draw_rect(Rect2(top, Vector2(wbar * f, 34)), Color(INK, 0.25))
 			draw_rect(Rect2(top, Vector2(wbar, 34)), INK, false, 3.0)
@@ -110,7 +110,7 @@ func _draw_dynamic() -> void:
 			continue
 		var p: Vector2 = inc["p"] * PX
 		var pulse := 0.5 + 0.5 * sin(director.w.t * 4.0)
-		draw_arc(p, 90.0 + 50.0 * pulse, 0.0, TAU, 40, Color(0.1, 0.1, 0.1, 0.85), 6.0)
+		draw_arc(p, 90.0 + 50.0 * pulse, 0.0, TAU, 40, Color(0.07, 0.07, 0.07, 0.85), 6.0)
 		draw_arc(p, 30.0, 0.0, TAU, 20, INK, 6.0)
 		var label := "INCIDENT %d  ·  %s%s" % [inc["id"], inc["state"].to_upper(), ("  ·  %d DUPLICATE%s" % [inc["dups"], "" if inc["dups"] == 1 else "S"]) if inc["dups"] > 0 else ""]
 		draw_string(bold, p + Vector2(110, -14), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 34, INK)

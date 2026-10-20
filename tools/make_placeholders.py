@@ -17,21 +17,41 @@ Godot drops <text> in SVGs, so there is no text in any file.
 import argparse
 import json
 import math
+import re
 import os
 import random
 
 PPM = 80  # pixels per metre in the SVG files
-INK = "#1c1c1c"
-LINE = "#3a3a3a"
-FAINT = "#8a8a8a"
-WHITE = "#ffffff"
-PAPER = "#f4f4f4"
-GREY_L = "#d9d9d9"
-GREY_M = "#a6a6a6"
-GREY_D = "#6b6b6b"
-BLOOD = "#7d0a0a"
-BLOOD_D = "#560505"
-BLOOD_L = "#a01212"
+# The red-ink tokens (v0.8): ink, stepped greys, paper. Every grey written below is
+# quantised to these on output; red is never painted into base art (blood is drawn by
+# the game as red ink, through one accent, so the monochrome proof is one switch).
+INK = "#121212"
+LINE = "#2b2b2b"
+FAINT = "#737370"
+WHITE = "#edede8"
+PAPER = "#edede8"
+GREY_L = "#d4d4cf"
+GREY_M = "#bfbfba"
+GREY_D = "#737370"
+SHADOW = "#2b2b2b"
+BLOOD = "#b31f26"
+TOKENS = [(232, "#edede8"), (208, "#d4d4cf"), (152, "#bfbfba"), (80, "#737370"), (34, "#2b2b2b"), (0, "#121212")]
+
+
+def quantise(text):
+    """Snap every grey in an SVG to the nearest step of the token ramp; red stays red."""
+    def rep(m):
+        hx = m.group(1)
+        if len(hx) == 3:
+            hx = "".join(c * 2 for c in hx)
+        r, g, b = int(hx[0:2], 16), int(hx[2:4], 16), int(hx[4:6], 16)
+        if max(r, g, b) - min(r, g, b) > 10:
+            return m.group(0)
+        lum = (r + g + b) // 3
+        for lo, tok in TOKENS:
+            if lum >= lo:
+                return tok
+    return re.sub(r"#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b", rep, text)
 
 
 def svg(w_m, h_m, body, defs=""):
@@ -89,83 +109,80 @@ def blob_path(cx, cy, r, rng, lobes=9, jitter=0.35):
     return d + "Z"
 
 
-# ------------------------------------------------------------- operators
-def operator(team, pose="stand"):
-    """Plan-view figure, facing +x. 0.8 x 0.8 m canvas, centre = body centre."""
+# ------------------------------------------------------------- operators (v0.8: flat ink)
+# Officers, suspects and civilians are flat ink silhouettes from directly above: head
+# circle, body block, limb strokes, an offset soft shadow (Dark at 0.2) and one pale
+# equipment mark. No faces, no gear detail. Roles differ by mark, never by hue. A downed
+# figure is the same silhouette on its side; the injury is never drawn.
+
+def _shadow(parts, dx=3, dy=3):
+    return f'<g transform="translate({dx},{dy})" opacity="0.2">' + "".join(parts).replace(INK, SHADOW) + "</g>"
+
+
+def _figure(mark_fn=None, body=INK, outline=None, limb=5.0):
+    """Standing silhouette facing +x on a 0.8 m canvas; mark_fn(cx, cy) adds the mark."""
     w = h = 0.8 * PPM
     cx, cy = w / 2, h / 2
-    if team == "a":
-        body, head, hatch = WHITE, WHITE, None
-    else:
-        body, head, hatch = GREY_M, GREY_L, True
-    b = []
-    # shoulders (wider across y because the figure faces +x)
-    b.append(ellipse(cx - 2, cy, 11, 23, body, INK, 2.2))
-    if hatch:
-        for k in range(-3, 4):
-            y = cy + k * 6
-            b.append(line(cx - 9, y - 3, cx + 5, y + 3, GREY_D, 1.2))
-        b.append(ellipse(cx - 2, cy, 11, 23, "none", INK, 2.2))
-    # arms reaching forward to a weapon (both hands)
-    b.append(path(f"M{cx - 2},{cy - 19} Q{cx + 12},{cy - 14} {cx + 22},{cy - 2}", "none", INK, 2.0))
-    b.append(path(f"M{cx - 2},{cy + 19} Q{cx + 10},{cy + 12} {cx + 16},{cy + 2}", "none", INK, 2.0))
-    # head
-    b.append(circle(cx + 1, cy, 8.5, head, INK, 2.2))
-    # nose tick showing facing
-    b.append(line(cx + 9, cy, cx + 12, cy, INK, 2.0))
+    shape = [path(f"M{cx - 2},{cy - 18} Q{cx + 12},{cy - 14} {cx + 22},{cy - 2}", "none", INK, limb),
+             path(f"M{cx - 2},{cy + 18} Q{cx + 10},{cy + 12} {cx + 16},{cy + 2}", "none", INK, limb),
+             rect(cx - 13, cy - 22, 17, 44, body, 8, outline or "none", 2.6 if outline else 0)]
+    head = circle(cx + 5, cy, 8.0, body, PAPER if not outline else INK, 2.0 if not outline else 2.6)
+    b = [_shadow(shape + [circle(cx + 5, cy, 8.0, INK, None)])] + shape
+    if mark_fn:
+        b += mark_fn(cx - 3, cy)
+    b.append(head)   # the head over the shoulders, cut out by a paper hairline
+    b.append(line(cx + 13, cy, cx + 16, cy, INK, 2.4))
     return svg(0.8, 0.8, "".join(b))
+
+
+def _figure_down(mark_fn=None, body=INK, outline=None, limb=6.0):
+    """The same silhouette on its side: long axis along x, 1.9 x 0.9 m."""
+    w, h = 1.9 * PPM, 0.9 * PPM
+    cy = h / 2
+    shape = [path(f"M{22},{cy - 7} L{62},{cy - 6} M{22},{cy + 7} L{62},{cy + 6}", "none", INK, limb + 1),
+             path(f"M{70},{cy - 21} L{104},{cy - 24} M{70},{cy + 21} L{104},{cy + 24}", "none", INK, limb - 1),
+             rect(58, cy - 20, 54, 40, body, 10, outline or "none", 2.6 if outline else 0),
+             circle(124, cy - 2, 10, body, outline or "none", 2.6 if outline else 0)]
+    b = [_shadow(shape)] + shape
+    if mark_fn:
+        b += mark_fn(85, cy)
+    return svg(1.9, 0.9, "".join(b))
+
+
+def _bar(cx, cy):          # police: a pale bar across the shoulders
+    return [rect(cx - 6, cy - 17, 5, 34, GREY_M, 2, None)]
+
+
+def _bar_down(cx, cy):
+    return [rect(cx - 17, cy - 3, 34, 6, GREY_M, 2, None)]
+
+
+def _hatch3(cx, cy):       # the other side: three pale diagonals
+    return [line(cx - 8, cy + k * 11 - 4, cx + 1, cy + k * 11 + 4, GREY_M, 2.0) for k in (-1, 0, 1)]
+
+
+def _hatch3_down(cx, cy):
+    return [line(cx + k * 12 - 4, cy - 12, cx + k * 12 + 4, cy + 12, GREY_M, 2.0) for k in (-1, 0, 1)]
+
+
+def operator(team, pose="stand"):
+    """Plan-view figure, facing +x. 0.8 x 0.8 m canvas, centre = body centre."""
+    return _figure(_bar if team == "a" else _hatch3)
 
 
 def operator_down(team):
-    """Figure lying on its back, long axis along x. 1.9 x 0.9 m."""
-    w, h = 1.9 * PPM, 0.9 * PPM
-    cy = h / 2
-    fill = WHITE if team == "a" else GREY_M
-    head = WHITE if team == "a" else GREY_L
-    b = []
-    # legs
-    b.append(path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", INK, 7))
-    b.append(path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", fill, 4))
-    # torso
-    b.append(rect(58, cy - 20, 54, 40, fill, 10, INK, 2.2))
-    if team == "b":
-        for k in range(0, 8):
-            x = 62 + k * 6
-            b.append(line(x, cy - 16, x + 6, cy + 16, GREY_D, 1.2))
-        b.append(rect(58, cy - 20, 54, 40, "none", 10, INK, 2.2))
-    # arms flung out
-    b.append(path(f"M{100},{cy - 18} Q{112},{cy - 34} {96},{cy - 32}", "none", INK, 2.2))
-    b.append(path(f"M{100},{cy + 18} Q{120},{cy + 30} {108},{cy + 34}", "none", INK, 2.2))
-    # head
-    b.append(circle(124, cy - 2, 10, head, INK, 2.2))
-    return svg(1.9, 0.9, "".join(b))
+    """Figure on its side, long axis along x. 1.9 x 0.9 m."""
+    return _figure_down(_bar_down if team == "a" else _hatch3_down)
 
 
 def civilian(pose="stand"):
-    """Civilian in plan, facing +x: no gear, arms at the sides, a thinner, lighter outline
-    (people who were not dressed for this). 0.8 x 0.8 m canvas."""
-    w = h = 0.8 * PPM
-    cx, cy = w / 2, h / 2
-    b = [ellipse(cx - 2, cy, 10, 21, WHITE, GREY_D, 1.6)]
-    # arms hanging at the sides
-    b.append(path(f"M{cx - 4},{cy - 20} Q{cx + 2},{cy - 24} {cx + 6},{cy - 21}", "none", GREY_D, 1.6))
-    b.append(path(f"M{cx - 4},{cy + 20} Q{cx + 2},{cy + 24} {cx + 6},{cy + 21}", "none", GREY_D, 1.6))
-    b.append(circle(cx + 1, cy, 8, WHITE, GREY_D, 1.6))
-    b.append(line(cx + 8.5, cy, cx + 11, cy, GREY_D, 1.6))
-    return svg(0.8, 0.8, "".join(b))
+    """Civilian: the hollow silhouette, an ink outline on paper, no mark (people who were
+    not dressed for this). 0.8 x 0.8 m canvas."""
+    return _figure(None, PAPER, INK, 3.0)
 
 
 def civilian_down():
-    """Civilian lying on their back, long axis along x. 1.9 x 0.9 m."""
-    w, h = 1.9 * PPM, 0.9 * PPM
-    cy = h / 2
-    b = [path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", GREY_D, 6),
-         path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", WHITE, 3.4),
-         rect(58, cy - 18, 52, 36, WHITE, 10, GREY_D, 1.6),
-         path(f"M{98},{cy - 16} Q{110},{cy - 32} {94},{cy - 30}", "none", GREY_D, 1.6),
-         path(f"M{98},{cy + 16} Q{118},{cy + 28} {106},{cy + 32}", "none", GREY_D, 1.6),
-         circle(122, cy - 2, 9.5, WHITE, GREY_D, 1.6)]
-    return svg(1.9, 0.9, "".join(b))
+    return _figure_down(None, PAPER, INK, 3.6)
 
 
 def weapon(kind):
@@ -281,34 +298,22 @@ WEAPON_ART = {
 # ------------------------------------------------------------- kit seen from above (v0.7.5)
 # Overlays drawn on the 0.8 x 0.8 m figure canvas (same centre and facing).
 def kit_vest():
+    """v0.8: armour is a pale outline inside the ink torso, not a drawing of a vest."""
     w = h = 0.8 * PPM
     cx, cy = w / 2, h / 2
-    b = [path(f"M{cx - 9},{cy - 17} Q{cx + 2},{cy - 19} {cx + 6},{cy - 13} L{cx + 6},{cy + 13} "
-              f"Q{cx + 2},{cy + 19} {cx - 9},{cy + 17} Z", "#f2f2f2", INK, 1.6),
-         line(cx - 9, cy, cx + 6, cy, GREY_M, 1.0)]
-    return svg(0.8, 0.8, "".join(b))
+    return svg(0.8, 0.8, rect(cx - 11, cy - 18, 13, 36, "none", 5, GREY_M, 1.2))
 
 
 def kit_plates():
     w = h = 0.8 * PPM
     cx, cy = w / 2, h / 2
-    b = [path(f"M{cx - 8},{cy - 14} Q{cx + 2},{cy - 16} {cx + 6},{cy - 11} L{cx + 6},{cy + 11} "
-              f"Q{cx + 2},{cy + 16} {cx - 8},{cy + 14} Z", "#9a9a9a", INK, 1.6)]
-    # magazine pouches across the front, and the back panel's edge
-    for k in (-7.5, -2.5, 2.5, 7.5):
-        b.append(rect(cx + 3, cy + k - 2.0, 5, 4.0, "#6a6a6a", 1, INK, 0.7))
-    b.append(line(cx - 5, cy - 13, cx - 5, cy + 13, "#c4c4c4", 1.0))
-    return svg(0.8, 0.8, "".join(b))
+    return svg(0.8, 0.8, rect(cx - 11, cy - 18, 13, 36, "none", 5, GREY_M, 2.2))
 
 
 def kit_helmet():
     w = h = 0.8 * PPM
     cx, cy = w / 2, h / 2
-    b = [circle(cx + 1, cy, 10.5, "#7a7a7a", INK, 1.8),
-         path(f"M{cx - 5},{cy - 8} A10 10 0 0 1 {cx + 7},{cy - 7}", "none", "#8a8a8a", 1.2),
-         rect(cx + 9, cy - 2.5, 4, 5, DARK, 1, INK, 0.8),          # mount at the brow
-         line(cx - 9, cy, cx - 6, cy, "#8a8a8a", 1.2)]
-    return svg(0.8, 0.8, "".join(b))
+    return svg(0.8, 0.8, circle(cx + 5, cy, 9.5, INK, PAPER, 1.6) + circle(cx + 5, cy, 6.0, "none", GREY_M, 1.4))
 
 
 def kit_gas_mask():
@@ -906,10 +911,6 @@ ASSETS = {
     "yard/low_wall.svg": low_wall, "yard/woodpile.svg": woodpile, "yard/picnic.svg": picnic,
     "yard/ac_unit.svg": ac_unit, "yard/bins.svg": bins, "yard/shed.svg": shed_roof,
     "fx/chip.svg": chip, "fx/casing.svg": casing, "fx/scuff.svg": plate_scuff, "fx/flash.svg": flash,
-    "fx/pool.svg": lambda: pool(5), "fx/pool2.svg": lambda: pool(9),
-    "fx/drip1.svg": lambda: drip(1), "fx/drip2.svg": lambda: drip(2),
-    "fx/stain1.svg": lambda: stain(21), "fx/stain2.svg": lambda: stain(22), "fx/stain3.svg": lambda: stain(23),
-    "fx/smear1.svg": lambda: wall_smear(31), "fx/smear2.svg": lambda: wall_smear(32),
     "ui/north.svg": north_arrow,
     "furn/bunk.svg": bunk, "furn/desk.svg": desk, "furn/chair.svg": chair, "furn/table.svg": table,
     "furn/shelving.svg": shelving, "furn/rack.svg": rack, "furn/crate.svg": crate, "furn/pallet.svg": pallet,
@@ -919,9 +920,6 @@ ASSETS = {
     "yard/sandbags.svg": sandbags, "yard/tank.svg": tank, "yard/generator.svg": generator, "yard/bench.svg": bench,
     "yard/planter.svg": planter, "yard/barrier.svg": barrier, "yard/forklift.svg": forklift,
 }
-for i in range(1, 5):
-    ASSETS[f"fx/splat{i}.svg"] = (lambda i=i: splat(100 + i))
-    ASSETS[f"fx/spray{i}.svg"] = (lambda i=i: spray(200 + i))
 
 
 # ------------------------------------------------------------- city factions and vehicles
@@ -961,55 +959,59 @@ def _marks(mark, cx, cy):
     return b
 
 
+def _fmark(mark, down=False):
+    """A faction's one pale mark on the silhouette (the pattern that hatches its territory)."""
+    def f(cx, cy):
+        b = []
+        if mark in ("cap", "helmet"):
+            b += (_bar_down if down else _bar)(cx, cy)
+        elif mark == "dots":
+            for k in range(-2, 3):
+                b.append(circle(cx + (k * 8 if down else -3), cy + (0 if down else k * 8), 2.2, GREY_M, None))
+        elif mark == "bands":
+            for k in (-12, 0, 12):
+                b.append(line(cx + k, cy - 16, cx + k, cy + 16, GREY_M, 2.2) if down else line(cx - 10, cy + k, cx + 6, cy + k, GREY_M, 2.2))
+        elif mark in ("hatch", "check"):
+            b += (_hatch3_down if down else _hatch3)(cx, cy)
+            if mark == "check":
+                if down:
+                    b += [line(cx + k * 12 + 4, cy - 12, cx + k * 12 - 4, cy + 12, GREY_M, 2.0) for k in (-1, 0, 1)]
+                else:
+                    b += [line(cx - 9, cy + k * 9 + 4, cx + 3, cy + k * 9 - 4, GREY_M, 2.0) for k in (-1, 0, 1)]
+        elif mark == "cross":
+            col = INK if MED_HOLLOW else GREY_M
+            if down:
+                b += [rect(cx - 9, cy - 4, 18, 8, col, 0, None), rect(cx - 4, cy - 10, 8, 20, col, 0, None)]
+            else:
+                b += [rect(cx - 10, cy - 3, 14, 6, col, 0, None), rect(cx - 6, cy - 10, 6, 20, col, 0, None)]
+        return b
+    return f
+
+
+MED_HOLLOW = False
+
+
 def operator_f(key):
     """Faction figure, facing +x. 0.8 x 0.8 m canvas."""
-    body, head, mark = FACTION_LOOK[key]
-    w = h = 0.8 * PPM
-    cx, cy = w / 2, h / 2
-    b = [ellipse(cx - 2, cy, 11, 23, body, INK, 2.2)]
-    b += _marks(mark, cx, cy)
-    b.append(ellipse(cx - 2, cy, 11, 23, "none", INK, 2.2))
-    b.append(path(f"M{cx - 2},{cy - 19} Q{cx + 12},{cy - 14} {cx + 22},{cy - 2}", "none", INK, 2.0))
-    b.append(path(f"M{cx - 2},{cy + 19} Q{cx + 10},{cy + 12} {cx + 16},{cy + 2}", "none", INK, 2.0))
-    b.append(circle(cx + 1, cy, 8.5, head, INK, 2.2))
-    if mark == "cap":
-        b.append(path(f"M{cx + 3},{cy - 8} A8.5 8.5 0 0 1 {cx + 3},{cy + 8} L{cx + 12},{cy + 5} L{cx + 12},{cy - 5} Z", INK, INK, 1.0))
-    elif mark == "helmet":
-        b.append(circle(cx + 1, cy, 10.5, "none", INK, 2.6))
-    b.append(line(cx + 9, cy, cx + 12, cy, INK, 2.0))
-    return svg(0.8, 0.8, "".join(b))
+    global MED_HOLLOW
+    _body, _head, mark = FACTION_LOOK[key]
+    MED_HOLLOW = key == "med"
+    if key == "med":     # city paramedics: hollow, like the people they come for, with a cross
+        out = _figure(_fmark(mark), PAPER, INK, 3.0)
+    else:
+        out = _figure(_fmark(mark))
+    if mark == "helmet":  # the QRF: a helmet ring around the head
+        out = out.replace("</svg>", circle(0.4 * PPM + 5, 0.4 * PPM, 11.0, "none", GREY_M, 2.0) + "</svg>")
+    return out
 
 
 def operator_f_down(key):
-    body, head, mark = FACTION_LOOK[key]
-    w, h = 1.9 * PPM, 0.9 * PPM
-    cy = h / 2
-    b = [path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", INK, 7),
-         path(f"M{20},{cy - 9} L{62},{cy - 7} M{20},{cy + 9} L{62},{cy + 6}", "none", body, 4),
-         rect(58, cy - 20, 54, 40, body, 10, INK, 2.2)]
-    if mark == "cross":
-        b.append(rect(76, cy - 4, 18, 8, INK, 0, None))
-        b.append(rect(81, cy - 10, 8, 20, INK, 0, None))
-    elif mark == "bands":
-        for x in (68, 85, 102):
-            b.append(line(x, cy - 18, x, cy + 18, INK, 2.0))
-    elif mark == "dots":
-        for x in range(66, 108, 9):
-            b.append(circle(x, cy, 2.2, INK, None))
-    elif mark in ("hatch", "check"):
-        for k in range(0, 8):
-            b.append(line(62 + k * 6, cy - 16, 68 + k * 6, cy + 16, INK, 1.0))
-            if mark == "check":
-                b.append(line(68 + k * 6, cy - 16, 62 + k * 6, cy + 16, INK, 1.0))
-    b.append(rect(58, cy - 20, 54, 40, "none", 10, INK, 2.2))
-    b.append(path(f"M{100},{cy - 18} Q{112},{cy - 34} {96},{cy - 32}", "none", INK, 2.2))
-    b.append(path(f"M{100},{cy + 18} Q{120},{cy + 30} {108},{cy + 34}", "none", INK, 2.2))
-    b.append(circle(124, cy - 2, 10, head, INK, 2.2))
-    if mark == "helmet":
-        b.append(circle(124, cy - 2, 12, "none", INK, 2.4))
-    elif mark == "cap":
-        b.append(path(f"M{126},{cy - 11} A10 10 0 0 1 {126},{cy + 7} L{136},{cy + 4} L{136},{cy - 8} Z", INK, INK, 1.0))
-    return svg(1.9, 0.9, "".join(b))
+    global MED_HOLLOW
+    _body, _head, mark = FACTION_LOOK[key]
+    MED_HOLLOW = key == "med"
+    if key == "med":
+        return _figure_down(_fmark(mark, True), PAPER, INK, 3.6)
+    return _figure_down(_fmark(mark, True))
 
 
 def _wheels(w, h, f1, f2):
@@ -1084,10 +1086,10 @@ def main():
         dst = os.path.join(a.out, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         with open(dst, "w", encoding="utf-8") as f:
-            f.write(fn())
+            f.write(quantise(fn()))
     if not a.list:
         with open("icon.svg", "w", encoding="utf-8") as f:
-            f.write(icon_app())
+            f.write(quantise(icon_app()))
         with open(os.path.join(a.out, "manifest.json"), "w", encoding="utf-8") as f:
             json.dump({"generator": "tools/make_placeholders.py", "license": "original, project-owned",
                        "px_per_metre": PPM, "files": list(ASSETS)}, f, indent=1)

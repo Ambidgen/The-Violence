@@ -5,6 +5,7 @@ extends CanvasLayer
 ## replay. Built in code, in the drafting-table style of the setup panel.
 
 const UI = preload("res://scripts/ui/ui.gd")
+const Ink = preload("res://scripts/view/ink.gd")
 const Habits = preload("res://scripts/data/habits.gd")
 const Orders = preload("res://scripts/campaign/orders.gd")
 const Situations = preload("res://scripts/campaign/situations.gd")
@@ -12,8 +13,8 @@ const Operation = preload("res://scripts/campaign/operation.gd")
 const Autoplan = preload("res://scripts/campaign/autoplan.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const PANEL_W := 460.0
-const INK := Color("#1c1c1c")
-const GREY := Color("#666666")
+const INK := Color("#121212")
+const GREY := Color("#737370")
 const OBJ_KINDS := ["clear", "arrest", "rescue", "contain", "post", "patrol"]
 
 var main
@@ -62,7 +63,7 @@ func _clear() -> void:
 # ------------------------------------------------------------------ widgets
 func _title(text: String, size := 18) -> Label:
 	var l := Label.new()
-	l.text = text
+	l.text = Ink.bb(text)
 	l.add_theme_font_size_override("font_size", size)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(l)
@@ -71,7 +72,7 @@ func _title(text: String, size := 18) -> Label:
 
 func _text(parent: Control, text: String, col := INK, size := 12) -> Label:
 	var l := Label.new()
-	l.text = text
+	l.text = Ink.bb(text)
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", col)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -83,7 +84,7 @@ func _text(parent: Control, text: String, col := INK, size := 12) -> Label:
 ## A short fixed label for a row of controls (no wrapping).
 func _lab(parent: Control, text: String, col := INK, size := 12) -> Label:
 	var l := Label.new()
-	l.text = text
+	l.text = Ink.bb(text)
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", col)
 	parent.add_child(l)
@@ -99,7 +100,7 @@ func _rich(parent: Control, bb: String, min_h := 0.0) -> RichTextLabel:
 		r.custom_minimum_size = Vector2(0, min_h)
 	r.add_theme_font_size_override("normal_font_size", 11)
 	r.add_theme_font_size_override("bold_font_size", 11)
-	r.text = bb
+	r.text = Ink.bb(bb)
 	parent.add_child(r)
 	return r
 
@@ -113,7 +114,7 @@ func _h(parent: Control) -> HBoxContainer:
 
 func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Button:
 	var b := Button.new()
-	b.text = text
+	b.text = Ink.bb(text)
 	b.toggle_mode = toggle
 	if toggle:
 		b.toggled.connect(func(on): cb.call(on))
@@ -125,7 +126,7 @@ func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Butto
 
 func _card(parent: Control) -> VBoxContainer:
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", UI._sb(Color("#ffffff"), Color("#9a9a9a"), 1, 8.0))
+	p.add_theme_stylebox_override("panel", UI._sb(Color("#edede8"), Color("#bfbfba"), 1, 8.0))
 	parent.add_child(p)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 3)
@@ -525,7 +526,7 @@ func _orders(s: Dictionary) -> void:
 	var pts := Orders.points_for(recs)
 	var used := Orders.cost(od)
 	_text(box, "Order points: %d of %d used%s" % [used, pts, ("  ·  leader " + Orders.leader(recs)["name"]) if not recs.is_empty() else ""],
-		INK if used <= pts else Color("#7d0a0a"), 13)
+		INK if used <= pts else Ink.accent(0.9), 13)
 	# objectives
 	for oi in 2:
 		var v := _card(box)
@@ -944,7 +945,7 @@ func refresh_run(w, fog) -> void:
 			if el.get("consolidating", false):
 				st = "consolidating"
 			bb += "[b]SQUAD %d[/b]  %d/%d  ·  %s%s\n" % [el["i"] + 1, alive, el["members"].size(), st, ("  ·  " + what) if what != "" else ""]
-	_run_refs["squads"].text = bb
+	_run_refs["squads"].text = Ink.bb(bb)
 	# the radio: what the officers say and what happens to them
 	var lg: RichTextLabel = _run_refs["log"]
 	_log_shown = maxi(_log_shown, w.log_base)
@@ -956,13 +957,13 @@ func refresh_run(w, fog) -> void:
 		var txt: String = String(ln["text"]).replace("[", "(")
 		match ln["kind"]:
 			"kill":
-				lg.append_text("[b][color=#7d0a0a]%s[/color][/b]\n" % txt)
+				lg.append_text(Ink.bb("[b][color=#b31f26]%s[/color][/b]\n" % txt))
 			"bad", "end":
-				lg.append_text("[b]%s[/b]\n" % txt)
+				lg.append_text(Ink.bb("[b]%s[/b]\n" % txt))
 			"comms":
-				lg.append_text("[i][color=#555555]%s[/color][/i]\n" % txt)
+				lg.append_text(Ink.bb("[i][color=#737370]%s[/color][/i]\n" % txt))
 			_:
-				lg.append_text("[color=#444444]%s[/color]\n" % txt)
+				lg.append_text(Ink.bb("[color=#2b2b2b]%s[/color]\n" % txt))
 
 
 ## Is a log line something the department would hear on the radio?
@@ -1027,9 +1028,9 @@ func show_debrief(res: Dictionary, w, dept_lines: Array) -> void:
 			misses.append("%d %s" % [p2["miss"][k], k if k != "" else "somewhere"])
 		var st: String = "standing"
 		if o.state == "dead":
-			st = "[color=#7d0a0a]killed[/color]"
+			st = "[color=#b31f26]killed[/color]"
 		elif o.state == "down":
-			st = "[color=#7d0a0a]down[/color]"
+			st = "[color=#b31f26]down[/color]"
 		elif o.wounds > 0 or o.arm_hit or o.leg_hit:
 			st = "wounded"
 		var used: Array = []
@@ -1040,7 +1041,7 @@ func show_debrief(res: Dictionary, w, dept_lines: Array) -> void:
 				used.append("%s x%d" % [String(Equipment.GEAR[gid]["short"]).to_lower(), spent])
 		if o.kit.get("head", "") == "sof_helmet" and not o.helmet:
 			used.append("helmet took a round")
-		bb += "%s %s: %s; %d rounds, %d hit%s%s\n    [color=#666666]%s%s[/color]\n" % [o.id, o.name, st, p2["shots"], p2["hits"],
+		bb += "%s %s: %s; %d rounds, %d hit%s%s\n    [color=#737370]%s%s[/color]\n" % [o.id, o.name, st, p2["shots"], p2["hits"],
 			("; misses: " + ", ".join(misses)) if not misses.is_empty() else "",
 			("; [b]broke orders:[/b] " + ", ".join(broken.get(o.id, []))) if broken.has(o.id) else "",
 			Equipment.describe(o.kit), ("; used " + ", ".join(used)) if not used.is_empty() else ""]

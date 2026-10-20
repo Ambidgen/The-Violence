@@ -3,6 +3,7 @@ extends CanvasLayer
 ## ambulances at work, the selected person, and the running feed of what happens.
 
 const UI = preload("res://scripts/ui/ui.gd")
+const Ink = preload("res://scripts/view/ink.gd")
 const Op = preload("res://scripts/sim/op.gd")
 const Habits = preload("res://scripts/data/habits.gd")
 const PANEL_W := 460.0
@@ -39,7 +40,7 @@ func build(m) -> void:
 	v.add_child(title)
 	var sub := Label.new()
 	sub.text = "Endless battle  ·  Port Carrick  ·  seed %d" % main.seed_val
-	sub.add_theme_color_override("font_color", Color("#666666"))
+	sub.add_theme_color_override("font_color", Color("#737370"))
 	v.add_child(sub)
 	v.add_child(HSeparator.new())
 	var h := _h(v)
@@ -59,7 +60,7 @@ func build(m) -> void:
 		b.custom_minimum_size = Vector2(44, 0)
 		speed_buttons.append(b)
 	speed_note = Label.new()
-	speed_note.add_theme_color_override("font_color", Color("#666666"))
+	speed_note.add_theme_color_override("font_color", Color("#737370"))
 	speed_note.add_theme_font_size_override("font_size", 11)
 	v.add_child(speed_note)
 	var ho := _h(v)
@@ -76,7 +77,7 @@ func build(m) -> void:
 	factions_box = _rich(v, 214)
 	police_box = _rich(v, 196)
 	card = _rich(v, 112)
-	card.text = "[color=#777777]Click anyone on the plan to follow them here.[/color]"
+	card.text = "[color=#737370]Click anyone on the plan to follow them here.[/color]"
 	feed_box = _rich(v, 0)
 	feed_box.scroll_following = true
 	feed_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -95,7 +96,7 @@ func _h(parent: Control) -> HBoxContainer:
 
 func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Button:
 	var b := Button.new()
-	b.text = text
+	b.text = Ink.bb(text)
 	b.toggle_mode = toggle
 	if toggle:
 		b.toggled.connect(func(on): cb.call(on))
@@ -156,11 +157,11 @@ func refresh(w, d, actual: float) -> void:
 			ex = "  ·  [i]attacking %s[/i]" % (d.lv.bldgs[tgt]["address"] if tgt >= 0 else "?")
 		tx += "[b]%s[/b] (%s)  %d / %d  ·  %d buildings  ·  %.1f recruits/min%s\n" % [g["name"], _pat(fi), alive, int(d.cfg["gang_cap"]),
 			held.get(fi, 0), g["rate"], ex]
-		tx += "[color=#555555]      %d untrained, %d militia, %d soldiers  ·  kills %d, dead %d, taken %d  ·  %s[/color]\n" % [
+		tx += "[color=#737370]      %d untrained, %d militia, %d soldiers  ·  kills %d, dead %d, taken %d  ·  %s[/color]\n" % [
 			ech["untrained"], ech["militia"], ech["regular"], g["kills"], g["lost"], g["captured"],
 			(", ".join(hoods) if not hoods.is_empty() else "no neighbourhood")]
-	tx += "[color=#555555]Unclaimed: %d of %d buildings.  Captures %d, assaults %d.[/color]" % [held.get(-1, 0), n_b, d.stats["captures"], d.stats["expansions"]]
-	factions_box.text = tx
+	tx += "[color=#737370]Unclaimed: %d of %d buildings.  Captures %d, assaults %d.[/color]" % [held.get(-1, 0), n_b, d.stats["captures"], d.stats["expansions"]]
+	factions_box.text = Ink.bb(tx)
 	# ---- police and ambulances
 	var pt := "[b]PORT CARRICK PD[/b]  "
 	var on_duty := 0
@@ -172,7 +173,7 @@ func refresh(w, d, actual: float) -> void:
 			elif o2.state == "down":
 				down += 1
 	pt += "%d on duty, %d down, %d recovering, %d new hires due  ·  cap %d\n" % [on_duty, down, d.returning.size(), d.hires.size(), int(d.cfg["police_cap"])]
-	pt += "[color=#555555]Reports %d  ·  incidents %d  ·  waiting for a QRF: %d[/color]\n" % [d.stats["reports"], d.stats["incidents"], d.queue.size()]
+	pt += "[color=#737370]Reports %d  ·  incidents %d  ·  waiting for a QRF: %d[/color]\n" % [d.stats["reports"], d.stats["incidents"], d.queue.size()]
 	for st in d.stations:
 		var n_q := 0
 		for m in w.teams[st["qrf"]]["members"]:
@@ -186,7 +187,7 @@ func refresh(w, d, actual: float) -> void:
 		var cvs: Array = []
 		for cv in st["convoys"]:
 			cvs.append({"patrol": "patrolling", "respond": "out on foot", "remount": "remounting", "down": "out of action"}.get(cv["state"], cv["state"]))
-		pt += "QRF %d [color=#555555](%d/10)[/color] %s  ·  [color=#555555]patrols: %s[/color]\n" % [st["i"] + 1, n_q, what, ", ".join(cvs)]
+		pt += "QRF %d [color=#737370](%d/10)[/color] %s  ·  [color=#737370]patrols: %s[/color]\n" % [st["i"] + 1, n_q, what, ", ".join(cvs)]
 	var jobs := {}
 	for v in d.roads.vehicles:
 		if v["kind"] == "amb" or v["kind"] == "pamb":
@@ -199,8 +200,8 @@ func refresh(w, d, actual: float) -> void:
 			jp.append("%d %s" % [jobs[j2], {"idle": "standing by", "out": "on the way", "fetch": "reaching casualties", "treat": "treating",
 				"carry": "carrying stretchers", "hospital": "to hospital", "home": "returning"}[j2]])
 	pt += ", ".join(jp) + "\n"
-	pt += "[color=#555555]Saved %d  ·  bodies recovered %d  ·  died waiting %d[/color]" % [d.stats["saved"], d.stats["evacuated_dead"], d.stats["bled_out"]]
-	police_box.text = pt
+	pt += "[color=#737370]Saved %d  ·  bodies recovered %d  ·  died waiting %d[/color]" % [d.stats["saved"], d.stats["evacuated_dead"], d.stats["bled_out"]]
+	police_box.text = Ink.bb(pt)
 	# ---- the selected person
 	_card(w)
 	# ---- the feed
@@ -215,7 +216,7 @@ func refresh(w, d, actual: float) -> void:
 	while feed_shown < d.feed.size():
 		var ln: Dictionary = d.feed[feed_shown]
 		feed_shown += 1
-		feed_box.append_text("[color=#777777]%s[/color]  %s\n" % [w.clock(ln["t"]), _esc(ln["text"])])
+		feed_box.append_text(Ink.bb("[color=#737370]%s[/color]  %s\n" % [w.clock(ln["t"]), _esc(ln["text"])]))
 
 
 func _pat(fi: int) -> String:
@@ -242,24 +243,24 @@ func _card(w) -> void:
 	var o = w.op_by_id(main.selected) if main.selected != "" else null
 	if o == null:
 		if main.selected != "":
-			card.text = "[color=#777777]%s is no longer on the plan (taken to hospital or the morgue).[/color]" % main.selected
+			card.text = "[color=#737370]%s is no longer on the plan (taken to hospital or the morgue).[/color]" % main.selected
 		return
 	var fac: String = w.factions[o.faction]["name"]
 	var tm: Dictionary = w.teams[o.team] if o.team >= 0 and o.team < w.teams.size() else {}
 	var st := "on their feet"
 	if o.state == "dead":
-		st = "[color=#7d0a0a]dead[/color]"
+		st = "[color=#b31f26]dead[/color]"
 	elif o.state == "down":
-		st = "[color=#7d0a0a]down, %d s left to reach an ambulance[/color]" % int(maxf(0.0, w.BLEED_OUT - (w.t - o.ticker.get("down_t", w.t)))) if not o.carried else "down, aboard or on a stretcher"
+		st = "[color=#b31f26]down, %d s left to reach an ambulance[/color]" % int(maxf(0.0, w.BLEED_OUT - (w.t - o.ticker.get("down_t", w.t)))) if not o.carried else "down, aboard or on a stretcher"
 	elif o.mounted != null:
 		st = "in a vehicle"
-	var al: String = ["[color=#3d7a46]GREEN[/color]", "[color=#a8861c]YELLOW[/color]", "[color=#9b2a27]RED[/color]"][clampi(o.alert, 0, 2)]
+	var al: String = ["[color=#737370]GREEN[/color]", "[b]YELLOW[/b]", "[b][color=#b31f26]RED[/color][/b]"][clampi(o.alert, 0, 2)]
 	var t := "[b]%s[/b]  %s, %s  ·  %s\n" % [_esc(o.name), o.rank, fac, o.id]
 	t += "%s  ·  %s  ·  %s\n" % [Habits.ECHELONS[o.echelon]["name"], al, st]
-	t += "[color=#555555]%s[/color]\n" % _esc(UI.quirks(o))
+	t += "[color=#737370]%s[/color]\n" % _esc(UI.quirks(o))
 	if not o.medic:
 		var s: Dictionary = o.ws()
 		t += "%s %d+%d  ·  plates %d/%d  ·  experience %d  ·  stress %d%%%s\n" % ["Rifle" if o.active == "rifle" else "Pistol", s["mag"], s["spare"],
 			o.plates, o.plates_max, o.exp, int(o.stress * 100.0), "  ·  [b]%s[/b]" % " ".join(o.active_bad.keys()) if not o.active_bad.is_empty() else ""]
-	t += "[color=#555555]%s  ·  %s  ·  %s[/color]" % [_esc(tm.get("tag", "")), _esc(o.dbg), _esc(w.director.place_name(o.pos))]
-	card.text = t
+	t += "[color=#737370]%s  ·  %s  ·  %s[/color]" % [_esc(tm.get("tag", "")), _esc(o.dbg), _esc(w.director.place_name(o.pos))]
+	card.text = Ink.bb(t)

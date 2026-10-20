@@ -4,8 +4,8 @@ extends Control
 ## waiting for an ambulance) and where they fell. Older lines move down and fade out; a
 ## running count by side heads the column. Used in normal matches and the endless battle.
 
-const INK := Color("#1c1c1c")
-const BLOOD := Color("#7d0a0a")
+const Ink = preload("res://scripts/view/ink.gd")
+const INK := Color("#121212")
 const W := 384.0
 const ROW_H := 47.0
 const HEAD_H := 46.0
@@ -95,9 +95,9 @@ func _draw() -> void:
 	var total := 0
 	for k in totals:
 		total += totals[k]
-	draw_rect(Rect2(0, 0, W, HEAD_H - 6.0), Color(1, 1, 1, 0.92))
+	draw_rect(Rect2(0, 0, W, HEAD_H - 6.0), Color(0.93, 0.93, 0.91, 0.92))
 	draw_rect(Rect2(0, 0, W, HEAD_H - 6.0), INK, false, 1.0)
-	draw_string(bold, Vector2(10, 18), "T H E   D E A D   %d" % total, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, BLOOD)
+	draw_string(bold, Vector2(10, 18), "T H E   D E A D   %d" % total, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ink.accent(0.9) if total > 0 else INK)
 	var parts: Array = []
 	var keys: Array = totals.keys()
 	keys.sort()
@@ -105,7 +105,7 @@ func _draw() -> void:
 		parts.append("%s %d" % [world.factions[k2].get("tag", "?") if k2 < world.factions.size() else "?", totals[k2]])
 	if bled > 0:
 		parts.append("of wounds %d" % bled)
-	draw_string(font, Vector2(10, 34), "   ".join(parts), HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 11, Color("#444444"))
+	draw_string(font, Vector2(10, 34), "   ".join(parts), HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 11, Color("#2b2b2b"))
 	for i in entries.size():
 		var e: Dictionary = entries[i]
 		var rec: Dictionary = e["rec"]
@@ -116,19 +116,19 @@ func _draw() -> void:
 		var a := clampf(1.0 - maxf(0.0, i - (max_rows - 4)) * 0.22, 0.15, 1.0)
 		var y: float = e["y"]
 		var box := Rect2(x, y, W, ROW_H - 4.0)
-		draw_rect(box, Color(1, 1, 1, 0.9 * a))
+		draw_rect(box, Color(0.93, 0.93, 0.91, 0.9 * a))
 		if age < 1.4:
-			draw_rect(box, Color(BLOOD, 0.22 * (1.0 - age / 1.4)))
-		draw_rect(Rect2(x, y, 4.0, ROW_H - 4.0), Color(BLOOD, a))
-		draw_rect(box, Color(0, 0, 0, 0.35 * a), false, 1.0)
+			draw_rect(box, Ink.accent(0.22 * (1.0 - age / 1.4)))
+		draw_rect(Rect2(x, y, 4.0, ROW_H - 4.0), Ink.accent(a))
+		draw_rect(box, Color(0.07, 0.07, 0.07, 0.35 * a), false, 1.0)
 		var t: String = world.clock(rec["t"])
 		var who: String = rec["name"] if rec["name"] != "" else rec["id"]
-		draw_string(font, Vector2(x + 10, y + 15), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.35, 0.35, 0.35, a))
+		draw_string(font, Vector2(x + 10, y + 15), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.45, 0.45, 0.44, a))
 		draw_string(bold, Vector2(x + 66, y + 15), who, HORIZONTAL_ALIGNMENT_LEFT, W - 76.0, 12, Color(INK, a))
 		var nw := bold.get_string_size(who, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 		var tag: String = ("%s, %s" % [rec["rank"], _side_name(rec["faction"])]) if rec["rank"] != "" else _side_name(rec["faction"])
 		if rec.get("medic", false):
 			tag = "%s, %s" % [rec["rank"], _side_name(rec["faction"])]
-		draw_string(font, Vector2(x + 72 + nw, y + 15), tag, HORIZONTAL_ALIGNMENT_LEFT, maxf(20.0, W - 82.0 - nw), 10, Color(0.4, 0.4, 0.4, a))
-		draw_string(font, Vector2(x + 10, y + 29), _how(rec), HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 11, Color(0.12, 0.12, 0.12, a))
-		draw_string(font, Vector2(x + 10, y + 42), rec["place"], HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 10, Color(0.45, 0.45, 0.45, a))
+		draw_string(font, Vector2(x + 72 + nw, y + 15), tag, HORIZONTAL_ALIGNMENT_LEFT, maxf(20.0, W - 82.0 - nw), 10, Color(0.45, 0.45, 0.44, a))
+		draw_string(font, Vector2(x + 10, y + 29), _how(rec), HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 11, Color(0.07, 0.07, 0.07, a))
+		draw_string(font, Vector2(x + 10, y + 42), rec["place"], HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 10, Color(0.45, 0.45, 0.44, a))
