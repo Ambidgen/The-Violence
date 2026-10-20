@@ -138,6 +138,20 @@ var arrested := false   # cuffed
 var cstate := ""        # civilian: unaware, alarmed, flee, hide, freeze, comply, film
 var persona := {}       # civilian: {panic, curiosity, defiance, mobility, phone}
 
+# ---------------------------------------------------------------- planned operations (v0.7)
+var squad := -1         # police squad (element) this officer was assigned to (-1: formed automatically)
+var pace_cap := ""      # order: "walk" or "creep" caps movement speed
+var roe_tight := false  # order Weapons tight: fire only at someone firing or pointing a weapon
+var avoid_key := ""     # order Avoid: the navigation overlay this officer's paths use
+var flight := 0.0       # suspect: readiness to run for it when police are close (0-1)
+var hostage := false    # civilian held by captors (stays put until freed)
+var captor := false     # suspect guarding hostages
+var attacker := false   # event attacker: hidden in the crowd (as a civilian) until the attack
+var arms := ""          # what a concealed attacker carries: "pistol" or "rifle"
+var gone := false       # out of the operation: escaped over the fence, or withdrawn to the vehicles
+var gone_how := ""      # "escaped" | "withdrew"
+var pistols_only := false
+
 
 func configure(cfg: Dictionary) -> void:
 	id = cfg["id"]
@@ -170,6 +184,19 @@ func configure(cfg: Dictionary) -> void:
 	integrity = int(cfg.get("integrity", 60))
 	civ = cfg.get("civ", false)
 	persona = cfg.get("persona", {}).duplicate()
+	squad = int(cfg.get("squad", -1))
+	pace_cap = cfg.get("pace", "")
+	roe_tight = cfg.get("tight", false)
+	avoid_key = cfg.get("avoid_key", "")
+	pistols_only = cfg.get("pistols", false)
+	flight = float(cfg.get("flight", 0.0))
+	hostage = cfg.get("hostage", false)
+	captor = cfg.get("captor", false)
+	attacker = cfg.get("attacker", false)
+	arms = cfg.get("arms", "")
+	if attacker:
+		# hidden in the crowd: a civilian to every eye until the attack begins
+		civ = true
 	if civ:
 		sidearm_only = false
 		alert_floor = 0
@@ -192,11 +219,17 @@ func reset() -> void:
 		weapons["rifle"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
 		weapons["pistol"]["spare"] += 1
 		active = "pistol"
+	if pistols_only and not civ:
+		weapons["rifle"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
+		weapons["pistol"]["spare"] += 1
+		active = "pistol"
 	if civ:
 		weapons["rifle"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
 		weapons["pistol"] = {"mag": 0, "spare": 0, "jam": false, "lost": true, "none": true}
 		active = "pistol"
-		cstate = "unaware"
+		cstate = "hostage" if hostage else "unaware"
+	gone = false
+	gone_how = ""
 	alert = alert_floor
 	alert_t = 0.0
 	stress = clampf(float(ech.get("stress0", 0.0)), 0.0, 0.5)
@@ -215,9 +248,23 @@ func alive() -> bool:
 	return state == "ok"
 
 
-## Still in the fight: alive, not a civilian, not given up.
+## Still in the fight: alive, not a civilian, not given up, not gone from the scene.
 func fighting() -> bool:
-	return state == "ok" and not civ and not complying
+	return state == "ok" and not civ and not complying and not gone
+
+
+## A concealed attacker drops the act (v0.7): weapons out, a combatant from now on.
+func reveal() -> void:
+	civ = false
+	cstate = ""
+	weapons["pistol"] = {"mag": Habits.WEAPONS["pistol"]["mag"], "spare": Habits.WEAPONS["pistol"]["spare"] + 1, "jam": false, "lost": false}
+	if arms == "rifle":
+		weapons["rifle"] = {"mag": Habits.WEAPONS["rifle"]["mag"], "spare": Habits.WEAPONS["rifle"]["spare"], "jam": false, "lost": false}
+		active = "rifle"
+	else:
+		active = "pistol"
+	alert_floor = YELLOW
+	alert = RED
 
 
 ## What an observer can see in this person's hands: a rifle carried, or any weapon drawn.

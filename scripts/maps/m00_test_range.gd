@@ -10,7 +10,7 @@ func _init() -> void:
 	id = "m00"
 	map_name = "Test Range 01 - Shotgun House"
 	title = "THE VIOLENCE  -  TEST RANGE 01"
-	notes = ["14 x 32 SHOTGUN HOUSE, DRAWN AT 5 x 13 m", "YARD WITH SCATTERED COVER  ·  1 SQUARE = 1 m", "MAP 00  ·  SHEET 1 OF 11"]
+	notes = ["14 x 32 SHOTGUN HOUSE, DRAWN AT 5 x 13 m", "YARD WITH SCATTERED COVER  ·  1 SQUARE = 1 m", "MAP 00  ·  SHEET 1 OF 12"]
 	W = 36.0
 	H = 24.0
 	time_limit = 300.0

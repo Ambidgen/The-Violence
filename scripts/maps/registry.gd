@@ -13,6 +13,7 @@ const MAPS := [
 	preload("res://scripts/maps/m08_warehouse.gd"),
 	preload("res://scripts/maps/m09_compound.gd"),
 	preload("res://scripts/maps/m10_apartments.gd"),
+	preload("res://scripts/maps/m11_plaza.gd"),
 ]
 
 static var _built := {}

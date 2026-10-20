@@ -263,6 +263,29 @@ const QUIRKS_MINUS := [
 const FORM_STATS := ["t_rec0", "a", "b", "reload", "transition", "s_snap", "s_min", "tau"]
 
 
+## Stats part of the way from one echelon to another (v0.7: an officer's years on the
+## job move them from Patrol towards Regular, and past it towards Police tactical).
+static func blend(from_e: String, to_e: String, f: float) -> Dictionary:
+	var a: Dictionary = ECHELONS[from_e]
+	var b: Dictionary = ECHELONS[to_e]
+	var e := a.duplicate()
+	for k in a:
+		if typeof(a[k]) == TYPE_FLOAT and b.has(k):
+			e[k] = lerpf(float(a[k]), float(b[k]), clampf(f, 0.0, 1.0))
+	return e
+
+
+## Patrol stats after a number of years of service: a rookie is Patrol; ten years
+## brings Regular; the best-trained veterans go on part of the way to Police tactical.
+static func service_stats(years: float) -> Dictionary:
+	var f := years / 10.0
+	if f <= 1.0:
+		return blend("patrol", "regular", f)
+	var e := blend("regular", "police", minf(f - 1.0, 0.6))
+	e["name"] = ECHELONS["patrol"]["name"]
+	return e
+
+
 ## A per-operator copy of an echelon's stats with form, jitter and quirks applied.
 static func vary(base: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var e := base.duplicate()

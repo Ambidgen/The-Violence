@@ -46,6 +46,21 @@ var incident = null            # the incident record of an operation (v0.6; none
 var night := false             # darkness: slower recognition and judgment, more mistakes
 var roe_strict := false        # armed but not attacking: challenge before firing (v0.7 Weapons tight)
 var _end_wait := -1.0
+# planned operations (v0.7)
+var recorder = null            # snapshots for rewind and the debrief replay
+var aborted := false           # the player cut their losses: every squad withdraws to the vehicles
+var abort_t := -1.0
+var vehicles: Array = []       # per squad: where its vehicles are (start point, withdrawal point)
+var casualty_point := Vector2.INF   # where rescued hostages are walked to
+var escape_pts: Array = []     # points over the fence a fleeing suspect makes for
+var event := {}                # a public event: {attack_t, crowd: [Vector2], duration}
+var attack_on := false         # the attack at an event has begun
+var deadline := -1.0           # hostage takers start killing hostages at this time
+var _exec_next := -1.0
+var knock_done := false
+var squad_orders: Array = []   # the orders each police squad was given (operation spec)
+var broken: Array = []         # orders broken: [{t, id, order, why, where}]
+var timeline: Array = []       # key moments for the debrief: [{t, text, kind}]
 
 ## Judgment (v0.6). A recognized person is judged before an officer under police rules
 ## may fire: JUDGE_BASE seconds at Judgment 50, longer under stress and in the dark,
@@ -81,11 +96,25 @@ func setup(lv, nv, cfgs: Array, postures: Array, seed_val: int, alerts := [1, 1]
 	var pol: bool = opts.get("police_rules", false)
 	night = opts.get("night", false)
 	roe_strict = opts.get("roe_strict", false)
+	time_limit = float(opts.get("time_limit", time_limit))
+	squad_orders = opts.get("squads", [])
+	vehicles = opts.get("vehicles", [])
+	casualty_point = opts.get("casualty", Vector2.INF)
+	event = opts.get("event", {})
+	deadline = float(opts.get("deadline", -1.0))
 	factions = [{"id": 0, "name": "Police" if pol else "Team A", "tag": "A", "gang": false, "police": pol, "judges": pol},
 		{"id": 1, "name": "Suspects" if pol else "Team B", "tag": "B", "gang": false, "police": false},
 		{"id": 2, "name": "Civilians", "tag": "C", "gang": false, "police": false, "civ": true}]
 	for k in 2:
-		new_unit(k, postures[k], "Team " + "AB"[k], {"base_alert": int(alerts[k])})
+		var uo := {"base_alert": int(alerts[k])}
+		if k == 0 and not squad_orders.is_empty():
+			uo["orders"] = squad_orders
+			uo["stay"] = true
+		if k == 1 and opts.get("b_stay", false):
+			uo["stay"] = true
+		if k == 1 and opts.get("b_posted", false):
+			uo["posted"] = true
+		new_unit(k, postures[k], "Team " + "AB"[k], uo)
 	new_unit(2, "civ", "Civilians", {"civ": true, "sleep": true})
 	incident = Incident.new(self)
 	# names: team A from every culture, team B mostly from one (it reads as a local crew)
@@ -106,8 +135,10 @@ func setup(lv, nv, cfgs: Array, postures: Array, seed_val: int, alerts := [1, 1]
 			o.rank = "Civilian" if o.civ else Habits.ECHELONS[o.echelon]["name"]
 		_attach(o)
 	for o in ops:
-		if not o.civ:
+		if not o.civ or o.attacker:
 			_update_bad(o, true)
+	if not squad_orders.is_empty() or opts.has("escape"):
+		_escape_points()
 	brain.init_teams()
 	var n_civ: int = teams[2]["members"].size()
 	say("Seed %d. Team A: %d, %s. Team B: %d, %s.%s%s%s" % [seed_val, teams[0]["members"].size(), postures[0],
@@ -179,7 +210,7 @@ func _attach(o) -> void:
 		o.police = factions[o.faction].get("police", false)
 	if o.faction < factions.size():
 		o.judges = factions[o.faction].get("judges", false)
-	if not o.ech.has("form") and not o.civ:
+	if not o.ech.has("form") and (not o.civ or o.attacker):
 		o.ech = Habits.vary(o.ech, rng)
 	if o.civ and o.persona.is_empty():
 		o.persona = CivBrain.roll_persona(rng)
@@ -299,6 +330,7 @@ func step() -> void:
 		t0 = _pf("think", t0)
 	if incident != null and tick_n % 30 == 7:
 		_surrender_checks()
+		_op_checks()
 	for o in ops:
 		if o.alive() and not o.dormant and o.mounted == null:
 			_integrate(o)
@@ -317,6 +349,8 @@ func step() -> void:
 			t0 = _pf("director", t0)
 	if not endless:
 		_check_end()
+	if recorder != null:
+		recorder.tick()
 
 
 ## Break reference cycles so a finished match frees its memory.
@@ -330,6 +364,9 @@ func dispose() -> void:
 	if incident != null:
 		incident.w = null
 	incident = null
+	if recorder != null:
+		recorder.w = null
+	recorder = null
 	if director != null and director.has_method("dispose"):
 		director.dispose()
 	director = null
@@ -400,6 +437,8 @@ func carry_time(o) -> float:
 func emit(ev: Dictionary) -> void:
 	if keep_events:
 		events.append(ev)
+	if recorder != null:
+		recorder.on_event(ev)
 
 
 func op_by_id(oid: String):
@@ -418,9 +457,12 @@ func hostile(a, b) -> bool:
 		return false
 	# civilians and people who have given up are nobody's targets, unless an officer has
 	# judged them a threat by mistake, or has not yet let go of the trigger (v0.6)
-	if a.civ or a.complying:
+	if a.civ or a.complying or a.gone or b.gone:
 		return false
 	if b.civ or b.complying:
+		# an attacker at a public event shoots into the crowd (v0.7)
+		if a.attacker and b.civ and not b.attacker:
+			return true
 		return a.misjudged.has(b.id) or a.ticker.get("late_" + b.id, -1.0) >= t
 	if not city:
 		return true
@@ -444,11 +486,11 @@ func hostile(a, b) -> bool:
 func potential(a, b) -> bool:
 	if a == b or a.medic or b.medic or a.faction == b.faction:
 		return false
-	if a.civ or a.complying:
+	if a.civ or a.complying or a.gone or b.gone:
 		return false
 	# officers under police rules watch everyone, to judge them
 	if b.civ or b.complying:
-		return a.judges or hostile(a, b)
+		return a.judges or a.attacker or hostile(a, b)
 	if not city:
 		return true
 	var ga: bool = a.gang
@@ -1106,6 +1148,10 @@ func cleared_to_fire(o, e) -> bool:
 		j["v"] = "threat"
 	if j.get("v", "") != "threat":
 		return false
+	# Weapons tight (v0.7): armed is not enough; only someone attacking may be shot. A
+	# squad sent to arrest a named suspect holds the same rule for that suspect.
+	if o.roe_tight or o.ticker.get("arrest_tid", "") == e.id:
+		return false
 	return not roe_strict
 
 
@@ -1216,6 +1262,225 @@ func _hold_complying(o) -> void:
 	o.aim = {}
 
 
+# ================================================================== planned operations (v0.7)
+## A key moment for the debrief's timeline (and the run panel).
+func mark(text: String, kind := "info") -> void:
+	timeline.append({"t": t, "text": text, "kind": kind})
+
+
+## An order broken: once per officer, order and place. Written into the incident record.
+func order_broken(o, order: String, why: String) -> void:
+	if not o.judges or o.squad < 0:
+		return
+	var where: String = place_of(o.pos)
+	var key := "brk_%s_%s" % [order, where]
+	if o.ticker.has(key):
+		return
+	o.ticker[key] = true
+	var rec := {"t": t, "id": o.id, "order": order, "why": why, "where": where, "squad": o.squad}
+	broken.append(rec)
+	say("%s breaks the %s order: %s, %s" % [o.id, order, why, where], "bad")
+	emit({"type": "float", "p": o.pos, "text": "ORDER BROKEN"})
+	mark("%s broke the %s order (%s, %s)" % [o.id, order, why, where], "order")
+	if incident != null:
+		incident.on_order_broken(o, order, why)
+
+
+## Every second during an operation: suspects decide whether to run, hostage takers
+## act on their deadline, the attack at an event begins, and officers are checked
+## against their Avoid orders.
+func _op_checks() -> void:
+	if not event.is_empty() and not attack_on and float(event.get("attack_t", -1.0)) >= 0.0 and t >= float(event["attack_t"]):
+		_begin_attack()
+	if deadline >= 0.0 and t >= deadline:
+		_hostage_deadline()
+	for o in ops:
+		if o.gone or not o.alive():
+			continue
+		if o.judges and o.squad >= 0 and o.squad < squad_orders.size():
+			var av: Array = squad_orders[o.squad].get("avoid", [])
+			if not av.is_empty() and av.has(o.room):
+				var why := "chasing a contact" if o.hb("BH12") else ("pushing alone" if o.hb("BH15") else "in a fight")
+				order_broken(o, "avoid", why)
+		elif o.fighting() and not o.judges and o.flight > 0.0 and not o.ticker.has("flee"):
+			_flight_check(o)
+		if not o.judges and o.ticker.has("flee") and o.alive() and not o.complying:
+			var fp: Vector2 = o.ticker["flee"]["p"]
+			if o.pos.distance_to(fp) < 1.6:
+				leave(o, "escaped")
+
+
+## A suspect who knows the police are here, and is not yet in a fight, may run for it.
+func _flight_check(o) -> void:
+	if o.alert < Op.YELLOW or o.complying:
+		return
+	var tm: Dictionary = teams[o.team]
+	var knows: bool = knock_done or not tm["lkps"].is_empty() or (not o.heard.is_empty() and t - o.heard["t"] < 20.0)
+	if not knows or t - o.last_stress_t < 2.0 or not visible_enemies(o).is_empty():
+		return
+	var p: float = 0.05 * o.flight
+	if o.ticker.get("knocked", false):
+		o.ticker["knocked"] = false
+		p += 0.35 * o.flight
+	if rng.randf() >= p:
+		return
+	var dest = _escape_for(o)
+	if dest == null:
+		return
+	o.ticker["flee"] = {"p": dest, "since": t}
+	o.alert_floor = Op.YELLOW
+	say("%s makes a run for it" % o.id, "info")
+	mark("%s ran for it" % o.id, "escape")
+
+
+## Points just inside the lot's edge that a runner could go over or past.
+func _escape_points() -> void:
+	escape_pts = []
+	var step := 3.0
+	for k in 4:
+		var n := int((level.W if k < 2 else level.H) / step)
+		for i in range(1, n):
+			var s := i * step
+			var p: Vector2
+			match k:
+				0: p = Vector2(s, 1.0)
+				1: p = Vector2(s, level.H - 1.0)
+				2: p = Vector2(1.0, s)
+				_: p = Vector2(level.W - 1.0, s)
+			if nav.reachable(p) and level.room_at(p) == "OUT":
+				escape_pts.append(p)
+
+
+## The best way out for a runner: far from where the police are known to be, and not
+## much further than it needs to be.
+func _escape_for(o):
+	var cops: Array = []
+	for eid in teams[o.team]["lkps"]:
+		cops.append(teams[o.team]["lkps"][eid]["p"])
+	if not o.heard.is_empty():
+		cops.append(o.heard["p"])
+	for v in vehicles:
+		cops.append(v)
+	var best = null
+	var best_s := -INF
+	for p in escape_pts:
+		var dmin := 60.0
+		for c in cops:
+			dmin = minf(dmin, (c as Vector2).distance_to(p))
+		var s: float = dmin * 1.5 - o.pos.distance_to(p)
+		if s > best_s:
+			best_s = s
+			best = p
+	return best
+
+
+## Out of the operation for good: a suspect over the fence, or an officer at the vehicles.
+func leave(o, how: String) -> void:
+	if o.gone:
+		return
+	o.gone = true
+	o.gone_how = how
+	o.aim = {}
+	o.action = {}
+	stop(o)
+	o.mounted = {"gone": how}
+	o.ticker.erase("flee")
+	if how == "escaped":
+		say("%s gets away" % o.id, "kill")
+		emit({"type": "float", "p": o.pos, "text": "ESCAPED"})
+		mark("%s escaped" % o.id, "escape")
+		if incident != null:
+			incident.on_escape(o)
+	else:
+		say("%s reaches the vehicles" % o.id, "info")
+
+
+## Knock and announce: everyone inside hears the police. Suspects have time to get
+## ready, give up, or run; civilians have time to put their hands up.
+func announce(by) -> void:
+	if knock_done:
+		return
+	knock_done = true
+	say("%s: Police! Search warrant! Come to the door with your hands up!" % by.id, "comms")
+	emit({"type": "float", "p": by.pos, "text": "POLICE! SEARCH WARRANT!"})
+	mark("%s knocked and announced" % by.id, "order")
+	for o in ops:
+		if not o.alive() or o.judges or o.gone or o.pos.distance_to(by.pos) > 40.0:
+			continue
+		if o.civ:
+			if o.cstate == "unaware" and not o.attacker:
+				if level.is_inside(o.pos) and rng.randf() < 0.65:
+					civ_brain.comply(o, by)
+				else:
+					civ_brain.alarm(o, by.pos, "police")
+			continue
+		if not o.fighting():
+			continue
+		raise_alert(o, Op.YELLOW)
+		o.heard = {"p": by.pos, "t": t, "kind": "walk"}
+		teams[o.team]["sound"] = {"p": by.pos, "t": t, "kind": "walk"}
+		o.ticker["knocked"] = true
+		brain.on_heard(o, by.pos, "walk")
+		_surrender_roll(o, by, true)
+
+
+## Abort (cut losses): every squad breaks contact and walks back to its vehicles, still
+## under fire until it gets there. The operation is a failure; how big a one depends on
+## who comes back.
+func abort() -> void:
+	if aborted or over:
+		return
+	aborted = true
+	abort_t = t
+	say("ABORT: all units withdraw to the vehicles", "end")
+	mark("Abort ordered: all squads withdraw", "abort")
+	brain.withdraw(teams[0])
+
+
+## The attack at a public event begins: the hidden attackers draw and open fire.
+func _begin_attack() -> void:
+	attack_on = true
+	for o in ops:
+		if o.attacker and o.alive() and o.civ:
+			o.reveal()
+			o.rank = "Attacker"
+			o.weapon_up = true
+			o.armed_t = t
+			o.dormant = false
+			_update_bad(o, true)
+			emit({"type": "float", "p": o.pos, "text": "GUN!"})
+	say("Shots fired at the event!", "kill")
+	mark("The attack began", "attack")
+	brain.attack(teams[1], event.get("crowd", []))
+
+
+## Past the deadline, a hostage taker with a hostage beside them and no officer in
+## the room kills one, and another every 90 s.
+func _hostage_deadline() -> void:
+	if _exec_next < 0.0:
+		_exec_next = t
+	if t < _exec_next:
+		return
+	for o in ops:
+		if not o.captor or not o.fighting() or not o.aim.is_empty():
+			continue
+		var victim = null
+		for h in ops:
+			if h.hostage and h.alive() and h.cstate == "hostage" and h.pos.distance_to(o.pos) < 6.0:
+				victim = h
+				break
+		if victim == null:
+			continue
+		_exec_next = t + 90.0
+		say("%s shoots a hostage (%s)" % [o.id, victim.id], "kill")
+		mark("%s killed a hostage, %s" % [o.id, victim.id], "hostage")
+		o.weapon_up = true
+		o.muzzle_dir = (victim.pos - o.pos).angle()
+		_fire(o, o.muzzle_dir, victim.zone_centre("head"), maxf(victim.pos.distance_to(o.pos), 0.3), 2.0, victim)
+		return
+	_exec_next = t + 5.0
+
+
 # ================================================================== actions
 func start_action(o, type: String, dur: float, extra := {}) -> void:
 	o.action = {"type": type, "left": dur, "total": dur}
@@ -1282,9 +1547,21 @@ func blocks_move(o) -> bool:
 
 
 # ================================================================== movement
-func move_to(o, p: Vector2, mode: String, prof := -1) -> void:
+## Movement orders (v0.7): a Pace order caps the pace (walk, or creep) unless the officer
+## is in a fight; an Avoid order sends paths around the listed rooms. A bad habit that
+## drives the move (free = true: chasing a contact, rushing a room) ignores both, and
+## the incident record notes the broken order.
+const PACE_RANK := {"creep": 0, "slice": 1, "clear": 2, "step": 2, "walk": 3, "entry": 4, "run": 5, "sprint": 6}
+
+
+func move_to(o, p: Vector2, mode: String, prof := -1, free := false) -> void:
 	if prof < 0:
 		prof = (1 if o.has("PF01") else 0) | (2 if o.has("PF02") else 0)
+	if o.pace_cap != "" and PACE_RANK.get(mode, 3) > PACE_RANK.get(o.pace_cap, 3):
+		if free:
+			order_broken(o, "pace", "moves at a %s" % mode)
+		elif not in_combat(o):
+			mode = o.pace_cap
 	o.goal_mode = mode
 	var spd: float = SPEEDS.get(mode, 1.6)
 	spd *= 1.0 - 0.04 * o.plates_max
@@ -1300,7 +1577,9 @@ func move_to(o, p: Vector2, mode: String, prof := -1) -> void:
 		stuck = o.moving and o.pos.distance_to(o.ticker.get("prog_p", Vector2.INF)) < 0.1 and not blocks_move(o)
 		o.ticker["prog_p"] = o.pos
 		o.repath_t = t + 1.5
-	var need: bool = o.path.is_empty() or o.goal.distance_to(p) > 0.4 or stuck or o.ticker.get("prof", -1) != prof
+	var ak: String = "" if free else o.avoid_key
+	var need: bool = o.path.is_empty() or o.goal.distance_to(p) > 0.4 or stuck or o.ticker.get("prof", -1) != prof \
+		or o.ticker.get("ak", "") != ak
 	if need and o.path.is_empty() and o.goal.distance_to(p) <= 0.4 and t < o.ticker.get("path_fail_until", -1.0):
 		need = false
 	if need:
@@ -1309,7 +1588,8 @@ func move_to(o, p: Vector2, mode: String, prof := -1) -> void:
 			why = "pth_empty" if o.path.is_empty() else ("pth_goal" if o.goal.distance_to(p) > 0.4 else ("pth_stuck" if stuck else "pth_prof"))
 		var tp0 := Time.get_ticks_usec()
 		o.goal = p
-		o.path = nav.find_path(prof, o.pos, p)
+		o.ticker["ak"] = ak
+		o.path = nav.find_path(prof, o.pos, p, ak)
 		if brain.fine:
 			if o.path.is_empty():
 				why += "_FAIL"
@@ -1665,7 +1945,7 @@ func _fire(o, bearing: float, aim_z: float, dist: float, settle: float, tgt = nu
 			if a.civ:
 				civ_brain.alarm(a, o.pos, "near miss")
 	if incident != null:
-		incident.on_shot(o, tgt, hit_op, walls)
+		incident.on_shot(o, tgt, hit_op, walls, endp)
 	if hit_op != null:
 		_hit(hit_op, hit_zone, hit_lat, u, o, e_at, walls)
 	elif not mh.is_empty() and mh["hit"]:
@@ -2035,32 +2315,65 @@ func _check_end() -> void:
 	for o in ops:
 		if o.team < 2 and o.fighting():
 			alive[o.team] += 1
+	# an abort ends when every officer still standing is back at the vehicles (v0.7)
+	if aborted:
+		if alive[0] == 0 or t >= time_limit:
+			_finish(3)
+		return
+	# a public event runs its course; the hidden attackers count only once they attack
+	if not event.is_empty() and not attack_on:
+		if t >= time_limit:
+			_finish(0)
+		elif alive[0] == 0:
+			_finish(1)
+		return
+	if alive[1] > 0:
+		_end_wait = -1.0
 	# under police rules the operation goes on until the people who gave up are cuffed
 	if alive[1] == 0 and alive[0] > 0 and t < time_limit and police_rules():
 		var waiting := false
+		var long_wait := false
 		for o2 in ops:
 			if o2.complying and o2.alive() and not o2.arrested:
 				waiting = true
-				break
+			# hostages still to be walked out (v0.7)
+			if o2.hostage and o2.alive() and o2.cstate in ["hostage", "escorted"]:
+				waiting = true
+				long_wait = true
 		if waiting:
 			if _end_wait < 0.0:
-				_end_wait = t + 60.0
+				_end_wait = t + (150.0 if long_wait else 60.0)
 			if t < _end_wait:
 				return
 	if alive[0] == 0 or alive[1] == 0 or t >= time_limit:
-		over = true
 		if alive[0] == 0 and alive[1] == 0:
-			winner = 2
+			_finish(2)
 		elif alive[0] == 0:
-			winner = 1
+			_finish(1)
 		elif alive[1] == 0:
-			winner = 0
+			_finish(0)
 		else:
-			winner = 2
-		var names := ["TEAM A WINS", "TEAM B WINS", "DRAW"]
-		say("%s at %.1f s. %d shots, %d hits." % [names[winner], t, stat["shots"], stat["hits"]], "end")
-		for o in ops:
-			if o.civ:
-				continue
-			say("  %s %s: %d shots, %d hits, %d down; %s" % [o.id, o.ech["name"], o.shots, o.hits, o.kills,
-				("ARRESTED" if o.arrested else ("GAVE UP" if o.complying else o.state.to_upper()))], "end")
+			_finish(2)
+
+
+## winner: 0 team A (police) stood, 1 team B, 2 draw or time, 3 aborted.
+func _finish(win: int) -> void:
+	over = true
+	winner = win
+	var names := ["TEAM A WINS", "TEAM B WINS", "DRAW", "ABORTED"]
+	say("%s at %.1f s. %d shots, %d hits." % [names[winner], t, stat["shots"], stat["hits"]], "end")
+	mark({0: "Operation over: the police hold the scene", 1: "Operation over: the police were stopped", 2: "Operation over: time ran out",
+		3: "Operation over: withdrawn"}[winner], "end")
+	for o in ops:
+		if o.civ:
+			continue
+		var st: String = o.state.to_upper()
+		if o.arrested:
+			st = "ARRESTED"
+		elif o.complying:
+			st = "GAVE UP"
+		elif o.gone:
+			st = o.gone_how.to_upper()
+		say("  %s %s: %d shots, %d hits, %d down; %s" % [o.id, o.ech["name"], o.shots, o.hits, o.kills, st], "end")
+	if recorder != null:
+		recorder.snap()

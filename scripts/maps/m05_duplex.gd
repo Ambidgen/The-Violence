@@ -10,7 +10,7 @@ func _init() -> void:
 	id = "m05"
 	map_name = "Duplex"
 	title = "THE VIOLENCE  -  05 DUPLEX"
-	notes = ["TWO MIRRORED UNITS, 6 ROOMS EACH, 20 x 13 m", "PARTY-WALL DOOR, FRONT AND BACK YARDS  ·  1 SQUARE = 1 m", "MAP 05  ·  SHEET 6 OF 11"]
+	notes = ["TWO MIRRORED UNITS, 6 ROOMS EACH, 20 x 13 m", "PARTY-WALL DOOR, FRONT AND BACK YARDS  ·  1 SQUARE = 1 m", "MAP 05  ·  SHEET 6 OF 12"]
 	W = 44.0
 	H = 30.0
 	time_limit = 420.0

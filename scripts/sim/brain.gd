@@ -33,8 +33,25 @@ func init_teams() -> void:
 
 
 ## Form a unit's elements and start it on its posture (also for units created mid-match).
+## A police unit with orders (v0.7) forms the player's squads and starts each on its
+## first objective instead.
 func init_team(tm: Dictionary) -> void:
 	_form_elements(tm)
+	if tm.has("orders"):
+		for el in tm["elements"]:
+			el["obj_i"] = 0
+			el["results"] = []
+			_begin_objective(tm, el)
+		return
+	# occupants of a planned operation (v0.7) stay where the situation put them until
+	# something happens: no gathering into one room
+	if tm.get("posted", false):
+		for el in tm["elements"]:
+			var posts: Array = []
+			for m in el["members"]:
+				posts.append({"p": m.spawn, "face": m.spawn_face})
+			_set_posts(tm, el, posts, -1)
+		return
 	if tm["posture"] == "hold":
 		# squads already gathered in one room claim it first
 		var order: Array = tm["elements"].duplicate()
@@ -60,6 +77,25 @@ func _concentration(el: Dictionary) -> int:
 func _form_elements(tm: Dictionary) -> void:
 	var ms: Array = tm["members"].duplicate()
 	ms.sort_custom(func(a, b): return a.slot < b.slot)
+	# the player's squads (v0.7): one element per squad, whatever its size
+	if tm.has("orders") and not ms.is_empty() and ms[0].squad >= 0:
+		var n_sq: int = tm["orders"].size()
+		tm["elements"] = []
+		for i in n_sq:
+			var el0 := _new_element(i)
+			el0["orders"] = tm["orders"][i]
+			tm["elements"].append(el0)
+		for m0 in ms:
+			var si := clampi(m0.squad, 0, n_sq - 1)
+			var e0: Dictionary = tm["elements"][si]
+			m0.el = si
+			m0.eslot = e0["members"].size()
+			e0["members"].append(m0)
+		var parts: Array = []
+		for e1 in tm["elements"]:
+			parts.append(str(e1["members"].size()))
+		w.say("Police: %d squad%s (%s)" % [n_sq, "" if n_sq == 1 else "s", " + ".join(parts)], "info")
+		return
 	var n := ms.size()
 	var n_el := maxi(1, int(ceil(n / 5.0)))
 	tm["elements"] = []
@@ -115,7 +151,7 @@ func _set_mode(tm: Dictionary, el: Dictionary, mode: String) -> void:
 		_release(tm, el)
 		el["task"] = {}
 		var n_el: int = tm["elements"].size()
-		el["hunt_i"] = int(el["i"] * tm.get("patrol", w.level.patrol).size() / maxi(1, n_el))
+		el["hunt_i"] = 0 if el.has("patrol") else int(el["i"] * tm.get("patrol", w.level.patrol).size() / maxi(1, n_el))
 		el["hunt_done_t"] = -1.0
 
 
@@ -148,6 +184,8 @@ func _el_mates(o) -> Array:
 
 
 func _tag(tm: Dictionary, el: Dictionary) -> String:
+	if el.has("orders"):
+		return "Squad %d" % (el["i"] + 1)
 	if tm["elements"].size() <= 1:
 		return tm["tag"]
 	return "%s-%d" % [tm["tag"], el["i"] + 1]
@@ -187,10 +225,25 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 	var cands: Array = []
 	var bi: int = tm.get("bldg", -1)
 	var door_ids: Array = lv.building_doors(bi) if bi >= 0 else lv.doors.keys()
+	# orders (v0.7): only the rooms the objective needs, never an avoided room, and the
+	# first entry through the ordered door while the room behind it is still to clear
+	var od: Dictionary = el.get("orders", {})
+	var allowed: Dictionary = el.get("allowed", {})
+	var avoid: Array = od.get("avoid", [])
+	var entry: String = od.get("entry", "")
+	var use_entry := false
+	if entry != "" and not el.get("entered", false) and lv.doors.has(entry):
+		for side in [lv.doors[entry]["a"], lv.doors[entry]["b"]]:
+			if not lv.is_exterior(side) and not tm["cleared"].has(side) and not avoid.has(side):
+				use_entry = true
 	for did in door_ids:
+		if use_entry and did != entry:
+			continue
 		var D: Dictionary = lv.doors[did]
 		for into in [D["a"], D["b"]]:
 			if lv.is_exterior(into) or tm["cleared"].has(into) or tm["skipped"].has(into):
+				continue
+			if avoid.has(into) or (not allowed.is_empty() and not allowed.has(into)):
 				continue
 			if tm["claimed"].has(into) and tm["claimed"][into] != el["i"]:
 				continue
@@ -223,6 +276,8 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 		el["task"] = {"door": best[1], "into": best[2], "check": best[3]}
 		tm["claimed"][best[2]] = el["i"]
 		el["mode"] = "assault"
+		if best[1] == entry:
+			el["entered"] = true
 		_begin_task(tm, el)
 		return
 	# nothing open to this element: wait behind another element, or hunt if all clear
@@ -231,6 +286,8 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 		if lv.is_exterior(name) or tm["cleared"].has(name) or tm["skipped"].has(name):
 			continue
 		if lv.adj.get(name, []).is_empty():
+			continue
+		if avoid.has(name) or (not allowed.is_empty() and not allowed.has(name)):
 			continue
 		remaining = true
 	var others_busy := false
@@ -242,6 +299,14 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 			w.say("%s waits on the next room" % _tag(tm, el), "info")
 		el["mode"] = "support"
 		el["retask_t"] = w.t + 1.0
+		return
+	if el.has("orders"):
+		# a squad under orders reports its rooms done instead of going hunting
+		el["mode"] = "assault"
+		if not el.get("rooms_said", false):
+			el["rooms_said"] = true
+			w.say("%s: %s" % [_tag(tm, el), "rooms clear" if not remaining else "rooms out of reach"], "info")
+		_objective_done(tm, el, not remaining, "rooms clear" if not remaining else "rooms out of reach")
 		return
 	if bi >= 0:
 		# a building search: report done and wait for the next tasking
@@ -471,6 +536,8 @@ func update_teams() -> void:
 				continue
 			_sectors(el, eal)
 			_bounding(el, eal)
+			if el.has("orders") and (tick + el["i"]) % 10 == 0:
+				_orders_tick(tm, el)
 			match el["mode"]:
 				"assault":
 					_assault_tick(tm, el, eal)
@@ -685,6 +752,19 @@ func _room_done(tm: Dictionary, el: Dictionary, what: String) -> void:
 	tm["cleared"][into] = true
 	w.say("%s: %s %s" % [_tag(tm, el), w.level.rooms[into]["title"].to_lower(), what], "info")
 	el["last_room"] = into
+	# Consolidate (v0.7): hold this room, covering every door off it, before going on
+	if el.get("orders", {}).get("consolidate", "") == into and not el.get("consol_done", false):
+		el["consol_done"] = true
+		el["consolidating"] = true
+		el["consol_t"] = w.t
+		_release(tm, el)
+		el["task"] = {}
+		el["fixed_room"] = into
+		el["mode"] = "hold"
+		_consolidate(tm, el)
+		w.say("%s consolidates the %s before going on" % [_tag(tm, el), w.level.rooms[into]["title"].to_lower()], "info")
+		w.mark("%s consolidated the %s" % [_tag(tm, el), w.level.rooms[into]["title"].to_lower()], "order")
+		return
 	_next_task(tm, el)
 
 
@@ -732,6 +812,18 @@ func _assault_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
 				go = any_ready
 			if w.t - el["phase_t"] > 45.0:
 				go = true
+			# Knock and announce (v0.7): the first squad to the door knocks, then gives
+			# the occupants ten seconds
+			if go and el.get("orders", {}).get("knock", false) and not w.knock_done:
+				var knocker = null
+				for m in al:
+					if entry[m.id]["at_stack"] and (knocker == null or entry[m.id]["order"] < entry[knocker.id]["order"]):
+						knocker = m
+				if knocker != null:
+					w.announce(knocker)
+					el["knock_wait"] = w.t + 10.0
+			if el.get("knock_wait", -1.0) > w.t and not rusher:
+				go = false
 			if go:
 				el["phase"] = "entry"
 				el["phase_t"] = w.t
@@ -885,17 +977,33 @@ func _think(o) -> void:
 			_reload(o, o.active, false)
 			w.say("%s panic-reloads in the open" % o.id, "bad")
 			return
-	# P4: engage beyond 10 m
+	# a suspect running for it keeps running unless shot at (v0.7)
+	var fl: Dictionary = o.ticker.get("flee", {})
+	if not fl.is_empty() and w.t - o.last_stress_t > 1.2:
+		o.dbg = "running for it"
+		o.aim = {}
+		w.move_to(o, fl["p"], "sprint")
+		_finish_look(o)
+		return
+	var withdrawing: bool = el["mode"] == "withdraw"
+	# P4: engage beyond 10 m (a squad withdrawing only answers fire)
 	var far = _far_target(o)
+	if far != null and withdrawing and not w.attacking(far, o):
+		far = null
 	if far == null and o.ticker.has("far_dest") and _to_far_dest(o):
 		return
 	if far != null:
 		_engage_far(o, far)
 		return
 	# police rules: cuff anyone close by who has given up (v0.6)
-	if o.judges and _arrest(o):
+	if o.judges and not withdrawing and _arrest(o):
 		_finish_look(o)
 		return
+	# Rescue (v0.7): walk a freed hostage out to the casualty point
+	if o.ticker.has("escort") and not withdrawing:
+		if _task_escort(o):
+			_finish_look(o)
+			return
 	# fixation on a body (no ED05)
 	if o.ticker.get("fixate_until", -1.0) > w.t:
 		o.dbg = "staring at body"
@@ -922,6 +1030,11 @@ func _think(o) -> void:
 			_task_support(o, tm, el)
 		"transit":
 			_task_transit(o, el)
+		"withdraw":
+			_task_withdraw(o, el)
+		"wait":
+			w.stop(o)
+			o.dbg = "waiting on the phase line"
 		_:
 			w.stop(o)
 			o.dbg = "waiting"
@@ -1423,7 +1536,7 @@ func _react(o, tm: Dictionary) -> bool:
 		return true
 	if o.hb("BH12") and lk != null and w.t - lk["t"] > 0.3 and w.t - lk["t"] < 15.0 and o.pos.distance_to(lk["p"]) > 1.2:
 		o.dbg = "chasing contact"
-		w.move_to(o, lk["p"], "sprint")
+		w.move_to(o, lk["p"], "sprint", -1, true)
 		o.look_goal = (lk["p"] - o.pos).angle()
 		_task_look(o, o.look_goal)
 		return true
@@ -1438,7 +1551,7 @@ func _react(o, tm: Dictionary) -> bool:
 		var tl = _team_lkp(tm, 15.0, o.pos)
 		if tl != null and o.pos.distance_to(tl) > 1.5 and not _stuck_on(o, tl):
 			o.dbg = "lone wolf push"
-			w.move_to(o, tl, "walk")
+			w.move_to(o, tl, "walk", -1, true)
 			return true
 	return false
 
@@ -1502,7 +1615,7 @@ func _maintain(o) -> bool:
 
 
 # ------------------------------------------------------------------ P7 tasks
-func _go(o, p: Vector2, mode: String, group := true) -> void:
+func _go(o, p: Vector2, mode: String, group := true, free := false) -> void:
 	var el := _el(o)
 	var mates: Array = _el_mates(o)
 	var outside: bool = w.level.is_exterior(o.room)
@@ -1555,7 +1668,7 @@ func _go(o, p: Vector2, mode: String, group := true) -> void:
 		if o.has("PF02") and _near_window(o.pos):
 			m2 = "creep"
 			o.stance_goal = Op.DUCK
-	w.move_to(o, p, m2)
+	w.move_to(o, p, m2, -1, free)
 
 
 ## A teammate's muzzle line is live while they are aiming or have fired in the last
@@ -1640,7 +1753,7 @@ func _task_assault(o, tm: Dictionary, el: Dictionary) -> void:
 					mode = "clear"
 				if o.hb("BH11"):
 					mode = "sprint"
-				_go(o, target, mode)
+				_go(o, target, mode, true, o.hb("BH11"))
 				if slicing:
 					o.dbg = "slicing the pie"
 					_task_look(o, (c + n_in * 2.5 - o.pos).angle())
@@ -1706,7 +1819,7 @@ func _task_assault(o, tm: Dictionary, el: Dictionary) -> void:
 				return
 			var target: Vector2 = d["target"]
 			if not w.at(o, target, 0.3):
-				_go(o, target, "sprint" if o.hb("BH11") else "entry", false)
+				_go(o, target, "sprint" if o.hb("BH11") else "entry", false, o.hb("BH11"))
 			else:
 				w.stop(o)
 				if not d["arrived"]:
@@ -1784,7 +1897,7 @@ func _task_hunt(o, tm: Dictionary, el: Dictionary) -> void:
 	al.sort_custom(func(a, b): return a.eslot < b.eslot)
 	var k := al.find(o)
 	if target == null:
-		var pts: Array = tm.get("patrol", w.level.patrol)
+		var pts: Array = el.get("patrol", tm.get("patrol", w.level.patrol))
 		if pts.is_empty():
 			w.stop(o)
 			return
@@ -2194,3 +2307,327 @@ func _task_transit(o, el: Dictionary) -> void:
 		w.stop(o)
 	else:
 		_go(o, fp, el.get("pace", "run"), false)
+
+
+# ================================================================== orders (v0.7)
+## A squad's objectives run in order: Clear (the building or listed rooms), Arrest (a
+## named suspect), Rescue (hostages), Contain (posts outside listed doors and windows),
+## Post (a point, for the event) and Patrol (a route). Constraints shape how: Avoid,
+## Consolidate, Phase line, Entry point, Pace, Weapons tight, Knock, Pistols only.
+func _begin_objective(tm: Dictionary, el: Dictionary) -> void:
+	var od: Dictionary = el.get("orders", {})
+	var objs: Array = od.get("objs", [])
+	if _alive(el).is_empty():
+		el["mode"] = "lost"
+		return
+	# a phase line holds the squad where it starts until its condition is met
+	if int(el.get("obj_i", 0)) == 0 and not od.get("phase", {}).is_empty() and not el.get("phase_ok", false):
+		el["mode"] = "wait"
+		for m in el["members"]:
+			m.alert_floor = Op.YELLOW
+			if m.alive() and m.alert < Op.YELLOW:
+				w.raise_alert(m, Op.YELLOW)
+		return
+	if int(el.get("obj_i", 0)) >= objs.size():
+		el["obj"] = {}
+		_orders_done(tm, el)
+		return
+	var ob: Dictionary = objs[el["obj_i"]]
+	el["obj"] = ob
+	el["obj_t"] = w.t
+	el.erase("holding_for")
+	el.erase("rooms_said")
+	match ob.get("kind", "clear"):
+		"clear", "arrest", "rescue":
+			el["allowed"] = _allowed_rooms(el, ob.get("rooms", []))
+			if ob.get("kind", "") == "arrest":
+				for m in el["members"]:
+					m.ticker["arrest_tid"] = ob.get("target", "")
+			_set_mode(tm, el, "assault")
+		"contain", "post":
+			_set_posts(tm, el, ob.get("posts", []))
+		"patrol":
+			el["patrol"] = ob.get("route", [])
+			_set_mode(tm, el, "hunt")
+		_:
+			_orders_done(tm, el)
+
+
+## Rooms a Clear objective may enter: the listed rooms and the rooms on the way to them
+## from outside (fewest doors, never through an avoided room). Empty: the whole building.
+func _allowed_rooms(el: Dictionary, rooms: Array) -> Dictionary:
+	var out := {}
+	if rooms.is_empty():
+		return out
+	var lv = w.level
+	var avoid: Array = el.get("orders", {}).get("avoid", [])
+	# breadth-first from outside over the room graph
+	var prev := {"OUT": ""}
+	var queue: Array = ["OUT"]
+	while not queue.is_empty():
+		var cur: String = queue.pop_front()
+		for did in lv.adj.get(cur, []):
+			var D: Dictionary = lv.doors[did]
+			for nb in [D["a"], D["b"]]:
+				var key: String = "OUT" if lv.is_exterior(nb) else nb
+				if prev.has(key) or avoid.has(key):
+					continue
+				prev[key] = cur
+				queue.append(key)
+	for rm in rooms:
+		out[rm] = true
+		var c: String = prev.get(rm, "")
+		while c != "" and c != "OUT":
+			out[c] = true
+			c = prev.get(c, "")
+	return out
+
+
+## Contain and Post: each member takes the post planned for them, facing their sector.
+## floor: the alert they will not relax below (-1 leaves it as it is).
+func _set_posts(tm: Dictionary, el: Dictionary, posts: Array, floor := Op.YELLOW) -> void:
+	_release(tm, el)
+	_release_hold(tm, el)
+	el["task"] = {}
+	el["mode"] = "hold"
+	el["hold_room"] = ""
+	el["posted"] = true
+	el["sector_posture"] = ""
+	var al := _alive(el)
+	for k in al.size():
+		var m = al[k]
+		w.wake(m)
+		if floor >= 0:
+			m.alert_floor = floor
+			if m.alert < floor:
+				w.raise_alert(m, floor)
+		if not posts.is_empty():
+			var p: Dictionary = posts[k % posts.size()]
+			m.spawn = p["p"] + (Vector2(0.9, 0).rotated(k * 2.4) if k >= posts.size() else Vector2.ZERO)
+			m.spawn = w.nav.snap(m.spawn)
+			m.spawn_face = float(p["face"])
+
+
+## The squad stays where it stands, each member facing where they look.
+func _hold_here(tm: Dictionary, el: Dictionary) -> void:
+	var posts: Array = []
+	for m in _alive(el):
+		posts.append({"p": m.pos, "face": m.look_dir})
+	_set_posts(tm, el, posts)
+
+
+func _objective_done(tm: Dictionary, el: Dictionary, ok: bool, why: String) -> void:
+	var ob: Dictionary = el.get("obj", {})
+	var kind: String = ob.get("kind", "")
+	# an Arrest or Rescue squad that has run out of rooms holds until its target resolves
+	if kind in ["arrest", "rescue"] and why in ["rooms clear", "rooms out of reach"]:
+		if not el.get("holding_for", false):
+			el["holding_for"] = true
+			el["holding_t"] = w.t
+			_hold_here(tm, el)
+		return
+	if el.get("obj_closed_" + str(el.get("obj_i", 0)), false):
+		return
+	el["obj_closed_" + str(el.get("obj_i", 0))] = true
+	el["results"].append({"kind": kind, "ok": ok, "why": why, "t": w.t})
+	if int(el.get("obj_i", 0)) == 0:
+		el["first_done"] = true
+	for m in el["members"]:
+		m.ticker.erase("arrest_tid")
+	w.mark("%s: %s %s (%s)" % [_tag(tm, el), kind, "done" if ok else "failed", why], "objective")
+	el["obj_i"] = int(el.get("obj_i", 0)) + 1
+	el.erase("allowed")
+	_begin_objective(tm, el)
+
+
+## No objectives left: hold where they are.
+func _orders_done(tm: Dictionary, el: Dictionary) -> void:
+	if el.get("all_done", false):
+		return
+	el["all_done"] = true
+	_hold_here(tm, el)
+	w.say("%s holds: orders complete" % _tag(tm, el), "info")
+
+
+func _phase_ok(tm: Dictionary, el: Dictionary) -> bool:
+	var ph: Dictionary = el["orders"].get("phase", {})
+	match ph.get("kind", ""):
+		"time":
+			return w.t >= float(ph.get("t", 0.0))
+		"squad":
+			var k: int = int(ph.get("squad", 0))
+			if k < 0 or k >= tm["elements"].size() or k == el["i"]:
+				return true
+			var other: Dictionary = tm["elements"][k]
+			return other.get("first_done", false) or _alive(other).is_empty()
+	return true
+
+
+## Every ten ticks per squad: phase lines, consolidation, and whether the objective in
+## hand has been met or has failed.
+func _orders_tick(tm: Dictionary, el: Dictionary) -> void:
+	if el["mode"] == "withdraw":
+		return
+	if el["mode"] == "wait":
+		if _phase_ok(tm, el):
+			el["phase_ok"] = true
+			w.say("%s crosses the phase line" % _tag(tm, el), "info")
+			w.mark("%s crossed its phase line" % _tag(tm, el), "order")
+			_begin_objective(tm, el)
+		return
+	if el.get("consolidating", false):
+		var quiet := true
+		var rusher = null
+		for m in _alive(el):
+			if not w.visible_enemies(m).is_empty():
+				quiet = false
+			if m.hb("BH11") and rusher == null:
+				rusher = m
+		quiet = quiet and w.t - float(tm["last_contact"]) > 6.0
+		var held: float = w.t - float(el["consol_t"])
+		if (held >= 20.0 and quiet) or (rusher != null and held > 3.0) or held > 90.0:
+			if rusher != null and held < 20.0:
+				w.order_broken(rusher, "consolidate", "rushes on before the room is held")
+			el["consolidating"] = false
+			el.erase("fixed_room")
+			_set_mode(tm, el, "assault")
+		return
+	var ob: Dictionary = el.get("obj", {})
+	match ob.get("kind", ""):
+		"contain", "post":
+			# a standing order: "in position" once everyone has reached their post (other
+			# squads' phase lines can wait for this)
+			if not el.get("first_done", false):
+				var all_in := true
+				for m in _alive(el):
+					if m.pos.distance_to(m.spawn) > 1.2:
+						all_in = false
+				if all_in or w.t - float(el.get("obj_t", 0.0)) > 60.0:
+					el["first_done"] = true
+					w.say("%s in position" % _tag(tm, el), "comms")
+					w.mark("%s in position" % _tag(tm, el), "order")
+		"clear":
+			var rooms: Array = ob.get("rooms", [])
+			if not rooms.is_empty():
+				var all := true
+				for rm in rooms:
+					if not tm["cleared"].has(rm) and not tm["skipped"].has(rm):
+						all = false
+				if all:
+					_objective_done(tm, el, true, "rooms clear")
+		"arrest":
+			var tg = w.by_id.get(ob.get("target", ""), null)
+			if tg == null:
+				_objective_done(tm, el, false, "no such suspect")
+			elif tg.arrested:
+				_objective_done(tm, el, true, "%s in cuffs" % tg.id)
+			elif tg.gone:
+				_objective_done(tm, el, false, "%s escaped" % tg.id)
+			elif not tg.alive():
+				_objective_done(tm, el, false, "%s %s" % [tg.id, "killed" if tg.state == "dead" else "down"])
+			elif el.get("holding_for", false) and w.t - float(el["holding_t"]) > 120.0 and not tg.complying:
+				_objective_done(tm, el, false, "%s not found" % tg.id)
+		"rescue":
+			var left := 0
+			var lost := 0
+			for h in w.ops:
+				if not h.hostage:
+					continue
+				if not h.alive():
+					lost += 1
+				elif h.cstate != "safe":
+					left += 1
+					if h.cstate in ["hostage", "freed"] and h.ticker.get("free_ok", false):
+						rescuer_for(h)
+			if left == 0:
+				_objective_done(tm, el, lost == 0, "hostages out" if lost == 0 else "%d hostage%s lost" % [lost, "" if lost == 1 else "s"])
+
+
+## The nearest free member of a Rescue squad walks a freed hostage out. Returns the
+## officer, or null when no Rescue squad has anyone free.
+func rescuer_for(h):
+	if h.ticker.has("escort_by"):
+		var cur = w.by_id.get(h.ticker["escort_by"], null)
+		if cur != null and cur.fighting() and cur.ticker.get("escort", "") == h.id:
+			return cur
+	var tm: Dictionary = w.teams[0]
+	var best = null
+	var bd := INF
+	for el in tm["elements"]:
+		if el.get("obj", {}).get("kind", "") != "rescue" or el["mode"] == "withdraw":
+			continue
+		for m in _alive(el):
+			if m.ticker.has("escort") or not m.fighting():
+				continue
+			var d: float = m.pos.distance_to(h.pos)
+			if d < bd:
+				bd = d
+				best = m
+	if best != null:
+		best.ticker["escort"] = h.id
+		h.ticker["escort_by"] = best.id
+	return best
+
+
+## Walking a hostage out: stay a metre behind them; done when they reach safety.
+func _task_escort(o) -> bool:
+	var h = w.by_id.get(o.ticker["escort"], null)
+	if h == null or not h.alive() or h.cstate == "safe" or not h.hostage:
+		o.ticker.erase("escort")
+		return false
+	if h.cstate == "hostage":
+		# go and get them
+		o.dbg = "going to the hostage"
+		if not w.at(o, h.pos, 1.2):
+			_go(o, h.pos, "clear" if w.level.is_inside(o.pos) else "walk", false)
+		else:
+			w.stop(o)
+		return true
+	o.dbg = "escorting %s" % h.id
+	var cp: Vector2 = w.casualty_point
+	var behind: Vector2 = h.pos - (cp - h.pos).normalized() * 1.0
+	if o.pos.distance_to(behind) > 0.6:
+		_go(o, behind, "walk", false)
+	else:
+		w.stop(o)
+	return true
+
+
+## Abort: every squad withdraws to its vehicles, at a run, fighting only if fired on.
+func withdraw(tm: Dictionary) -> void:
+	for el in tm["elements"]:
+		_release(tm, el)
+		_release_hold(tm, el)
+		el["task"] = {}
+		el["consolidating"] = false
+		el["mode"] = "withdraw"
+		var v: Vector2 = _centre(el["members"]) if not el["members"].is_empty() else Vector2.ZERO
+		if el["i"] < w.vehicles.size():
+			v = w.vehicles[el["i"]]
+		el["veh"] = v
+		for m in el["members"]:
+			m.ticker.erase("escort")
+			m.ticker.erase("arrest_tid")
+			m.pace_cap = ""
+			w.wake(m)
+
+
+func _task_withdraw(o, el: Dictionary) -> void:
+	var v: Vector2 = el.get("veh", o.spawn)
+	var spot: Vector2 = w.nav.snap(v + Vector2(1.1, 0).rotated(o.eslot * 1.3) * (0.0 if o.eslot == 0 else 1.0))
+	o.dbg = "withdrawing to the vehicles"
+	if o.pos.distance_to(spot) < 1.6:
+		w.leave(o, "withdrew")
+		return
+	_go(o, spot, "run", false)
+
+
+## The attack at an event: the attackers go hunting through the crowd.
+func attack(tm: Dictionary, crowd: Array) -> void:
+	tm["stay"] = true
+	for el in tm["elements"]:
+		var route: Array = crowd.duplicate()
+		if route.is_empty():
+			route = w.level.patrol.duplicate()
+		el["patrol"] = route
+		_set_mode(tm, el, "hunt")

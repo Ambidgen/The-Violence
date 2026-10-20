@@ -276,6 +276,83 @@ func sight_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float) -> in
 	return mask
 
 
+## How far along a->b sight carries before something blocks it (v0.7, the fog of war):
+## the fraction 0..1 of the segment, 1.0 when nothing does. One sight line, from height
+## za to zb, with the same rules as sight_mask.
+func sight_reach(a: Vector2, za: float, b: Vector2, zb: float) -> float:
+	_stamp_id += 1
+	var d := b - a
+	var L := d.length()
+	if L < 0.001:
+		return 1.0
+	var x := int(floor(a.x))
+	var y := int(floor(a.y))
+	var xe := int(floor(b.x))
+	var ye := int(floor(b.y))
+	var step_x := 1 if d.x > 0.0 else -1
+	var step_y := 1 if d.y > 0.0 else -1
+	var t_max_x := INF
+	var t_max_y := INF
+	var t_dx := INF
+	var t_dy := INF
+	if absf(d.x) > 1e-9:
+		t_max_x = ((x + (1 if d.x > 0.0 else 0)) - a.x) / d.x
+		t_dx = absf(1.0 / d.x)
+	if absf(d.y) > 1e-9:
+		t_max_y = ((y + (1 if d.y > 0.0 else 0)) - a.y) / d.y
+		t_dy = absf(1.0 / d.y)
+	var best := 1.0
+	var t_cell := 0.0
+	var guard := 0
+	while true:
+		if t_cell > best:
+			break
+		if x >= 0 and y >= 0 and x < _cw and y < _ch:
+			var cc := y * _cw + x
+			for kk in range(_cstart[cc], _cstart[cc + 1]):
+				var idx: int = _citems[kk]
+				if _stamp[idx] == _stamp_id:
+					continue
+				_stamp[idx] = _stamp_id
+				var kind: int = _kind[idx]
+				if kind == LOW:
+					continue
+				var r: Rect2 = _rect[idx]
+				if r.has_point(a):
+					continue
+				var tt := seg_rect(a, d, r)
+				if tt.x < 0.0 or tt.x >= best:
+					continue
+				var stop := false
+				if kind == WALL:
+					stop = true
+				else:
+					var z0 := lerpf(za, zb, tt.x)
+					var z1 := lerpf(za, zb, tt.y)
+					var zlo := minf(z0, z1)
+					if kind == WINDOW:
+						stop = zlo < _sill[idx] or maxf(z0, z1) > _lintel[idx]
+					else:
+						var h: float = _h[idx]
+						if h <= LOW_COVER_H and za > h:
+							h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
+						stop = zlo < h
+				if stop:
+					best = tt.x
+		if (x == xe and y == ye) or guard > 512:
+			break
+		if t_max_x < t_max_y:
+			t_cell = t_max_x
+			t_max_x += t_dx
+			x += step_x
+		else:
+			t_cell = t_max_y
+			t_max_y += t_dy
+			y += step_y
+		guard += 1
+	return best
+
+
 ## First obstacle that stops a bullet on a->b. Returns {hit, t, p, n, idx, kind}.
 func trace_shot(a: Vector2, za: float, b: Vector2, zb: float) -> Dictionary:
 	var d := b - a

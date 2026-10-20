@@ -10,7 +10,7 @@ func _init() -> void:
 	id = "m07"
 	map_name = "Roadside Motel"
 	title = "THE VIOLENCE  -  07 ROADSIDE MOTEL"
-	notes = ["SIX ROOMS ON A WALKWAY, OFFICE, 36 x 8 m", "PARKING LOT, SERVICE LANE  ·  1 SQUARE = 1 m", "MAP 07  ·  SHEET 8 OF 11"]
+	notes = ["SIX ROOMS ON A WALKWAY, OFFICE, 36 x 8 m", "PARKING LOT, SERVICE LANE  ·  1 SQUARE = 1 m", "MAP 07  ·  SHEET 8 OF 12"]
 	W = 56.0
 	H = 34.0
 	time_limit = 480.0

@@ -277,17 +277,94 @@ func exposure_at(p: Vector2) -> float:
 var path_calls := 0
 var path_us := 0
 
+## Avoid overlays (v0.7 order Avoid): per squad, the cells of the rooms it must keep out
+## of cost AVOID_W more to cross. They get their own grids, built on first use and
+## cached with the map (a squad keeps its overlay key for the whole operation).
+const AVOID_W := 400.0
+static var _avoid_cache := {}   # map id + key -> {"mask": PackedByteArray, "grids": {prof: AStarGrid2D}}
+var _mask := PackedByteArray()  # the overlay in use during one search (empty: none)
 
-func find_path(prof: int, a: Vector2, b: Vector2) -> PackedVector2Array:
+
+## Register the overlay for a set of rooms; returns its key ("" for no rooms).
+func avoid_key(rooms: Array) -> String:
+	if rooms.is_empty():
+		return ""
+	var names := rooms.duplicate()
+	names.sort()
+	var key := "%s|%s" % [level.id, ",".join(names)]
+	if _avoid_cache.has(key):
+		return key
+	var mask := PackedByteArray()
+	mask.resize(nx * ny)
+	mask.fill(0)
+	for rm in names:
+		if not level.rooms.has(rm):
+			continue
+		for rv in level.rooms[rm]["rects"]:
+			var r: Rect2 = (rv as Rect2).grow(0.05)
+			var c0 := cell_of(r.position)
+			var c1 := cell_of(r.end)
+			for y in range(c0.y, c1.y + 1):
+				for x in range(c0.x, c1.x + 1):
+					if r.has_point(cell_centre(Vector2i(x, y))):
+						mask[y * nx + x] = 1
+	_avoid_cache[key] = {"mask": mask, "grids": {}}
+	return key
+
+
+func avoid_mask(key: String) -> PackedByteArray:
+	if key == "" or not _avoid_cache.has(key):
+		return PackedByteArray()
+	return _avoid_cache[key]["mask"]
+
+
+func _avoid_grid(key: String, prof: int) -> AStarGrid2D:
+	var rec: Dictionary = _avoid_cache[key]
+	if rec["grids"].has(prof):
+		return rec["grids"][prof]
+	var mask: PackedByteArray = rec["mask"]
+	var g := AStarGrid2D.new()
+	g.region = Rect2i(0, 0, nx, ny)
+	g.cell_size = Vector2(1, 1)
+	g.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+	g.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+	g.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+	g.update()
+	for y in ny:
+		for x in nx:
+			var i := y * nx + x
+			if solid[i] == 1:
+				g.set_point_solid(Vector2i(x, y), true)
+				continue
+			var w := 1.0
+			if prof & 1:
+				w += w_door[i]
+			if prof & 2:
+				w += w_expo[i]
+			if mask[i] == 1:
+				w += AVOID_W
+			if w != 1.0:
+				g.set_point_weight_scale(Vector2i(x, y), w)
+	rec["grids"][prof] = g
+	return g
+
+
+func find_path(prof: int, a: Vector2, b: Vector2, avoid := "") -> PackedVector2Array:
 	path_calls += 1
 	var t0 := Time.get_ticks_usec()
-	var res := _find_path(prof, a, b)
+	var res: PackedVector2Array
+	if avoid != "" and _avoid_cache.has(avoid):
+		_mask = _avoid_cache[avoid]["mask"]
+		res = _find_path(prof, a, b, _avoid_grid(avoid, clampi(prof, 0, 3)))
+		_mask = PackedByteArray()
+	else:
+		res = _find_path(prof, a, b)
 	path_us += Time.get_ticks_usec() - t0
 	return res
 
 
-func _find_path(prof: int, a: Vector2, b: Vector2) -> PackedVector2Array:
-	var g: AStarGrid2D = grids[clampi(prof, 0, 3)]
+func _find_path(prof: int, a: Vector2, b: Vector2, grid: AStarGrid2D = null) -> PackedVector2Array:
+	var g: AStarGrid2D = grid if grid != null else grids[clampi(prof, 0, 3)]
 	var ca := nearest_free(a)
 	var cb := nearest_free(b)
 	var ids: Array[Vector2i] = g.get_id_path(ca, cb)
@@ -323,20 +400,22 @@ func _w(prof: int, i: int) -> float:
 		v += w_door[i]
 	if prof & 2:
 		v += w_expo[i]
+	if not _mask.is_empty() and _mask[i] == 1:
+		v += AVOID_W
 	return v
 
 
 func line_ok(prof: int, a: Vector2, b: Vector2) -> bool:
 	var steps := int(a.distance_to(b) / CS) + 1
 	var w0 := 1.0
-	if prof != 0:
+	if prof != 0 or not _mask.is_empty():
 		w0 = _w(prof, clampi(int(a.y / CS), 0, ny - 1) * nx + clampi(int(a.x / CS), 0, nx - 1))
 	for k in range(1, steps + 1):
 		var p := a.lerp(b, float(k) / steps)
 		var i := clampi(int(p.y / CS), 0, ny - 1) * nx + clampi(int(p.x / CS), 0, nx - 1)
 		if solid[i] == 1:
 			return false
-		if prof != 0 and _w(prof, i) > w0 + 0.01:
+		if (prof != 0 or not _mask.is_empty()) and _w(prof, i) > w0 + 0.01:
 			return false
 	return true
 

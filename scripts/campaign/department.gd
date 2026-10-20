@@ -12,7 +12,7 @@ extends RefCounted
 const Habits = preload("res://scripts/data/habits.gd")
 const Names = preload("res://scripts/data/names.gd")
 
-const VERSION := 1
+const VERSION := 2
 const SAVE_PATH := "user://department.json"
 ## Experience points needed for tiers 1-5 (Green, Blooded, Seasoned, Veteran, Exceptional).
 const XP_TIERS := [0, 6, 18, 40, 80]
@@ -20,6 +20,20 @@ const RANKS := ["Officer", "Corporal", "Sergeant", "Lieutenant", "Captain"]
 ## Personality traits and the bad habits each brings (habits.gd, trait habits).
 const PERSONALITY := {"Aggression": ["BH11", "BH12"], "Anxiety": ["BH13", "BH14"], "Ego": ["BH15", "BH16"],
 	"Complacency": ["BH17", "BH18"], "Rigidity": ["BH19", "BH20"]}
+## The department the player inherits (v0.7): twenty officers. A lieutenant, two
+## sergeants and four corporals with years on the job, six officers with a little, and
+## seven rookies.
+## New hires are rookies: Patrol, between Militia and Regular infantry.
+const FOUNDING := [
+	["Lieutenant", 14, 46], ["Sergeant", 11, 28], ["Sergeant", 9, 22],
+	["Corporal", 7, 14], ["Corporal", 5, 10], ["Corporal", 4, 8],
+	["Corporal", 3, 7], ["Officer", 3, 7], ["Officer", 2, 6], ["Officer", 2, 4], ["Officer", 1, 2], ["Officer", 1, 2],
+	["Officer", 1, 1], ["Officer", 0, 0], ["Officer", 0, 0], ["Officer", 0, 0], ["Officer", 0, 0], ["Officer", 0, 0],
+	["Officer", 0, 0], ["Officer", 0, 0]]
+## Habits a Regular has that the academy's Patrol twelve lack, and those a tactical
+## team adds on top: years on the job bring the first, the best veterans some of both.
+const SERVICE_HABITS := ["PF02", "GD02", "GD05", "GD06", "WD07"]
+const VETERAN_HABITS := ["PF03", "PF04", "ED03", "ED05", "GD03", "WD10", "WD02", "ED10"]
 
 var seed_val := 1
 var week := 1
@@ -34,8 +48,9 @@ var names
 
 
 # ================================================================== founding and hiring
-## A new department: a sergeant, a corporal and ten officers, all rolled from the seed.
-func found(seed_v: int, n := 12) -> void:
+## A new department, all rolled from the seed: by default the FOUNDING roster (veterans,
+## officers with a few years in, and rookies). n > 0 founds n rookies instead (tests).
+func found(seed_v: int, n := 0) -> void:
 	seed_val = seed_v
 	rng.seed = seed_v
 	names = Names.new(seed_v * 7 + 3)
@@ -45,47 +60,51 @@ func found(seed_v: int, n := 12) -> void:
 	history = []
 	notes = []
 	ops_run = 0
-	for k in n:
-		var rank := "Officer"
-		var xp := 0
-		if k == 0:
-			rank = "Sergeant"
-			xp = 20
-		elif k == 1:
-			rank = "Corporal"
-			xp = 8
-		elif rng.randf() < 0.25:
-			xp = 6
-		hire(rank, xp)
-	note("Department founded: %d officers." % officers.size())
+	if n > 0:
+		for k in n:
+			hire("Officer", 0)
+	else:
+		for f in FOUNDING:
+			hire(f[0], f[2], false, float(f[1]))
+	note("Department inherited: %d officers (%d with five years or more on the job)." % [officers.size(),
+		officers.filter(func(r): return float(r.get("years", 0.0)) >= 5.0).size()])
 
 
-## Hire one officer of the Patrol echelon. A lateral hire arrives with experience.
-func hire(rank := "Officer", xp := 0, lateral := false) -> Dictionary:
+## Hire one officer. A rookie is Patrol (the midpoint of Militia and Regular in every
+## stat); years of service move the stats towards Regular and add habits. A lateral
+## hire arrives with experience.
+func hire(rank := "Officer", xp := 0, lateral := false, years := 0.0) -> Dictionary:
 	if names == null:
 		names = Names.new(seed_val * 7 + 3 + serial)
 	serial += 1
+	if lateral and years <= 0.0:
+		years = 3.0
 	var r := {"id": "PC-%04d" % serial, "badge": 1000 + serial * 7 + rng.randi_range(0, 6), "name": names.diverse_name(0.3),
-		"rank": rank, "echelon": "patrol", "hired_week": week, "status": "active", "out_until": 0,
-		"ech": Habits.vary(Habits.ECHELONS["patrol"], rng), "good": [], "bad_traits": [], "traits": [],
-		"personality": "", "judgment": _trait(50.0, 12.0), "temper": _trait(40.0, 15.0), "integrity": _trait(65.0, 15.0),
-		"exp": 1, "xp": 0, "trauma": 0.0, "ops": 0, "shots": 0, "hits": 0, "kills": 0, "civ_hits": 0,
-		"wounded": 0, "arrests": 0, "file": [], "lateral": lateral}
-	# habits: the academy's twelve, sometimes one swapped for another Regular habit
+		"rank": rank, "echelon": "patrol", "hired_week": week, "status": "active", "out_until": 0, "years": years,
+		"ech": Habits.vary(Habits.service_stats(years), rng), "good": [], "bad_traits": [], "traits": [],
+		"personality": "", "judgment": _trait(50.0 + 1.2 * years, 11.0), "temper": _trait(40.0, 15.0),
+		"integrity": _trait(65.0, 15.0), "exp": 1, "xp": 0, "trauma": 0.0, "ops": 0, "shots": 0, "hits": 0, "kills": 0,
+		"civ_hits": 0, "wounded": 0, "arrests": 0, "file": [], "lateral": lateral, "orders_broken": 0}
+	# habits: the academy's twelve, sometimes one swapped for another Regular habit;
+	# years on the job add Regular habits, and the senior veterans some tactical ones
 	var good: Array = Habits.preset_good("patrol")
-	if rng.randf() < 0.5:
+	if rng.randf() < 0.5 and years < 1.0:
 		var extra: Array = Habits.preset_good("regular").filter(func(g): return not good.has(g))
 		if not extra.is_empty():
 			good.remove_at(rng.randi() % good.size())
 			good.append(extra[rng.randi() % extra.size()])
-	if rank == "Sergeant" or rank == "Corporal" or lateral:
-		var more: Array = Habits.preset_good("regular").filter(func(g): return not good.has(g))
-		for k in (4 if rank == "Sergeant" else 2):
-			if more.is_empty():
-				break
-			good.append(more.pop_at(rng.randi() % more.size()))
+	var more: Array = SERVICE_HABITS.filter(func(g): return not good.has(g))
+	for k in mini(more.size(), int(round(years * 0.6))):
+		good.append(more.pop_at(rng.randi() % more.size()))
+	if years >= 9.0:
+		var vet: Array = VETERAN_HABITS.duplicate()
+		for k2 in clampi(int(years - 8.0) / 2 + 1, 1, 4):
+			good.append(vet.pop_at(rng.randi() % vet.size()))
 	good.sort()
 	r["good"] = good
+	# a career leaves something behind
+	if years >= 4.0:
+		r["trauma"] = snappedf(rng.randf() * years * 0.35, 0.5)
 	# personality: some recruits bring a trait and the bad habits that come with it
 	if rng.randf() < 0.4:
 		var keys: Array = PERSONALITY.keys()
@@ -99,7 +118,10 @@ func hire(rank := "Officer", xp := 0, lateral := false) -> Dictionary:
 		r["traits"].append("TR02")
 	r["xp"] = xp
 	r["exp"] = tier_for(xp)
-	r["file"].append({"week": week, "text": "Hired as %s%s." % [rank.to_lower(), " (lateral)" if lateral else ""]})
+	if years >= 1.0 and not lateral:
+		r["file"].append({"week": week, "text": "%s, %d year%s on the job when you took command." % [rank, int(years), "" if int(years) == 1 else "s"]})
+	else:
+		r["file"].append({"week": week, "text": "Hired as %s%s." % [rank.to_lower(), " (lateral)" if lateral else ""]})
 	officers.append(r)
 	return r
 
@@ -278,7 +300,8 @@ func to_data() -> Dictionary:
 
 
 func from_data(d: Dictionary) -> bool:
-	if int(d.get("version", 0)) != VERSION:
+	var ver := int(d.get("version", 0))
+	if ver < 1 or ver > VERSION:
 		return false
 	seed_val = int(d["seed"])
 	week = int(d["week"])
@@ -293,9 +316,11 @@ func from_data(d: Dictionary) -> bool:
 		var r: Dictionary = r0
 		# JSON has no integers: restore them
 		for k in ["badge", "hired_week", "out_until", "judgment", "temper", "integrity", "exp", "xp", "ops", "shots",
-				"hits", "kills", "civ_hits", "wounded", "arrests"]:
+				"hits", "kills", "civ_hits", "wounded", "arrests", "orders_broken"]:
 			r[k] = int(r.get(k, 0))
 		r["trauma"] = float(r.get("trauma", 0.0))
+		# version 1 (v0.5-v0.6) had no years of service
+		r["years"] = float(r.get("years", 0.0))
 		for fe in r["file"]:
 			fe["week"] = int(fe["week"])
 		officers.append(r)

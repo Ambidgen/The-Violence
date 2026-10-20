@@ -24,6 +24,8 @@ var findings: Array = []     # [{t, kind, by, target, text, place, evidence, str
 var per_op := {}             # id -> {shots, hits_threat, hits_civ, hits_friend, walls, misjudged, excessive, kills}
 var surrenders: Array = []   # [{t, id, by}]
 var arrests: Array = []      # [{t, id, by}]
+var escapes: Array = []      # [{t, id}] (v0.7)
+var orders_broken: Array = []   # [{t, id, order, why, place}] (v0.7)
 var _keys := {}              # finding dedupe keys
 var dropped := 0
 
@@ -61,10 +63,12 @@ func _po(o) -> Dictionary:
 
 ## One round fired. tgt is the person aimed at (null for a stray), hit the person struck
 ## (null for a miss), walls how many walls the round went through before it stopped.
-func on_shot(o, tgt, hit, walls: int) -> void:
+func on_shot(o, tgt, hit, walls: int, endp := Vector2.INF) -> void:
 	var verdict := verdict_for(o, tgt)
 	var rec := {"t": w.t, "by": o.id, "pol": o.judges, "tgt": tgt.id if tgt != null else "", "tkind": role(tgt) if tgt != null else "",
-		"verdict": verdict, "hit": hit.id if hit != null else "", "hkind": role(hit) if hit != null else "", "walls": walls}
+		"verdict": verdict, "hit": hit.id if hit != null else "", "hkind": role(hit) if hit != null else "", "walls": walls,
+		"weapon": o.active, "att": tgt != null and w.attacking(tgt, o),
+		"end": w.place_of(endp) if endp != Vector2.INF and hit == null else ""}
 	if shots.size() < SHOTS_MAX:
 		shots.append(rec)
 	else:
@@ -157,6 +161,17 @@ func on_arrest(e, by) -> void:
 	arrests.append({"t": w.t, "id": e.id, "by": by.id})
 
 
+## A suspect got away (v0.7).
+func on_escape(e) -> void:
+	escapes.append({"t": w.t, "id": e.id})
+
+
+## An officer broke an order (v0.7): always a line in the record, and in their file.
+func on_order_broken(o, order: String, why: String) -> void:
+	orders_broken.append({"t": w.t, "id": o.id, "order": order, "why": why, "place": w.place_of(o.pos)})
+	_finding("order_broken", o, null, "%s broke the %s order (%s)" % [_who(o), order, why], o.pos, false)
+
+
 # ------------------------------------------------------------------ evidence
 ## Who saw, filmed, recorded or heard an event at p.
 func evidence(p: Vector2, shooter) -> Dictionary:
@@ -205,7 +220,7 @@ func _finding(kind: String, by, target, text: String, p: Vector2, once := true) 
 
 # ------------------------------------------------------------------ summary
 const SEVERITY := ["civilian_killed", "excessive_force", "civilian_hit_by_police", "misjudgment", "officer_killed",
-	"friendly_fire", "civilian_down", "civilian_hit_by_suspect", "jumpy_fire", "officer_down"]
+	"friendly_fire", "civilian_down", "civilian_hit_by_suspect", "jumpy_fire", "officer_down", "order_broken"]
 
 
 ## Totals and readable lines for the debrief and for the department's records.
@@ -213,13 +228,20 @@ func summary() -> Dictionary:
 	var s := {"shots": shots.size() + dropped, "police_shots": 0, "through_walls": 0, "civ_hit": 0, "civ_hit_police": 0,
 		"civ_killed": 0, "civ_total": 0, "suspects": 0, "suspects_down": 0, "suspects_killed": 0, "surrendered": surrenders.size(),
 		"arrested": arrests.size(), "officers": 0, "officers_down": 0, "officers_killed": 0, "excessive": 0, "misjudged": 0,
-		"findings": findings.size(), "lines": [], "strength": {}}
+		"findings": findings.size(), "lines": [], "strength": {}, "escaped": escapes.size(), "orders_broken": orders_broken.size(),
+		"hostages": 0, "hostages_safe": 0, "hostages_killed": 0}
 	for sh in shots:
 		if sh.get("pol", false):
 			s["police_shots"] += 1
 		if sh["walls"] > 0:
 			s["through_walls"] += 1
 	for o in w.ops:
+		if o.hostage:
+			s["hostages"] += 1
+			if o.state == "dead":
+				s["hostages_killed"] += 1
+			elif o.cstate == "safe":
+				s["hostages_safe"] += 1
 		if o.civ:
 			s["civ_total"] += 1
 			if o.state != "ok" or o.wounds > 0 or o.arm_hit or o.leg_hit:
@@ -276,4 +298,5 @@ func summary() -> Dictionary:
 func to_data() -> Dictionary:
 	var s := summary()
 	return {"summary": s, "findings": findings.duplicate(true), "per_op": per_op.duplicate(true),
-		"surrenders": surrenders.duplicate(true), "arrests": arrests.duplicate(true)}
+		"surrenders": surrenders.duplicate(true), "arrests": arrests.duplicate(true), "escapes": escapes.duplicate(true),
+		"orders_broken": orders_broken.duplicate(true)}

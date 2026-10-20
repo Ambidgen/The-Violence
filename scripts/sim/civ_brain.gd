@@ -61,6 +61,15 @@ func think(o) -> void:
 			_comply(o, t)
 		"film":
 			_film(o, t)
+		"hostage":
+			_hostage(o, t)
+		"escorted":
+			_escorted(o, t)
+		"safe":
+			w.stop(o)
+			o.stance_goal = Op.CROUCH
+	if o.cstate in ["hostage", "escorted", "safe"]:
+		return
 	if o.cstate != "comply" and o.cstate != "unaware" and t >= o.ticker.get("comply_check", 0.0):
 		o.ticker["comply_check"] = t + 0.5
 		_check_comply(o)
@@ -79,7 +88,7 @@ func alarm(o, p: Vector2, why: String) -> void:
 	if o.cstate == "unaware":
 		o.cstate = "alarmed"
 		w.say("%s (civilian) %s" % [o.id, {"gunfire": "hears gunfire", "gun": "sees a gun", "near miss": "has a round go past",
-			"fall": "sees someone fall", "hit": "is hit"}.get(why, why)], "civ")
+			"fall": "sees someone fall", "hit": "is hit", "police": "hears the police at the door"}.get(why, why)], "civ")
 		return
 	# a new threat much closer than the old one changes the plan
 	if o.cstate in ["film", "freeze", "hide"] and (old == Vector2.INF or o.pos.distance_to(p) < o.pos.distance_to(old) - 4.0):
@@ -349,3 +358,66 @@ func _comply(o, t: float) -> void:
 		elif t - o.ticker.get("comply_since", t) > 12.0:
 			o.ticker.erase("hands")
 			_start_flee(o)
+
+
+# ------------------------------------------------------------------ hostages (v0.7)
+## Held by captors: kneeling, hands bound, going nowhere. Freed when no captor is close
+## and an officer is: a Rescue squad walks them out to the casualty point; otherwise
+## they run on their own, into whatever is happening.
+func _hostage(o, t: float) -> void:
+	w.stop(o)
+	o.stance_goal = Op.DUCK
+	o.ticker["hands"] = t
+	if t < o.ticker.get("hcheck", 0.0):
+		return
+	o.ticker["hcheck"] = t + 0.5
+	var captor := false
+	var officer = null
+	for x in w._near_fast(o.pos, 8.0):
+		if not x.alive() or x == o:
+			continue
+		if x.fighting() and not x.judges and x.pos.distance_to(o.pos) < 7.0 and w.geom.sight_clear(x.pos, x.eye(), o.pos, 0.8):
+			captor = true
+		elif x.judges and x.fighting() and x.pos.distance_to(o.pos) < 4.0 and w.geom.sight_clear(x.pos, x.eye(), o.pos, 0.8):
+			officer = x
+	if captor or officer == null:
+		return
+	o.ticker["free_ok"] = true
+	var resc = w.brain.rescuer_for(o)
+	if resc != null:
+		o.cstate = "escorted"
+		# the squad tells everyone: a hostage is coming out
+		for x2 in w.ops:
+			if x2.judges:
+				x2.cleared[o.id] = 1.0e9
+				x2.tracked.erase(o.id)
+				x2.judged.erase(o.id)
+				if x2.aim.get("tid", "") == o.id:
+					x2.aim = {}
+		w.say("%s (hostage) is freed; %s walks them out" % [o.id, resc.id], "civ")
+		w.mark("%s freed; %s walks them out" % [o.id, resc.id], "hostage")
+	else:
+		o.cstate = "alarmed"
+		o.ticker["threat_p"] = officer.pos
+		w.say("%s (hostage) is free and runs" % o.id, "civ")
+		w.mark("%s freed and ran on their own" % o.id, "hostage")
+
+
+func _escorted(o, t: float) -> void:
+	var cp: Vector2 = w.casualty_point
+	if cp == Vector2.INF or o.pos.distance_to(cp) < 1.8:
+		o.cstate = "safe"
+		w.stop(o)
+		w.say("%s (hostage) reaches the casualty point" % o.id, "civ")
+		w.mark("%s safe at the casualty point" % o.id, "hostage")
+		return
+	var esc = w.brain.rescuer_for(o)
+	if esc == null:
+		o.cstate = "alarmed"
+		return
+	if esc.pos.distance_to(o.pos) < 3.5:
+		w.move_to(o, cp, "walk", 0)
+		o.stance_goal = Op.STAND
+	else:
+		w.stop(o)
+		o.stance_goal = Op.CROUCH
