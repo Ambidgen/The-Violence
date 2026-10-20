@@ -311,7 +311,7 @@ func _briefing(s: Dictionary) -> void:
 	var cams: bool = main.campaign.dept.bodycams
 	var cb := _btn(box, "Body cameras: %s" % ("worn" if cams else "not issued"), func(on): main.ops_set_bodycams(on), true)
 	cb.set_pressed_no_signal(cams)
-	cb.tooltip_text = "With body cameras you see what each officer sees, live. Without them, only the officers and the radio's last-known positions."
+	cb.tooltip_text = "Body cameras record what each officer sees as evidence for the incident record. You always see what your officers see."
 
 
 func _force(s: Dictionary) -> void:
@@ -917,15 +917,15 @@ func refresh_run(w, fog) -> void:
 	if not _rewinding:
 		sl.set_value_no_signal(w.t)
 	_sliding = false
-	var cams := 0
+	var eyes := 0
 	var offs := 0
 	for o in w.ops:
 		if o.judges and o.alive() and not o.gone:
 			offs += 1
-			if o.bodycam:
-				cams += 1
+			if not o.stunned(w.t):
+				eyes += 1
 	if fog != null and fog.enabled:
-		_run_refs["know"].text = "Fog of war: %d of %d officers on camera. %d people in view, %d radio last-known positions." % [cams, offs,
+		_run_refs["know"].text = "Fog of war: what %d of %d officers can see. %d people in view, %d radio last-known positions." % [eyes, offs,
 			fog.visible_ids.size(), fog.lkps.size()]
 	else:
 		_run_refs["know"].text = "Fog lifted."

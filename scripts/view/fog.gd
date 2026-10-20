@@ -1,20 +1,23 @@
 extends Node2D
-## The fog of war (v0.7): during a planned operation the player sees only what the
-## department knows.
-##   - officers' own positions, always;
-##   - what an officer wearing a body camera can see, live (a 140 degree view, 30 m);
+## The fog of war (v0.7; v0.8.1 sees through the officers' eyes): during a planned
+## operation the player sees only what the officers see.
+##   - officers' own positions, always, and the ground within arm's reach;
+##   - what each officer can see right now, taken from the simulation's own perception:
+##     their view cone where they are actually looking (narrowed by stress and tunnel
+##     vision, gone while a flashbang has them), out to 45 m, stopped by walls;
+##   - the people any officer has a line of sight to, exactly as the sim has it;
 ##   - everyone else only as last-known positions from radio callouts.
-## Ground once seen stays lighter than ground never seen. Blood and bodies appear when a
-## camera sees them. Without body cameras, only the officers and the callouts show.
+## Ground once seen stays lighter than ground never seen. Blood and bodies appear when an
+## officer sees them. Body cameras no longer gate the view; they are evidence.
 ##
 ## Every snapshot the recorder takes gets a copy of what was known, so rewinding shows
 ## the operation as it was seen at the time; the debrief replay lifts the fog.
 
 const PX := 40.0
 const CELL := 0.5
-const CAM_R := 30.0
-const CAM_HALF := 1.2
-const RAYS := 56
+const CAM_R := 45.0          # the sim's perception range
+const RAY_DEG := 2.0         # one sight line every 2 degrees of the cone
+const NEAR_R := 1.5          # the ground an officer is standing in
 const UNSEEN := 0.62
 const SEEN := 0.40
 
@@ -97,26 +100,23 @@ func refresh() -> void:
 	if world == null:
 		return
 	now.fill(0)
-	var cams: Array = []
+	var eyes: Array = []
 	for o in world.ops:
 		if o.judges and o.alive() and not o.gone:
-			_mark_disc(o.pos, 1.2)
-			if o.bodycam:
-				cams.append(o)
+			_mark_disc(o.pos, NEAR_R)
+			if not o.stunned(world.t):
+				eyes.append(o)
 				_cast(o)
 	visible_ids.clear()
 	for e in world.ops:
 		if e.judges or e.gone:
 			continue
-		if now[_cell(e.pos)] != 1:
-			continue
 		var seen_by := false
-		for o2 in cams:
-			if o2.pos.distance_to(e.pos) > CAM_R:
+		for o2 in eyes:
+			var v: Dictionary = o2.vis.get(e.id, {})
+			if not v.get("los", false):
 				continue
-			if absf(angle_difference(o2.body_dir, (e.pos - o2.pos).angle())) > CAM_HALF and o2.pos.distance_to(e.pos) > 1.5:
-				continue
-			if world.geom.sight_clear(o2.pos, o2.eye(), e.pos, maxf(0.3, e.eye() - 0.4)):
+			if absf(angle_difference(o2.look_dir, (e.pos - o2.pos).angle())) <= world.cone_half(o2) + 0.05:
 				seen_by = true
 				break
 		if not seen_by:
@@ -157,26 +157,35 @@ func _mark_disc(p: Vector2, r: float) -> void:
 				_mark(y * nx + x)
 
 
-## A fan of sight lines across the camera's view; every cell along each, up to where
-## sight is blocked, is in view.
+## A fan of sight lines across the officer's view cone, where they are looking now; every
+## cell along each, up to where sight is blocked, is in view. Far out the lines spread,
+## so each also fills sideways to meet its neighbour.
 func _cast(o) -> void:
 	var g = world.geom
-	for k in RAYS:
-		var a: float = o.body_dir - CAM_HALF + 2.0 * CAM_HALF * k / float(RAYS - 1)
+	var half: float = world.cone_half(o)
+	var rays := maxi(8, int(ceil(rad_to_deg(2.0 * half) / RAY_DEG)) + 1)
+	var step_a := 2.0 * half / float(rays - 1)
+	var ez: float = o.eye()
+	for k in rays:
+		var a: float = o.look_dir - half + step_a * k
 		var dir := Vector2.from_angle(a)
+		var side := dir.orthogonal()
 		var end: Vector2 = o.pos + dir * CAM_R
 		end = Vector2(clampf(end.x, 0.05, level.W - 0.05), clampf(end.y, 0.05, level.H - 0.05))
 		var full: float = o.pos.distance_to(end)
-		var f: float = g.sight_reach(o.pos, 1.6, end, 1.1)
+		var f: float = g.sight_reach(o.pos, ez, end, 1.1)
 		var reach := f * full + 0.25
 		var s := 0.0
 		while s <= reach:
 			var q: Vector2 = o.pos + dir * s
 			_mark(_cell(q))
-			if s > 9.0:
-				_mark(_cell(q + dir.orthogonal() * CELL))
-				_mark(_cell(q - dir.orthogonal() * CELL))
-			s += CELL * 0.7
+			var w := s * step_a * 0.5
+			var off := CELL
+			while off <= w + 0.01:
+				_mark(_cell(q + side * off))
+				_mark(_cell(q - side * off))
+				off += CELL
+			s += CELL * 0.8
 
 
 func _paint() -> void:

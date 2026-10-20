@@ -1,4 +1,4 @@
-# The Violence - vertical slice (v0.8.0)
+# The Violence - vertical slice (v0.8.1)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
@@ -364,7 +364,7 @@ The week ends with `End week`. Situations nobody went to are written down, wound
 - Tips come from the public (more at high visibility) and from the ward's community group (more where trust is high).
 - `Canvass` sends one officer round the neighbourhood: two more tips, and that officer is gone for the week.
 - Warrants let you choose night: everyone is at home, recognition and judgment are slower and civilians are misjudged more often.
-- `Body cameras` decides what you can see during the run (below).
+- `Body cameras` decides whether what officers see is kept as evidence (below).
 
 **2 Force.** Tick who goes. An officer is committed to one situation a week and can't go to another. The injured are listed but can't be picked.
 
@@ -394,7 +394,7 @@ Bad habits can break orders. A rusher (BH11) won't wait out a consolidation. A c
 
 **Run.** You watch; the officers carry out the plan as well as their habits, stress and experience allow.
 - Pause, 0.25x to 20x, and a rewind slider. Rewinding only replays what was recorded; `Live` returns to the present. None of it changes the outcome.
-- **Fog of war.** With body cameras you see what each officer sees, live. Without them, you see your officers and the radio's last-known positions, drawn as diamonds where they were called out. Blood, casings and bodies show only once someone has seen them.
+- **Fog of war (v0.8.1).** You see what your officers see, live: each officer's actual view cone, where they are looking right now, out to 45 m and stopped by walls. A stressed officer's cone narrows, and a flashbanged one sees nothing until it wears off. The people shown are exactly the ones an officer has a line of sight to. Everyone else appears only at the radio's last-known positions, drawn as diamonds where they were called out. Blood, casings and bodies show only once someone has seen them. Body cameras no longer decide what you see; they decide what is kept as evidence.
 - The radio log keeps to what a commander hears: contacts, shots, squads' progress, surrenders and casualties.
 - **Abort (cut losses):** confirm once, and every squad withdraws to its vehicle at a run, fighting only if fired on. An abort is a failure, but it stops the losses.
 
