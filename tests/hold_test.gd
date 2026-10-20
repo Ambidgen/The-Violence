@@ -5,7 +5,7 @@ extends SceneTree
 ## how the defence ended (fell back, counterattacked, sold dearly).
 ##   godot --headless --path . -s res://tests/hold_test.gd -- --n=10 [--size=5] [--maps=0,4,5,6]
 ##     [--pairs="police,police;sof,sof"] [--layers=on] [--without=HD07] [--set=HD01,HD02]
-##     [--tune=hd10_lo:0.5,hd10_hi:0.95]
+##     [--tune=hd10_lo:0.5,hd10_hi:0.95] [--nobh]
 ##   ... -- --ablate=drop|only [--pair=police,police] [--ids=HD01,HD02] [--base]
 
 const Habits = preload("res://scripts/data/habits.gd")
@@ -19,6 +19,7 @@ var only := ""        # ablation: the one hold habit kept ("" = all of them)
 var drop := ""        # ablation: the one hold habit removed
 var keep := {}        # --set: the hold habits kept for the defenders (empty = all)
 var without := {}     # --without: hold habits taken away from the defenders
+var no_bh := false    # --nobh: the defenders get the hold habits but none of the hold bad habits
 
 
 func cfg(id: String, team: int, slot: int, ech: String, lv, hold_layer: bool) -> Dictionary:
@@ -35,7 +36,7 @@ func cfg(id: String, team: int, slot: int, ech: String, lv, hold_layer: bool) ->
 			good[g] = true
 	var bad := {}
 	for b in Habits.stress_bad_ids():
-		if hold_layer or not Habits.is_hold(b):
+		if (hold_layer and not (no_bh and team == 1)) or not Habits.is_hold(b):
 			bad[b] = true
 	return {"id": id, "team": team, "slot": slot, "echelon": ech, "good": good, "bad": bad,
 		"plates": Habits.PRESET_PLATES[ech], "exp": Habits.PRESET_EXP[ech], "pos": lv.spawns[id]["p"],
@@ -67,6 +68,7 @@ func _init() -> void:
 				"hd07_hidden": Brain.hd07_hidden = float(pr2[1])
 				"hd07_face_door": Brain.hd07_face_door = pr2[1] == "1"
 		print("tune: lane %.2f door_too %s hidden %.1f face_door %s hd10 %.2f-%.2f bonus %.2f" % [Brain.hd07_lane, Brain.hd07_door_too, Brain.hd07_hidden, Brain.hd07_face_door, Brain.hd10_lo, Brain.hd10_hi, Brain.hd10_bonus])
+	no_bh = args.has("nobh")
 	if args.has("without"):
 		for g in String(args["without"]).split(","):
 			without[g] = true

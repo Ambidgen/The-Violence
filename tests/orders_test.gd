@@ -56,7 +56,7 @@ const GATES := {
 	"post": {"measure": "distance from the post at the end, m (less)", "dir": -1, "margin": 3.0},
 	"patrol": {"measure": "route waypoints visited (share)", "dir": 1, "margin": 0.4},
 	"avoid": {"measure": "officer-seconds in the avoided room (fewer)", "dir": -1, "margin": 5.0},
-	"consolidate": {"measure": "s from the hall to the next room (longer)", "dir": 1, "margin": 10.0},
+	"consolidate": {"measure": "s from the hall to the next room or the end", "dir": 1, "margin": 10.0},
 	"phase": {"measure": "s to the first officer inside (later)", "dir": 1, "margin": 20.0},
 	"entry": {"measure": "first room entered is the kitchen (share)", "dir": 1, "margin": 0.5},
 	"pace": {"measure": "top speed out of a fight, m/s (lower)", "dir": -1, "margin": 0.3},
@@ -239,7 +239,17 @@ func t_consolidate(on: bool, sd: int) -> float:
 			for r in _inside_rooms(ww):
 				if r != "HALL":
 					st["next"] = ww.t)
-	var res: float = (st["next"] - st["hall"]) if st["hall"] >= 0.0 and st["next"] >= 0.0 else 0.0
+	# the time until an officer is in another room, or until the operation ends if the
+	# suspect forces the issue first (a fight at the hall door can end it before anyone
+	# goes on)
+	var res := 0.0
+	if st["hall"] >= 0.0:
+		res = (st["next"] if st["next"] >= 0.0 else w.t) - st["hall"]
+	if args.has("vv"):
+		print("  seed %d %s: hall %.1f next %.1f end %.1f winner %d" % [sd, "on" if on else "off", st["hall"], st["next"], w.t, w.winner])
+		for ln in w.log_lines:
+			if ln["kind"] in ["info", "order", "comms"] and not String(ln["text"]).contains("Show me"):
+				print("     ", ln["text"])
 	w.dispose()
 	return res
 

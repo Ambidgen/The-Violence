@@ -136,7 +136,7 @@ Constraints, each for points:
 
 Rooms, doors, windows, posts and routes are picked by clicking the plan, which draws every squad's orders. `Suggest a plan` fills in a reasonable plan you can then change.
 
-Bad habits can break orders: a rusher won't wait out a consolidation, a chaser leaves the avoided rooms behind, a jumpy trigger ignores Weapons tight. Every broken order goes into the officer's file and the debrief.
+Bad habits can break orders. A rusher (BH11) won't wait out a consolidation. A chaser (BH12) or a lone wolf (BH15) moves at their own pace and through avoided rooms. Every broken order goes into the officer's file and the debrief.
 
 **Run.** You watch; the officers carry out the plan as well as their habits, stress and experience allow.
 - Pause, 0.25x to 20x, and a rewind slider. Rewinding only replays what was recorded; `Live` returns to the present. None of it changes the outcome.
@@ -160,7 +160,12 @@ Bad habits can break orders: a rusher won't wait out a consolidation, a chaser l
 - Police tactical and special operations get all of them except HD12 (police only), and except HD07 (both).
 - The seven bad habits ride on stress or a personality trait like the others.
 
-HOLD_RESULTS
+Measured over 120 assaults per matchup (five a side on maps 00, 04, 05 and 06), the attackers' wins with the defenders' layer off and on:
+- Regular against Regular: 44% to 33%.
+- Police tactical against Police tactical: 58% to 48%.
+- Special operations against Special operations: 57% to 58%. Single habits help (the reserve, HD16, is worth 11 points), but together they cancel out; that interaction is the next thing to tune.
+
+Two drafted habits made the defence worse and were changed: HD10's 50-80 degree angle is now 30-55 degrees, and HD07 is left out of every preset. Details are in section 5.8 of the NPC CQB Bible.
 
 ## New in v0.6: civilians, judgment, the department
 
