@@ -787,8 +787,9 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 			var kit_s := ""
 			for gid in Equipment.GEAR_ORDER:
 				var left: int = int(o.gear.get(gid, 0))
-				if left > 0 and gid in ["flashbang", "ram", "breach", "taser", "launcher", "medkit"]:
-					kit_s += " %s%s" % [Equipment.GEAR[gid]["short"], "" if left == 1 and gid in ["ram", "medkit", "breach"] else "×%d" % left]
+				if left > 0 and not gid in ["light", "shield"]:
+					var bare: bool = gid in ["baton", "gas_mask"] or (left == 1 and gid in ["ram", "medkit", "breach"])
+					kit_s += " %s%s" % [Equipment.GEAR[gid]["short"], "" if bare else "×%d" % left]
 			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s%s" % [head, ["[color=#3d7a46]G[/color]", "[color=#a8861c]Y[/color]", "[color=#9b2a27]R[/color]"][o.alert],
 				gun, s["mag"], s["spare"], o.plates, o.plates_max, o.exp, bar,
 				"" if kit_s == "" else "  [color=#555555]%s[/color]" % kit_s.strip_edges()]

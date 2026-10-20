@@ -51,9 +51,10 @@ func _init() -> void:
 			var res: Dictionary = Outcome.evaluate(s, w)
 			var lines: Array = c.dept.apply_result(w, lv.map_name)
 			c.record(s["id"], res)
-			print("%s %-9s map %02d vis %d  %-15s %3d  %s  (%.0f s sim, %d ms, %d officers, %d snaps, broken %d)" % [s["id"], s["type"], int(s["map"]),
+			print("%s %-9s map %02d vis %d  %-15s %3d  %s  (%.0f s sim, %d ms, %d officers, %d snaps, broken %d, less %d, gas %d, sting %d)" % [s["id"], s["type"], int(s["map"]),
 				int(s["visibility"]), res["label"], res["score"], res["goal"], w.t, Time.get_ticks_msec() - t0,
-				c.plan_members(s).size(), w.recorder.times.size(), res["orders_broken"]])
+				c.plan_members(s).size(), w.recorder.times.size(), res["orders_broken"], int(w.stat.get("less", 0)),
+				int(w.stat.get("gas", 0)), int(w.stat.get("stings", 0))])
 			if args.has("v"):
 				for sq in res["squads"]:
 					print("    squad %d: %d/%d alive, %s, %s" % [sq["i"] + 1, sq["alive"], sq["n"], sq["mode"], str(sq["results"])])

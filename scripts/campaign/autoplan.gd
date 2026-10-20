@@ -118,7 +118,7 @@ static func suggest(sit: Dictionary, available: Array, lv, bodycams := false, ca
 			if n_sq > 2:
 				squads[2]["orders"]["objs"] = [{"kind": "post", "p": [sc.x + 6.0, sc.y + 3.5], "face": PI / 2.0}]
 	# kit (v0.7.5): squads going in carry the entry kit (a ram on the point man, flashbangs
-	# for those trained for them); the rest keep their own
+	# for those trained for them), at a barricade the gas kit (v0.8); the rest keep their own
 	if sit["type"] != "event":
 		var by_id := {}
 		for r in available:
@@ -127,7 +127,9 @@ static func suggest(sit: Dictionary, available: Array, lv, bodycams := false, ca
 			var kinds: Array = squads[si]["orders"]["objs"].map(func(o): return o.get("kind", ""))
 			if not (kinds.has("clear") or kinds.has("arrest") or kinds.has("rescue")):
 				continue
-			var spec: Dictionary = Equipment.SQUAD_KITS["entry"]
+			# a barricade (v0.8): time is on the police side, so gas and masks; elsewhere
+			# the entry kit (never gas where hostages are held)
+			var spec: Dictionary = Equipment.SQUAD_KITS["gas" if sit["type"] == "barricade" else "entry"]
 			var mem: Array = squads[si]["members"]
 			for k in mem.size():
 				var r2: Dictionary = by_id.get(mem[k], {})

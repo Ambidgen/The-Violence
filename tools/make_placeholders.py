@@ -311,6 +311,19 @@ def kit_helmet():
     return svg(0.8, 0.8, "".join(b))
 
 
+def kit_gas_mask():
+    """A gas mask seen from above (v0.8): head straps round the back, the face piece and a
+    filter canister forward (+x)."""
+    w = h = 0.8 * PPM
+    cx, cy = w / 2, h / 2
+    b = [path(f"M{cx - 8},{cy - 7} A10 10 0 0 0 {cx - 8},{cy + 7}", "none", DARK, 1.6),   # strap
+         rect(cx + 3, cy - 8, 6, 16, "#3a3a3a", 3, INK, 1.2),                              # face piece
+         circle(cx + 12, cy, 4.2, "#5a5a5a", INK, 1.2),                                  # filter
+         line(cx + 10, cy - 2.5, cx + 14, cy - 2.5, "#8a8a8a", 0.8),
+         line(cx + 10, cy + 2.5, cx + 14, cy + 2.5, "#8a8a8a", 0.8)]
+    return svg(0.8, 0.8, "".join(b))
+
+
 def shield_art():
     """A ballistic shield carried in front, seen edge-on from above: a curved slab."""
     w_m, h_m = 0.22, 0.74
@@ -1056,6 +1069,7 @@ ASSETS["kit/plates.svg"] = kit_plates
 ASSETS["kit/helmet.svg"] = kit_helmet
 ASSETS["kit/shield.svg"] = shield_art
 ASSETS["kit/ram.svg"] = ram_art
+ASSETS["kit/gas_mask.svg"] = kit_gas_mask
 
 
 def main():

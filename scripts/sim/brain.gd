@@ -9,7 +9,9 @@ extends RefCounted
 const Op = preload("res://scripts/sim/op.gd")
 const Geom = preload("res://scripts/sim/geom.gd")
 const Habits = preload("res://scripts/data/habits.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const DT := 1.0 / 30.0
+const GAS_WAIT := 20.0     # s a squad holds the door after gassing a room (v0.8)
 
 # Hold-post geometry, kept as static values so the hold test can sweep them (tuned
 # 2026-10-20: the drafted 50-80 deg HD10 band cost a police defence 9 points of attacker
@@ -869,17 +871,27 @@ func _assault_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
 			# flashbang in once nobody stands in front of the door; everyone looks away;
 			# the entry goes the moment it goes off
 			var det: float = float(ctl.get("bang_det", -1.0))
+			var kind: String = ctl.get("kind", "flashbang")
 			if det < 0.0:
 				var th = w.by_id.get(ctl.get("thrower", ""), null)
-				if th == null or not th.alive() or th.stunned(w.t) or int(th.gear.get("flashbang", 0)) <= 0:
+				if th == null or not th.alive() or th.stunned(w.t) or int(th.gear.get(kind, 0)) <= 0:
 					_go_entry(tm, el)
 				elif _funnel_clear(el, al, _bang_point(el)) and th.action.is_empty():
-					w.throw_flash(th, _bang_point(el))
-					ctl["bang_det"] = w.t + 0.4 + w.BANG_FUSE
+					w.throw_flash(th, _bang_point(el), kind)
+					ctl["bang_det"] = w.t + 0.4 + w.fuse_of(kind)
 				elif w.t - el["phase_t"] > 4.0:
 					# somebody cannot get out of its way: go without it
 					_go_entry(tm, el)
 			elif w.t >= det + 0.15:
+				if kind == "gas":
+					# gas (v0.8): hold the door while it works, then go in
+					el["phase"] = "gas_wait"
+					el["phase_t"] = w.t
+					w.say("%s holds the door while the gas works" % _tag(tm, el), "info")
+				else:
+					_go_entry(tm, el)
+		"gas_wait":
+			if w.t - el["phase_t"] >= GAS_WAIT:
 				_go_entry(tm, el)
 		"entry":
 			var done := true
@@ -927,19 +939,47 @@ func _after_stack(tm: Dictionary, el: Dictionary, al: Array) -> void:
 			w.say("%s %s the %s door" % [_tag(tm, el), how, w.level.rooms[st["into"]]["title"].to_lower()], "info")
 		return
 	if not ctl.has("bang_done") and el.get("orders", {}).get("bangs", true) and _bang_wanted(tm, el):
-		var thrower = null
-		for m in al:
-			if int(m.gear.get("flashbang", 0)) > 0 and not m.stunned(w.t) and m.pos.distance_to(st_c(el)) < 3.5:
-				if thrower == null or m.pos.distance_to(st_c(el)) < thrower.pos.distance_to(st_c(el)):
-					thrower = m
-		if thrower != null:
-			ctl["bang_done"] = true
-			ctl["thrower"] = thrower.id
-			ctl["bang_det"] = -1.0
-			el["phase"] = "bang"
-			el["phase_t"] = w.t
-			return
+		# v0.8: gas first where someone is known to be inside and no hostage could be,
+		# then a flashbang, then a sting-ball
+		var kinds: Array = ["flashbang", "stingball"]
+		if _gas_wanted(tm, el):
+			kinds.push_front("gas")
+		for kind in kinds:
+			var thrower = null
+			for m in al:
+				if int(m.gear.get(kind, 0)) > 0 and not m.stunned(w.t) and m.pos.distance_to(st_c(el)) < 3.5:
+					if thrower == null or m.pos.distance_to(st_c(el)) < thrower.pos.distance_to(st_c(el)):
+						thrower = m
+			if thrower != null:
+				ctl["bang_done"] = true
+				ctl["thrower"] = thrower.id
+				ctl["kind"] = kind
+				ctl["bang_det"] = -1.0
+				el["phase"] = "bang"
+				el["phase_t"] = w.t
+				return
 	_go_entry(tm, el)
+
+
+## Gas the room (v0.8)? Only where the briefing puts the suspect or someone has been
+## seen or heard in it lately, never where hostages are held, and not a room already
+## full of it.
+func _gas_wanted(tm: Dictionary, el: Dictionary) -> bool:
+	var into: String = el["task"]["into"]
+	for h in w.ops:
+		if h.hostage:
+			return false
+	for c in w.clouds:
+		if c["room"] == into:
+			return false
+	if w.intel_rooms.has(into):
+		return true
+	for eid in tm["lkps"]:
+		var l: Dictionary = tm["lkps"][eid]
+		if w.level.room_at(l["p"]) == into and w.t - float(l["t"]) < 90.0:
+			return true
+	var snd: Dictionary = tm.get("sound", {})
+	return not snd.is_empty() and w.level.room_at(snd["p"]) == into and w.t - float(snd["t"]) < 60.0
 
 
 ## Is this room worth a flashbang? Someone has been seen or heard in it, its door was
@@ -1033,7 +1073,7 @@ func _treat(o, tm: Dictionary) -> bool:
 	# the task first: a squad in the middle of an entry needs everyone; only a teammate
 	# down close by is treated then
 	var el := _el(o)
-	var busy: bool = el["mode"] in ["assault", "hunt"] and not el["task"].is_empty() and el.get("phase", "") in ["approach", "breach", "bang", "entry", "clear", "check"]
+	var busy: bool = el["mode"] in ["assault", "hunt"] and not el["task"].is_empty() and el.get("phase", "") in ["approach", "breach", "bang", "gas_wait", "entry", "clear", "check"]
 	if busy and o.ticker.get("treat_tid", "") == "":
 		var near_mate := false
 		for x0 in w.ops:
@@ -1138,6 +1178,14 @@ func _think(o) -> void:
 		o.aim = {}
 		w.stop(o)
 		return
+	# gassed (v0.8): someone who would give up runs for clean air instead of fighting
+	var flg: Dictionary = o.ticker.get("flee", {})
+	if flg.get("gas", false) and not o.judges and not o.complying and o.gassed(w.t):
+		o.dbg = "out of the gas"
+		o.aim = {}
+		w.move_to(o, flg["p"], "run")
+		_finish_look(o)
+		return
 	# PF09: keep a fallback cover point cached while threats are known
 	if o.has("PF09") and w.t >= o.ticker.get("cover_next", 0.0):
 		o.ticker["cover_next"] = w.t + 0.5
@@ -1208,7 +1256,7 @@ func _think(o) -> void:
 			return
 	# a suspect running for it keeps running unless shot at (v0.7)
 	var fl: Dictionary = o.ticker.get("flee", {})
-	if not fl.is_empty() and w.t - o.last_stress_t > 1.2:
+	if not fl.is_empty() and (w.t - o.last_stress_t > 1.2 or fl.get("gas", false)):
 		o.dbg = "running for it"
 		o.aim = {}
 		w.move_to(o, fl["p"], "sprint")
@@ -1352,9 +1400,52 @@ func _rule1(o, e) -> void:
 				best_dir = dv
 		if best_dir != Vector2.ZERO:
 			o.sidestep = {"dir": best_dir, "left": 1.0}
-	if o.sidestep.is_empty():
+	if o.sidestep.is_empty() and not _close_in(o, e):
 		w.stop(o)
 	w.engage(o, e, _aim_zone(o, e), true)
+
+
+## Less-lethal (v0.8): an unarmed man who has ignored two challenges, and no tool this
+## officer carries is in range now: one officer moves to where one is, walking in for OC
+## spray (3 m) or a baton (arm's reach), stepping back for beanbags (4 m and more), while
+## the others cover. True while moving.
+func _close_in(o, e) -> bool:
+	if not o.judges or not e.alive() or e.complying or e.civ or e.shows_weapon() or e.stunned(w.t):
+		return false
+	if int(o.ticker.get("chal_n_" + e.id, 0)) < 2 or o.judged.get(e.id, {}).get("v", "") != "unknown":
+		return false
+	var d: float = o.pos.distance_to(e.pos)
+	if d > 12.0 or w.less_tool(o, e, d) != "":
+		return false
+	# the smallest move that puts a carried tool in range
+	var want := -1.0
+	for gid in Equipment.LESS_ORDER:
+		if int(o.gear.get(gid, 0)) <= 0:
+			continue
+		var sp: Dictionary = Equipment.GEAR[gid]
+		if float(sp.get("blind", 0.0)) > 0.0 and (e.blind(w.t) or e.masked()):
+			continue
+		var lo: float = float(sp.get("min", 0.0))
+		var hi: float = float(sp["range"])
+		var goal: float = hi * 0.7 if d > hi else (minf(lo * 1.25 + 0.5, hi) if d < lo else d)
+		if want < 0.0 or absf(goal - d) < absf(want - d):
+			want = goal
+	if want < 0.0:
+		return false
+	var by: String = e.ticker.get("close_by", "")
+	if by != "" and by != o.id:
+		var other = w.by_id.get(by, null)
+		if other != null and other.alive() and w.t - float(e.ticker.get("close_t", -99.0)) < 2.0:
+			return false
+	var away: Vector2 = (o.pos - e.pos).normalized() if d > 0.05 else Vector2.RIGHT
+	var spot: Vector2 = w.nav.snap(e.pos + away * want)
+	if want > d and (spot.distance_to(e.pos) < d + 0.3 or not w.geom.sight_clear(spot, 1.6, e.pos, 1.2)):
+		return false
+	e.ticker["close_by"] = o.id
+	e.ticker["close_t"] = w.t
+	w.move_to(o, spot, "walk")
+	o.dbg = ("closing in > " if want < d else "stepping back > ") + e.id
+	return true
 
 
 func _aim_zone(o, e) -> String:
@@ -1694,7 +1785,7 @@ func _engage_far(o, e) -> void:
 				return
 	if o.hb("BH15") and o.pos.distance_to(e.pos) > 6.0:
 		w.move_to(o, e.pos, "walk", -1, true)
-	else:
+	elif not _close_in(o, e):
 		w.stop(o)
 	# fire over half cover from a crouch
 	if o.ticker.get("stance_t", -1.0) < w.t:
@@ -2058,6 +2149,16 @@ func _task_assault(o, tm: Dictionary, el: Dictionary) -> void:
 			else:
 				_task_look(o, (c + n_in * 2.0 - o.pos).angle())
 				o.dbg = "flashbang: clearing the throw"
+		"gas_wait":
+			# out of the room's line of fire (where they stood for the throw), weapons on
+			# the door: whoever comes out of the gas is met there
+			var gsp: Vector2 = ctl.get("safe_" + o.id, d["stack"])
+			if not w.at(o, gsp, 0.35):
+				_go(o, gsp, "walk", false)
+			else:
+				w.stop(o)
+			_task_look(o, (c - o.pos).angle())
+			o.dbg = "gas: holding the door"
 		"sweep":
 			_task_sweep(o, el)
 		"entry", "clear":

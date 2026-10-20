@@ -67,7 +67,10 @@ var squad_orders: Array = []   # the orders each police squad was given (operati
 var broken: Array = []         # orders broken: [{t, id, order, why, where}]
 var timeline: Array = []       # key moments for the debrief: [{t, text, kind}]
 var keyholders := [1, 2]       # teams that hold keys to the building (they unlock, others break in)
-var flashes: Array = []        # thrown flashbangs: [{p, det, by}]
+var flashes: Array = []        # thrown flashbangs, sting-balls, gas: [{p, det, by, kind}]
+var clouds: Array = []         # CS gas (v0.8): [{room, p, r, until, by}] (room "" = a cloud in the open)
+var _gas_next := 0.0
+var intel_rooms: Array = []    # rooms the briefing believes someone is in (v0.8: where gas may go)
 var door_busy := {}            # door id -> [operator id, until]: someone is working it
 
 ## Judgment (v0.6). A recognized person is judged before an officer under police rules
@@ -140,8 +143,10 @@ func setup(lv, nv, cfgs: Array, postures: Array, seed_val: int, alerts := [1, 1]
 	# doors (v0.7.5): every door open unless the operation or the setup says otherwise
 	level.reset_doors()
 	flashes = []
+	clouds = []
 	door_busy = {}
 	keyholders = opts.get("keys", [1, 2])
+	intel_rooms = opts.get("intel_rooms", [])
 	if opts.get("door_mode", "") != "":
 		set_door_mode(opts["door_mode"])
 	var ds: Dictionary = opts.get("doors", {})
@@ -407,6 +412,9 @@ func step() -> void:
 	_melee()
 	if not flashes.is_empty():
 		_flash_tick()
+	if not clouds.is_empty() and t >= _gas_next:
+		_gas_next = t + 0.5
+		_gas_tick()
 	if profiling:
 		t0 = _pf("melee", t0)
 	for o in ops:
@@ -998,7 +1006,7 @@ func t_rec(o, e, ecc: float, head_only: bool) -> float:
 	var N := 1.25 if night else 1.0
 	if night and _lit(o, e, ecc):
 		N = 1.0
-	return o.ech["t_rec0"] * o.m_h * E * X * S * C * G * N
+	return o.ech["t_rec0"] * o.m_h * E * X * S * C * G * N * o.vision_m(t)
 
 
 ## A weapon light at night (v0.7.5): the observer's beam is on the person (30 deg,
@@ -1231,8 +1239,10 @@ func judge_time(o, e) -> float:
 func misjudge_p(o, e) -> float:
 	var eff: float = o.stress * (1.0 - o.ech["resist"])
 	var p: float = 0.003 + 0.12 * eff + 0.002 * (50.0 - o.judgment)
+	var calm: bool = not in_combat(o) and o.stress < 0.2
+	# a phone held up: a real risk to someone keyed up, small to a calm officer (v0.7.7)
 	if e.civ and e.cstate == "film":
-		p += 0.04
+		p += 0.04 if not calm else 0.005
 	if e.vel.length() > 2.0:
 		p += 0.03
 	if night and not (o.light and o.alert >= Op.YELLOW and o.pos.distance_to(e.pos) <= 25.0):
@@ -1249,7 +1259,6 @@ func misjudge_p(o, e) -> float:
 	# someone already judged harmless and not running is seen again, not judged afresh: a crowd watched for ten minutes must not
 	# roll a new mistake on every face every 10 s (v0.7.6, found at the rally); a calm
 	# officer makes no new mistake about them at all
-	var calm: bool = not in_combat(o) and o.stress < 0.2
 	if o.cleared.has(e.id) and e.vel.length() <= 2.0:
 		if e.civ and e.cstate == "film":
 			# a phone held up by someone already seen: still a phone, mostly
@@ -1336,6 +1345,9 @@ func _surrender_roll(e, by, challenged: bool) -> void:
 		p += 0.25 * prop
 	if not e.any_loaded() and not e.defiant:
 		p += 0.5
+	# pepper or gas in the eyes (v0.8): fighting blind is no fight
+	if e.blind(t) or e.gassed(t):
+		p += 0.3 * prop
 	p += 0.2 * e.stress * (1.0 - e.ech["resist"]) * prop
 	if e.defiant and not e.stunned(t):
 		p *= 0.05
@@ -1707,11 +1719,19 @@ func _door_action_done(o, a: Dictionary) -> void:
 
 # ================================================================== flashbangs (v0.7.5)
 ## A flashbang thrown by o lands at p and goes off after the fuse.
-func throw_flash(o, p: Vector2) -> void:
-	if int(o.gear.get("flashbang", 0)) <= 0 or not o.action.is_empty():
+## kind (v0.8): "flashbang", "stingball" or "gas".
+const THROW_ACT := {"flashbang": "throw", "stingball": "throw_sting", "gas": "throw_gas"}
+
+
+func throw_flash(o, p: Vector2, kind := "flashbang") -> void:
+	if int(o.gear.get(kind, 0)) <= 0 or not o.action.is_empty():
 		return
-	o.gear["flashbang"] = int(o.gear["flashbang"]) - 1
-	start_action(o, "throw", 0.4, {"p": p})
+	o.gear[kind] = int(o.gear[kind]) - 1
+	start_action(o, THROW_ACT[kind], 0.4, {"p": p, "kind": kind})
+
+
+func fuse_of(kind: String) -> float:
+	return BANG_FUSE if kind == "flashbang" else float(Equipment.GEAR[kind].get("fuse", 1.2))
 
 
 func _flash_tick() -> void:
@@ -1725,6 +1745,13 @@ func _flash_tick() -> void:
 
 
 func _detonate(f: Dictionary) -> void:
+	match f.get("kind", "flashbang"):
+		"stingball":
+			_sting(f)
+			return
+		"gas":
+			_gas_start(f)
+			return
 	var p: Vector2 = f["p"]
 	var by = by_id.get(f["by"], null)
 	emit({"type": "flash", "p": p})
@@ -1761,9 +1788,123 @@ func _detonate(f: Dictionary) -> void:
 	say("Flashbang: %d stunned%s" % [n, (" (%s)" % ", ".join(who)) if n > 0 else ""], "comms")
 
 
-# ================================================================== less-lethal (v0.7.5)
+# ================================================================== sting-balls and gas (v0.8)
+## A sting-ball goes off: rubber pellets within 5 m with a line of sight.
+func _sting(f: Dictionary) -> void:
+	var p: Vector2 = f["p"]
+	var by = by_id.get(f["by"], null)
+	var R: float = float(Equipment.GEAR["stingball"]["radius"])
+	emit({"type": "flash", "p": p, "kind": "sting"})
+	if by != null:
+		emit_sound(by, "stingball")
+	stat["stings"] = stat.get("stings", 0) + 1
+	var who: Array = []
+	for x in ops:
+		if not x.alive() or x.gone or x.mounted != null:
+			continue
+		var d: float = x.pos.distance_to(p)
+		if d > R or not geom.sight_clear(p, 0.4, x.pos, 1.0):
+			continue
+		x.ticker["stun_until"] = maxf(x.ticker.get("stun_until", -1.0), t + rng.randf_range(1.0, 2.5))
+		x.aim = {}
+		x.sidestep = {}
+		x.stance_goal = Op.CROUCH
+		add_stress(x, 0.35, "sting-ball")
+		who.append(x.id)
+		if x.civ:
+			civ_brain.alarm(x, p, "gunfire")
+		var injury := ""
+		if d < 2.0 and rng.randf() < 0.04:
+			injury = "hurt"
+			x.wounds += 1
+			say("%s hurt by the sting-ball" % x.id, "hit")
+		if incident != null and by != null and not x.judges:
+			incident.on_less_lethal(by, x, "stingball", true, injury)
+		if police_rules() and x.fighting() and not x.judges and not x.civ and not x.complying:
+			var give: float = 0.1 if x.shows_weapon() else 0.35
+			if x.defiant:
+				give *= 0.2
+			if by != null and rng.randf() < give:
+				surrender(x, by)
+	say("Sting-ball: %d stung%s" % [who.size(), (" (%s)" % ", ".join(who)) if not who.is_empty() else ""], "comms")
+
+
+## CS gas lands: it fills the room it lands in (in the open, a 4 m cloud for 20 s).
+func _gas_start(f: Dictionary) -> void:
+	var p: Vector2 = f["p"]
+	var rm: String = level.room_at(p)
+	var inside: bool = level.rooms.has(rm) and not level.is_exterior(rm)
+	var linger: float = float(Equipment.GEAR["gas"]["linger"])
+	var c := {"room": rm if inside else "", "p": p, "r": 4.0, "until": t + (linger if inside else 20.0), "by": f["by"], "t0": t}
+	clouds.append(c)
+	stat["gas"] = stat.get("gas", 0) + 1
+	var by = by_id.get(f["by"], null)
+	if by != null:
+		emit_sound(by, "gas")
+	emit({"type": "gas", "p": p, "room": c["room"], "until": c["until"]})
+	say("Gas in the %s" % (String(level.rooms[rm]["title"]).to_lower() if inside else "open"), "comms")
+	_gas_tick()
+
+
+func in_gas(x) -> Dictionary:
+	for c in clouds:
+		if c["room"] != "":
+			if x.room == c["room"] or level.room_at(x.pos) == c["room"]:
+				return c
+		elif x.pos.distance_to(c["p"]) <= float(c["r"]):
+			return c
+	return {}
+
+
+## Twice a second: everyone unmasked in a cloud is gassed for the next 6 s. Suspects who
+## would give up come out; civilians run; the defiant stay.
+func _gas_tick() -> void:
+	clouds = clouds.filter(func(c): return float(c["until"]) > t)
+	if clouds.is_empty():
+		return
+	for x in ops:
+		if not x.alive() or x.gone or x.mounted != null or x.masked():
+			continue
+		var c: Dictionary = in_gas(x)
+		if c.is_empty():
+			continue
+		var first: bool = not x.gassed(t)
+		x.ticker["gassed_until"] = t + 6.0
+		x.stress = minf(1.0, x.stress + 0.03)
+		if not first:
+			continue
+		# the first breath: eyes shut, doubled over coughing
+		x.ticker["stun_until"] = maxf(x.ticker.get("stun_until", -1.0), t + rng.randf_range(1.5, 3.0))
+		x.aim = {}
+		x.action = {} if not x.action.get("type", "") in ["cuff"] else x.action
+		say("%s is gassed" % x.id, "bad" if x.judges else "info")
+		emit({"type": "float", "p": x.pos, "text": "GASSED"})
+		if incident != null:
+			incident.on_gassed(by_id.get(c["by"], null), x)
+		if x.civ and not x.hostage:
+			civ_brain.alarm(x, c["p"], "gas")
+			if x.cstate != "flee":
+				civ_brain._start_flee(x)
+		elif not x.judges and not x.civ and not x.complying and not x.defiant and not x.ticker.has("flee"):
+			var dest = _escape_for(x)
+			if dest != null:
+				x.ticker["flee"] = {"p": dest, "since": t, "gas": true}
+				x.alert_floor = Op.YELLOW
+				say("%s comes out of the gas" % x.id, "info")
+
+
+# ================================================================== less-lethal (v0.7.5, v0.8)
+## The action name each direct tool runs as (what the label over the officer says).
+const LESS_ACT := {"taser": "tase", "launcher": "sponge", "oc_spray": "spray", "baton": "strike",
+	"pepperball": "pepperball", "beanbag": "beanbag"}
+const LESS_FLOAT := {"taser": "TASED", "launcher": "SPONGE ROUND", "oc_spray": "OC", "baton": "BATON",
+	"pepperball": "PEPPERBALL", "beanbag": "BEANBAG"}
+const LESS_SOUND := {"taser": "taser", "launcher": "launcher", "pepperball": "pepperball", "beanbag": "launcher"}
+
+
 ## A covered, challenged person who shows no weapon and has not complied after two
-## challenges: an officer with a taser in range (7 m) or a 40 mm launcher (30 m) uses it.
+## challenges: the officer reaches for the least harmful tool he carries that is in range
+## (Equipment.LESS_ORDER: OC spray, taser, pepperball, 40 mm, beanbag, baton).
 func _less_lethal(o, e) -> void:
 	if not o.action.is_empty() or o.stunned(t):
 		return
@@ -1772,16 +1913,26 @@ func _less_lethal(o, e) -> void:
 	var j: Dictionary = o.judged.get(e.id, {})
 	if j.get("v", "") != "unknown" or e.shows_weapon():
 		return
-	var d: float = o.pos.distance_to(e.pos)
-	var tool := ""
-	if int(o.gear.get("taser", 0)) > 0 and d <= float(Equipment.GEAR["taser"]["range"]):
-		tool = "taser"
-	elif int(o.gear.get("launcher", 0)) > 0 and d <= float(Equipment.GEAR["launcher"]["range"]) and d >= 3.0:
-		tool = "launcher"
+	var tool := less_tool(o, e, o.pos.distance_to(e.pos))
 	if tool == "":
 		return
 	o.gear[tool] = int(o.gear[tool]) - 1
-	start_action(o, "tase" if tool == "taser" else "sponge", 0.4, {"tid": e.id, "tool": tool})
+	start_action(o, LESS_ACT[tool], float(Equipment.GEAR[tool].get("act", 0.4)), {"tid": e.id, "tool": tool})
+
+
+## The tool o would use on e at distance d, or "".
+func less_tool(o, e, d: float) -> String:
+	for gid in Equipment.LESS_ORDER:
+		if int(o.gear.get(gid, 0)) <= 0:
+			continue
+		var sp: Dictionary = Equipment.GEAR[gid]
+		if d > float(sp["range"]) or d < float(sp.get("min", 0.0)):
+			continue
+		# pepper is no use on someone already blinded, or masked
+		if float(sp.get("blind", 0.0)) > 0.0 and e != null and (e.blind(t) or e.masked()):
+			continue
+		return gid
+	return ""
 
 
 func _less_lethal_done(o, a: Dictionary) -> void:
@@ -1795,22 +1946,55 @@ func _less_lethal_done(o, a: Dictionary) -> void:
 	var clear: bool = geom.sight_clear(o.pos, o.eye(), e.pos, e.zone_centre("chest"))
 	var hit: bool = clear and rng.randf() < p
 	emit({"type": "less", "from": o.pos, "to": e.pos, "id": o.id, "hit": hit, "tool": tool})
-	emit_sound(o, "taser" if tool == "taser" else "launcher")
+	if LESS_SOUND.has(tool):
+		emit_sound(o, LESS_SOUND[tool])
 	stat["less"] = stat.get("less", 0) + 1
-	if incident != null and incident.has_method("on_less_lethal"):
-		incident.on_less_lethal(o, e, tool, hit)
 	if not hit:
-		say("%s: %s misses %s" % [o.id, spec["name"].to_lower(), e.id], "info")
+		if incident != null:
+			incident.on_less_lethal(o, e, tool, false, "")
+		say("%s: %s misses %s" % [o.id, String(spec["name"]).to_lower(), e.id], "info")
 		return
-	var dur: float = 5.0 if tool == "taser" else 3.0
+	var st: Array = spec.get("stun", [3.0, 3.0])
+	var dur: float = rng.randf_range(float(st[0]), float(st[1]))
 	e.ticker["stun_until"] = maxf(e.ticker.get("stun_until", -1.0), t + dur)
 	e.aim = {}
 	e.action = {}
 	e.stance_goal = Op.CROUCH
 	add_stress(e, 0.4, tool)
-	say("%s: %s hits %s" % [o.id, spec["name"].to_lower(), e.id], "comms")
-	emit({"type": "float", "p": e.pos, "text": "TASED" if tool == "taser" else "SPONGE ROUND"})
-	if rng.randf() < (0.9 if tool == "taser" else 0.6):
+	var bl: float = float(spec.get("blind", 0.0))
+	if bl > 0.0 and not e.masked():
+		e.ticker["blind_until"] = maxf(e.ticker.get("blind_until", -1.0), t + bl)
+	# the pepper cloud reaches whoever stands close, officers included (v0.8)
+	var sr: float = float(spec.get("splash", 0.0))
+	if sr > 0.0:
+		for x in _near_fast(e.pos, sr).duplicate():
+			if x == e or not x.alive() or x.gone or x.masked():
+				continue
+			x.ticker["blind_until"] = maxf(x.ticker.get("blind_until", -1.0), t + bl * 0.5)
+			add_stress(x, 0.15, "pepper")
+			say("%s caught in the pepper" % x.id, "bad" if x.judges else "info")
+	# injury: a fall, a broken bone, an eye; close in, a round hard enough to put a man down
+	var injury := ""
+	var serious: float = float(spec.get("serious", 0.0))
+	if d <= float(spec.get("close", -1.0)):
+		serious = maxf(serious, float(spec.get("serious_close", 0.0)))
+	var r := rng.randf()
+	if r < serious:
+		injury = "serious"
+	elif r < serious + float(spec.get("injury", 0.0)):
+		injury = "hurt"
+	say("%s: %s hits %s" % [o.id, String(spec["name"]).to_lower(), e.id], "comms")
+	emit({"type": "float", "p": e.pos, "text": LESS_FLOAT.get(tool, tool.to_upper())})
+	if incident != null:
+		incident.on_less_lethal(o, e, tool, true, injury)
+	if injury == "serious":
+		e.ticker["down_less"] = tool
+		_down(e, o, false, String(spec["short"]).to_lower())
+		return
+	if injury == "hurt":
+		e.wounds += 1
+		say("%s hurt by the %s" % [e.id, String(spec["short"]).to_lower()], "hit")
+	if rng.randf() < float(spec.get("give", 0.5)):
 		surrender(e, o)
 
 
@@ -1891,10 +2075,11 @@ func _finish_action(o) -> void:
 			say("%s tops up a %s magazine from the cache" % [o.id, wn2], "info")
 		"open", "unlock", "ram", "kick", "breach_shot":
 			_door_action_done(o, a)
-		"throw":
-			flashes.append({"p": a["p"], "det": t + BANG_FUSE, "by": o.id})
-			say("%s: flashbang out" % o.id, "comms")
-			emit({"type": "float", "p": o.pos, "text": "BANG OUT"})
+		"throw", "throw_sting", "throw_gas":
+			var kind: String = a.get("kind", "flashbang")
+			flashes.append({"p": a["p"], "det": t + fuse_of(kind), "by": o.id, "kind": kind})
+			say("%s: %s out" % [o.id, {"flashbang": "flashbang", "stingball": "sting-ball", "gas": "gas"}[kind]], "comms")
+			emit({"type": "float", "p": o.pos, "text": {"flashbang": "BANG OUT", "stingball": "STING OUT", "gas": "GAS OUT"}[kind]})
 			emit({"type": "throw", "from": o.pos, "to": a["p"], "id": o.id})
 		"treat":
 			var pt = by_id.get(a.get("tid", ""), null)
@@ -1904,7 +2089,7 @@ func _finish_action(o) -> void:
 				emit({"type": "float", "p": pt.pos, "text": "TREATED"})
 				if incident != null and incident.has_method("on_treated"):
 					incident.on_treated(o, pt)
-		"tase", "sponge":
+		"tase", "sponge", "spray", "strike", "pepperball", "beanbag":
 			_less_lethal_done(o, a)
 		"cuff":
 			var e = by_id.get(a.get("tid", ""), null)
@@ -2074,7 +2259,7 @@ func _move2(o) -> void:
 
 # ================================================================== aiming and firing
 func sigma_shooter(o, settle: float) -> float:
-	return o.ech["s_min"] + (o.ech["s_snap"] - o.ech["s_min"]) * exp(-settle / o.ech["tau"])
+	return (o.ech["s_min"] + (o.ech["s_snap"] - o.ech["s_min"]) * exp(-settle / o.ech["tau"])) * o.aim_m(t)
 
 
 ## Aim at e, and fire when ready. Under police rules fire waits for the officer's

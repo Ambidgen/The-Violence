@@ -436,7 +436,7 @@ func _kit_editor(parent: Control, r: Dictionary) -> void:
 		sp.value_changed.connect(func(val): _set_gear(r, g2, int(val)))
 		grid.add_child(sp)
 	_text(v, "%.1f kg (pace x%.2f), cost %d.%s" % [Equipment.weight(kit), Equipment.speed_factor(kit), Equipment.cost(kit),
-		"" if who == "tactical" else " Rams, flashbangs, the short rifle and the shield need five years on the job or Experience 3."], GREY, 10)
+		"" if who == "tactical" else " Flashbangs, sting-balls, gas, the pepperball and 40 mm launchers, breaching rounds, the short rifle, the battle and marksman rifles and the shield need five years on the job or Experience 3."], GREY, 10)
 
 
 func _set_kit(r: Dictionary, field: String, value) -> void:

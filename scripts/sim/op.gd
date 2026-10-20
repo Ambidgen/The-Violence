@@ -371,6 +371,32 @@ func stunned(now: float) -> bool:
 	return ticker.get("stun_until", -1.0) > now
 
 
+## Less-lethal (v0.8): eyes full of pepper (OC spray, a pepperball cloud), or in CS gas.
+func blind(now: float) -> bool:
+	return ticker.get("blind_until", -1.0) > now
+
+
+func gassed(now: float) -> bool:
+	return ticker.get("gassed_until", -1.0) > now
+
+
+func masked() -> bool:
+	return gear.has("gas_mask")
+
+
+## Recognition time multiplier: pepper or gas in the eyes, or a mask's visor.
+func vision_m(now: float) -> float:
+	var m := 1.1 if masked() else 1.0
+	if blind(now) or gassed(now):
+		m *= 3.0
+	return m
+
+
+## Dispersion multiplier while blinded or gassed.
+func aim_m(now: float) -> float:
+	return 2.0 if blind(now) or gassed(now) else 1.0
+
+
 func ws() -> Dictionary:
 	return weapons[active]
 

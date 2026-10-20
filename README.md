@@ -1,4 +1,4 @@
-# The Violence - vertical slice (v0.7.6)
+# The Violence - vertical slice (v0.7.7)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
@@ -82,6 +82,64 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - `Rerun same seed` replays the fight exactly; `Rerun new seed` rolls a new one.
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small dot beside each figure is their alert state: green, yellow or red.
+
+## New in v0.7.7: the less-lethal suite
+
+Seven new items, and the taser and 40 mm launcher reworked into one system with them.
+
+**Who uses what, and when.** An officer reaches for a less-lethal tool only for someone covered, challenged twice, showing no weapon and still not complying. He takes the least harmful tool he carries that is in range, in this order: OC spray, taser, pepperball, 40 mm, beanbag, baton. If nothing he carries is in range, one officer moves to where something is while the others cover. He walks in for OC spray or the baton, and steps back for beanbags.
+
+| Item | Range | On a hit | Gives up | Hurt |
+|---|---|---|---|---|
+| OC (pepper) spray | 3 m, six bursts | down 1-2 s, then 15 s nearly blind | 7 in 10 | no; the cloud reaches anyone within 1.2 m, officers too |
+| Taser | 7 m, two cartridges | down 5 s | 9 in 10 | 1 in 100 (the fall) |
+| Pepperball launcher (tactical) | 2-18 m, ten volleys | 8 s nearly blind | half | 1 in 100; cloud 1.5 m |
+| 40 mm launcher (tactical) | 3-30 m, five rounds | down 3 s | 6 in 10 | 3 in 100; inside 5 m, 1 in 8 goes down |
+| Beanbag rounds (pump shotgun) | 4-20 m, five rounds | down 2.5-3.5 s | a little over half | 1 in 20; inside 6 m, 1 in 5 goes down |
+| Expandable baton | arm's reach | to a knee 1.5-2.5 s | nearly half | 1 in 12 a wound; 1 in 50 a head strike that puts him down |
+
+Nearly blind means three times slower to recognize anyone and aim twice as loose. Someone blinded or gassed also gives up far more easily when covered.
+
+**Thrown.**
+- **Sting-ball grenade** (tactical): goes in before the entry in place of a flashbang, 1.5 s fuse. Everyone within 5 m with a line of sight is down on one knee for 1-2.5 s and in pain. Those who show no weapon often give up (about a third; a tenth of the armed). One in twenty-five within 2 m is hurt.
+- **CS gas grenade** (tactical): fills the room it lands in for 90 s (in the open, a 4 m cloud for 20 s).
+  - Anyone inside without a mask is doubled over for 1.5-3 s at the first breath, then gassed for as long as they stay and 6 s after: nearly blind and coughing.
+  - Suspects who would give up run for clean air instead of fighting. Civilians run. The defiant stay and suffer.
+  - The squad throws it from out of the room's line of fire and holds the door for 20 s, so whoever comes out meets them.
+  - Gas goes only where the briefing puts the suspect or someone was seen or heard lately, and never where there are hostages.
+- **Gas mask:** no effect from gas or a pepper cloud; the visor slows recognition by a tenth.
+
+**In the record.** Every less-lethal use goes in the incident record, hit or miss. Anyone hurt by one is a finding (*less-lethal injury*), and so is a civilian or hostage caught in gas (*gassed civilian*).
+
+**Kits.**
+- Department officers are now issued OC spray and a baton with the taser. On the test range, the Patrol preset carries both and Police tactical carries OC.
+- The Less-lethal squad kit:
+  - Point man: pump shotgun with beanbags, the 40 mm, OC and a baton.
+  - The rest: taser, pepperball, OC, baton.
+- A new Gas squad kit:
+  - Point man: two gas grenades, a ram, a mask.
+  - The rest: masks, a sting-ball, taser and OC.
+- `Suggest a plan` gives a barricade's entry squad the Gas kit; hostage rescues never get gas.
+
+**On screen.** Gas is a halftone haze of dots over the room, thinning as it clears. Sting-balls burst into a ring of pellets, pepper sprays show as a dark-red stream, and baton strikes as an arc. Labels read GASSED, BLINDED, OC SPRAY, BATON, PEPPERBALL, BEANBAG, STING OUT and GAS OUT. A masked officer wears the mask on the plan, and the roster lists every consumable.
+
+**The gate** (16 paired runs each):
+
+| Item | Measure | With | Without |
+|---|---|---|---|
+| OC spray | s until an unarmed man who will not give up is cuffed (240 = never) | 122 | 228 |
+| Baton | same | 194 | 228 |
+| Pepperball | same | 110 | 228 |
+| Beanbag | same | 217 | 228 |
+| Sting-ball | barricaded suspects (two, with pistols) who end alive in cuffs | 1.12 | 0.06 |
+| CS gas | same | 0.69 | 0.06 |
+| Gas mask | officer-seconds spent gassed taking a gassed room | 0.0 | 5.5 |
+
+The beanbag is the weakest indoors: a house rarely leaves room to step back 5 m with a clear line, which is why it is a standoff tool.
+
+**Test range:** `--gear=gas:2,gas_mask:1` gives team A that gear too (as far as its training allows).
+
+**Also.** The campaign sweep found one more rally shooting: a calm officer took a phone held up 26 m away for a gun, and the shooting set off a second officer. A phone now adds 0.5 points to a calm officer's chance of misjudging, down from 4; it stays 4 under stress or in a fight. All six rallies in the three-seed sweep are clean of police shootings.
 
 ## New in v0.7.6: playtest fixes
 

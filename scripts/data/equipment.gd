@@ -113,13 +113,47 @@ const GEAR := {
 		"desc": "At night, cancels the dark's penalty to recognizing anyone in its beam (30 deg either side, 25 m). Anyone who sees the beam sees the carrier as if by day."},
 	"medkit": {"name": "Medical kit", "short": "Med", "kg": 0.6, "max": 1, "cost": 90, "who": "any",
 		"desc": "Once the area is quiet, treats a downed person within 20 m (20 s): no bleeding out, and far better odds after the operation."},
-	"taser": {"name": "Taser", "short": "Taser", "kg": 0.3, "max": 1, "cost": 1000, "who": "any", "shots": 2,
-		"range": 7.0, "p_hit": 0.75, "desc": "Two cartridges, 7 m. For someone covered and challenged who will not comply but shows no weapon: down for 5 s, and nearly always gives up."},
-	"launcher": {"name": "40 mm launcher", "short": "40 mm", "kg": 3.0, "max": 1, "cost": 1300, "who": "tactical", "shots": 5,
-		"range": 30.0, "p_hit": 0.6, "desc": "Five sponge rounds, 30 m. Like the taser, at range: knocked down for 3 s, gives up six times in ten."},
+	"stingball": {"name": "Sting-ball grenade", "short": "Sting", "kg": 0.45, "max": 3, "cost": 90, "who": "tactical",
+		"fuse": 1.5, "radius": 5.0,
+		"desc": "Thrown into a room before the entry in place of a flashbang, 1.5 s fuse: rubber pellets within 5 m with a line of sight. Down on one knee for 1-2.5 s, pain (stress +0.35), and those who show no weapon often give up. One in twenty-five within 2 m is hurt (an eye, a cut)."},
+	"gas": {"name": "CS gas grenade", "short": "Gas", "kg": 0.5, "max": 2, "cost": 45, "who": "tactical",
+		"fuse": 1.0, "linger": 90.0,
+		"desc": "Thrown into a room, it fills it for 90 s. Anyone inside without a mask is gassed: three times slower to recognize anyone, aim twice as loose, coughing (stress). Suspects who will give up come out (and give up far more easily when challenged); civilians run; the defiant stay and suffer. The squad waits 20 s at the door before going in. Not thrown where hostages may be."},
+	"gas_mask": {"name": "Gas mask", "short": "Mask", "kg": 0.8, "max": 1, "cost": 250, "who": "any",
+		"desc": "Worn: no effect from CS gas or a pepper cloud. The visor slows recognizing anyone by a tenth."},
+	"oc_spray": {"name": "OC (pepper) spray", "short": "OC", "kg": 0.2, "max": 1, "cost": 40, "who": "any",
+		"less": true, "shots": 6, "range": 3.0, "min": 0.0, "p_hit": 0.85, "stun": [1.0, 2.0], "blind": 15.0, "give": 0.7,
+		"splash": 1.2, "injury": 0.0, "act": 0.5,
+		"desc": "Six bursts, 3 m. Eyes shut and burning: down for 1-2 s, then 15 s nearly blind (three times slower to recognize anyone, aim twice as loose); seven in ten give up. The cloud reaches anyone within 1.2 m of the target, officers too, unless masked."},
+	"baton": {"name": "Expandable baton", "short": "Baton", "kg": 0.6, "max": 1, "cost": 60, "who": "any",
+		"less": true, "shots": 99, "range": 1.6, "min": 0.0, "p_hit": 0.7, "stun": [1.5, 2.5], "blind": 0.0, "give": 0.45,
+		"injury": 0.08, "serious": 0.02, "act": 0.6,
+		"desc": "Strikes within arm's reach: knocked to a knee for 1.5-2.5 s, gives up nearly half the time. One strike in twelve breaks something (a wound); one in fifty is a head strike that puts the man down. The last tool tried: closest and most likely to hurt."},
+	"taser": {"name": "Taser", "short": "Taser", "kg": 0.3, "max": 1, "cost": 1000, "who": "any",
+		"less": true, "shots": 2, "range": 7.0, "min": 0.0, "p_hit": 0.75, "stun": [5.0, 5.0], "blind": 0.0, "give": 0.9,
+		"injury": 0.01, "act": 0.4,
+		"desc": "Two cartridges, 7 m. For someone covered and challenged who will not comply but shows no weapon: down for 5 s, and nearly always gives up. One in a hundred is hurt in the fall."},
+	"pepperball": {"name": "Pepperball launcher", "short": "Pepperball", "kg": 3.2, "max": 1, "cost": 1600, "who": "tactical",
+		"less": true, "shots": 10, "range": 18.0, "min": 2.0, "p_hit": 0.55, "stun": [0.5, 1.0], "blind": 8.0, "give": 0.5,
+		"splash": 1.5, "injury": 0.01, "act": 0.4,
+		"desc": "Ten volleys, 18 m. Powder balls burst into a pepper cloud: 8 s nearly blind, half give up. The cloud catches anyone within 1.5 m, unless masked."},
+	"launcher": {"name": "40 mm launcher", "short": "40 mm", "kg": 3.0, "max": 1, "cost": 1300, "who": "tactical",
+		"less": true, "shots": 5, "range": 30.0, "min": 3.0, "p_hit": 0.6, "stun": [3.0, 3.0], "blind": 0.0, "give": 0.6,
+		"injury": 0.03, "close": 5.0, "serious_close": 0.12, "act": 0.4,
+		"desc": "Five sponge rounds, 3-30 m. Knocked down for 3 s, gives up six times in ten. Three in a hundred are hurt; inside 5 m, one in eight is hurt badly enough to go down."},
+	"beanbag": {"name": "Beanbag rounds", "short": "Beanbag", "kg": 0.3, "max": 1, "cost": 80, "who": "any",
+		"needs": "shotgun", "less": true, "shots": 5, "range": 20.0, "min": 4.0, "p_hit": 0.65, "stun": [2.5, 3.5],
+		"blind": 0.0, "give": 0.55, "injury": 0.05, "close": 6.0, "serious_close": 0.2, "act": 0.7,
+		"desc": "Five rounds for the pump shotgun, 4-20 m. Knocked down for 2.5-3.5 s, gives up a little over half the time. One in twenty is hurt; inside 6 m, one in five is hurt badly enough to go down. Needs the pump shotgun."},
 }
 
-const GEAR_ORDER := ["flashbang", "ram", "breach", "shield", "light", "medkit", "taser", "launcher"]
+## The direct less-lethal tools in the order an officer reaches for them: the least
+## likely to hurt first, among those in range.
+const LESS_ORDER := ["oc_spray", "taser", "pepperball", "launcher", "beanbag", "baton"]
+const THROWN := ["flashbang", "stingball", "gas"]
+
+const GEAR_ORDER := ["flashbang", "stingball", "gas", "ram", "breach", "shield", "light", "medkit", "gas_mask",
+	"oc_spray", "baton", "taser", "pepperball", "launcher", "beanbag"]
 const PRIMARY_ORDER := ["carbine", "sbr", "smg", "shotgun", "battle_rifle", "marksman", "assault_rifle"]
 const SECONDARY_ORDER := ["service_pistol", "compact_pistol", "heavy_pistol"]
 
@@ -131,18 +165,18 @@ const PRESETS := {
 	"militia": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "none", "plates": 0,
 		"head": "none", "gear": {}},
 	"patrol": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "vest", "plates": 0,
-		"head": "none", "gear": {"light": 1, "medkit": 1, "taser": 1}},
+		"head": "none", "gear": {"light": 1, "medkit": 1, "taser": 1, "oc_spray": 1, "baton": 1}},
 	"regular": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
 		"head": "none", "gear": {"medkit": 1}},
 	"police": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
-		"head": "none", "gear": {"light": 1, "medkit": 1, "flashbang": 1}},
+		"head": "none", "gear": {"light": 1, "medkit": 1, "flashbang": 1, "oc_spray": 1}},
 	"sof": {"primary": "sbr", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 3,
 		"head": "sof_helmet", "gear": {"light": 1, "medkit": 1, "flashbang": 2}},
 }
 
 ## What a new department officer is issued.
 const DEPT_DEFAULT := {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "vest",
-	"plates": 0, "head": "none", "gear": {"light": 1, "medkit": 1, "taser": 1}}
+	"plates": 0, "head": "none", "gear": {"light": 1, "medkit": 1, "taser": 1, "oc_spray": 1, "baton": 1}}
 
 ## Ready-made squad kits on the Force screen: [name, kit for the point man, kit for the rest].
 const SQUAD_KITS := {
@@ -158,10 +192,15 @@ const SQUAD_KITS := {
 		"rest": {"primary": "sbr", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
 			"head": "none", "gear": {"flashbang": 1, "medkit": 1, "light": 1}}},
 	"less": {"name": "Less-lethal",
-		"point": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "vest", "plates": 0,
-			"head": "none", "gear": {"launcher": 1, "medkit": 1}},
+		"point": {"primary": "shotgun", "secondary": "service_pistol", "optic": "red_dot", "armour": "vest", "plates": 0,
+			"head": "none", "gear": {"beanbag": 1, "launcher": 1, "oc_spray": 1, "baton": 1, "medkit": 1}},
 		"rest": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "vest", "plates": 0,
-			"head": "none", "gear": {"taser": 1, "medkit": 1, "light": 1}}},
+			"head": "none", "gear": {"taser": 1, "pepperball": 1, "oc_spray": 1, "baton": 1, "medkit": 1, "light": 1}}},
+	"gas": {"name": "Gas",
+		"point": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
+			"head": "none", "gear": {"gas": 2, "gas_mask": 1, "ram": 1, "medkit": 1}},
+		"rest": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
+			"head": "none", "gear": {"gas_mask": 1, "stingball": 1, "taser": 1, "oc_spray": 1, "medkit": 1, "light": 1}}},
 }
 
 

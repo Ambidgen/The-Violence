@@ -343,6 +343,12 @@ static func build_planned(sit: Dictionary, plan: Dictionary, dept, level, nav) -
 	var opts := {"police_rules": true, "night": bool(plan.get("night", sit.get("night", false))), "squads": orders_rt,
 		"vehicles": vehicles, "casualty": nav.snap(casualty), "b_stay": true, "b_posted": sit["type"] != "event",
 		"time_limit": TIME_LIMIT.get(sit["type"], 600.0), "escape": true, "doors": sit.get("doors", {}).duplicate()}
+	# where the briefing believes the named suspect is (its best guess, right or wrong)
+	for f in sit.get("intel", []):
+		if f.get("key", "") == "named_room":
+			var rr: String = f["room"] if f.get("known", false) else f.get("room_est", "")
+			if rr != "":
+				opts["intel_rooms"] = [rr]
 	if sit["type"] == "hostage":
 		opts["deadline"] = float(sit.get("deadline", 420))
 	if sit["type"] == "event":

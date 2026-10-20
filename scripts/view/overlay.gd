@@ -57,11 +57,11 @@ func handle(ev: Dictionary) -> void:
 			if o2 != null:
 				ears.append({"id": ev["id"], "dir": (ev["p"] - o2.pos).angle(), "age": 0.0})
 		"flash":
-			bursts.append({"p": ev["p"], "age": 0.0})
+			bursts.append({"p": ev["p"], "age": 0.0, "sting": ev.get("kind", "") == "sting"})
 		"throw":
 			lobs.append({"a": ev["from"], "b": ev["to"], "age": 0.0})
 		"less":
-			wires.append({"a": ev["from"], "b": ev["to"], "hit": ev["hit"], "age": 0.0})
+			wires.append({"a": ev["from"], "b": ev["to"], "hit": ev["hit"], "age": 0.0, "tool": ev.get("tool", "taser")})
 		"shield", "helmet":
 			stops.append({"p": ev["p"], "dir": (ev["dir"] as Vector2).angle() + PI, "age": 0.0, "head": ev["type"] == "helmet"})
 
@@ -212,6 +212,7 @@ func _draw() -> void:
 
 ## Entry tools and protection (v0.7.5), drawn above everything else.
 func _draw_kit_fx() -> void:
+	_draw_gas()
 	for l in lobs:
 		# the flashbang's arc, a dot travelling along it
 		var a: Vector2 = l["a"] * PX
@@ -227,6 +228,14 @@ func _draw_kit_fx() -> void:
 	for bz in bursts:
 		var c: Vector2 = bz["p"] * PX
 		var f2: float = 1.0 - bz["age"] / 0.6
+		if bz.get("sting", false):
+			# a sting-ball: a ring of rubber pellets flying out
+			var rs: float = (0.4 + 4.6 * (1.0 - f2)) * PX
+			for k3 in 24:
+				var an3: float = TAU * k3 / 24.0 + 0.21 * (k3 % 3)
+				draw_circle(c + Vector2.from_angle(an3) * rs * (0.8 + 0.2 * ((k3 * 7) % 5) / 4.0), 1.8, Color(0.1, 0.1, 0.1, 0.85 * f2))
+			draw_circle(c, 0.35 * PX, Color(0.1, 0.1, 0.1, 0.5 * f2))
+			continue
 		var r: float = (0.6 + 1.6 * (1.0 - f2)) * PX
 		draw_circle(c, r, Color(1, 1, 1, 0.85 * f2))
 		draw_arc(c, r, 0.0, TAU, 32, Color(0.1, 0.1, 0.1, 0.7 * f2), 1.5)
@@ -235,6 +244,27 @@ func _draw_kit_fx() -> void:
 			draw_line(c + Vector2.from_angle(an) * r * 0.55, c + Vector2.from_angle(an) * r * 1.25, Color(0.1, 0.1, 0.1, 0.6 * f2), 1.2)
 	for wv in wires:
 		var al: float = 1.0 - wv["age"]
+		var tool: String = wv.get("tool", "taser")
+		if tool in ["oc_spray", "pepperball"]:
+			# a spray: a widening stream of droplets, a cloud where it lands
+			var a5: Vector2 = wv["a"] * PX
+			var b5: Vector2 = wv["b"] * PX
+			var dv: Vector2 = (b5 - a5)
+			for k5 in 14:
+				var f5: float = (k5 + 1) / 14.0
+				var off: Vector2 = dv.orthogonal().normalized() * sin(k5 * 2.3) * 5.0 * f5
+				draw_circle(a5 + dv * f5 + off, 1.2 + 0.6 * f5, Color(0.55, 0.12, 0.12, 0.6 * al))
+			if wv["hit"]:
+				for k6 in 10:
+					draw_circle(b5 + Vector2.from_angle(k6 * 0.63) * (4.0 + 3.0 * (k6 % 3)), 2.0, Color(0.55, 0.12, 0.12, 0.35 * al))
+			continue
+		if tool == "baton":
+			var b7: Vector2 = wv["b"] * PX
+			var an7: float = (wv["b"] - wv["a"]).angle()
+			draw_arc(wv["a"] * PX, (wv["b"] - wv["a"]).length() * PX, an7 - 0.6, an7 + 0.6, 8, Color(0.1, 0.1, 0.1, 0.8 * al), 2.0)
+			if wv["hit"]:
+				draw_circle(b7, 4.0, Color(0.1, 0.1, 0.1, 0.8 * al))
+			continue
 		draw_dashed_line(wv["a"] * PX, wv["b"] * PX, Color(0.1, 0.1, 0.1, 0.7 * al), 1.0, 3.0)
 		if wv["hit"]:
 			draw_circle(wv["b"] * PX, 4.0, Color(0.1, 0.1, 0.1, 0.8 * al))
@@ -243,3 +273,35 @@ func _draw_kit_fx() -> void:
 		var al2: float = 1.0 - st["age"] / 0.35
 		var rr: float = 9.0 if st["head"] else 14.0
 		draw_arc(p, rr, st["dir"] - 0.9, st["dir"] + 0.9, 10, Color(0.1, 0.1, 0.1, 0.9 * al2), 2.5)
+
+
+## CS gas (v0.8): a halftone haze of dots over every gassed room (or a cloud in the open),
+## thinning as it clears.
+func _draw_gas() -> void:
+	if world == null or world.clouds.is_empty():
+		return
+	for c in world.clouds:
+		var left: float = float(c["until"]) - world.t
+		var thick: float = clampf(left / 20.0, 0.0, 1.0) * clampf((world.t - float(c.get("t0", world.t))) / 2.0 + 0.3, 0.0, 1.0)
+		var col := Color(0.32, 0.32, 0.30, 0.55 * thick)
+		var rects: Array = []
+		if c["room"] != "" and world.level.rooms.has(c["room"]):
+			rects = world.level.rooms[c["room"]]["rects"]
+		else:
+			var r: float = float(c["r"])
+			rects = [Rect2(c["p"] - Vector2(r, r), Vector2(r, r) * 2.0)]
+		for rc in rects:
+			var rr: Rect2 = rc
+			var step := 0.35
+			var y: float = rr.position.y + step * 0.5
+			var row := 0
+			while y < rr.end.y:
+				var x: float = rr.position.x + step * (0.25 if row % 2 == 0 else 0.75)
+				while x < rr.end.x:
+					var q := Vector2(x, y)
+					if c["room"] != "" or q.distance_to(c["p"]) <= float(c["r"]):
+						var wob: float = 0.5 + 0.5 * sin(x * 3.1 + y * 2.3 + world.t * 0.8)
+						draw_circle(q * PX, 2.2 + 2.4 * wob, col)
+					x += step
+				y += step
+				row += 1

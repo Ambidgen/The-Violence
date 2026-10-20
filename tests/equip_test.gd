@@ -1,5 +1,5 @@
 extends SceneTree
-## The v0.7.5 gate: every item in the equipment database has a test where carrying it
+## The v0.7.5 gate (v0.8: with the less-lethal suite): every item in the equipment database has a test where carrying it
 ## changes the outcome, and the special operations helmet stops one head hit and never
 ## a second. Each test runs N seeds with the item and N without, on the same map with
 ## the same people, and compares one measure (means over the seeds).
@@ -84,6 +84,13 @@ const GATES := {
 	"medkit": {"measure": "share of the downed who die after the operation (less)", "dir": -1, "margin": 0.1},
 	"taser": {"measure": "s until an unarmed man who will not give up is cuffed (less)", "dir": -1, "margin": 10.0},
 	"launcher": {"measure": "s until an unarmed man who will not give up is cuffed (less)", "dir": -1, "margin": 10.0},
+	"oc_spray": {"measure": "s until an unarmed man who will not give up is cuffed (less)", "dir": -1, "margin": 10.0},
+	"baton": {"measure": "s until an unarmed man who will not give up is cuffed (less)", "dir": -1, "margin": 10.0},
+	"pepperball": {"measure": "s until an unarmed man who will not give up is cuffed (less)", "dir": -1, "margin": 10.0},
+	"beanbag": {"measure": "s until an unarmed man who will not give up is cuffed (less)", "dir": -1, "margin": 10.0},
+	"stingball": {"measure": "barricaded suspects who end alive in cuffs (more)", "dir": 1, "margin": 0.3},
+	"gas": {"measure": "barricaded suspects who end alive in cuffs (more)", "dir": 1, "margin": 0.3},
+	"gas_mask": {"measure": "officer-seconds gassed taking a gassed room (less)", "dir": -1, "margin": 3.0},
 	"sof_helmet": {"measure": "head hits survived: first, second", "dir": 1, "margin": 0},
 }
 
@@ -248,7 +255,7 @@ func t_magnified(on: bool, sd: int):
 # ------------------------------------------------------------------ operation harness
 ## Five police (Police tactical stats) assault a house held by five Militia. kits: one
 ## per officer. Returns the world after the fight (caller disposes).
-func _op(mi: int, kits: Array, sd: int, opts := {}, b_kit := {}, nb := 5, b_ech := "militia", t_max := 240.0, b_alert := 1, b_extra := {}):
+func _op(mi: int, kits: Array, sd: int, opts := {}, b_kit := {}, nb := 5, b_ech := "militia", t_max := 240.0, b_alert := 1, b_extra := {}, each := Callable()):
 	var lv = Maps.get_level(mi)
 	var cfgs: Array = []
 	for k in kits.size():
@@ -268,6 +275,8 @@ func _op(mi: int, kits: Array, sd: int, opts := {}, b_kit := {}, nb := 5, b_ech 
 	while not w.over and w.t < t_max:
 		w.step()
 		w.events.clear()
+		if each.is_valid():
+			each.call(w)
 		if first_in < 0.0:
 			for o in w.ops:
 				if o.team == 0 and o.alive() and lv.is_inside(o.pos):
@@ -298,12 +307,16 @@ func _officers_hit(w) -> int:
 ## A bedroom held by three men with rifles, facing its door; a police squad of four in the
 ## hall outside it (map 05, the east unit): the entry is the whole fight.
 func t_flashbang(on: bool, sd: int):
+	return _room_entry(on, sd, "flashbang")
+
+
+func _room_entry(on: bool, sd: int, item: String):
 	var lv = Maps.get_level(5)
 	var door: Vector2 = lv.doors["D8"]["c"]
 	var cfgs: Array = []
 	var a_pos := [Vector2(26.5, 13.5), Vector2(25.5, 13.5), Vector2(26.5, 14.3), Vector2(25.5, 14.3)]
 	for k in 4:
-		var kit := _kit("carbine", "service_pistol", {"flashbang": 2} if on else {}, {"armour": "plates", "plates": 2})
+		var kit := _kit("carbine", "service_pistol", {item: 2} if on else {}, {"armour": "plates", "plates": 2})
 		cfgs.append(_cfg("A%d" % (k + 1), 0, k, "police", kit, _nav(5).snap(a_pos[k]), -PI / 2.0))
 	for k2 in 3:
 		var p: Vector2 = lv.spawns["B%d" % (k2 + 1)]["p"]
@@ -393,12 +406,11 @@ func t_medkit(on: bool, sd: int):
 
 ## A man alone in the house with no weapon who will not give up when covered and
 ## challenged. Seconds until he is in cuffs (the operation's 240 s if never).
-func _defiant(on: bool, sd: int, tool: String):
+func _defiant(on: bool, sd: int, tool: String, primary := "carbine", mi := 4):
 	var gear := {tool: 1} if on else {}
-	var kits := _police_kits(3, gear)
-	var lv = Maps.get_level(4)
+	var kits := _police_kits(3, gear, {}, primary)
 	var cfgs_extra := {"defiant": true}
-	var w = _op(4, kits, sd, {"police_rules": true}, _kit("", ""), 1, "untrained", 240.0, 0, cfgs_extra)
+	var w = _op(mi, kits, sd, {"police_rules": true}, _kit("", ""), 1, "untrained", 240.0, 0, cfgs_extra)
 	var b = w.by_id["B1"]
 	var v: float = float(b.ticker.get("cuffed_t", w.t)) if b.arrested else 240.0
 	w.dispose()
@@ -411,6 +423,88 @@ func t_taser(on: bool, sd: int):
 
 func t_launcher(on: bool, sd: int):
 	return _defiant(on, sd, "launcher")
+
+
+func t_oc_spray(on: bool, sd: int):
+	return _defiant(on, sd, "oc_spray")
+
+
+func t_baton(on: bool, sd: int):
+	return _defiant(on, sd, "baton")
+
+
+func t_pepperball(on: bool, sd: int):
+	return _defiant(on, sd, "pepperball")
+
+
+func t_beanbag(on: bool, sd: int):
+	return _defiant(on, sd, "beanbag", "shotgun")
+
+
+## Sting-balls (v0.8): the barricaded bedroom, the point man with two.
+func t_stingball(on: bool, sd: int):
+	var w = _barricade(sd, {"stingball": 2} if on else {}, {})
+	var v := _cuffed_alive(w)
+	w.dispose()
+	return v
+
+
+## Gas (v0.8): the barricaded bedroom; the point man carries gas, everyone a mask.
+func t_gas(on: bool, sd: int):
+	var w = _barricade(sd, {"gas": 2} if on else {}, {"gas_mask": 1})
+	var v := _cuffed_alive(w)
+	w.dispose()
+	return v
+
+
+## The same with gas both ways, masks on everyone or no one: officer-seconds gassed.
+func t_gas_mask(on: bool, sd: int):
+	var acc := {"s": 0.0}
+	var w = _barricade(sd, {"gas": 2}, {"gas_mask": 1} if on else {}, func(ww):
+		for o in ww.ops:
+			if o.team == 0 and o.alive() and o.gassed(ww.t):
+				acc["s"] += 1.0 / 30.0)
+	w.dispose()
+	return acc["s"]
+
+
+func _cuffed_alive(w) -> int:
+	var v := 0
+	for o in w.ops:
+		if o.team == 1 and o.alive() and (o.arrested or o.complying):
+			v += 1
+	return v
+
+
+## A barricade (v0.8): two untrained men with pistols in the Duplex's east bedroom behind
+## a shut door, who would give up; the briefing says they are in there. Four police
+## officers (police rules) come from the hall; the point man gets point_gear, everyone
+## all_gear.
+func _barricade(sd: int, point_gear: Dictionary, all_gear: Dictionary, each := Callable()):
+	var lv = Maps.get_level(5)
+	var door: Vector2 = lv.doors["D8"]["c"]
+	var cfgs: Array = []
+	var a_pos := [Vector2(26.5, 13.5), Vector2(25.5, 13.5), Vector2(26.5, 14.3), Vector2(25.5, 14.3)]
+	for k in 4:
+		var g: Dictionary = all_gear.duplicate()
+		if k == 0:
+			for key in point_gear:
+				g[key] = point_gear[key]
+		var kit := _kit("carbine", "service_pistol", g, {"armour": "plates", "plates": 2})
+		cfgs.append(_cfg("A%d" % (k + 1), 0, k, "police", kit, _nav(5).snap(a_pos[k]), -PI / 2.0))
+	for k2 in 2:
+		var p: Vector2 = lv.spawns["B%d" % (k2 + 1)]["p"]
+		cfgs.append(_cfg("B%d" % (k2 + 1), 1, k2, "untrained", _kit("", "service_pistol"), p, (door - p).angle()))
+	var w = World.new()
+	w.keep_events = false
+	w.setup(lv, _nav(5), cfgs, ["assault", "hold"], sd, [1, 2], {"police_rules": true, "b_stay": true, "b_posted": true,
+		"doors": {"D8": "closed"}, "intel_rooms": ["E BED1"], "escape": true})
+	while not w.over and w.t < 240.0:
+		w.step()
+		w.events.clear()
+		if each.is_valid():
+			each.call(w)
+	return w
 
 
 func t_smg(on: bool, sd: int):

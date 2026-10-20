@@ -50,6 +50,10 @@ func setup(o, w) -> void:
 		helmet = Sprite2D.new()
 		helmet.texture = Decals.tex("kit/helmet")
 		body.add_child(helmet)
+	if o.gear.has("gas_mask"):
+		var mask := Sprite2D.new()
+		mask.texture = Decals.tex("kit/gas_mask")
+		body.add_child(mask)
 	if o.shield:
 		shield = Sprite2D.new()
 		shield.texture = Decals.tex("kit/shield")
@@ -182,9 +186,15 @@ func sync(force := false) -> void:
 		t = {"reload": "RELOADING", "transition": "> PISTOL" if op.active == "rifle" else "> LONG GUN",
 			"clear": "STOPPAGE", "check": "CHECK", "stall": "STALLS", "click": "*click*", "cuff": "CUFFING",
 			"open": "OPENING", "unlock": "UNLOCKING", "ram": "RAMMING", "kick": "KICKING", "breach_shot": "BREACHING",
-			"throw": "BANG OUT", "treat": "TREATING", "tase": "TASER", "sponge": "40 MM"}.get(a, a.to_upper())
+			"throw": "BANG OUT", "treat": "TREATING", "tase": "TASER", "sponge": "40 MM",
+			"throw_sting": "STING OUT", "throw_gas": "GAS OUT", "spray": "OC SPRAY", "strike": "BATON",
+			"pepperball": "PEPPERBALL", "beanbag": "BEANBAG"}.get(a, a.to_upper())
 	elif world != null and op.stunned(world.t):
 		t = "STUNNED"
+	elif world != null and op.gassed(world.t):
+		t = "GASSED"
+	elif world != null and op.blind(world.t):
+		t = "BLINDED"
 	elif world != null and op.ticker.get("freeze_until", -1.0) > world.t:
 		t = "FROZEN"
 	elif world != null and op.ticker.get("flinch_until", -1.0) > world.t:

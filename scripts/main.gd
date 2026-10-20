@@ -233,6 +233,16 @@ func _default_cfgs() -> void:
 		var team := 0 if id.begins_with("A") else 1
 		var slot := int(id.substr(1)) - 1
 		cfgs[id] = _cfg_for(id, team, slot, ea if team == 0 else eb)
+	# --gear=gas:2,gas_mask:1 (v0.8): team A carries this gear too (what its training allows)
+	if _args.has("gear"):
+		for id2 in IDS:
+			if not id2.begins_with("A"):
+				continue
+			var k: Dictionary = (cfgs[id2]["kit"] as Dictionary).duplicate(true)
+			for part in String(_args["gear"]).split(","):
+				var kv := part.split(":")
+				k["gear"][kv[0]] = int(kv[1]) if kv.size() > 1 else 1
+			cfgs[id2]["kit"] = Equipment.validate(k, Equipment.who_of_echelon(ea))
 	_apply_sizes()
 
 

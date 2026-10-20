@@ -11,6 +11,7 @@ extends RefCounted
 ## evidence attached to each sets how hard and how fast the consequence lands.
 
 const Geom = preload("res://scripts/sim/geom.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 
 const WITNESS_R := 35.0     # a civilian sees an event within this distance, with a line of sight
 const HEARD_R := 60.0       # and hears the shots within this one
@@ -26,6 +27,7 @@ var surrenders: Array = []   # [{t, id, by}]
 var arrests: Array = []      # [{t, id, by}]
 var escapes: Array = []      # [{t, id}] (v0.7)
 var orders_broken: Array = []   # [{t, id, order, why, place}] (v0.7)
+var less_uses: Array = []    # [{t, by, tgt, tool, hit, injury}] (v0.8)
 var _keys := {}              # finding dedupe keys
 var dropped := 0
 
@@ -57,7 +59,7 @@ func _who(o) -> String:
 func _po(o) -> Dictionary:
 	if not per_op.has(o.id):
 		per_op[o.id] = {"shots": 0, "hits_threat": 0, "hits_civ": 0, "hits_friend": 0, "walls": 0,
-			"misjudged": 0, "excessive": 0, "kills": 0, "name": o.name, "role": role(o), "officer_id": o.officer_id}
+			"misjudged": 0, "excessive": 0, "kills": 0, "less": 0, "less_hit": 0, "less_hurt": 0, "name": o.name, "role": role(o), "officer_id": o.officer_id}
 	return per_op[o.id]
 
 
@@ -112,6 +114,28 @@ func verdict_for(o, tgt) -> String:
 	if j.get("v", "") == "threat":
 		return "threat"
 	return "self-defence" if w.attacking(tgt, o) else "jumpy"
+
+
+## A less-lethal tool used (v0.8): the force is on the record, hit or miss, and anyone it
+## hurt is a finding.
+func on_less_lethal(o, e, tool: String, hit: bool, injury: String) -> void:
+	var po := _po(o)
+	po["less"] += 1
+	less_uses.append({"t": w.t, "by": o.id, "tgt": e.id, "tool": tool, "hit": hit, "injury": injury})
+	if not hit:
+		return
+	po["less_hit"] += 1
+	if injury != "":
+		po["less_hurt"] += 1
+		var nm: String = String(Equipment.GEAR[tool]["name"]).to_lower()
+		_finding("less_lethal_injury", o, e, "%s %s %s with the %s" % [_who(o), "badly hurt" if injury == "serious" else "hurt", _who(e), nm], e.pos)
+
+
+## Someone gassed (v0.8): civilians or hostages in the gas are a finding for the thrower.
+func on_gassed(by, x) -> void:
+	if by == null or not (x.civ or x.hostage):
+		return
+	_finding("gassed_civilian", by, x, "%s gassed %s" % [_who(by), _who(x)], x.pos)
 
 
 ## An officer has judged a civilian (or someone giving up) to be a threat.
@@ -220,7 +244,8 @@ func _finding(kind: String, by, target, text: String, p: Vector2, once := true) 
 
 # ------------------------------------------------------------------ summary
 const SEVERITY := ["civilian_killed", "excessive_force", "civilian_hit_by_police", "misjudgment", "officer_killed",
-	"friendly_fire", "civilian_down", "civilian_hit_by_suspect", "jumpy_fire", "officer_down", "order_broken"]
+	"friendly_fire", "civilian_down", "civilian_hit_by_suspect", "less_lethal_injury", "gassed_civilian", "jumpy_fire",
+	"officer_down", "order_broken"]
 
 
 ## Totals and readable lines for the debrief and for the department's records.
@@ -229,7 +254,7 @@ func summary() -> Dictionary:
 		"civ_killed": 0, "civ_total": 0, "suspects": 0, "suspects_down": 0, "suspects_killed": 0, "surrendered": surrenders.size(),
 		"arrested": arrests.size(), "officers": 0, "officers_down": 0, "officers_killed": 0, "excessive": 0, "misjudged": 0,
 		"findings": findings.size(), "lines": [], "strength": {}, "escaped": escapes.size(), "orders_broken": orders_broken.size(),
-		"hostages": 0, "hostages_safe": 0, "hostages_killed": 0}
+		"hostages": 0, "hostages_safe": 0, "hostages_killed": 0, "less": 0, "less_hit": 0, "less_hurt": 0}
 	for sh in shots:
 		if sh.get("pol", false):
 			s["police_shots"] += 1
@@ -265,6 +290,9 @@ func summary() -> Dictionary:
 		s["civ_hit_police"] += po["hits_civ"] if po["role"] == "officer" else 0
 		s["excessive"] += po["excessive"]
 		s["misjudged"] += po["misjudged"]
+		s["less"] += int(po.get("less", 0))
+		s["less_hit"] += int(po.get("less_hit", 0))
+		s["less_hurt"] += int(po.get("less_hurt", 0))
 	var order := findings.duplicate()
 	order.sort_custom(func(a, b):
 		var ia := SEVERITY.find(a["kind"])

@@ -428,7 +428,9 @@ const SOUND := {"rifle": 45.0, "pistol": 35.0, "sprint": 8.0, "run": 5.0, "walk"
 	"clear": 2.0, "reload": 4.0,
 	# v0.7.5: the weapon roster and the entry tools
 	"smg": 38.0, "rifle_loud": 50.0, "rifle_heavy": 55.0, "shotgun": 48.0, "pistol_heavy": 38.0,
-	"breach_shot": 48.0, "ram": 30.0, "kick": 22.0, "door": 5.0, "flashbang": 60.0, "taser": 4.0, "launcher": 25.0}
+	"breach_shot": 48.0, "ram": 30.0, "kick": 22.0, "door": 5.0, "flashbang": 60.0, "taser": 4.0, "launcher": 25.0,
+	# v0.8: less-lethal
+	"stingball": 50.0, "gas": 12.0, "pepperball": 15.0}
 
 
 static func trait_ids() -> Array:
