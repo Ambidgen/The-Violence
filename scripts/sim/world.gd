@@ -754,9 +754,14 @@ func wake(o) -> void:
 # ================================================================== bad habits
 func _update_bad(o, first: bool) -> void:
 	var eff: float = o.stress * (1.0 - o.ech["resist"])
+	# hold-mode habits (v0.7) count only while the squad holds: a change of posture
+	# forces a recount
+	var hold_now: bool = o.holding
+	var gate_changed: bool = o.ticker.get("hold_gate", false) != hold_now
+	o.ticker["hold_gate"] = hold_now
 	# stress habits switch on at their threshold and off 0.1 below it: nothing can change
 	# while effective stress stays inside the band between the nearest two such points
-	if not first and eff >= o.bad_lo and eff < o.bad_hi:
+	if not first and not gate_changed and eff >= o.bad_lo and eff < o.bad_hi:
 		return
 	var anx := 70.0 if (o.bad.get("BH13", false) or o.bad.get("BH14", false)) else 40.0
 	var changed := false
@@ -765,7 +770,7 @@ func _update_bad(o, first: bool) -> void:
 	var hi := INF
 	for b in Habits.BAD:
 		var bid: String = b["id"]
-		var present: bool = o.bad.get(bid, false)
+		var present: bool = o.bad.get(bid, false) and (hold_now or not b.get("hold", false))
 		var on: bool = o.active_bad.has(bid)
 		if not present:
 			if on:
@@ -799,15 +804,20 @@ func _update_bad(o, first: bool) -> void:
 			hi = minf(hi, thr)
 	o.bad_lo = lo
 	o.bad_hi = hi
-	if changed or first:
+	if changed or first or gate_changed:
 		o.suspended.clear()
 		for bid in o.active_bad:
 			for gid in Habits.bad_info(bid)["over"]:
 				if o.good.get(gid, false):
 					o.suspended[gid] = true
+		# hold-mode good habits sleep while the squad is not holding
+		if not hold_now:
+			for gid2 in o.good:
+				if String(gid2).begins_with("HD"):
+					o.suspended[gid2] = true
 		var n := 0
 		for gid in o.good:
-			if o.has(gid):
+			if o.has(gid) and not String(gid).begins_with("HD"):
 				n += 1
 		o.m_h = 1.0 - 0.005 * n
 
@@ -1046,6 +1056,8 @@ func _on_recognized(o, e) -> void:
 		o.freeze_add = rng.randf_range(0.4, 1.0)
 		o.ticker["freeze_until"] = t + o.freeze_add
 		say("%s freezes for %.1f s" % [o.id, o.freeze_add], "bad")
+	if o.holding:
+		brain.hold_sighting(o, e)
 	if o.has("GD04") and t - o.ticker.get("callout_" + e.id, -99.0) > 5.0:
 		o.ticker["callout_" + e.id] = t
 		for m in mates_near(o, 30.0):
@@ -1527,6 +1539,10 @@ func _finish_action(o) -> void:
 				start_action(o, "clear", a["total"], {"p_ok": a["p_ok"]})
 		"click":
 			o.ticker["clicked"] = true
+		"restock":
+			var wn2: String = a.get("w", o.active)
+			o.weapons[wn2]["spare"] += 1
+			say("%s tops up a %s magazine from the cache" % [o.id, wn2], "info")
 		"cuff":
 			var e = by_id.get(a.get("tid", ""), null)
 			if e != null and e.alive() and e.complying and not e.arrested:
@@ -1543,7 +1559,7 @@ func blocks_move(o) -> bool:
 		return true
 	if o.action.is_empty():
 		return false
-	return o.action["type"] in ["reload", "clear", "check", "stall", "click", "melee", "cuff"]
+	return o.action["type"] in ["reload", "clear", "check", "stall", "click", "melee", "cuff", "restock"]
 
 
 # ================================================================== movement
@@ -1793,6 +1809,14 @@ func _aim_update(o) -> void:
 		release = sigma_shooter(o, o.aim["settle"]) <= 0.35 * W or o.aim["settle"] >= cap
 	if since < split or not release:
 		return
+	# HD11 lift and shift (hold): no fire while a teammate is in the lane, and half a
+	# second more once they are clear
+	if o.holding and o.has("HD11"):
+		if friend_in_line(o, e.pos):
+			o.ticker["lift_until"] = t + 0.5
+			return
+		if t < o.ticker.get("lift_until", -1.0):
+			return
 	if o.has("WD10") and friend_in_line(o, e.pos):
 		o.aim["hold"] += DT
 		if o.aim["hold"] > 0.3 and o.sidestep.is_empty() and o.action.is_empty():
@@ -1804,6 +1828,9 @@ func _aim_update(o) -> void:
 		return
 	o.aim["hold"] = 0.0
 	fire_at(o, e, o.aim["zone"], o.aim["settle"])
+	# the round can set off a chain (a stray shot in reply) that ends this shooter's aim
+	if o.aim.is_empty():
+		return
 	o.aim["pair"] += 1
 	o.aim["settle"] = 0.0
 	if o.hb("BH19"):
@@ -2360,6 +2387,8 @@ func _check_end() -> void:
 func _finish(win: int) -> void:
 	over = true
 	winner = win
+	if not squad_orders.is_empty():
+		brain.close_orders()
 	var names := ["TEAM A WINS", "TEAM B WINS", "DRAW", "ABORTED"]
 	say("%s at %.1f s. %d shots, %d hits." % [names[winner], t, stat["shots"], stat["hits"]], "end")
 	mark({0: "Operation over: the police hold the scene", 1: "Operation over: the police were stopped", 2: "Operation over: time ran out",

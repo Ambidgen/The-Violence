@@ -11,6 +11,18 @@ const Geom = preload("res://scripts/sim/geom.gd")
 const Habits = preload("res://scripts/data/habits.gd")
 const DT := 1.0 / 30.0
 
+# Hold-post geometry, kept as static values so the hold test can sweep them (tuned
+# 2026-10-20: the drafted 50-80 deg HD10 band cost a police defence 9 points of attacker
+# wins; 30-55 deg is neutral. Every HD07 variant tried cost 4-7 points, so HD07 is out of
+# the presets until it is reworked).
+static var hd07_lane := 1.5          # HD07: how far inside the door the lane is covered
+static var hd07_door_too := true     # HD07: the post must also see the doorway itself
+static var hd07_hidden := 0.0        # HD07: penalty for a post seen from 4 m outside the door
+static var hd10_lo := 0.5            # HD10: the band off the door's axis (radians)
+static var hd10_hi := 0.95
+static var hd10_bonus := 0.5
+static var hd07_face_door := true    # HD07: pick the post on the lane, but keep the eyes on the door
+
 var w
 var tick := 0
 
@@ -146,6 +158,7 @@ func _set_mode(tm: Dictionary, el: Dictionary, mode: String) -> void:
 	if mode == "assault":
 		_next_task(tm, el)
 	elif mode == "hold":
+		_hold_on(el)
 		_consolidate(tm, el)
 	elif mode == "hunt":
 		_release(tm, el)
@@ -538,6 +551,11 @@ func update_teams() -> void:
 			_bounding(el, eal)
 			if el.has("orders") and (tick + el["i"]) % 10 == 0:
 				_orders_tick(tm, el)
+			var hold_now: bool = el["mode"] == "hold"
+			for hm in eal:
+				hm.holding = hold_now
+			if hold_now and (tick + el["i"]) % 15 == 0:
+				_hold_tick(tm, el, eal)
 			match el["mode"]:
 				"assault":
 					_assault_tick(tm, el, eal)
@@ -1069,7 +1087,12 @@ func _close_threat(o):
 			best_d = d
 			best = e
 	if best != null and cur != "" and cur_d <= 10.0 and best.id != cur and best_d > cur_d - 0.5:
-		return w.op_by_id(cur)
+		best = w.op_by_id(cur)
+	# HD09 drop the point man (hold): whoever is in a doorway of the room goes first
+	if best != null and o.holding and o.has("HD09"):
+		var door_e = _at_room_door(o)
+		if door_e != null:
+			return door_e
 	return best
 
 
@@ -1455,7 +1478,7 @@ func _engage_far(o, e) -> void:
 				o.ticker["far_dest"] = spot
 				return
 	if o.hb("BH15") and o.pos.distance_to(e.pos) > 6.0:
-		w.move_to(o, e.pos, "walk")
+		w.move_to(o, e.pos, "walk", -1, true)
 	else:
 		w.stop(o)
 	# fire over half cover from a crouch
@@ -1469,6 +1492,12 @@ func _engage_far(o, e) -> void:
 	o.last_exposure = o.pos
 	if o.hb("BH13"):
 		o.hide_until = maxf(o.hide_until, o.last_stress_t + 3.0) if w.t - o.last_stress_t < 0.2 else o.hide_until
+	# HD08 wait for the funnel (hold): aim, but hold fire at range until the enemy is at
+	# an opening of the room, attacking, or the squad has opened up
+	if o.holding and o.has("HD08") and not _funnel_ready(o, e):
+		o.dbg = "waiting for the funnel > " + e.id
+		w.engage(o, e, _aim_zone(o, e), false)
+		return
 	w.engage(o, e, _aim_zone(o, e), true)
 
 
@@ -1852,12 +1881,27 @@ func _task_hold(o) -> void:
 			_go(o, inv["p"], "walk", false)
 			_task_look(o, (inv["p"] - o.pos).angle())
 			return
+	if _hold_extras(o):
+		return
 	if not w.at(o, o.spawn, 0.6):
-		_go(o, o.spawn, "walk", false)
+		# HD14 peel back: one half moves while the other covers
+		var el := _el(o)
+		if el.get("peel_until", -1.0) > w.t and o.has("HD14") and o.eslot % 2 != int(el.get("peel_half", 0)):
+			w.stop(o)
+			o.dbg = "covering the peel"
+			o.stance_goal = Op.CROUCH
+			return
+		var prof := (1 if o.has("PF01") else 0) | (2 if o.has("PF02") or o.has("HD06") else 0)
+		w.move_to(o, o.spawn, "walk", prof)
 		o.dbg = "returning to post"
 	else:
 		w.stop(o)
 		o.dbg = "holding"
+		var kind: String = o.ticker.get("post_kind", "")
+		if kind == "window" and o.has("HD05"):
+			o.stance_goal = Op.CROUCH
+		elif kind == "window" and o.hb("BH22"):
+			o.stance_goal = Op.STAND
 
 
 ## Progress watchdog for operators who should be closing on a point: true once they have
@@ -1936,6 +1980,12 @@ func _finish_look(o) -> void:
 
 func _finish_look2(o) -> void:
 	var tm: Dictionary = w.teams[o.team]
+	# BH24 door stare (hold): eyes locked on the room's nearest door
+	if o.holding and o.hb("BH24"):
+		var dp = _stare_door(o)
+		if dp != null:
+			o.look_goal = (dp - o.pos).angle()
+			return
 	if o.hb("BH04"):
 		var lk = _latest_lkp(o)
 		if lk != null:
@@ -2158,12 +2208,29 @@ func _consolidate(tm: Dictionary, el: Dictionary) -> void:
 	if best == "":
 		return
 	held[best] = el["i"]
+	_hold_on(el)
+	# members already in the room keep their posts, unless their hold habits choose a
+	# post of their own (depth, angles, windows); HD16 keeps one back as a reserve
+	var reserve = null
+	if al.size() >= 4:
+		for m0 in al:
+			if m0.has("HD16"):
+				reserve = m0
+				break
 	var moved: Array = []
+	var taken: Array = []
 	for m in al:
-		if lv.room_at(m.spawn) != best:
+		if m == reserve:
+			continue
+		if lv.room_at(m.spawn) != best or _picky(m):
 			moved.append(m)
+		else:
+			taken.append(m.spawn)
 	for m in moved:
-		_post_member(el, m, {})
+		_post_member(el, m, {}, taken)
+		taken.append(m.spawn)
+	if reserve != null:
+		_reserve_post(el, reserve, taken)
 	if not moved.is_empty() or tm["elements"].size() > 1:
 		w.say("%s consolidates in the %s" % [_tag(tm, el), lv.rooms[best]["title"].to_lower()], "info")
 	el["sector_posture"] = ""
@@ -2177,20 +2244,25 @@ func _release_hold(tm: Dictionary, el: Dictionary) -> void:
 
 
 ## Give one member a post in the squad's room covering an opening (or the given one).
-func _post_member(el: Dictionary, m, only: Dictionary) -> void:
-	var taken: Array = []
+func _post_member(el: Dictionary, m, only: Dictionary, taken0 := []) -> void:
+	var taken: Array = taken0.duplicate()
 	for x in _alive(el):
-		if x != m:
+		if x != m and not taken.has(x.spawn):
 			taken.append(x.spawn)
 	var ops: Array = w.level.room_openings(el["hold_room"])
 	var op: Dictionary = only
 	if op.is_empty() and not ops.is_empty():
 		op = ops[m.eslot % ops.size()]
-	var posts: Array = w.level.cover_posts(el["hold_room"], 1, taken, w.nav, op)
-	if posts.is_empty():
-		return
-	m.spawn = posts[0]["p"]
-	m.spawn_face = posts[0]["face"]
+	var post: Dictionary = _hold_post(el["hold_room"], m, op, taken)
+	if post.is_empty():
+		var posts: Array = w.level.cover_posts(el["hold_room"], 1, taken, w.nav, op)
+		if posts.is_empty():
+			return
+		post = posts[0]
+	m.spawn = post["p"]
+	m.spawn_face = post["face"]
+	m.ticker["post_op"] = op
+	m.ticker["post_kind"] = op.get("kind", "")
 
 
 ## Somebody heard an enemy. Aggressive operators (a hunting team, or the Aggression
@@ -2203,7 +2275,7 @@ func on_heard(o, p: Vector2, kind: String) -> void:
 	var el: Dictionary = tm["elements"][o.el]
 	if el["mode"] != "hold":
 		return
-	if o.hb("BH11") or o.hb("BH12"):
+	if o.hb("BH11") or o.hb("BH12") or o.hb("BH25"):
 		var inv: Dictionary = o.ticker.get("investigate", {})
 		if inv.is_empty():
 			w.say("%s hears %s and goes after it (aggression)" % [o.id, _sound_name(kind)], "bad")
@@ -2244,25 +2316,36 @@ func _cover_sound(tm: Dictionary, el: Dictionary, p: Vector2, kind: String) -> v
 	el["cover_t"] = w.t
 	var op: Dictionary = ops[bi]
 	# everyone covers that opening, except one rear watcher (ED09 first) in squads of 3+
+	# HD13 redistribute to the pressure: someone (ED09 or HD13 first) keeps watching the
+	# quiet side; without either habit the whole squad turns to the noise
 	var watcher = null
-	if al.size() >= 3:
+	# an HD16 reserve already watches from the depth of the room
+	for m0 in al:
+		if m0.ticker.get("reserve", false) and m0.has("HD16"):
+			watcher = m0
+	if watcher == null and al.size() >= 3:
 		for m in al:
-			if m.has("ED09"):
+			if m.has("HD13") or m.has("ED09"):
 				watcher = m
 				break
-		if watcher == null:
-			watcher = al[-1]
 	var taken: Array = []
 	if watcher != null:
 		taken.append(watcher.spawn)
 	for m in al:
 		if m == watcher or not w.visible_enemies(m).is_empty():
 			continue
-		var posts: Array = w.level.cover_posts(hr, 1, taken, w.nav, op)
-		if posts.is_empty():
+		if m.ticker.get("reserve", false) and m.has("HD16"):
 			continue
-		m.spawn = posts[0]["p"]
-		m.spawn_face = posts[0]["face"]
+		var post: Dictionary = _hold_post(hr, m, op, taken)
+		if post.is_empty():
+			var posts: Array = w.level.cover_posts(hr, 1, taken, w.nav, op)
+			if posts.is_empty():
+				continue
+			post = posts[0]
+		m.spawn = post["p"]
+		m.spawn_face = post["face"]
+		m.ticker["post_op"] = op
+		m.ticker["post_kind"] = op.get("kind", "")
 		taken.append(m.spawn)
 	el["sector_posture"] = ""
 	var what: String = "door" if op["kind"] == "door" else "window"
@@ -2393,6 +2476,7 @@ func _set_posts(tm: Dictionary, el: Dictionary, posts: Array, floor := Op.YELLOW
 	el["hold_room"] = ""
 	el["posted"] = true
 	el["sector_posture"] = ""
+	_hold_on(el)
 	var al := _alive(el)
 	for k in al.size():
 		var m = al[k]
@@ -2543,6 +2627,78 @@ func _orders_tick(tm: Dictionary, el: Dictionary) -> void:
 				_objective_done(tm, el, lost == 0, "hostages out" if lost == 0 else "%d hostage%s lost" % [lost, "" if lost == 1 else "s"])
 
 
+## When the operation ends: settle every squad's objective in hand (the last checks may
+## not have run). Standing orders (Contain, Post, Patrol) count as held if anyone stands;
+## a squad still at its phase line is judged on its first objective, whoever met it.
+func close_orders() -> void:
+	if w.teams.is_empty():
+		return
+	var tm: Dictionary = w.teams[0]
+	for el in tm["elements"]:
+		if not el.has("orders"):
+			continue
+		var objs: Array = el["orders"].get("objs", [])
+		if el["mode"] == "wait":
+			if not objs.is_empty():
+				var v0: Dictionary = _settle(tm, el, objs[0])
+				el["results"].append({"kind": objs[0].get("kind", ""), "ok": v0["ok"], "why": v0["why"] + "; the squad never crossed its phase line", "t": w.t})
+			continue
+		var closed: bool = el.get("obj_closed_" + str(el.get("obj_i", 0)), false)
+		if el["mode"] == "withdraw":
+			var ob1: Dictionary = el.get("obj", {})
+			if ob1.is_empty() and int(el.get("obj_i", 0)) < objs.size():
+				ob1 = objs[int(el.get("obj_i", 0))]
+			if not ob1.is_empty() and not closed:
+				el["results"].append({"kind": ob1.get("kind", ""), "ok": false, "why": "withdrawn on the abort", "t": w.t})
+			continue
+		_orders_tick(tm, el)
+		var ob: Dictionary = el.get("obj", {})
+		if ob.is_empty() or el.get("obj_closed_" + str(el.get("obj_i", 0)), false):
+			continue
+		var v: Dictionary = _settle(tm, el, ob)
+		el["results"].append({"kind": ob.get("kind", ""), "ok": v["ok"], "why": v["why"], "t": w.t})
+
+
+## The verdict on one objective as things stand.
+func _settle(tm: Dictionary, el: Dictionary, ob: Dictionary) -> Dictionary:
+	var standing: bool = not _alive(el).is_empty()
+	match ob.get("kind", ""):
+		"contain", "post", "patrol":
+			return {"ok": standing, "why": "held to the end" if standing else "squad lost"}
+		"clear":
+			var left := 0
+			for rm in ob.get("rooms", []):
+				if not tm["cleared"].has(rm) and not tm["skipped"].has(rm):
+					left += 1
+			if left == 0:
+				return {"ok": true, "why": "rooms clear"}
+			return {"ok": false, "why": "%d room%s not cleared" % [left, "" if left == 1 else "s"]}
+		"arrest":
+			var tg = w.by_id.get(ob.get("target", ""), null)
+			if tg == null:
+				return {"ok": false, "why": "no such suspect"}
+			if tg.arrested:
+				return {"ok": true, "why": "%s in cuffs" % tg.id}
+			if tg.gone:
+				return {"ok": false, "why": "%s escaped" % tg.id}
+			if not tg.alive():
+				return {"ok": false, "why": "%s %s" % [tg.id, "killed" if tg.state == "dead" else "down"]}
+			return {"ok": false, "why": "%s still at large" % tg.id}
+		"rescue":
+			var left2 := 0
+			var lost := 0
+			for h in w.ops:
+				if h.hostage:
+					if not h.alive():
+						lost += 1
+					elif h.cstate != "safe":
+						left2 += 1
+			if left2 == 0 and lost == 0:
+				return {"ok": true, "why": "hostages out"}
+			return {"ok": false, "why": "%d still inside, %d lost" % [left2, lost]}
+	return {"ok": standing, "why": "ended"}
+
+
 ## The nearest free member of a Rescue squad walks a freed hostage out. Returns the
 ## officer, or null when no Rescue squad has anyone free.
 func rescuer_for(h):
@@ -2631,3 +2787,530 @@ func attack(tm: Dictionary, crowd: Array) -> void:
 			route = w.level.patrol.duplicate()
 		el["patrol"] = route
 		_set_mode(tm, el, "hunt")
+
+
+
+# ================================================================== hold-mode habits (v0.7)
+## HD01-HD20 and BH21-BH27 work only while the squad holds (defending a room, or police
+## on a Post or Contain order). Switch them on for the squad now, before posts are picked.
+func _hold_on(el: Dictionary) -> void:
+	for m in el["members"]:
+		if m.alive() and not m.holding:
+			m.holding = true
+			if not m.civ:
+				w._update_bad(m, false)
+
+
+## Does this member pick a post of their own rather than keep the one they stand on?
+func _picky(m) -> bool:
+	for g in ["HD02", "HD03", "HD05", "HD07", "HD10"]:
+		if m.has(g):
+			return true
+	return m.bad.get("BH22", false) or m.bad.get("BH27", false)
+
+
+## A post covering one opening (or, outdoors, a spot near the current post), chosen by the
+## member's hold habits:
+##   HD02 depth (2.5-4 m back, off the axis; without it close to the opening, near the axis)
+##   HD05 windows from 2.6 m back, kneeling   HD07 see the lane 1.5 m inside the door too
+##   HD10 30-55 deg off the door's axis       HD03 cross a teammate's line by 35 deg or more
+##   BH22 stands at the window                BH27 stands in the middle of the room
+func _hold_post(room: String, m, op: Dictionary, taken: Array, away_from := Vector2.INF) -> Dictionary:
+	var lv = w.level
+	var kind: String = op.get("kind", "")
+	var deep: bool = m.has("HD02")
+	var win := kind == "window"
+	var target_d := 3.2 if deep else 1.6
+	if win and m.has("HD05"):
+		target_d = maxf(target_d, 2.6)
+	if win and m.hb("BH22"):
+		target_d = 0.8
+	var c: Vector2 = op.get("c", m.spawn)
+	var n_in: Vector2 = op.get("n_in", Vector2.ZERO)
+	var lane: bool = kind == "door" and m.has("HD07")
+	var aim: Vector2 = c + n_in * (hd07_lane if lane else 0.25)
+	var indoor: bool = room != "" and lv.rooms.has(room) and not lv.is_exterior(room)
+	if m.hb("BH27") and indoor:
+		var lp: Vector2 = w.nav.snap(lv.rooms[room]["label"])
+		return {"p": lp, "face": (c - lp).angle()}
+	var mates: Array = []
+	if m.el >= 0:
+		for x in _alive(_el(m)):
+			if x != m and (x.ticker.get("post_op", {}) as Dictionary).get("c", Vector2.INF) == c:
+				mates.append(x.spawn)
+	var cands: Array = []
+	if indoor:
+		var step := 0.5 if lv.room_area(room) < 100.0 else 1.0
+		for rv in lv.rooms[room]["rects"]:
+			var r: Rect2 = rv
+			var x := r.position.x + 0.45
+			while x <= r.end.x - 0.4:
+				var y := r.position.y + 0.45
+				while y <= r.end.y - 0.4:
+					cands.append(Vector2(x, y))
+					y += step
+				x += step
+	else:
+		var ctr: Vector2 = m.spawn
+		for ring in [1.5, 2.25, 3.0]:
+			for k in 12:
+				cands.append(ctr + Vector2.from_angle(TAU * k / 12.0) * ring)
+	var room_doors: Array = []
+	if indoor:
+		for did in lv.adj.get(room, []):
+			room_doors.append(lv.doors[did]["c"])
+	var best = null
+	var best_s := -INF
+	for p in cands:
+		if not w.nav.reachable(p):
+			continue
+		if indoor and lv.room_at(p) != room:
+			continue
+		if away_from != Vector2.INF and p.distance_to(away_from) < 1.5:
+			continue
+		var bad := false
+		for dc in room_doors:
+			if (dc as Vector2).distance_to(p) < 1.0:
+				bad = true
+				break
+		if bad:
+			continue
+		for q in taken:
+			if (q as Vector2).distance_to(p) < 1.2:
+				bad = true
+				break
+		if bad:
+			continue
+		var s := 0.0
+		if indoor or kind != "":
+			var v: Vector2 = p - c
+			var dist := v.length()
+			s -= absf(dist - target_d)
+			if n_in != Vector2.ZERO:
+				var ang := absf(v.angle_to(n_in))
+				if deep:
+					s += 1.0 if (ang > 0.35 and ang < 1.2) else 0.0
+				else:
+					s += 0.6 if ang < 0.4 else 0.0
+				if kind == "door" and m.has("HD10"):
+					s += hd10_bonus if (ang > hd10_lo and ang < hd10_hi) else 0.0
+			if m.has("HD03") and not mates.is_empty():
+				var crossed := false
+				for q2 in mates:
+					var cross := absf((p - c).angle_to((q2 as Vector2) - c))
+					if cross >= 0.61:
+						crossed = true
+					elif cross < 0.35:
+						s -= 0.8
+				if crossed:
+					s += 1.2
+		else:
+			s -= absf(p.distance_to(m.spawn) - 2.0)
+		if not w.geom.sight_clear(p, 1.1, aim, 1.0):
+			continue
+		if lane and hd07_door_too and not w.geom.sight_clear(p, 1.1, c, 1.0):
+			continue
+		if lane and hd07_hidden > 0.0 and w.geom.sight_clear(p, 1.1, c - n_in * 4.0, 1.6):
+			s -= hd07_hidden
+		if w.geom.dist_to_kinds(p, [Geom.COVER, Geom.WALL], 1.0) < 0.75:
+			s += 0.6
+		if s > best_s:
+			best_s = s
+			best = p
+	if best == null:
+		return {}
+	return {"p": best, "face": ((c if (lane and hd07_face_door) else aim) - best).angle()}
+
+
+## HD16: the reserve stands back in the depth of the room, facing its main door.
+func _reserve_post(el: Dictionary, m, taken: Array) -> void:
+	var lv = w.level
+	var room: String = el.get("hold_room", "")
+	if room == "" or not lv.rooms.has(room):
+		return
+	var ops: Array = lv.room_openings(room)
+	# the main door: the one closest to where the attack will come from (the stage)
+	var main_op = null
+	for op0 in ops:
+		if op0["kind"] == "door" and (main_op == null or (op0["c"] as Vector2).distance_to(lv.stage_centre()) < (main_op["c"] as Vector2).distance_to(lv.stage_centre())):
+			main_op = op0
+	var best = null
+	var best_s := -INF
+	for rv in lv.rooms[room]["rects"]:
+		var r: Rect2 = rv
+		var x := r.position.x + 0.5
+		while x <= r.end.x - 0.45:
+			var y := r.position.y + 0.5
+			while y <= r.end.y - 0.45:
+				var p := Vector2(x, y)
+				y += 0.5
+				if not w.nav.reachable(p) or lv.room_at(p) != room:
+					continue
+				var ok := true
+				for q in taken:
+					if (q as Vector2).distance_to(p) < 1.2:
+						ok = false
+				if not ok:
+					continue
+				var dmin := 99.0
+				for op in ops:
+					dmin = minf(dmin, (op["c"] as Vector2).distance_to(p))
+				# deep, but still able to shoot at the room's main door
+				var sc := dmin
+				if main_op != null and w.geom.sight_clear(p, 1.1, main_op["c"] + main_op["n_in"] * 0.5, 1.0):
+					sc += 4.0
+				if sc > best_s:
+					best_s = sc
+					best = p
+			x += 0.5
+	if best == null:
+		return
+	m.spawn = best
+	m.spawn_face = ((main_op["c"] as Vector2) - best).angle() if main_op != null else m.spawn_face
+	m.ticker["reserve"] = true
+	m.ticker["post_op"] = {}
+	m.ticker["post_kind"] = ""
+
+
+## The room a holder defends: the squad's hold room, or the room they stand in.
+func _hold_room(o) -> String:
+	var el := _el(o)
+	var hr: String = el.get("hold_room", "")
+	if hr == "" and not w.level.is_exterior(o.room):
+		hr = o.room
+	return hr
+
+
+## A visible enemy within 1.8 m of a door of the holder's room (HD09), or null.
+func _at_room_door(o):
+	var hr := _hold_room(o)
+	if hr == "":
+		return null
+	var best = null
+	var bd := INF
+	for e in w.visible_enemies(o):
+		if o.pos.distance_to(e.pos) > 12.0:
+			continue
+		for did in w.level.adj.get(hr, []):
+			var d: float = (w.level.doors[did]["c"] as Vector2).distance_to(e.pos)
+			if d < 1.8 and d < bd:
+				bd = d
+				best = e
+	return best
+
+
+## HD08: is it time to open up on this enemy?
+func _funnel_ready(o, e) -> bool:
+	var el := _el(o)
+	if w.t - float(el.get("initiated_t", -99.0)) < 10.0 or w.attacking(e, o) or w.t - o.last_stress_t < 2.0:
+		return true
+	var hr := _hold_room(o)
+	if hr == "":
+		return true
+	if e.room == hr:
+		return true
+	for op in w.level.room_openings(hr):
+		if (op["c"] as Vector2).distance_to(e.pos) < 2.5:
+			return true
+	return false
+
+
+## BH24: the door of the room the starer keeps their eyes on (nearest the last contact).
+func _stare_door(o):
+	var hr := _hold_room(o)
+	if hr == "":
+		return null
+	var ref: Vector2 = o.pos
+	var lk = _latest_lkp(o)
+	if lk != null:
+		ref = lk["p"]
+	var best = null
+	var bd := INF
+	for did in w.level.adj.get(hr, []):
+		var c: Vector2 = w.level.doors[did]["c"]
+		if c.distance_to(ref) < bd:
+			bd = c.distance_to(ref)
+			best = c
+	return best
+
+
+## Seen by a holder (world calls this on recognition): HD17 turns the squad's eyes at the
+## first sighting; HD18 calls an enemy at a door of the room.
+func hold_sighting(o, e) -> void:
+	if o.el < 0 or not e.alive():
+		return
+	var el := _el(o)
+	if o.has("HD17") and w.t > float(el.get("standto_t", -99.0)) + 10.0:
+		el["standto_t"] = w.t
+		for m in _el_mates(o):
+			w.raise_alert(m, Op.YELLOW)
+			var dir: float = (e.pos - m.pos).angle()
+			if w.visible_enemies(m).is_empty() and w.in_sector(m, dir):
+				m.look_hint = {"dir": dir, "start": w.t + 0.2, "until": w.t + 2.0, "why": "stand-to"}
+	if o.has("HD18"):
+		var hr := _hold_room(o)
+		if hr == "":
+			return
+		var at_door := false
+		for did in w.level.adj.get(hr, []):
+			if (w.level.doors[did]["c"] as Vector2).distance_to(e.pos) < 2.5:
+				at_door = true
+		if at_door and w.t - float(o.ticker.get("breach_call", -99.0)) > 4.0:
+			o.ticker["breach_call"] = w.t
+			w.say("%s: breach! %s at the door" % [o.id, e.id], "comms")
+			for m2 in _el_mates(o):
+				m2.cue[e.id] = w.t + 3.0
+				if w.visible_enemies(m2).is_empty():
+					m2.look_hint = {"dir": (e.pos - m2.pos).angle(), "start": w.t + 0.2, "until": w.t + 2.0, "why": "breach"}
+
+
+## Per member, ahead of returning to the post: a counterattack (HD12), a drag (HD19), a
+## hop to an alternate post (HD01, HD04), a top-up from the cache (HD20). True when one
+## of them took the tick.
+func _hold_extras(o) -> bool:
+	var el := _el(o)
+	# HD12: rush the foothold
+	if o.ticker.get("counter_until", -1.0) > w.t:
+		var cp: Vector2 = o.ticker["counter_p"]
+		if o.pos.distance_to(cp) > 1.2:
+			o.dbg = "counterattacking the foothold"
+			w.move_to(o, cp, "sprint")
+			return true
+	# HD19: drag a downed teammate out of the lane
+	if o.ticker.has("drag"):
+		var cas = w.by_id.get(o.ticker["drag"], null)
+		var to: Vector2 = o.ticker.get("drag_to", o.pos)
+		if cas == null or cas.state == "ok" or cas.mounted != null or not w.visible_enemies(o).is_empty():
+			o.ticker.erase("drag")
+		elif o.pos.distance_to(cas.pos) > 0.9 and not o.ticker.get("dragging", false):
+			o.dbg = "going to drag " + cas.id
+			_go(o, cas.pos, "run", false)
+			return true
+		else:
+			o.ticker["dragging"] = true
+			o.dbg = "dragging " + cas.id
+			if o.pos.distance_to(to) < 0.4:
+				o.ticker.erase("drag")
+				o.ticker.erase("dragging")
+				w.say("%s drags %s out of the lane" % [o.id, cas.id], "info")
+				return false
+			w.move_to(o, to, "creep")
+			cas.pos = o.pos - (to - o.pos).normalized() * 0.6
+			cas.room = w.level.room_at(cas.pos)
+			return true
+	# HD01 / HD04: hop to an alternate post
+	if (o.has("HD01") or o.has("HD04")) and w.t > float(o.ticker.get("hop_next", 0.0)) and not o.ticker.get("reserve", false):
+		var why := ""
+		if o.has("HD01") and w.t - float(o.ticker.get("near_t", -9.0)) < 1.0 and w.t - o.last_stress_t < 1.0:
+			why = "suppressed"
+		elif o.has("HD01") and _flanked(o):
+			why = "flanked"
+		elif o.has("HD04") and w.t - o.last_shot_t < 1.5 and w.visible_enemies(o).is_empty() \
+				and float(o.ticker.get("hop_shot", -1.0)) != o.last_shot_t:
+			o.ticker["hop_shot"] = o.last_shot_t
+			why = "off the spot it fired from"
+		if why != "":
+			o.ticker["hop_next"] = w.t + 6.0
+			_hop(o, el, why)
+	# HD20: top up from the cache between contacts
+	if o.has("HD20") and o.action.is_empty() and o.pos.distance_to(o.spawn) < 0.8 and int(o.ticker.get("cache_used", 0)) < 2 \
+			and w.t - o.last_enemy_seen_t > 5.0 and w.t - o.last_stress_t > 5.0:
+		for wn in [o.active, o.other()]:
+			var ws: Dictionary = o.weapons[wn]
+			if ws["lost"] or ws.get("none", false):
+				continue
+			if int(ws["spare"]) < int(Habits.WEAPONS[wn]["spare"]):
+				o.ticker["cache_used"] = int(o.ticker.get("cache_used", 0)) + 1
+				w.start_action(o, "restock", 2.0, {"w": wn})
+				return true
+	return false
+
+
+func _flanked(o) -> bool:
+	for e in w.visible_enemies(o):
+		if absf(angle_difference(o.spawn_face, (e.pos - o.pos).angle())) > deg_to_rad(100.0):
+			return true
+	return false
+
+
+func _hop(o, el: Dictionary, why: String) -> void:
+	var room := _hold_room(o)
+	var op: Dictionary = o.ticker.get("post_op", {})
+	if op.is_empty():
+		op = {"c": o.pos + Vector2.from_angle(o.spawn_face) * 4.0, "n_in": -Vector2.from_angle(o.spawn_face), "kind": "point"}
+	var taken: Array = []
+	for x in _alive(el):
+		if x != o:
+			taken.append(x.spawn)
+	var post := _hold_post(room if not el.get("posted", false) else "", o, op, taken, o.spawn)
+	if post.is_empty():
+		return
+	o.spawn = post["p"]
+	o.spawn_face = post["face"]
+	w.say("%s moves to an alternate post (%s)" % [o.id, why], "info")
+
+
+## Per squad, every half second while holding: stand-to (HD17), who has opened fire
+## (HD08), counterattack (HD12), drags (HD19), and whether to give up the room (HD15,
+## peeling back with HD14).
+func _hold_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
+	var lv = w.level
+	var room: String = el.get("hold_room", "")
+	for m in al:
+		if m.has("HD17") and m.alert_floor < Op.YELLOW:
+			m.alert_floor = Op.YELLOW
+			if m.alert < Op.YELLOW:
+				w.raise_alert(m, Op.YELLOW)
+		if w.t - m.last_shot_t < 0.6:
+			el["initiated_t"] = w.t
+	if el.get("peel_until", -1.0) > w.t and w.t - float(el.get("peel_flip", -99.0)) > 2.0:
+		el["peel_flip"] = w.t
+		el["peel_half"] = 1 - int(el.get("peel_half", 0))
+	if room == "":
+		return
+	# HD12: an enemy inside the room is rushed by the nearest pair
+	if w.t > float(el.get("counter_t", -99.0)) + 8.0:
+		var intruder = null
+		for m in al:
+			for e in w.visible_enemies(m):
+				if e.room == room:
+					intruder = e
+		if intruder != null:
+			var cands: Array = al.filter(func(x): return x.has("HD12") and x.action.is_empty())
+			cands.sort_custom(func(a, b):
+				var ra: int = 0 if a.ticker.get("reserve", false) else 1
+				var rb: int = 0 if b.ticker.get("reserve", false) else 1
+				if ra != rb:
+					return ra < rb
+				return a.pos.distance_to(intruder.pos) < b.pos.distance_to(intruder.pos))
+			var n := 0
+			for c in cands:
+				if n >= 2:
+					break
+				c.ticker["counter_until"] = w.t + 4.0
+				c.ticker["counter_p"] = intruder.pos
+				n += 1
+			if n > 0:
+				el["counter_t"] = w.t
+				w.say("%s counterattacks %s in the %s" % [_tag(tm, el), intruder.id, lv.rooms[room]["title"].to_lower()], "info")
+	# HD19: drag a downed teammate once the doorway has been quiet for a second
+	var quiet := true
+	for m2 in al:
+		if not w.visible_enemies(m2).is_empty():
+			quiet = false
+	if quiet:
+		el["quiet_since"] = el.get("quiet_since", w.t)
+	else:
+		el.erase("quiet_since")
+	if quiet and w.t - float(el.get("quiet_since", w.t)) >= 1.0:
+		for x in el["members"]:
+			if x.state != "down" or x.ticker.get("dragged", false) or x.pos.distance_to(lv.rooms[room]["label"]) > 12.0:
+				continue
+			var best = null
+			for m3 in al:
+				if m3.has("HD19") and m3.action.is_empty() and not m3.ticker.has("drag") and (best == null or m3.pos.distance_to(x.pos) < best.pos.distance_to(x.pos)):
+					best = m3
+			if best == null:
+				continue
+			var near_c: Vector2 = x.pos
+			var bd := INF
+			for op in lv.room_openings(room):
+				if (op["c"] as Vector2).distance_to(x.pos) < bd:
+					bd = (op["c"] as Vector2).distance_to(x.pos)
+					near_c = op["c"]
+			var dir: Vector2 = (x.pos - near_c).normalized() if bd < INF and bd > 0.01 else Vector2.RIGHT
+			var to: Vector2 = w.nav.snap(x.pos + dir * 2.5)
+			if lv.room_at(to) != room:
+				to = w.nav.snap(lv.rooms[room]["label"])
+			best.ticker["drag"] = x.id
+			best.ticker["drag_to"] = to
+			x.ticker["dragged"] = true
+	# HD15: give up the room when it cannot be held
+	if w.t < float(el.get("fallback_t", -99.0)) + 30.0:
+		return
+	var has15 := false
+	for m4 in al:
+		if m4.has("HD15"):
+			has15 = true
+	if not has15:
+		return
+	var n0: int = el["members"].size()
+	var dry := 0
+	for m5 in al:
+		if not m5.any_loaded() and int(m5.weapons["rifle"]["spare"]) + int(m5.weapons["pistol"]["spare"]) == 0:
+			dry += 1
+	# enemies at the room's openings (within 3 m), by opening; an enemy already inside
+	# means running is worse than fighting
+	var at_ops := {}
+	var inside := false
+	var ops: Array = lv.room_openings(room)
+	for m6 in al:
+		for e2 in w.visible_enemies(m6):
+			if e2.room == room:
+				inside = true
+			for i in ops.size():
+				if (ops[i]["c"] as Vector2).distance_to(e2.pos) < 3.0:
+					at_ops[i] = true
+	if inside or al.size() <= 2:
+		return
+	for m7 in al:
+		if not w.visible_enemies(m7).is_empty() or w.t - m7.last_stress_t < 2.0:
+			return
+	var why := ""
+	if n0 >= 2 and al.size() * 2 <= n0:
+		why = "half the squad is down"
+	elif dry * 2 > al.size():
+		why = "out of ammunition"
+	elif at_ops.size() >= 2:
+		why = "flanked"
+	if why == "":
+		return
+	var fb := _fallback_room(tm, room)
+	if fb == "":
+		return
+	el["fallback_t"] = w.t
+	var stay: Array = al.filter(func(x): return x.hb("BH23"))
+	var keep := {}
+	for x2 in stay:
+		keep[x2.id] = [x2.spawn, x2.spawn_face]
+	_release_hold(tm, el)
+	el["fixed_room"] = fb
+	_consolidate(tm, el)
+	el.erase("fixed_room")
+	for x3 in stay:
+		x3.spawn = keep[x3.id][0]
+		x3.spawn_face = keep[x3.id][1]
+	el["peel_until"] = w.t + 8.0
+	el["peel_flip"] = w.t
+	el["peel_half"] = 0
+	w.say("%s gives up the %s (%s) and falls back to the %s" % [_tag(tm, el), lv.rooms[room]["title"].to_lower(), why,
+		lv.rooms[fb]["title"].to_lower()], "info")
+
+
+## The next room back: an interior room next door, with no enemy known in it, as far
+## from the enemy as possible.
+func _fallback_room(tm: Dictionary, room: String) -> String:
+	var lv = w.level
+	var foes: Array = []
+	for eid in tm["lkps"]:
+		foes.append(tm["lkps"][eid]["p"])
+	var best := ""
+	var best_s := -INF
+	for did in lv.adj.get(room, []):
+		var D: Dictionary = lv.doors[did]
+		var other: String = D["a"] if D["b"] == room else D["b"]
+		if lv.is_exterior(other) or tm["held"].has(other):
+			continue
+		var s := 0.0
+		var ok := true
+		for f in foes:
+			# no enemy known in it, and none close to the door the squad must use
+			if lv.room_at(f) == other or (f as Vector2).distance_to(D["c"]) < 6.0:
+				ok = false
+			s += minf((f as Vector2).distance_to(lv.rooms[other]["label"]), 30.0)
+		if not ok:
+			continue
+		if s > best_s:
+			best_s = s
+			best = other
+	return best

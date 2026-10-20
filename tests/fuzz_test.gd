@@ -101,5 +101,5 @@ func _init() -> void:
 	for b in Habits.bad_ids():
 		if not bad_seen.has(b):
 			missing.append(b)
-	print("bad habits activated: %d/20  missing: %s" % [bad_seen.size(), str(missing)])
+	print("bad habits activated: %d/%d  missing: %s" % [bad_seen.size(), Habits.bad_ids().size(), str(missing)])
 	quit()

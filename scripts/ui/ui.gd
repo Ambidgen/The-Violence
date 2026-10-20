@@ -212,6 +212,10 @@ func _build_setup() -> void:
 	map_opt.select(main.map_i)
 	map_opt.item_selected.connect(func(i): main.set_map(i))
 	hm.add_child(map_opt)
+	var opsb := _btn(s, "OPERATIONS   >   the week's board (planned operations, v0.7)", func(): main.ops_open())
+	opsb.custom_minimum_size = Vector2(0, 34)
+	opsb.add_theme_font_size_override("font_size", 14)
+	opsb.tooltip_text = "The campaign: forty weeks to the election. Each week, situations to brief, staff, order and run,\nwith the fog of war, rewind, abort and a debrief."
 	_heading(s, "1  PLACE  ·  click the plan to place the selected operator; right-click sets facing; wheel zooms, middle-drag pans")
 	var group := ButtonGroup.new()
 	for k in 2:
@@ -285,7 +289,7 @@ func _build_setup() -> void:
 	tabs = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	s.add_child(tabs)
-	var names := {"Pathfinding": "Path", "Group discipline": "Group", "Eye discipline": "Eyes", "Weapon discipline": "Weapon"}
+	var names := {"Pathfinding": "Path", "Group discipline": "Group", "Eye discipline": "Eyes", "Weapon discipline": "Weapon", "Defence": "Hold"}
 	for grp in Habits.GROUPS:
 		var sc := ScrollContainer.new()
 		sc.name = names[grp]
@@ -300,7 +304,8 @@ func _build_setup() -> void:
 			var gid: String = g["id"]
 			var b := _btn(col, "", func(on): _habit(gid, on), true)
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-			b.tooltip_text = "%s %s\nWith it: %s\nWithout it: %s\nOverridden by: %s" % [gid, g["name"], g["with"], g["without"], _overriders(gid)]
+			b.tooltip_text = "%s %s%s\nWith it: %s\nWithout it: %s\nOverridden by: %s" % [gid, g["name"],
+				"  (hold mode only: works while the squad holds a position)" if g.get("hold", false) else "", g["with"], g["without"], _overriders(gid)]
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			habit_buttons[gid] = b
 	var scb := ScrollContainer.new()
@@ -493,7 +498,7 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		n_good += 1 if on else 0
 		var b: Button = habit_buttons[g["id"]]
 		b.set_pressed_no_signal(on)
-		b.text = "%s  %s   %s" % ["[x]" if on else "[  ]", g["id"], g["name"]]
+		b.text = "%s  %s   %s%s" % ["[x]" if on else "[  ]", g["id"], g["name"], "   (hold)" if g.get("hold", false) else ""]
 	for b0 in Habits.BAD:
 		var on2: bool = c["bad"].get(b0["id"], false)
 		n_bad += 1 if on2 else 0
@@ -514,8 +519,12 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		if on3:
 			tnames.append(tr["name"])
 	var e: Dictionary = Habits.ECHELONS[c["echelon"]]
-	summary.text = "%s: %d good habits (reaction time x%.3f), %d bad habits present, experience %d. Recognition base %.2f s, stress resistance %.2f, %d plate%s, hearing x%.2f%s." % [
-		sel, n_good, 1.0 - 0.005 * n_good, n_bad, xp, e["t_rec0"], e["resist"], c["plates"], "" if c["plates"] == 1 else "s",
+	var n_base := 0
+	for gk in c["good"]:
+		if c["good"][gk] and not String(gk).begins_with("HD"):
+			n_base += 1
+	summary.text = "%s: %d good habits, %d of them hold-mode (reaction time x%.3f from the base habits), %d bad habits present, experience %d. Recognition base %.2f s, stress resistance %.2f, %d plate%s, hearing x%.2f%s." % [
+		sel, n_good, n_good - n_base, 1.0 - 0.005 * n_base, n_bad, xp, e["t_rec0"], e["resist"], c["plates"], "" if c["plates"] == 1 else "s",
 		Habits.hearing(traits), (" (" + ", ".join(tnames) + ")") if not tnames.is_empty() else ""]
 	_updating = false
 
@@ -838,7 +847,8 @@ static func officer_file(r: Dictionary) -> String:
 		plus.append("+" + String(q))
 	for q2 in e.get("minus", []):
 		plus.append("-" + String(q2))
-	t += "Patrol, form %+d%%  %s\n" % [int(round((1.0 - float(e.get("form", 1.0))) * 100.0)), "  ".join(plus)]
+	t += "Patrol, %d year%s on the job, form %+d%%  %s\n" % [int(r.get("years", 0)), "" if int(r.get("years", 0)) == 1 else "s",
+		int(round((1.0 - float(e.get("form", 1.0))) * 100.0)), "  ".join(plus)]
 	t += "Recognition %.2f s, stress resistance %.2f.  Judgment %d, temper %d, integrity %d%s\n" % [float(e["t_rec0"]), float(e["resist"]),
 		int(r["judgment"]), int(r["temper"]), int(r["integrity"]), ("  ·  " + String(r["personality"])) if r["personality"] != "" else ""]
 	t += "Habits (%d): %s\n" % [r["good"].size(), " ".join(r["good"])]

@@ -18,8 +18,8 @@ const SAVE_PATH := "user://department.json"
 const XP_TIERS := [0, 6, 18, 40, 80]
 const RANKS := ["Officer", "Corporal", "Sergeant", "Lieutenant", "Captain"]
 ## Personality traits and the bad habits each brings (habits.gd, trait habits).
-const PERSONALITY := {"Aggression": ["BH11", "BH12"], "Anxiety": ["BH13", "BH14"], "Ego": ["BH15", "BH16"],
-	"Complacency": ["BH17", "BH18"], "Rigidity": ["BH19", "BH20"]}
+const PERSONALITY := {"Aggression": ["BH11", "BH12", "BH25"], "Anxiety": ["BH13", "BH14"], "Ego": ["BH15", "BH16", "BH23"],
+	"Complacency": ["BH17", "BH18", "BH27"], "Rigidity": ["BH19", "BH20", "BH22"]}
 ## The department the player inherits (v0.7): twenty officers. A lieutenant, two
 ## sergeants and four corporals with years on the job, six officers with a little, and
 ## seven rookies.
@@ -111,7 +111,7 @@ func hire(rank := "Officer", xp := 0, lateral := false, years := 0.0) -> Diction
 		var pk: String = keys[rng.randi() % keys.size()]
 		r["personality"] = pk
 		var bh: Array = PERSONALITY[pk]
-		r["bad_traits"] = bh.duplicate() if rng.randf() < 0.3 else [bh[rng.randi() % 2]]
+		r["bad_traits"] = bh.duplicate() if rng.randf() < 0.3 else [bh[rng.randi() % bh.size()]]
 	if rng.randf() < 0.06:
 		r["traits"].append("TR01")
 	elif rng.randf() < 0.05:

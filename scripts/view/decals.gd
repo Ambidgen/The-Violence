@@ -12,6 +12,8 @@ static var _tex := {}
 var world
 var rng := RandomNumberGenerator.new()
 var pools: Array = []           # [{s: Sprite2D, t0, full}]
+var fog = null                  # v0.7: marks made out of every camera's view stay hidden until one sees them
+var fog_hidden: Array = []
 
 
 static func tex(key: String) -> Texture2D:
@@ -22,6 +24,8 @@ static func tex(key: String) -> Texture2D:
 
 func setup_empty() -> void:
 	world = null
+	fog = null
+	fog_hidden.clear()
 	for c in get_children():
 		c.queue_free()
 	pools.clear()
@@ -29,10 +33,31 @@ func setup_empty() -> void:
 
 func setup(w) -> void:
 	world = w
+	fog = null
+	fog_hidden.clear()
 	rng.seed = w.seed_used + 77
 	for c in get_children():
 		c.queue_free()
 	pools.clear()
+
+
+func _fogged(s: Node2D, p_m: Vector2) -> void:
+	if fog != null and fog.enabled and not fog.visible_at(p_m):
+		s.visible = false
+		fog_hidden.append(s)
+
+
+## Show the hidden marks a camera now sees (or all of them, when the fog lifts).
+func reveal(all := false) -> void:
+	var keep: Array = []
+	for s in fog_hidden:
+		if not is_instance_valid(s):
+			continue
+		if all or fog == null or fog.visible_at(s.position / PX):
+			s.visible = true
+		else:
+			keep.append(s)
+	fog_hidden = keep
 
 
 func _sprite(key: String, p_m: Vector2, rot: float, scale_f: float, alpha := 1.0) -> Sprite2D:
@@ -43,6 +68,7 @@ func _sprite(key: String, p_m: Vector2, rot: float, scale_f: float, alpha := 1.0
 	s.scale = Vector2.ONE * SVG_SCALE * scale_f
 	s.modulate.a = alpha
 	add_child(s)
+	_fogged(s, p_m)
 	if get_child_count() > MAX_MARKS:
 		get_child(0).queue_free()
 	return s
@@ -84,6 +110,7 @@ func _blood(ev: Dictionary) -> void:
 	s.scale = Vector2(reach, rng.randf_range(0.7, 1.1) * (0.8 + 0.3 * power)) * SVG_SCALE
 	s.modulate.a = 0.92
 	add_child(s)
+	_fogged(s, p)
 	# a splat at the feet
 	_sprite("fx/splat%d" % rng.randi_range(1, 4), p + u * rng.randf_range(0.1, 0.35), rng.randf() * TAU, rng.randf_range(0.25, 0.45) * power, 0.9)
 	# smear where the spray meets a wall

@@ -3,7 +3,11 @@ extends RefCounted
 ## the 20 bad habits with the good habits each overrides, echelon presets
 ## (section 2.1) and the two weapons used in this slice (section 3.1).
 
-const GROUPS := ["Pathfinding", "Group discipline", "Eye discipline", "Weapon discipline"]
+const GROUPS := ["Pathfinding", "Group discipline", "Eye discipline", "Weapon discipline", "Defence"]
+## Hold-mode habits (v0.7, HD01-HD20): they work only while the operator's squad is in
+## Hold (defending, or police on a Post or Contain order). They do not add the 0.5%
+## reaction bonus: the 40 base habits keep that to themselves.
+const HOLD_PREFIX := "HD"
 
 const GOOD := [
 	{"id": "PF01", "name": "Avoid the fatal funnel", "group": "Pathfinding",
@@ -126,6 +130,67 @@ const GOOD := [
 	{"id": "WD10", "name": "Friendly-line check", "group": "Weapon discipline",
 		"with": "Won't fire with a friend within 0.5 m of the line; waits up to 0.3 s.",
 		"without": "Fires anyway."},
+	# ---- hold mode (v0.7): only while the squad holds a position
+	{"id": "HD01", "name": "Alternate and supplementary posts", "group": "Defence", "hold": true,
+		"with": "Keeps an alternate post covering the same opening; hops to it within 2 s when suppressed or flanked.",
+		"without": "Stays on the one post it was given."},
+	{"id": "HD02", "name": "Fight from depth", "group": "Defence", "hold": true,
+		"with": "Posts 2.5-4 m back from the opening, off its centre line.",
+		"without": "Posts close to the opening, near its axis: seen from outside."},
+	{"id": "HD03", "name": "Interlocking angles", "group": "Defence", "hold": true,
+		"with": "Picks a post that crosses a teammate's line onto the same opening by 35 deg or more.",
+		"without": "Covers its opening alone, whatever the others do."},
+	{"id": "HD04", "name": "Don't re-peek", "group": "Defence", "hold": true,
+		"with": "After firing from a post and losing the target, moves 1.5 m or more before showing again.",
+		"without": "Comes back to the same spot."},
+	{"id": "HD05", "name": "Deep-window discipline", "group": "Defence", "hold": true,
+		"with": "Covers a window kneeling, 2 m or more back from the sill.",
+		"without": "Stands at the window."},
+	{"id": "HD06", "name": "Internal routes", "group": "Defence", "hold": true,
+		"with": "Moves between posts by the least exposed route (doors and windows cost more).",
+		"without": "Takes the shortest route, across open doorways."},
+	{"id": "HD07", "name": "Canalize the entry", "group": "Defence", "hold": true,
+		"with": "Picks a post that sees the lane 1.5 m inside the door as well as the doorway (not in the presets: measured harmful).",
+		"without": "Covers the doorway."},
+	{"id": "HD08", "name": "Wait for the funnel", "group": "Weapon discipline", "hold": true,
+		"with": "Beyond 10 m, holds fire until the enemy is at an opening of the room, attacking, or a teammate opens up.",
+		"without": "Fires at the first face at range."},
+	{"id": "HD09", "name": "Drop the point man", "group": "Weapon discipline", "hold": true,
+		"with": "Shoots first whoever is in or at a doorway of the room.",
+		"without": "Shoots the closest."},
+	{"id": "HD10", "name": "Enfilade the threshold", "group": "Weapon discipline", "hold": true,
+		"with": "Picks a post 30-55 deg off the door's axis, across the entry line.",
+		"without": "Faces the door square on."},
+	{"id": "HD11", "name": "Lift and shift", "group": "Weapon discipline", "hold": true,
+		"with": "Holds fire while a teammate is in the lane; reopens 0.5 s after it clears.",
+		"without": "Fires into the doorway anyway (unless WD10)."},
+	{"id": "HD12", "name": "Counterattack the foothold", "group": "Defence", "hold": true,
+		"with": "When an enemy gets inside the room, the nearest pair rushes the entry point for 4 s.",
+		"without": "Waits for the attackers to set up inside."},
+	{"id": "HD13", "name": "Redistribute to the pressure", "group": "Group discipline", "hold": true,
+		"with": "When the squad turns to a noise, one member keeps watch on the quiet side.",
+		"without": "Everyone turns to the loudest door."},
+	{"id": "HD14", "name": "Peel back", "group": "Defence", "hold": true,
+		"with": "Falls back in two halves, one moving while the other covers, 2 s legs.",
+		"without": "Everyone runs at once."},
+	{"id": "HD15", "name": "Give up the room", "group": "Defence", "hold": true,
+		"with": "Falls back to the next room when flanked, low on ammunition or half the squad is down.",
+		"without": "Holds the room to the last."},
+	{"id": "HD16", "name": "Keep the fifth man", "group": "Group discipline", "hold": true,
+		"with": "In squads of four or more, one member stays back in the room as a reserve: first to counterattack or drag.",
+		"without": "Everyone is on an opening."},
+	{"id": "HD17", "name": "Early warning", "group": "Eye discipline", "hold": true,
+		"with": "Stands to: never relaxes below yellow, and the first sighting turns the whole squad's eyes.",
+		"without": "Relaxes to green; the first warning is the breach."},
+	{"id": "HD18", "name": "Call the breach", "group": "Group discipline", "hold": true,
+		"with": "An enemy at a doorway of the room is called within 0.2 s: the squad turns and recognizes 40% faster.",
+		"without": "Says nothing."},
+	{"id": "HD19", "name": "Drag the wounded", "group": "Group discipline", "hold": true,
+		"with": "Once the doorway is quiet for a second, pulls a downed teammate 2.5 m back out of the lane.",
+		"without": "Leaves them where they fell."},
+	{"id": "HD20", "name": "Ammo in the position", "group": "Weapon discipline", "hold": true,
+		"with": "A cache at the post: between contacts, tops up a magazine (up to two) from it.",
+		"without": "Has only what it carries."},
 ]
 
 ## kind "stress": active when stress x (1 - resist) >= t - 0.3 x anxiety/100 (off 0.1 below).
@@ -171,6 +236,21 @@ const BAD := [
 		"desc": "Always two rounds centre mass then a 0.6 s pause; full 3 s range drill on stoppages."},
 	{"id": "BH20", "name": "Fixed scan pattern", "kind": "trait", "t": 0.0, "trait": "Rigidity", "over": ["ED03", "ED07"],
 		"desc": "Sweeps left to right on every entry, ignoring corners and sounds until done."},
+	# ---- hold mode (v0.7): active only while the squad holds a position
+	{"id": "BH21", "name": "First sight, first shot", "kind": "stress", "t": 0.55, "trait": "", "hold": true,
+		"over": ["HD08", "HD09", "HD10"], "desc": "Opens up on the first silhouette at range; the ambush dies with the first round."},
+	{"id": "BH22", "name": "Window silhouette", "kind": "trait", "t": 0.0, "trait": "Rigidity", "hold": true,
+		"over": ["HD05", "HD04"], "desc": "Stands tall at the window it covers; the post is located before it fires twice."},
+	{"id": "BH23", "name": "Die at the post", "kind": "trait", "t": 0.0, "trait": "Ego", "hold": true,
+		"over": ["HD01", "HD14", "HD15"], "desc": "Will not give up the post; stays when the squad falls back."},
+	{"id": "BH24", "name": "Door stare", "kind": "stress", "t": 0.70, "trait": "", "hold": true,
+		"over": ["HD13", "HD03", "GD02", "ED02"], "desc": "Eyes locked on the nearest door of the room; flank and rear go unwatched."},
+	{"id": "BH25", "name": "Sally out for a noise", "kind": "trait", "t": 0.0, "trait": "Aggression", "hold": true,
+		"over": ["HD17", "HD13", "GD10"], "desc": "Leaves the post alone to chase a sound."},
+	{"id": "BH26", "name": "Fire through the counter", "kind": "stress", "t": 0.60, "trait": "", "hold": true,
+		"over": ["HD11", "GD03", "WD10"], "desc": "Fires with a teammate in the lane."},
+	{"id": "BH27", "name": "Unprepared position", "kind": "trait", "t": 0.0, "trait": "Complacency", "hold": true,
+		"over": ["HD01", "HD07", "HD20", "HD05"], "desc": "Stands in the middle of the room: no alternate, no cache, no angle."},
 ]
 
 const ECHELON_ORDER := ["untrained", "militia", "patrol", "regular", "police", "sof"]
@@ -204,11 +284,15 @@ const PRESET_GOOD := {
 	"patrol": ["PF06", "GD04", "PF05", "WD03", "WD05", "GD07", "ED07", "WD01",
 		"PF01", "GD01", "ED01", "ED02"],
 	"regular": ["PF06", "GD04", "PF05", "WD03", "WD05", "GD07", "ED07", "WD01",
-		"PF01", "PF02", "GD01", "GD02", "GD05", "GD06", "ED01", "ED02", "WD07"],
+		"PF01", "PF02", "GD01", "GD02", "GD05", "GD06", "ED01", "ED02", "WD07",
+		"HD01", "HD02", "HD05", "HD08", "HD17"],
 	"police": ["PF06", "GD04", "PF05", "WD03", "WD05", "GD07", "ED07", "WD01",
 		"PF01", "PF02", "GD01", "GD02", "GD05", "GD06", "ED01", "ED02", "WD07",
-		"PF03", "PF04", "ED03", "ED05", "GD03", "WD10", "WD02", "ED10"],
-	"sof": ["ALL_BUT", "PF08", "ED09"],
+		"PF03", "PF04", "ED03", "ED05", "GD03", "WD10", "WD02", "ED10",
+		"HD01", "HD02", "HD03", "HD04", "HD05", "HD06", "HD08", "HD09", "HD10", "HD11",
+		"HD13", "HD14", "HD15", "HD16", "HD17", "HD18", "HD19", "HD20"],
+	# HD07 is left out of both presets: every version tried made a held room easier to take
+	"sof": ["ALL_BUT", "PF08", "ED09", "HD07"],
 }
 const PRESET_PLATES := {"untrained": 0, "militia": 0, "patrol": 0, "regular": 2, "police": 2, "sof": 3}
 ## Soft armour (v0.6): a vest under the shirt that stops pistol rounds to the chest from
@@ -403,6 +487,15 @@ static func preset_good(echelon: String) -> Array:
 			out.erase(list[i])
 		return out
 	return list.duplicate()
+
+
+static func is_hold(id: String) -> bool:
+	return id.begins_with("HD") or id in ["BH21", "BH22", "BH23", "BH24", "BH25", "BH26", "BH27"]
+
+
+## The 40 base good habits (the hold-mode ones excluded).
+static func base_good_ids() -> Array:
+	return good_ids().filter(func(g): return not g.begins_with("HD"))
 
 
 static func stress_bad_ids() -> Array:

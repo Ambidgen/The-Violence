@@ -63,7 +63,9 @@ func _init() -> void:
 	# founding, save and load
 	var dep = Department.new()
 	dep.found(77)
-	_check(dep.officers.size() == 12, "founded with 12 officers")
+	_check(dep.officers.size() == Department.FOUNDING.size(), "founded with %d officers (v0.7: the inherited roster)" % Department.FOUNDING.size())
+	var vets: int = dep.officers.filter(func(r): return float(r.get("years", 0.0)) >= 5.0).size()
+	_check(vets >= 4, "some of them experienced (%d with five years or more)" % vets)
 	var a: Dictionary = dep.officers[2]
 	_check(a["ech"].has("form") and a["echelon"] == "patrol", "stats rolled at hire (Patrol echelon, form %+.0f%%)" % ((1.0 - float(a["ech"]["form"])) * 100.0))
 	_check(dep.save(PATH), "saved")

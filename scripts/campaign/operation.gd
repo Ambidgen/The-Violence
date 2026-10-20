@@ -232,8 +232,8 @@ static func _occupant_cfg(oc: Dictionary, id: String, team: int, slot: int, p: V
 	for b in Habits.stress_bad_ids():
 		bad[b] = true
 	if rng.randf() < 0.3:
-		var pers: Array = [["BH11", "BH12"], ["BH13", "BH14"], ["BH15", "BH16"], ["BH17", "BH18"]][rng.randi() % 4]
-		bad[pers[rng.randi() % 2]] = true
+		var pers: Array = [["BH11", "BH12", "BH25"], ["BH13", "BH14"], ["BH15", "BH16", "BH23"], ["BH17", "BH18", "BH27"]][rng.randi() % 4]
+		bad[pers[rng.randi() % pers.size()]] = true
 	var c := {"id": id, "team": team, "slot": slot, "echelon": ech, "good": good, "bad": bad, "plates": 0,
 		"exp": Habits.PRESET_EXP[ech], "traits": {}, "pos": p, "face": face, "enabled": true, "alert": int(oc.get("alert", 0)),
 		"name": oc.get("name", ""), "flight": float(oc.get("flight", 0.0)), "captor": role == "captor",

@@ -151,6 +151,7 @@ var arms := ""          # what a concealed attacker carries: "pistol" or "rifle"
 var gone := false       # out of the operation: escaped over the fence, or withdrawn to the vehicles
 var gone_how := ""      # "escaped" | "withdrew"
 var pistols_only := false
+var holding := false    # the squad is in Hold: hold-mode habits (HD01-HD20, BH21-BH27) apply
 
 
 func configure(cfg: Dictionary) -> void:

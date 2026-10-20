@@ -257,9 +257,13 @@ static func _room_fact(s: Dictionary, lv, key: String, label: String, truth: Str
 static func room_title(lv, rm: String) -> String:
 	if lv.rooms.has(rm):
 		var tt: String = lv.rooms[rm]["title"]
+		var same: Array = []
 		for other in lv.rooms:
-			if other != rm and lv.rooms[other]["title"] == tt:
-				return rm.to_lower()
+			if lv.rooms[other]["title"] == tt:
+				same.append(other)
+		if same.size() > 1:
+			same.sort()
+			return "%s %d" % [tt.to_lower(), same.find(rm) + 1]
 		return tt.to_lower()
 	return rm.to_lower()
 

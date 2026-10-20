@@ -20,6 +20,7 @@ var was_down := false
 var gun_key := ""
 var pip: Pip
 var marks: Marks
+var look_key := ""
 
 
 func setup(o, w) -> void:
@@ -27,6 +28,7 @@ func setup(o, w) -> void:
 	world = w
 	rng.seed = hash(o.id)
 	var team: String = Palette.look(o, w)
+	look_key = team
 	gun = Sprite2D.new()
 	gun.centered = false
 	add_child(gun)
@@ -99,6 +101,12 @@ func sync(force := false) -> void:
 		if op.state == "dead" and tag.text == "DOWN":
 			tag.text = "KIA"
 		return
+	# a concealed attacker drops the act (v0.7): redraw as who they really are
+	var lk: String = Palette.look(op, world)
+	if lk != look_key:
+		look_key = lk
+		body.texture = Decals.tex("op/%s_stand" % lk)
+		down_body.texture = Decals.tex("op/%s_down" % lk)
 	body.rotation = op.body_dir
 	pip.refresh()
 	marks.refresh(world)

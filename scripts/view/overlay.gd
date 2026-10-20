@@ -17,6 +17,7 @@ var puffs: Array = []     # {p, age}
 var ears: Array = []      # {id, dir, age}: someone just heard an enemy
 var view := Rect2()       # city: only draw what is in view
 var zoom := 1.0
+var fog = null            # v0.7: with the fog on, only officers' cones, aims and recognition show
 
 
 func setup(w) -> void:
@@ -93,6 +94,8 @@ func _draw() -> void:
 			continue
 		if o.civ or o.complying:
 			continue
+		if fog != null and fog.enabled and not o.judges:
+			continue
 		if show_cones:
 			var half: float = world.cone_half(o)
 			var r := 7.0 * PX
@@ -130,7 +133,11 @@ func _draw() -> void:
 		for o in world.ops:
 			if not o.alive():
 				continue
+			if fog != null and fog.enabled and not o.judges:
+				continue
 			for eid in o.rec:
+				if fog != null and fog.enabled and not fog.visible_ids.has(eid):
+					continue
 				var rv: float = o.rec[eid]
 				if rv <= 0.02:
 					continue

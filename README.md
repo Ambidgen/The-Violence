@@ -1,7 +1,8 @@
-# The Violence - vertical slice (v0.6)
+# The Violence - vertical slice (v0.7)
 
-A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Two modes:
+A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
+- **Operations (new in v0.7):** the police command game's first playable loop. Each week the board shows two or three situations. Pick one, read the briefing, choose who goes, split them into squads and give each squad orders, then press RUN and watch. You can pause, slow down, rewind to look again, or abort. Nothing you do during the run changes what the officers do, except the abort. The debrief scores the operation and replays it with the fog lifted.
 - **Matches and operations:** eleven maps, from a one-room cabin to an apartment block. Two teams of one to twenty operators each carry a rifle and a pistol (the untrained carry only a pistol). You place everyone, set every operator's habits and traits, and press RUN. The fight resolves itself at up to 20x speed. New in v0.6: put civilians on the map, put team A under police rules, and send officers from your department, whose experience, wounds and files carry over from one operation to the next.
 - **Endless Battle:** Port Carrick, a 1 km city of about 250 lots. Four gangs fight over its buildings, six police precincts answer the gunfire, and three hospitals send out ambulances. It never ends.
 
@@ -39,6 +40,7 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 | 08 | Warehouse & Offices | 64 x 44 m | a racked 32 x 24 m warehouse next to a tight office block |
 | 09 | Walled Compound | 64 x 50 m | perimeter wall and gates, big main house, guard house, garage |
 | 10 | Apartment Block | 60 x 36 m | 43 rooms: eight flats off one 44 m corridor, two stair halls |
+| 11 | Civic Plaza | 64 x 46 m | an open square with a stage, a crowd and the buildings around it (public events) |
 
 ## Controls
 
@@ -79,6 +81,87 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small dot beside each figure is their alert state: green, yellow or red.
 
+## New in v0.7: operations
+
+Press `OPERATIONS` on the setup panel. The campaign is saved after every operation and every week (`user://campaign.json`, one slot). `New campaign` starts again from a new seed. The v0.6 department save is not carried over.
+
+**The department you inherit.** Port Carrick PD starts with 20 officers: a lieutenant with 14 years on the job, two sergeants with 9 and 11, four corporals with 3-7, and 13 officers, 7 of them in their first year.
+- A new hire is **Patrol**, between Militia (the irregulars) and Regular (the infantry) in every stat.
+- Years on the job move an officer's stats from Patrol toward Regular. At ten years they are a Regular; beyond that they move a little toward Police tactical (at most 60% of the way).
+- Each year also brings habits Regulars have and the academy doesn't teach (PF02, GD02, GD05, GD06, WD07, about three every five years). Officers with nine years or more also bring one to four tactical-team habits.
+- They arrive with the experience their years earned: the lieutenant is at tier 4.
+- Every officer's file opens with the years they had when you took command.
+
+**The board.** Each week has two or three situations from five types, in six wards. Each ward has its own trust in police and its own isolation.
+
+| Situation | Maps | Visibility | Time pressure | Success means |
+|---|---|---|---|---|
+| Warrant service | houses | 1-3 | none: you pick the hour (day or night) | the named suspect arrested or giving up |
+| Gang house raid | the bigger buildings | 1-2 | low | every member arrested or down, nobody away |
+| Barricaded suspect | houses, the store | 2-3 | low | the suspect arrested or giving up |
+| Hostage | houses, the store | 3-4 | high: a deadline, then the captor shoots | every hostage out alive |
+| Public event | Civic Plaza | 5 | set by the event | nothing happens, or an attack is stopped with nobody in the crowd killed |
+
+Public events come more often as the election nears (35% of weeks at the start, about 80% by week 40). Almost always nothing happens. When something does, attackers hidden in the crowd show their weapons at a random moment.
+
+The week ends with `End week`. Situations nobody went to are written down, wounds heal and a new board fills. The campaign runs 40 weeks to the election; the election itself arrives in v0.9.
+
+**1 Briefing.** The situation, the floor plan, visibility, time pressure and the ward. What is known about who is inside is listed fact by fact. Each fact is either a tip (confirmed) or an estimate with a confidence, and estimates can be wrong. Rooms named by the briefing are tagged on the plan.
+- Tips come from the public (more at high visibility) and from the ward's community group (more where trust is high).
+- `Canvass` sends one officer round the neighbourhood: two more tips, and that officer is gone for the week.
+- Warrants let you choose night: everyone is at home, recognition and judgment are slower and civilians are misjudged more often.
+- `Body cameras` decides what you can see during the run (below).
+
+**2 Force.** Tick who goes. An officer is committed to one situation a week and can't go to another. The injured are listed but can't be picked.
+
+**3 Orders.** Up to four squads of up to five. Each squad's leader is its highest rank, ties going to the most experience. The leader's experience tier sets the squad's order points: 1, 2, 3, 5 or 7 for tiers 1-5.
+
+Every squad gets one objective free; a second objective (done after the first) costs a point. Objectives:
+- **Clear:** the whole building, or only the rooms you pick (plus the rooms on the way to them).
+- **Arrest:** clear to the named suspect. Officers hold fire on them unless attacked, and challenge instead.
+- **Rescue:** clear to the hostages and walk each one out to the casualty point by the vehicles.
+- **Contain:** posts outside the doors and windows you pick. Anyone coming out is challenged.
+- **Post:** stand at a point for the whole event, facing the way you set.
+- **Patrol route:** walk a route you draw, again and again, and go to any contact.
+
+Constraints, each for points:
+- **Avoid** (1 per room): never go through the rooms you pick.
+- **Consolidate** (1): hold the room you pick, covering every door off it, for 20 s before going on.
+- **Phase line** (1): wait at the start until a time, or until another squad has met its first objective.
+- **Entry point** (1): make the first entry through the door you pick.
+- **Pace** (1): walk or creep only, unless in a fight.
+- **Weapons tight** (2): fire only at someone firing or pointing a weapon at police; armed is not enough.
+- **Knock and announce** (1): announce at the door and wait ten seconds.
+- **Pistols only** (1): rifles stay in the car.
+
+Rooms, doors, windows, posts and routes are picked by clicking the plan, which draws every squad's orders. `Suggest a plan` fills in a reasonable plan you can then change.
+
+Bad habits can break orders: a rusher won't wait out a consolidation, a chaser leaves the avoided rooms behind, a jumpy trigger ignores Weapons tight. Every broken order goes into the officer's file and the debrief.
+
+**Run.** You watch; the officers carry out the plan as well as their habits, stress and experience allow.
+- Pause, 0.25x to 20x, and a rewind slider. Rewinding only replays what was recorded; `Live` returns to the present. None of it changes the outcome.
+- **Fog of war.** With body cameras you see what each officer sees, live. Without them, you see your officers and the radio's last-known positions, drawn as diamonds where they were called out. Blood, casings and bodies show only once someone has seen them.
+- The radio log keeps to what a commander hears: contacts, shots, squads' progress, surrenders and casualties.
+- **Abort (cut losses):** confirm once, and every squad withdraws to its vehicle at a run, fighting only if fired on. An abort is a failure, but it stops the losses.
+
+**Debrief.** The result and its score, each squad's objectives (met or failed, and why), the timeline, every officer's rounds and hits, the civilians, and what the department gained or lost. Then the whole operation replays with the fog lifted, from 1x to 10x, with a slider.
+- Score: success 100, partial 65, failure (an abort included) 30. Every death (officer, civilian or hostage) costs 15 and every officer down 5.
+- Excessive force and civilians hit by police are not in this score. They are the department's other reputation, which lands as consequences from v0.9.
+
+**New in the sim for operations.**
+- **Suspects run.** A suspect who knows police are there (a knock, a radio call, a sound) and sees none of them may run for the edge of the lot; a knock makes it much more likely. Anyone who gets away is out of the operation.
+- **Hostages.** Captors keep hostages close. A hostage is free once no captor is within 7 m and an officer is within 4 m. A Rescue squad walks them out.
+- **Deadlines.** Once a hostage deadline passes, a captor with a hostage within 6 m and nobody to fight shoots one, then another every 90 s.
+- **Attackers in a crowd** count as civilians until they draw.
+- **Vehicles and a casualty point** by the stage area.
+
+**Hold-mode habits (HD01-HD20, BH21-BH27).** A fifth habit group, Defence, and seven bad habits, all active only while an operator's squad is holding a position. They come from "Hold-mode habits: a draft for the bible" and are in the Hold tab of the habit editor.
+- Regular gets HD01, HD02, HD05, HD08 and HD17.
+- Police tactical and special operations get all of them except HD12 (police only), and except HD07 (both).
+- The seven bad habits ride on stress or a personality trait like the others.
+
+HOLD_RESULTS
+
 ## New in v0.6: civilians, judgment, the department
 
 **The Patrol echelon.** A new police hire sits at the midpoint of Militia and Regular in every stat: recognition 0.39 s, stress resistance 0.375, twelve habits (Militia's eight plus PF01, GD01, ED01, ED02), experience tier 1, and a soft vest that stops pistol rounds to the chest from any side but not rifle rounds.
@@ -108,7 +191,7 @@ Default Judgment by echelon: untrained 35, militia 40, Patrol 50, regular 50, po
 - or only people who heard it.
 
 **The department.** Port Carrick PD keeps persistent officers, saved after every operation (one save slot):
-- Twelve officers to start: a sergeant, a corporal and ten officers, all Patrol. Each is rolled once at hire (form, strengths and weaknesses, habits, personality, Judgment, Temper, Integrity) and keeps that roll for their whole career.
+- Each officer is rolled once at hire (form, strengths and weaknesses, habits, personality, Judgment, Temper, Integrity) and keeps that roll for their whole career. (v0.6 started with twelve rookies; v0.7 starts with the 20 above.)
 - Tick who goes on the next operation. Hover a name to read their file.
 - After the operation, each officer gets experience: contact +2, under fire +2, +1 per hit on a threat (up to 3), +1 per arrest, +1 for coming back hurt. Tiers come at 6, 18, 40 and 80 xp.
 - Wounded officers are out 2-5 weeks, or 8-14 if they went down. The dead stay in the roster as killed. Trauma from taking a life, being hit, losing a partner or hitting a civilian raises the stress they bring into later operations, and eases by half a point a week.
@@ -292,7 +375,8 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
   - Nobody fires from a vehicle.
   - Gang members go everywhere on foot.
   - Away from any possible enemy, people skip perception and think every third tick; standing posts sleep until something comes near.
-- **Civilians and the department:** the city has no civilians yet, and its police do not judge or arrest (both come with the campaign map, v0.10). The department has no budget, training or discipline yet (v0.8). Orders, briefings and the fog of war are v0.7.
+- **Civilians and the department:** the city has no civilians yet, and its police do not judge or arrest (both come with the campaign map, v0.10). The department has no budget, training or discipline yet (v0.8).
+- **Operations:** situations use the hand-built maps, not the city's lots. Doors are open, so a door ram or a flashbang has nothing to do yet (equipment is the next milestone, v0.7.5). The election, consequences and the press arrive in v0.9.
 - **Out of scope:**
   - grenades;
   - multiple floors (the apartment stairs are scenery).
@@ -313,10 +397,18 @@ scripts/sim/world.gd      perception, tracking, hearing, aiming, shooting, wound
 scripts/sim/brain.gd      priorities P1-P8, elements, assault/hold/hunt, consolidation, habit hooks, arrests
 scripts/sim/civ_brain.gd  civilians: alarm, flee, hide, freeze, comply, film
 scripts/sim/incident.gd   the incident record: every round, findings and their evidence
-scripts/campaign/department.gd  persistent officers: hiring, rolls, experience, wounds, files, saving
-scripts/campaign/operation.gd   civilians' placement; team A from the department
-scripts/view/*            floor plan, blood and residue, operators, overlays, the ledger, the city's layers
+scripts/campaign/department.gd  persistent officers: the inherited roster, hiring, years of service, experience, wounds, files
+scripts/campaign/campaign.gd    the 40-week campaign: the board, commitments, canvassing, the week's end, saving
+scripts/campaign/situations.gd  wards, situation types, what is really inside, the briefing and its tips
+scripts/campaign/orders.gd      objectives, constraints, order points by the leader's experience
+scripts/campaign/operation.gd   civilians' placement; team A from the department; a planned operation built into a world
+scripts/campaign/autoplan.gd    "Suggest a plan"
+scripts/campaign/outcome.gd     the result, its score and each squad's objectives
+scripts/sim/recorder.gd   snapshots twice a second for rewind and the replay
+scripts/view/*            floor plan, blood and residue, operators, overlays, the ledger, the city's layers,
+                          the fog of war (fog.gd), the replay (replay_view.gd), the plan on the map (plan_marks.gd)
 scripts/ui/ui.gd          setup, run, debrief and department panels
+scripts/ui/ops_ui.gd      operations: the board, roster, briefing, force, orders, the run and the debrief
 assets/svg/               all sprites, generated by tools/make_placeholders.py
 tests/                    headless tests and an art gallery
 ```
@@ -336,6 +428,10 @@ godot --headless --path . -s res://tests/city_test.gd -- --seed=3          # bui
 godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10  # the endless battle headless, with timings
 godot --headless --path . -s res://tests/civ_test.gd -- --n=40             # v0.6 gate: operations with civilians, Patrol vs police tactical
 godot --headless --path . -s res://tests/dept_test.gd                      # v0.5 gate: save, load, carry-over, replay
+godot --headless --path . -s res://tests/orders_test.gd -- --n=8           # v0.7 gate: every order, with and without it
+godot --headless --path . -s res://tests/op_test.gd                        # a campaign played by "Suggest a plan", week by week
+godot --headless --path . -s res://tests/hold_test.gd -- --n=30            # the hold-mode habits on and off, by matchup
+godot --headless --path . -s res://tests/hold_test.gd -- --ablate=drop --n=30   # all hold habits but one, one at a time
 TR_STEP=1 godot --headless --path . -s res://tests/trace.gd -- --map=4 --a=sof --na=8 --b=militia --nb=8   # step-by-step trace
 ```
 
