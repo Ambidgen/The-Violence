@@ -318,7 +318,12 @@ func _next_task(tm: Dictionary, el: Dictionary) -> void:
 		el["mode"] = "assault"
 		if not el.get("rooms_said", false):
 			el["rooms_said"] = true
-			w.say("%s: %s" % [_tag(tm, el), "rooms clear" if not remaining else "rooms out of reach"], "info")
+			var unchecked := 0
+			for rk in tm["skipped"]:
+				if bi < 0 or lv.building_rooms(bi).has(rk):
+					unchecked += 1
+			var note := "" if unchecked == 0 else ", %d small room%s not checked" % [unchecked, "" if unchecked == 1 else "s"]
+			w.say("%s: %s%s" % [_tag(tm, el), "rooms clear" if not remaining else "rooms out of reach", note], "info")
 		_objective_done(tm, el, not remaining, "rooms clear" if not remaining else "rooms out of reach")
 		return
 	if bi >= 0:
@@ -2933,6 +2938,8 @@ func _settle(tm: Dictionary, el: Dictionary, ob: Dictionary) -> Dictionary:
 				if not tm["cleared"].has(rm) and not tm["skipped"].has(rm):
 					left += 1
 			if left == 0:
+				if not standing:
+					return {"ok": false, "why": "squad lost (the rooms were cleared by others)"}
 				return {"ok": true, "why": "rooms clear"}
 			return {"ok": false, "why": "%d room%s not cleared" % [left, "" if left == 1 else "s"]}
 		"arrest":
@@ -2959,6 +2966,36 @@ func _settle(tm: Dictionary, el: Dictionary, ob: Dictionary) -> Dictionary:
 				return {"ok": true, "why": "hostages out"}
 			return {"ok": false, "why": "%d still inside, %d lost" % [left2, lost]}
 	return {"ok": standing, "why": "ended"}
+
+
+## When every squad sent to search (Clear, Arrest, Rescue) has finished its objectives
+## or has nobody left standing: the latest time one finished. -1 while any is still at
+## it, or when no squad was sent to search at all.
+func searches_done_t() -> float:
+	if w.teams.is_empty():
+		return -1.0
+	var latest := -1.0
+	var any := false
+	for el in w.teams[0]["elements"]:
+		if not el.has("orders"):
+			continue
+		var objs: Array = el["orders"].get("objs", [])
+		var searching := false
+		for ob in objs:
+			if ob.get("kind", "") in ["clear", "arrest", "rescue"]:
+				searching = true
+		if not searching:
+			continue
+		any = true
+		if _alive(el).is_empty():
+			continue
+		if int(el.get("obj_i", 0)) < objs.size() and not el.get("obj_closed_" + str(el.get("obj_i", 0)), false):
+			var cur: String = el.get("obj", {}).get("kind", "")
+			if cur in ["clear", "arrest", "rescue"] or el["mode"] == "wait":
+				return -1.0
+		for r in el.get("results", []):
+			latest = maxf(latest, float(r["t"]))
+	return latest if any else -1.0
 
 
 ## The nearest free member of a Rescue squad walks a freed hostage out. Returns the

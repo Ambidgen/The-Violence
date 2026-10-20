@@ -30,8 +30,14 @@ func _init() -> void:
 			var lv = Maps.get_level(int(s["map"]))
 			var nav = Nav.new()
 			nav.build(lv)
-			var plan: Dictionary = Autoplan.suggest(s, c.available_for(s["id"]), lv)
+			var av: Array = c.available_for(s["id"])
+			var plan: Dictionary = Autoplan.suggest(s, av, lv, false, Autoplan.share(c.board, s["id"], av.size()))
 			s["plan"] = plan
+			if c.plan_members(s).is_empty():
+				# the game will not run a plan with nobody in it: the situation goes unattended
+				s["plan"] = {}
+				print("%s %-9s map %02d vis %d  nobody free to send" % [s["id"], s["type"], int(s["map"]), int(s["visibility"])])
+				continue
 			var b: Dictionary = Operation.build_planned(s, plan, c.dept, lv, nav)
 			var w = World.new()
 			w.setup(lv, nav, b["cfgs"], b["postures"], b["seed"], b["alerts"], b["opts"])

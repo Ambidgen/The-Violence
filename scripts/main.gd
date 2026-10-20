@@ -690,7 +690,8 @@ func ops_select(sid: String) -> void:
 	_load_map(int(cur_sit["map"]))
 	ui.set_map_title(level)
 	if cur_sit.get("plan", {}).is_empty():
-		cur_sit["plan"] = Autoplan.suggest(cur_sit, campaign.available_for(sid), level, dept.bodycams)
+		var av: Array = campaign.available_for(sid)
+		cur_sit["plan"] = Autoplan.suggest(cur_sit, av, level, dept.bodycams, Autoplan.share(campaign.board, sid, av.size()))
 	plan = cur_sit["plan"]
 	mode = "plan"
 	_clear_views()
@@ -707,7 +708,8 @@ func plan_changed() -> void:
 
 
 func ops_suggest() -> void:
-	plan = Autoplan.suggest(cur_sit, campaign.available_for(cur_sit["id"]), level, dept.bodycams)
+	var av: Array = campaign.available_for(cur_sit["id"])
+	plan = Autoplan.suggest(cur_sit, av, level, dept.bodycams, Autoplan.share(campaign.board, cur_sit["id"], av.size()))
 	cur_sit["plan"] = plan
 	plan_marks.setup(level, nav, cur_sit, plan)
 	ops_ui.show_plan()

@@ -38,9 +38,32 @@ static func ranked(records: Array) -> Array:
 	return r
 
 
-static func suggest(sit: Dictionary, available: Array, lv, bodycams := false) -> Dictionary:
+## How many officers a suggestion for one situation should take, so the week's other
+## open situations nobody has planned yet keep their fair part of those still free:
+## each situation's want, scaled down together when the free officers fall short.
+static func share(board: Array, sid: String, free: int) -> int:
+	var mine := 0
+	var total := 0
+	for s in board:
+		if s.get("status", "open") != "open":
+			continue
+		if s["id"] != sid and not s.get("plan", {}).get("squads", []).is_empty():
+			continue
+		var w: int = WANT.get(s["type"], 8)
+		total += w
+		if s["id"] == sid:
+			mine = w
+	if mine == 0 or total <= free:
+		return mini(mine if mine > 0 else 8, free)
+	return clampi(int(round(float(free) * mine / total)), mini(3, free), mine)
+
+
+## cap: the most officers to take (-1: as many as the situation wants).
+static func suggest(sit: Dictionary, available: Array, lv, bodycams := false, cap := -1) -> Dictionary:
 	var pool := ranked(available)
 	var want: int = mini(WANT.get(sit["type"], 8), pool.size())
+	if cap >= 0:
+		want = mini(want, cap)
 	var n_sq := 2 if want >= 4 else 1
 	if sit["type"] == "event" and want >= 9:
 		n_sq = 3

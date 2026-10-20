@@ -1,4 +1,4 @@
-# The Violence - vertical slice (v0.7.5)
+# The Violence - vertical slice (v0.7.6)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
@@ -82,6 +82,18 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - `Rerun same seed` replays the fight exactly; `Rerun new seed` rolls a new one.
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small dot beside each figure is their alert state: green, yellow or red.
+
+## New in v0.7.6: playtest fixes
+
+A playtest of every system (all tests, three campaign seeds over three weeks, the main screens) found five problems. All are fixed:
+
+- **Rallies: police shot the crowd.** Officers posted at a rally re-judged every face every 10 s, each time with a fresh chance of mistaking a phone for a gun. Over ten minutes that made a police shooting near-certain (up to 16 in the crowd killed before any attack). Now a calm officer, out of a fight and unstressed, makes a tenth of the mistakes, makes no new mistake about a person already cleared who is still calm, and only rarely about one filming. First sight, running, the dark and fear still carry the full risk. Misjudgments in house operations also fell (civilian test: patrol 11 to 4, police tactical 2 to 0); the civilian gate still passes.
+- **"Passed quietly" after police killed people.** A rally with no attack counted as quiet whatever the police did. Now deaths make it a failure and police hits a partial success.
+- **The suggested plan took everyone.** The first situation opened took up to ten officers and later ones got none. The suggestion now shares the officers still free across the week's open situations, each in proportion to what it wants (at least three where possible).
+- **Idling to the time limit.** A team without "Clear before passing" (PF10) skips small rooms, so a suspect hiding in a closet was never found and the squads stood for nine minutes. The skip is kept (it is what the habit is for), but the radio now says "rooms clear, N small rooms not checked". Once every searching squad is done and nobody has seen a suspect for 60 s, the commander stands the squads down; the debrief says the suspect was never found. Surrender needs an officer in sight, so standing down cannot cut one short.
+- **Labels.** The label is the goal; the score also counts deaths and officers down. A goal met at a cost now reads "Success, at a cost", so "Success, 50" no longer looks like a contradiction. A squad with nobody left standing is no longer credited with rooms others cleared.
+
+Campaign sweep (three seeds, three weeks, the suggested plans): before, 6 successes, 8 partial, 13 failures and 3 that ran empty or with nobody; after, 13 successes (7 at a cost), 13 partial, 2 failures, 2 quiet rallies.
 
 ## New in v0.7.5: equipment and doors
 

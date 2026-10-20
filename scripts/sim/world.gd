@@ -47,6 +47,10 @@ var incident = null            # the incident record of an operation (v0.6; none
 var night := false             # darkness: slower recognition and judgment, more mistakes
 var roe_strict := false        # armed but not attacking: challenge before firing (v0.7 Weapons tight)
 var _end_wait := -1.0
+var stood_down := false  # the search ended with someone never found (v0.7.6)
+## Planned operations: once every searching squad is done and nobody has seen a suspect
+## for this long, the commander stands the squads down instead of waiting out the clock.
+const STAND_DOWN := 60.0
 # planned operations (v0.7)
 var recorder = null            # snapshots for rewind and the debrief replay
 var aborted := false           # the player cut their losses: every squad withdraws to the vehicles
@@ -1242,6 +1246,22 @@ func misjudge_p(o, e) -> float:
 	if o.has("WD09"):
 		p *= 0.7
 	p *= o.ech["t_rec0"] / 0.39
+	# someone already judged harmless and not running is seen again, not judged afresh: a crowd watched for ten minutes must not
+	# roll a new mistake on every face every 10 s (v0.7.6, found at the rally); a calm
+	# officer makes no new mistake about them at all
+	var calm: bool = not in_combat(o) and o.stress < 0.2
+	if o.cleared.has(e.id) and e.vel.length() <= 2.0:
+		if e.civ and e.cstate == "film":
+			# a phone held up by someone already seen: still a phone, mostly
+			p *= 0.05 if calm else 0.3
+		elif calm:
+			return 0.0
+		else:
+			p *= 0.1
+	# a calm officer (no fight, no stress) looking over a calm crowd rarely sees a gun that
+	# is not there; the mistakes belong to raids, gunfire and fear
+	if calm:
+		p *= 0.1
 	return clampf(p, 0.0, 0.5)
 
 
@@ -2804,6 +2824,17 @@ func _check_end() -> void:
 				_end_wait = t + (150.0 if long_wait else 60.0)
 			if t < _end_wait:
 				return
+	if alive[0] > 0 and alive[1] > 0 and t < time_limit and not squad_orders.is_empty() and police_rules():
+		var done_t: float = brain.searches_done_t()
+		if done_t >= 0.0 and t - done_t > STAND_DOWN:
+			var seen := -99.0
+			for o3 in ops:
+				if o3.team == 0 and o3.alive():
+					seen = maxf(seen, o3.last_enemy_seen_t)
+			if t - seen > STAND_DOWN:
+				stood_down = true
+				_finish(0)
+				return
 	if alive[0] == 0 or alive[1] == 0 or t >= time_limit:
 		if alive[0] == 0 and alive[1] == 0:
 			_finish(2)
@@ -2825,7 +2856,7 @@ func _finish(win: int) -> void:
 		brain.close_orders()
 	var names := ["TEAM A WINS", "TEAM B WINS", "DRAW", "ABORTED"]
 	say("%s at %.1f s. %d shots, %d hits." % [names[winner], t, stat["shots"], stat["hits"]], "end")
-	mark({0: "Operation over: the police hold the scene", 1: "Operation over: the police were stopped", 2: "Operation over: time ran out",
+	mark({0: "Operation over: the search found no one else; the squads stood down" if stood_down else "Operation over: the police hold the scene", 1: "Operation over: the police were stopped", 2: "Operation over: time ran out",
 		3: "Operation over: withdrawn"}[winner], "end")
 	for o in ops:
 		if o.civ:

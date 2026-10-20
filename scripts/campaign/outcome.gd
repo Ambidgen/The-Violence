@@ -2,6 +2,8 @@ extends RefCounted
 ## How an operation went (v0.7): the situation's goal met or not, each squad's
 ## objectives, and a competence score.
 ##
+## Label: the goal result; a success or partial success that cost a death or an officer
+## down reads ", at a cost".
 ## Score: a success starts at 100, a partial success at 65, a failure (an abort
 ## included) at 30. Every death costs 15 (officers, civilians, hostages) and every
 ## officer down 5. So a failure with everyone alive always scores better than one
@@ -80,8 +82,19 @@ static func evaluate(sit: Dictionary, w) -> Dictionary:
 				goal = "%d hostage%s killed" % [dead, "" if dead == 1 else "s"] if dead > 0 else "no hostage got out"
 		"event":
 			if not w.attack_on:
-				kind = "quiet"
-				goal = "nothing happened"
+				# no attack, but anyone the police killed or an officer lost is not "quiet"
+				var ck := int(s.get("civ_killed", 0))
+				var chp := int(s.get("civ_hit_police", s.get("civ_hit_by_police", 0)))
+				var ok_ := int(s.get("officers_killed", 0))
+				if ck > 0 or ok_ > 0:
+					kind = "failure"
+					goal = "no attack came; %d in the crowd and %d officer%s killed" % [ck, ok_, "" if ok_ == 1 else "s"]
+				elif chp > 0:
+					kind = "partial"
+					goal = "no attack came; police shot %d in the crowd" % chp
+				else:
+					kind = "quiet"
+					goal = "nothing happened"
 			else:
 				var cd := int(s.get("civ_killed", 0))
 				var stopped: bool = true
@@ -114,7 +127,16 @@ static func evaluate(sit: Dictionary, w) -> Dictionary:
 					alive += 1
 			squads.append({"i": el["i"], "results": res.duplicate(true), "alive": alive, "n": el["members"].size(),
 				"mode": el["mode"]})
-	return {"kind": kind, "label": LABELS[kind] + (" (aborted)" if w.aborted else ""), "goal": goal, "score": score,
+	# the label is the goal; the score also counts the cost, so a goal met with people
+	# killed or hurt says so (otherwise "Success, 50" reads as a contradiction)
+	var label: String = LABELS[kind]
+	if kind in ["success", "partial"] and score < int(BASE[kind]):
+		label += ", at a cost"
+	if w.aborted:
+		label += " (aborted)"
+	if w.get("stood_down") == true and goal.find("still") >= 0:
+		goal += " (never found; the squads stood down)"
+	return {"kind": kind, "label": label, "goal": goal, "score": score,
 		"deaths": deaths, "officers_killed": int(s.get("officers_killed", 0)), "civ_killed": int(s.get("civ_killed", 0)),
 		"escaped": escaped, "aborted": w.aborted, "t": w.t, "squads": squads, "findings": int(s.get("findings", 0)),
 		"orders_broken": w.broken.size()}
