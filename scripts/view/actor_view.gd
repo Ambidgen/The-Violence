@@ -1,17 +1,24 @@
 extends Node2D
-## One operator on the plan. Starts as a clean architectural figure; every hit
-## leaves a stain on it, and a fallen operator is redrawn lying in the pool.
+## One operator on the plan. Starts as a clean architectural figure; the figure itself
+## (1.1) is an animated rig (rig.gd): it walks, aims, recoils, reloads, works doors and
+## cuffs, staggers when hit and falls. The injury is never drawn: the consequence is on
+## the floor (Decals) and in the paperwork.
 
 const Op = preload("res://scripts/sim/op.gd")
 const Decals = preload("res://scripts/view/decals.gd")
 const Palette = preload("res://scripts/view/palette.gd")
+const Rig = preload("res://scripts/view/rig.gd")
 const PX := 40.0
+
+const ACTION_POSE := {"reload": "reload", "transition": "swap", "clear": "clear", "check": "clear",
+	"cuff": "cuffing", "open": "door", "unlock": "door", "ram": "ram", "kick": "kick", "breach_shot": "breach",
+	"throw": "throw", "throw_sting": "throw", "throw_gas": "throw", "treat": "treat", "spray": "spray",
+	"strike": "strike", "tase": "aim", "sponge": "aim", "pepperball": "aim", "beanbag": "aim",
+	"stall": "aim", "click": "aim"}
 
 var op
 var world
-var body: Sprite2D
-var down_body: Sprite2D
-var gun: Sprite2D
+var rig
 var label: Label
 var tag: Label
 var stains: Array = []
@@ -19,12 +26,11 @@ var rng := RandomNumberGenerator.new()
 var was_down := false
 var gun_key := ""
 var pip: Pip
-var marks: Marks
 var look_key := ""
-var armour: Sprite2D      # kit (v0.7.5): vest or plate carrier over the figure
-var helmet: Sprite2D
 var shield: Sprite2D
 var ram: Sprite2D
+var helmet: Sprite2D
+var _last_hit := Vector2.ZERO
 
 
 func setup(o, w) -> void:
@@ -33,27 +39,17 @@ func setup(o, w) -> void:
 	rng.seed = hash(o.id)
 	var team: String = Palette.look(o, w)
 	look_key = team
-	gun = Sprite2D.new()
-	gun.centered = false
-	add_child(gun)
-	body = Sprite2D.new()
-	body.texture = Decals.tex("op/%s_stand" % team)
-	body.scale = Vector2.ONE * 0.5
-	add_child(body)
+	rig = Rig.new()
+	add_child(rig)
+	rig.setup(team, hash(o.id))
 	# what they carry, seen from above (v0.7.5)
 	var kit: Dictionary = o.kit if "kit" in o else {}
 	if not o.civ and kit.get("armour", "none") != "none":
-		armour = Sprite2D.new()
-		armour.texture = Decals.tex("kit/plates" if kit["armour"] == "plates" else "kit/vest")
-		body.add_child(armour)
+		rig.wear("kit/plates" if kit["armour"] == "plates" else "kit/vest", false)
 	if kit.get("head", "none") in ["sof_helmet", "ballistic_helmet"]:
-		helmet = Sprite2D.new()
-		helmet.texture = Decals.tex("kit/helmet")
-		body.add_child(helmet)
+		helmet = rig.wear("kit/helmet_head", true)
 	if o.gear.has("gas_mask"):
-		var mask := Sprite2D.new()
-		mask.texture = Decals.tex("kit/gas_mask")
-		body.add_child(mask)
+		rig.wear("kit/gas_mask_head", true)
 	if o.shield:
 		shield = Sprite2D.new()
 		shield.texture = Decals.tex("kit/shield")
@@ -64,17 +60,9 @@ func setup(o, w) -> void:
 		ram.texture = Decals.tex("kit/ram")
 		ram.scale = Vector2.ONE * 0.5
 		add_child(ram)
-	down_body = Sprite2D.new()
-	down_body.texture = Decals.tex("op/%s_down" % team)
-	down_body.scale = Vector2.ONE * 0.5
-	down_body.visible = false
-	add_child(down_body)
 	pip = Pip.new()
 	pip.op = o
 	add_child(pip)
-	marks = Marks.new()
-	marks.op = o
-	add_child(marks)
 	label = Label.new()
 	label.text = o.id
 	label.add_theme_font_size_override("font_size", 11)
@@ -87,6 +75,11 @@ func setup(o, w) -> void:
 	tag.position = Vector2(-26, 14)
 	add_child(tag)
 	_set_gun()
+	if not o.alive():
+		was_down = true
+		rig.lie(o.body_dir + rng.randf_range(-0.6, 0.6), o.state == "dead")
+		label.modulate.a = 0.55
+		tag.text = "KIA" if o.state == "dead" else "DOWN"
 	sync(true)
 
 
@@ -98,75 +91,118 @@ func _set_gun() -> void:
 	if key == gun_key:
 		return
 	gun_key = key
-	gun.texture = Decals.tex(key)
-	gun.scale = Vector2.ONE * 0.5
-	gun.offset = Vector2(0, -gun.texture.get_height() / 2.0)
+	rig.set_gun(key)
+
+
+## A simulation event about this operator: a shot fired, a hit taken, a fall.
+func event(ev: Dictionary) -> void:
+	match ev["type"]:
+		"shot":
+			if ev.get("id", "") == op.id:
+				rig.shot()
+		"blood":
+			var d: Vector2 = ev.get("dir", Vector2.ZERO)
+			_last_hit = d
+			if not was_down:
+				rig.hit(d, float(ev.get("side", 1.0)))
 
 
 func sync(force := false) -> void:
 	if op == null:
 		return
+	var dt := get_process_delta_time() if not force else 0.0
 	position = op.pos * PX
 	var down: bool = not op.alive()
 	if down and not was_down:
 		was_down = true
-		body.visible = false
-		gun.visible = false
+		rig.fall(_last_hit, op.state == "dead")
 		if shield != null:
 			shield.visible = false
 		if ram != null:
 			ram.visible = false
-		down_body.visible = true
-		down_body.rotation = op.body_dir + rng.randf_range(-0.6, 0.6)
-		for s in stains:
-			s.queue_free()
-		stains.clear()
-		# v0.8: the injury is never drawn; the consequence is on the floor (Decals)
 		label.modulate.a = 0.55
 		tag.text = "KIA" if op.state == "dead" else "DOWN"
 		pip.refresh()
-		return
 	if down:
 		if op.state == "dead" and tag.text == "DOWN":
 			tag.text = "KIA"
+			rig.set_dead(true)
+		if visible and (force or Rig.view.has_point(position)):
+			rig.advance(dt, position)
 		return
 	# a concealed attacker drops the act (v0.7): redraw as who they really are
 	var lk: String = Palette.look(op, world)
 	if lk != look_key:
 		look_key = lk
-		body.texture = Decals.tex("op/%s_stand" % lk)
-		down_body.texture = Decals.tex("op/%s_down" % lk)
-	body.rotation = op.body_dir
+		rig.set_look(lk)
+	_set_gun()
+	if visible and (force or Rig.view.has_point(position)):
+		_drive()
+		rig.advance(dt, position)
 	if helmet != null:
 		helmet.modulate.a = 1.0 if (op.helmet or op.helmet_ballistic) else 0.45
 	if shield != null:
 		shield.rotation = op.body_dir
-		shield.position = Vector2.from_angle(op.body_dir) * 13.0
+		shield.position = rig.torso.position + Vector2.from_angle(op.body_dir) * 13.0
 	if ram != null:
 		ram.rotation = op.body_dir
-		ram.position = Vector2.from_angle(op.body_dir + PI / 2.0) * 11.0 - Vector2.from_angle(op.body_dir) * 6.0
+		var off := Vector2.from_angle(op.body_dir + PI / 2.0) * 11.0 - Vector2.from_angle(op.body_dir) * 6.0
+		ram.position = rig.torso.position + off
 	pip.refresh()
-	marks.refresh(world)
-	var sc := 0.5
-	if op.stance == Op.CROUCH:
-		sc = 0.45
-	elif op.stance == Op.DUCK:
-		sc = 0.40
-	body.scale = Vector2.ONE * sc
-	_set_gun()
-	if op.civ or op.complying:
-		gun.visible = false
+	tag.text = _tag()
+
+
+## What the figure is doing, as a pose for the rig.
+func _drive() -> void:
+	rig.body_dir = op.body_dir
+	rig.muzzle_dir = op.muzzle_dir
+	rig.look_dir = op.look_dir
+	rig.stance = op.stance
+	rig.pistol = op.active == "pistol"
+	rig.gun_shown = not op.civ and not (op.active == "rifle" and op.weapons.get("rifle", {}).get("lost", false)) \
+		and not (op.active == "pistol" and op.weapons.get("pistol", {}).get("lost", false))
+	rig.ready_low = not (op.weapon_up or not op.aim.is_empty())
+	rig.pose_p = 0.0
+	var t: float = world.t if world != null else 0.0
+	var pose := "aim"
+	if op.civ or op.medic:
+		pose = "unarmed"
+		if op.civ:
+			match String(op.cstate):
+				"comply":
+					pose = "hands"
+				"film":
+					pose = "film"
+				"freeze":
+					pose = "frozen"
+				"hide":
+					pose = "frozen"
+	elif op.arrested:
+		pose = "cuffed"
+	elif op.complying:
+		pose = "hands"
+	elif not op.action.is_empty():
+		var a: String = op.action["type"]
+		pose = ACTION_POSE.get(a, "aim")
+		var total: float = float(op.action.get("total", 0.0))
+		if total > 0.0:
+			rig.pose_p = clampf(1.0 - float(op.action.get("left", 0.0)) / total, 0.0, 1.0)
+	elif world != null and op.stunned(t):
+		pose = "stunned"
+	elif world != null and op.gassed(t):
+		pose = "gassed"
+	elif world != null and op.blind(t):
+		pose = "blind"
+	elif world != null and op.ticker.get("flinch_until", -1.0) > t:
+		pose = "flinch"
 	elif op.alert == Op.GREEN and op.aim.is_empty() and not op.weapon_up:
-		# low carry: rifle slung across the body, muzzle down and to the side; pistol holstered
-		gun.visible = op.active == "rifle" and not op.weapons["rifle"]["lost"]
-		gun.rotation = op.body_dir + 1.15
-		gun.position = Vector2.from_angle(op.body_dir - 1.2) * 9.0
-		gun.modulate.a = 0.55
-	else:
-		gun.visible = not (op.active == "rifle" and op.weapons["rifle"]["lost"])
-		gun.rotation = op.muzzle_dir
-		gun.position = Vector2.from_angle(op.muzzle_dir) * 4.0
-		gun.modulate.a = 1.0 if op.weapon_up or not op.aim.is_empty() else 0.65
+		pose = "low" if op.active == "rifle" and rig.gun_shown else "holstered"
+	if pose == "aim" and not rig.gun_shown:
+		pose = "unarmed"
+	rig.pose = pose
+
+
+func _tag() -> String:
 	var t := ""
 	if op.civ:
 		t = {"flee": "FLEEING", "hide": "HIDING", "freeze": "FROZEN", "comply": "HANDS UP", "film": "FILMING",
@@ -193,7 +229,7 @@ func sync(force := false) -> void:
 		t = "FROZEN"
 	elif world != null and op.ticker.get("flinch_until", -1.0) > world.t:
 		t = "FLINCH"
-	tag.text = t
+	return t
 
 
 ## The alert pip beside the figure: green relaxed, yellow ready, red engaging.
@@ -213,65 +249,6 @@ class Pip extends Node2D:
 		Palette.alert_pip(self, Vector2(-14, 14), lvl)
 
 
-## Hands raised beside the head (someone complying, or cuffed: wrists together behind),
-## and a phone held up by someone filming.
-class Marks extends Node2D:
-	var op
-	var key := ""
-
-	func refresh(w) -> void:
-		var k := ""
-		if op.alive():
-			if op.arrested:
-				k = "cuffed"
-			elif op.complying or (op.civ and op.cstate == "comply"):
-				k = "hands"
-			elif op.civ and op.cstate == "film":
-				k = "phone"
-		rotation = op.body_dir
-		if k != key:
-			key = k
-			queue_redraw()
-
-	func _draw() -> void:
-		var ink := Color("#121212")
-		match key:
-			"hands":
-				for sgn in [-1.0, 1.0]:
-					draw_line(Vector2(-2, 16.0 * sgn), Vector2(4, 11.0 * sgn), ink, 1.6)
-					draw_circle(Vector2(5, 11.0 * sgn), 3.2, Color(0.93, 0.93, 0.91))
-					draw_arc(Vector2(5, 11.0 * sgn), 3.2, 0.0, TAU, 12, ink, 1.4)
-			"cuffed":
-				draw_circle(Vector2(-12, 0), 3.0, Color(0.93, 0.93, 0.91))
-				draw_arc(Vector2(-12, 0), 3.0, 0.0, TAU, 12, ink, 1.4)
-				draw_line(Vector2(-12, -4), Vector2(-12, 4), ink, 1.2)
-			"phone":
-				draw_rect(Rect2(Vector2(11, -3), Vector2(4, 6)), ink)
-				draw_line(Vector2(15, 0), Vector2(26, -6), Color(0.07, 0.07, 0.07, 0.35), 1.0)
-				draw_line(Vector2(15, 0), Vector2(26, 6), Color(0.07, 0.07, 0.07, 0.35), 1.0)
-
-
 ## A hit on a standing operator (retired in v0.8: the figure is never marked).
-func stain(zone: String, side: float) -> void:
-	# v0.8 red ink: figures stay pristine; a hit shows as marks on the floor, not the body
-	if was_down or true:
-		return
-	var st := Sprite2D.new()
-	st.texture = Decals.tex("fx/stain%d" % rng.randi_range(1, 3))
-	var local := Vector2.ZERO
-	match zone:
-		"head":
-			local = Vector2(2, 0)
-		"chest":
-			local = Vector2(-2, rng.randf_range(-10, 10))
-		"abd":
-			local = Vector2(-4, rng.randf_range(-6, 6))
-		"arm":
-			local = Vector2(4, 18.0 * side)
-		_:
-			local = Vector2(-6, rng.randf_range(-14, 14))
-	st.position = local
-	st.rotation = rng.randf() * TAU
-	st.scale = Vector2.ONE * rng.randf_range(0.7, 1.1)
-	body.add_child(st)
-	stains.append(st)
+func stain(_zone: String, _side: float) -> void:
+	pass

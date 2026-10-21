@@ -2,6 +2,13 @@
 
 Newest first. The README covers the game as it stands; this file keeps the history.
 
+## v1.1.0: figures that move
+
+- **Animated figures.** The plan's figures are now a rig (scripts/view/rig.gd) instead of one still sprite: torso and mark, a head that turns on its own, and arms, hands and feet drawn in code. Walking and running step the feet and swing the free arms; stance changes ease in; aiming puts both hands on the weapon and follows its traverse; each round kicks it back with a paper-white muzzle flash (no colour: red stays for consequence). Actions have their own hands: reload (canted rifle, the support hand to the pouch and back with a magazine), stoppage (tap, rack), the swap to the sidearm, doors (open, ram, kick), throwing a bang, sting-ball or gas, cuffing, treating, OC spray, the baton. Hands up, cuffed, filming, frozen and hiding civilians, the stunned, blinded and gassed each have a pose. A hit staggers; a fall plays out over half a second; the wounded on the floor breathe and the dead do not. The replay drives the same rig from the recorder, with recoil for each round fired. City figures step their feet.
+- **Performance:** figures off screen skip their animation; far out, limbs drop their shadows and paper edges. The simulation is unchanged (the determinism fixture holds).
+- **Fixes:** the ambience beds now loop by their import settings; 1.0 set the loop point at run time from the compressed data's byte count, which put it about a fifth of the way in, so only the first few seconds of each bed repeated.
+- **Tools:** tests/rig_gallery.gd shows every pose (and records them moving); a director's camera for recordings (--cam=action or follow:ID, --camzoom, --clean); --soundlog writes every sound the game plays, and tools/mix_soundtrack.py turns that log into a recording's soundtrack; tools/ad_card.gd draws title cards in the game's hand; --perf reports frame costs.
+
 ## v1.0.0: the release
 
 - **A front end.** The game opens on a title screen: Continue (with the week, fit officers and the account of the saved campaign), New campaign (it asks before it replaces a save), Test range, Endless battle, How to play, Settings, Credits and Quit. Every screen has a way back to the main menu.

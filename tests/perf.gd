@@ -21,6 +21,8 @@ func _init() -> void:
 	w.profiling = true
 	var cfgs: Array = Teams.team(lv, 0, {"n": int(opt["na"]), "ech": opt["a"]}) + Teams.team(lv, 1, {"n": int(opt["nb"]), "ech": opt["b"]})
 	w.setup(lv, nav, cfgs, [opt["pa"], opt["pb"]], int(opt["seed"]))
+	if opt.has("fine"):
+		w.brain.fine = true
 	var t0 := Time.get_ticks_usec()
 	var ticks := 0
 	var sc0: int = w.geom.sight_calls

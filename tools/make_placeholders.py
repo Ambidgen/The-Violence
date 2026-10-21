@@ -1056,6 +1056,48 @@ def stretcher(w_m=2.0, h_m=0.6):
                + line(0, h - 6, w, h - 6, INK, 2.4))
 
 
+# ------------------------------------------------------------------ rig parts (1.1)
+# The animated figure is drawn from parts: the torso with its mark, and the head, which
+# turns on its own. Arms, feet and the shadow are drawn in code (scripts/view/rig.gd).
+# Same 0.8 m canvas as the standing figure, so offsets line up.
+def _torso(mark_fn=None, body=INK, outline=None):
+    w = h = 0.8 * PPM
+    cx, cy = w / 2, h / 2
+    b = [rect(cx - 13, cy - 22, 17, 44, body, 8, outline or "none", 2.6 if outline else 0)]
+    if mark_fn:
+        b += mark_fn(cx - 3, cy)
+    return svg(0.8, 0.8, "".join(b))
+
+
+def _head(body=INK, outline=None, ring=False):
+    """The head alone, centred on a 0.3 m canvas, nose toward +x."""
+    w = h = 0.3 * PPM
+    cx, cy = w / 2, h / 2
+    b = [circle(cx, cy, 8.0, body, PAPER if not outline else INK, 2.0 if not outline else 2.6),
+         line(cx + 8, cy, cx + 11, cy, INK, 2.4)]
+    if ring:
+        b.append(circle(cx, cy, 11.0, "none", GREY_M, 2.0))
+    return svg(0.3, 0.3, "".join(b))
+
+
+def _rig_parts(key):
+    if key in ("a", "b"):
+        return _torso(_bar if key == "a" else _hatch3), _head()
+    if key == "c":
+        return _torso(None, PAPER, INK), _head(PAPER, INK)
+    global MED_HOLLOW
+    _body, _hd, mark = FACTION_LOOK[key]
+    MED_HOLLOW = key == "med"
+    if key == "med":
+        return _torso(_fmark(mark), PAPER, INK), _head(PAPER, INK)
+    return _torso(_fmark(mark)), _head(ring=mark == "helmet")
+
+
+for _k in ["a", "b", "c"] + list(FACTION_LOOK):
+    ASSETS[f"op/{_k}_torso.svg"] = (lambda k=_k: _rig_parts(k)[0])
+    ASSETS[f"op/{_k}_head.svg"] = (lambda k=_k: _rig_parts(k)[1])
+
+
 for _k in FACTION_LOOK:
     ASSETS[f"op/{_k}_stand.svg"] = (lambda k=_k: operator_f(k))
     ASSETS[f"op/{_k}_down.svg"] = (lambda k=_k: operator_f_down(k))
@@ -1072,6 +1114,26 @@ ASSETS["kit/helmet.svg"] = kit_helmet
 ASSETS["kit/shield.svg"] = shield_art
 ASSETS["kit/ram.svg"] = ram_art
 ASSETS["kit/gas_mask.svg"] = kit_gas_mask
+
+
+def kit_helmet_head():
+    c = 0.15 * PPM
+    return svg(0.3, 0.3, circle(c, c, 9.5, INK, PAPER, 1.6) + circle(c, c, 6.0, "none", GREY_M, 1.4))
+
+
+def kit_gas_mask_head():
+    c = 0.15 * PPM
+    cx, cy = c - 5, c
+    b = [path(f"M{cx - 8},{cy - 7} A10 10 0 0 0 {cx - 8},{cy + 7}", "none", DARK, 1.6),
+         rect(cx + 3, cy - 8, 6, 16, "#3a3a3a", 3, INK, 1.2),
+         circle(cx + 12, cy, 4.2, "#5a5a5a", INK, 1.2),
+         line(cx + 10, cy - 2.5, cx + 14, cy - 2.5, "#8a8a8a", 0.8),
+         line(cx + 10, cy + 2.5, cx + 14, cy + 2.5, "#8a8a8a", 0.8)]
+    return svg(0.3, 0.3, "".join(b))
+
+
+ASSETS["kit/helmet_head.svg"] = kit_helmet_head
+ASSETS["kit/gas_mask_head.svg"] = kit_gas_mask_head
 
 
 def main():

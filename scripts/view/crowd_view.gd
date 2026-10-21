@@ -16,6 +16,7 @@ var zoom := 1.0
 var selected := ""
 var stains := {}       # op id -> [[local Vector2, rot, scale, key]]
 var font: Font
+var _gait := {}        # op id -> [last position (m), phase] (1.1: feet that step)
 
 
 func setup(w) -> void:
@@ -91,6 +92,21 @@ func _draw() -> void:
 					alpha = 0.55
 				draw_set_transform(at, rot)
 				draw_texture_rect(gt, Rect2(Vector2(0, -gs.y / 2.0), gs), false, Color(0.93, 0.93, 0.91, alpha))
+		# feet stepping under the body (1.1), only close enough to see them
+		if zoom >= 0.45:
+			var g: Array = _gait.get(o.id, [o.pos, 0.0])
+			var moved: float = o.pos.distance_to(g[0])
+			if moved < 2.0:
+				g[1] = float(g[1]) + moved * TAU / 1.3
+			g[0] = o.pos
+			_gait[o.id] = g
+			if o.moving and moved > 0.0005:
+				var sw := sin(float(g[1]))
+				draw_set_transform(p, o.body_dir, Vector2.ONE * sc)
+				for k in 2:
+					var sgn := -1.0 if k == 0 else 1.0
+					var f := Vector2(13.0 * sw * -sgn - 2.0, 7.0 * sgn)
+					draw_line(f - Vector2(3.5, 0), f + Vector2(3.5, 0), INK, 5.5)
 		var bt: Texture2D = Decals.tex("op/%s_stand" % look)
 		var bs: Vector2 = bt.get_size() * sc
 		draw_set_transform(p, o.body_dir)

@@ -19,6 +19,7 @@ const Settings = preload("res://scripts/ui/settings.gd")
 const Decals = preload("res://scripts/view/decals.gd")
 const Sound = preload("res://scripts/view/sound.gd")
 const ActorView = preload("res://scripts/view/actor_view.gd")
+const Rig = preload("res://scripts/view/rig.gd")
 const Overlay = preload("res://scripts/view/overlay.gd")
 const DoorsView = preload("res://scripts/view/doors_view.gd")
 const Marks = preload("res://scripts/view/marks.gd")
@@ -1125,7 +1126,14 @@ func set_overlay(nm: String, on: bool) -> void:
 
 
 # ------------------------------------------------------------------ loop
+var _perf := {"frames": 0, "sim": 0, "view": 0, "steps": 0, "draws": 0}
+var _pf0 := 0
+var _sim_us := 0
+
+
 func _process(delta: float) -> void:
+	_pf0 = Time.get_ticks_usec()
+	_sim_us = 0
 	sound.ambience("amb_city" if mode == "run" and not replay_on else "amb_office")
 	if replay_on and world != null:
 		if replay_play:
@@ -1148,6 +1156,7 @@ func _process(delta: float) -> void:
 				if Time.get_ticks_usec() - t0 > 33000:
 					break
 			acc = minf(acc, DT * 3.0)
+			_sim_us = Time.get_ticks_usec() - t0
 		if world.t - _stamp_t >= 1.0 or (world.over and _stamp_t < world.t):
 			_stamp_t = world.t
 			_update_stamp()
@@ -1163,9 +1172,12 @@ func _process(delta: float) -> void:
 				sound.handle(ev)
 			if _ev_visible(ev):
 				overlay.handle(ev)
-			if ev["type"] == "blood" and views.has(ev["id"]):
-				views[ev["id"]].stain(ev["zone"], ev["side"])
+			if (ev["type"] == "blood" or ev["type"] == "shot") and views.has(ev.get("id", "")):
+				views[ev["id"]].event(ev)
 		world.events.clear()
+		Rig.detail = cam.zoom.x >= 0.8
+		var vs := get_viewport().get_visible_rect().size / cam.zoom
+		Rig.view = Rect2(cam.get_screen_center_position() - vs / 2.0, vs).grow(80.0)
 		for v in views.values():
 			v.sync()
 		if op_mode:
@@ -1196,6 +1208,49 @@ func _process(delta: float) -> void:
 				_save()
 			ui.show_debrief(world, dept_lines, use_dept)
 	_test_hooks()
+	_director(delta)
+
+
+## A director's camera for recordings (1.1): --cam=action follows where the fighting is,
+## --cam=follow:A1 one person; --camzoom sets the zoom; --clean hides the panels.
+var _cam_goal := Vector2.INF
+
+
+func _director(delta: float) -> void:
+	if not _args.has("cam") or world == null:
+		return
+	if _args.has("clean"):
+		for n in [ui, ops_ui, ledger_layer]:
+			if n != null:
+				n.visible = false
+	var zf := float(_args.get("camzoom", "2.0"))
+	var pts: Array = []
+	var mode: String = _args["cam"]
+	if mode.begins_with("follow:"):
+		var o = world.by_id.get(mode.substr(7), null)
+		if o != null:
+			pts.append(o.pos)
+	else:
+		for o in world.ops:
+			if o.alive() and not o.gone and (world.t - o.last_shot_t < 2.5 or (o.team == 0 and o.moving)):
+				pts.append(o.pos)
+		if pts.is_empty():
+			for o in world.ops:
+				if o.alive() and not o.gone and o.team == 0:
+					pts.append(o.pos)
+	if pts.is_empty():
+		return
+	var c := Vector2.ZERO
+	for q in pts:
+		c += q
+	c /= pts.size()
+	var goal := c * PX
+	if _cam_goal == Vector2.INF:
+		_cam_goal = goal
+	_cam_goal = _cam_goal.lerp(goal, 1.0 - exp(-delta * 1.6))
+	cam.zoom = Vector2(zf, zf)
+	var off := Vector2.ZERO if _args.has("clean") else Vector2(UI.PANEL_W / 2.0 / zf, 0)
+	cam.position = _cam_goal + off
 
 
 ## Application stamps on the title block (v0.8): the actual time, and the paperwork the
@@ -1310,6 +1365,11 @@ func _test_hooks() -> void:
 			set_door_mode(_args["doors"])
 		if _args.has("sel"):
 			select_op(_args["sel"])
+	if _args.has("perf") and mode == "run" and world != null and not world.over:
+		_perf["frames"] += 1
+		_perf["sim"] += _sim_us
+		_perf["view"] += Time.get_ticks_usec() - _pf0 - _sim_us
+		_perf["draws"] += int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 	if _args.has("setup-shot") and Engine.get_process_frames() == 8:
 		_shot(_args["setup-shot"])
 		if not _args.has("autorun"):
@@ -1321,6 +1381,9 @@ func _test_hooks() -> void:
 				_args["_shot_wait"] = Engine.get_process_frames()
 			elif Engine.get_process_frames() - int(_args["_shot_wait"]) > 3:
 				_shot(_args["shot"])
+				if _args.has("perf"):
+					var fr: float = maxf(1.0, _perf["frames"])
+					print("PERF frames %d  sim %.2f ms  view %.2f ms  draw calls %.0f  per frame" % [_perf["frames"], _perf["sim"] / 1000.0 / fr, _perf["view"] / 1000.0 / fr, _perf["draws"] / fr])
 				get_tree().quit()
 
 

@@ -9,7 +9,7 @@ const Ink = preload("res://scripts/view/ink.gd")
 const Settings = preload("res://scripts/ui/settings.gd")
 const Campaign = preload("res://scripts/campaign/campaign.gd")
 
-const VERSION := "1.0.0"
+const VERSION := "1.1.0"
 
 var main
 var shade: ColorRect

@@ -27,7 +27,32 @@ var cam: Camera2D
 var fog = null
 
 
+## Recording (1.1): with --soundlog=path, every sound the game plays is also written as a
+## line (frame, name, volume, pan), so a recorded video can be given its soundtrack
+## afterwards (the recorder's own audio capture is not reliable on a headless box).
+var _log: FileAccess = null
+
+
+func _log_line(name: String, db: float, pan: float, loop := false) -> void:
+	if _log == null:
+		return
+	_log.store_line(JSON.stringify({"f": Engine.get_process_frames(), "s": name, "db": snappedf(db, 0.1), "pan": snappedf(pan, 0.01), "loop": loop}))
+	_log.flush()
+
+
+func _pan_db(p_px: Vector2) -> Array:
+	if cam == null:
+		return [0.0, 0.0]
+	var c := cam.get_screen_center_position()
+	var half := get_viewport().get_visible_rect().size.x / cam.zoom.x / 2.0
+	var d := p_px.distance_to(c) * cam.zoom.x
+	return [clampf((p_px.x - c.x) / maxf(half, 1.0), -1.0, 1.0), -clampf(d / 900.0, 0.0, 1.0) * 14.0]
+
+
 func _ready() -> void:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--soundlog="):
+			_log = FileAccess.open(a.substr(11), FileAccess.WRITE)
 	for i in POOL:
 		var p := AudioStreamPlayer2D.new()
 		p.bus = "Effects"
@@ -68,6 +93,9 @@ func play_at(name: String, p_m: Vector2, db := 0.0, pitch := 1.0) -> void:
 	p.volume_db = db
 	p.pitch_scale = pitch
 	p.play()
+	if _log != null:
+		var pd := _pan_db(p.global_position)
+		_log_line(name, db + pd[1], pd[0])
 
 
 func play_ui(name: String, db := 0.0) -> void:
@@ -77,6 +105,7 @@ func play_ui(name: String, db := 0.0) -> void:
 	ui_player.stream = s
 	ui_player.volume_db = db
 	ui_player.play()
+	_log_line(name, db, 0.0)
 
 
 ## The radio's squelch when a callout comes in: at most one every 1.5 s.
@@ -91,6 +120,7 @@ func radio() -> void:
 		radio_player.volume_db = -6.0
 		radio_player.pitch_scale = randf_range(0.97, 1.03)
 		radio_player.play()
+		_log_line("radio", -6.0, 0.0)
 
 
 func ambience(name: String) -> void:
@@ -99,14 +129,13 @@ func ambience(name: String) -> void:
 	amb_name = name
 	amb.stop()
 	if name == "":
+		_log_line("", 0.0, 0.0, true)
 		return
-	var s = stream(name)
-	if s is AudioStreamWAV:
-		s.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		s.loop_end = int(s.data.size() / 2)
+	var s = stream(name)     # the beds loop by their import settings (loop_mode forward)
 	amb.stream = s
 	amb.volume_db = -8.0
 	amb.play()
+	_log_line(name, -8.0, 0.0, true)
 
 
 func _far(p_m: Vector2) -> bool:
