@@ -1,28 +1,51 @@
-# The Violence - vertical slice (v0.4)
+# The Violence (v1.2.0)
 
-A test range for the NPC CQB Bible, in two modes:
+You are the new chief of police in Port Carrick, a rust-belt city on the edge of collapse. You have forty weeks, an inherited department, a budget that does not cover it, and a contested election at the end.
 
-- **Matches:** eleven maps, from a one-room cabin to an apartment block. Two teams of one to twenty operators each carry a rifle and a pistol (the untrained carry only a pistol). You place everyone, set every operator's habits and traits, and press RUN. The fight resolves itself at up to 20x speed.
-- **Endless Battle:** Port Carrick, a 1 km city of about 250 lots. Four gangs fight over its buildings, six police precincts answer the gunfire, and three hospitals send out ambulances. It never ends.
+Each week the board shows two or three situations: warrants, barricades, hostages, gang houses, public events. Pick one. Read the briefing, which is always confident and never complete. Choose who goes, split them into squads, give each squad its orders and its constraints, and press RUN. Then watch. Nothing you do during the operation changes what your officers do, except calling it off. They see, hear, recognise, judge, hesitate and shoot by their training, their habits and their nerve, and the debrief tells you what actually happened in the room.
 
-Every plan is drawn as an architectural floor plan in greyscale. Operators start as clean plan symbols. Red appears only where the shooting has been: sprays, smears on walls, drip trails, pools under the fallen, stains on the figures.
+Between operations you run the department: pay, hiring and firing, kit, training courses, wounds and recovery, and the cases that excessive force and civilian harm leave behind. The city keeps score. Each ward's trust moves with what you do in it; the press prints what it can prove; four allies (the chair of the council's budget committee, the police union, the community coalition and the district attorney) stand by you or walk away. Three candidates run for mayor, and on election night whoever wins decides what happens to you.
+
+Every building is drawn as an architectural floor plan in greyscale. Red is the only colour, and it marks only where the plan touched a real room.
+
+Two more ways to play sit on the title screen:
+- **Test range:** eleven maps and two teams of one to thirty operators each. Set every operator's echelon, habits, traits and kit, place them, and watch the fight resolve itself at up to 20x.
+- **Endless battle:** Port Carrick itself, a 1 km city of about 250 lots. Four gangs fight over its buildings, six police precincts answer the gunfire, and three hospitals send out ambulances. It never ends.
 
 ## Run it
 
-**Standalone:** double-click `TheViolence.exe`. It is the whole game in one file (Godot 4.7.2 runtime with the game data embedded), so no Godot install is needed. The first launch may show a Windows SmartScreen warning because the file is unsigned: choose "More info", then "Run anyway".
+**Windows:** unpack `TheViolence-v1.2.0-windows.7z` and double-click `TheViolence.exe`. It is the whole game in one file; nothing else is needed. The exe is unsigned, so the first launch may show a SmartScreen warning: choose "More info", then "Run anyway".
 
-**From source:**
-1. Install Godot 4.4 or newer (tested on 4.4.1 and 4.7.2, standard build, no addons).
-2. Open `project.godot` in the Godot project manager (Import, select the folder).
-3. Press F5. The first open imports the SVGs (a few seconds).
+**Linux:** unpack `TheViolence-v1.2.0-linux.7z` and run `./TheViolence.x86_64`.
 
-**Rebuild the standalone exe:**
-1. In Godot 4.7.2, install the export templates (Editor > Manage Export Templates).
-2. Choose Project > Export > "Windows Desktop" > Export Project. The preset embeds the game data in the exe and writes `build/TheViolence.exe`.
+**From source:** install Godot 4.4 or newer (tested on 4.7.2), open `project.godot` and press F5. `Play.bat` / `play.sh` run the project with a Godot found beside it or on the PATH.
 
-From a terminal: `godot --headless --path . --export-release "Windows Desktop" build/TheViolence.exe`.
+**Rebuild:** with the Godot 4.7.2 export templates installed, `godot --headless --path . --export-release "Windows Desktop" build/TheViolence.exe` (or `"Linux"` to `build/TheViolence.x86_64`).
 
-## The maps
+Saves, the department and settings live in Godot's user folder (`%APPDATA%\Godot\app_userdata\The Violence` on Windows, `~/.local/share/godot/app_userdata/The Violence` on Linux). Each save keeps the previous one beside it as `.bak`.
+
+## Your first campaign
+
+1. **New campaign** on the title screen. The opening plays first (four short scenes; Space skips one, Esc skips them all; Prologue on the title plays them again). The outgoing chief leaves a note on the board for the first two weeks.
+2. Pick a situation and read the briefing. The tips under it are what your people believe, not what is true.
+3. Press **Suggest a plan** to see a reasonable one, then change what you disagree with: who goes, the squads, each squad's entry, objective and limits.
+4. **RUN.** Watch at any speed, pause, rewind to look again. **Abort** is the only order you can give.
+5. Read the debrief. The fog lifts and the replay shows what every officer saw. Then deal with the department: the wounded, the cases, the account.
+6. **End the week.** The city, the press and the allies answer.
+
+**How to play** on the title screen (or in the pause menu) covers all of it in eight short pages.
+
+## Settings and sound
+
+Settings (title screen or pause menu) are kept between sessions: fullscreen, master, effects and ambience volume, red ink (F2), gore (F3), the speed an operation starts at, and the first-weeks tips. Red ink off is the monochrome proof: everything still reads in grey. Gore off removes the stains and keeps the evidence markers. Neither changes the simulation.
+
+All sound is synthesised. Shots are placed where they were fired; a shot nobody on your side can see plays muffled, as if through walls.
+
+## The figures
+
+Everyone on the plan is still a flat ink figure seen from directly above, but since 1.1 the figure moves: feet step as they walk and run, free arms swing, and the head turns to where they are looking before the body does. Aiming puts both hands on the weapon and follows its traverse; every round kicks it back into the shoulder with a paper-white flash at the muzzle. A reload cants the rifle in while the support hand fetches a fresh magazine; a stoppage gets its tap and rack; doors are opened, rammed or kicked; bangs are thrown; cuffs go on; dressings are worked. A hit staggers the figure; a fall plays out before it lies still, and the wounded on the floor still breathe. The injury is never drawn. The replay animates the same way.
+
+## The maps (test range and operations)
 
 Maps climb in complexity. Pick one from the Map list at the top of the setup panel.
 
@@ -39,10 +62,16 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 | 08 | Warehouse & Offices | 64 x 44 m | a racked 32 x 24 m warehouse next to a tight office block |
 | 09 | Walled Compound | 64 x 50 m | perimeter wall and gates, big main house, guard house, garage |
 | 10 | Apartment Block | 60 x 36 m | 43 rooms: eight flats off one 44 m corridor, two stair halls |
+| 11 | Civic Plaza | 64 x 46 m | an open square with a stage, a crowd and the buildings around it (public events) |
 
 ## Controls
 
-**Setup**
+**Everywhere**
+- Esc steps back: out of a menu, or into the pause menu (Resume, How to play, Settings, Abort the operation or Main menu). In the test range it returns to setup.
+- F2 red ink, F3 gore.
+
+**Test range: setup**
+
 - Pick a map. Set each team's size (1-20 operators) and posture:
   - Assault: clear the building room by room.
   - Hold: defend.
@@ -51,11 +80,22 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - The Echelon dropdown plus `Apply preset` loads the bible's base stats, typical habits, plates and Experience. `Plates` sets 0-4 chest plate segments.
 - The habit tabs toggle all 40 good habits and 20 bad habits. Hover any habit to see what it does and what overrides it.
 - The Traits tab sets Experience (tier 1-5) and the hearing traits, Tinnitus and Elephant Ears.
-- `Copy to team` gives every teammate the selected operator's echelon, habits, traits and plates.
+- The Kit tab (new in v0.7.5) sets what the selected operator carries: primary, sidearm, sight, armour, helmet and tools. `Apply preset` also loads the echelon's kit.
+- `Copy to team` gives every teammate the selected operator's echelon, habits, traits, plates and kit.
 - `Seed` makes a fight repeatable. The same seed and configuration always replay the same fight.
 
 - Each team's alert option sets how it starts: Yellow (weapons drawn) or Green (relaxed, for an ambush).
 - `ENDLESS BATTLE` opens the city. It uses the seed above it. `Gang cap` and `Police cap` set the most members a gang can have and the police headcount at which hiring stops.
+
+**Operation (section 3, new in v0.6)**
+- `Civilians` (0-40) places that many civilians from the seed, about two in three indoors. They appear on the plan before you run.
+- `Police rules` puts team A under police rules: every recognized person is judged before an officer may fire, suspects can give up, and officers cuff them.
+- `Night` slows recognition and judgment and makes misjudgments more likely.
+- `Team A: department` replaces team A with the officers you picked in the department (always under police rules). Team B becomes a gang house of four relaxed suspects, which you can change.
+- `Body cameras` equips the department: what officers see is recorded as evidence.
+- The doors list (new in v0.7.5) sets how the building is shut: Doors open, Inner doors shut, Outer doors locked, or Shut and locked. Team B (the occupants) holds the keys.
+- `Department ...` opens the roster (see "The department" below).
+- When the run ends, the panel shows the **incident record**: suspects, officers and civilians, rounds fired and rounds through walls, misjudgments, excessive force, and every finding with its evidence.
 
 **Run**
 - Speed buttons run from 0.25x to 20x, or use keys 1-7. Space pauses, Esc returns to setup. Big fights may run slower than the target; the panel shows the real rate.
@@ -68,7 +108,8 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - Mouse wheel zooms; middle-drag or right-drag pans; Home refits the view.
 - `Rerun same seed` replays the fight exactly; `Rerun new seed` rolls a new one.
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
-- The small dot beside each figure is their alert state: green, yellow or red.
+- The small pip beside each figure is their alert state, told apart by shape: a hollow ring (GREEN), a grey disc (YELLOW) or a red disc in a heavy ring (RED).
+- F2 switches red ink off (the monochrome proof) and F3 switches gore off. The buttons sit at the bottom right of the plan. Neither changes the fight.
 
 ## What is simulated
 
@@ -86,7 +127,7 @@ Everything follows the NPC CQB Bible.
   - Every tracked enemy is recognized, and the aim set up, in parallel.
   - Switching to an enemy already acquired takes 0.06 s on the pistol and 0.08 s on the rifle, plus 4 ms per plate.
   - Tier 1 takes one enemy at a time, from scratch.
-  - Presets: untrained 1, militia 1, regular 2, police 3, special operations 4.
+  - Presets: untrained 1, militia 1, Patrol 1, regular 2, police 3, special operations 4.
 - **Sound (a mechanic; nothing is played yet):** each sound has a fixed loudness:
   - rifle 45 m, pistol 35 m;
   - footsteps: sprint 8 m, run 5 m, walk 3 m, room-clearing pace 2 m; creeping is silent;
@@ -108,7 +149,7 @@ Everything follows the NPC CQB Bible.
   - Hearing an enemy, seeing one, a callout or incoming fire raises an operator to yellow.
   - Red relaxes to yellow after 5 s without engaging. Yellow relaxes to green after a quiet minute, never below the starting state or a tasking's floor (assaults and hunts stay at least yellow).
 - **Melee:** two enemies in body contact (0.8 m). The quicker reaction kills; it comes from the echelon, habits and stress. It is half again slower against someone not yet recognized, and 30% slower in green.
-- **Every operator is an individual.** Each match rolls:
+- **Every operator is an individual.** Each match rolls (a department officer was rolled once, at hire, instead):
   - a form within about 6% of their echelon, moving every time-based stat;
   - a little jitter on each stat;
   - one or two named strengths and one or two named weaknesses of 15-25% each (Quick eyes, Fast hands, Steady aim, Snap shooter, Cool head, Recoil master, Quick to settle; Slow eyes, Fumbles reloads, Shaky aim, Slow on target, Jittery, Flincher, Slow to settle).
@@ -125,69 +166,9 @@ Bad habits present on an operator:
 - Stress habits switch on when stress x (1 - resistance) passes their threshold.
 - Personality habits are always on.
 
-## Attention, suppression, wounds and doors
+## Teams of up to thirty
 
-**The cone of attention (short-term memory).** An operator carries a handful of
-*attention entries*: things that have recently demanded their attention and whose
-position is only approximate.
-
-| Learned by | Cone | Lasts |
-|---|---|---|
-| a figure that was recognized, lost, and never watched die | 25 deg | 20 s |
-| a team-mate's contact callout | 30 deg | 25 s |
-| a sound (gunfire, footsteps, a breach) | 35 deg | 18 s |
-| incoming fire: a near miss or a round into cover beside you | 40 deg | 12 s |
-
-The strongest entry still live is the operator's *focus*, and they attend to it
-through a second cone that is independent of where the eyes are pointing. Where
-the cone of vision and the cone of attention overlap, acquisition is faster:
-
-- eyes dead on the focus: **35% off the time on target**
-- the two cones just touching at one edge: **7.5%**
-- no overlap, or the target outside the intersection: nothing
-
-scaled linearly in between. A 35% boost removes 35% of the time. Recognition gets
-the same boost at half strength (`ATT_REC_SHARE`), because spotting a figure and
-swinging onto it are two halves of the same effect.
-
-So the mechanic is a reward for acting on awareness: an operator who keeps looking
-back at the corner the man disappeared behind gets on target a third faster when he
-comes back. One who lets their attention go, or whose eyes are somewhere else, gets
-almost nothing. Memories fade, faster in green, slower with ED02/ED07/ED08, slower
-still with Tinnitus or a fixed scan pattern (BH20). Anyone who *watches* a figure
-die drops the memory at once; the rest keep covering a man who is already dead.
-
-With nothing else asking for the eyes, they come back to the remembered bearing for
-about 0.6 s in every 1.2-2.2 s. That is enough to be looking the right way when it
-matters, without ever locking the eyes up.
-
-**Suppression.** Incoming fire you are not answering degrades everything at once.
-A round passing within a metre, or striking cover within 2 m, raises `suppress`; it
-fades at 0.55/s. Suppression widens the group (x1.6 at full), slows recognition
-(x1.35), costs 15% of movement speed, knocks the sights off every time a burst
-lands so the group has to be rebuilt, and past 0.55 an unsteady hand fires a stray
-shot without being told to (WD09 stops that). Only the echelon's composure blunts
-it. This is what makes covering fire worth anything: GD05 bounding overwatch, GD08
-covering a reloader and WD07 controlled pairs all had no purpose before, because
-there was nothing to suppress the enemy *with*.
-
-**Wounds bleed.** Every round that gets through starts or adds to a bleed, by zone.
-Blood lost is a clock of its own (at 1.0 the operator goes down) and pain gathers
-stress. A wounded operator cannot sprint, and a downed one with blood already gone
-has less than the five minutes.
-
-**Doors are state.** Open, closed or locked. A shut leaf is a real obstacle: it
-blocks sight, bullets and movement at the same time, and it has to be opened before
-anyone goes through it. Opening takes 1.2 s; forcing a locked one takes 2.6 s with
-an 85% + 0.15 x composure chance on the first attempt, and both are loud (6 m and
-30 m). An element halted at a shut door works it with the number one man while the
-rest cover it. Every map except **01 Lone Cabin** starts with every door open, so
-the rest of the game is unchanged; map 01's single door starts shut, which is the
-whole problem of that map.
-
-## Teams of up to twenty
-
-A team of more than five splits into elements (fire teams) of up to five, as balanced contiguous blocks of slots: 6 = 3+3, 7 = 4+3, 11 = 4+4+3, 20 = 5x4.
+A team forms squads by the rules of v0.7.9 (see that section): 6 = 3+3, 7 = 4+3, 11 = 4+4+3, 20 = 4x5, 30 = 6x5. In the code a squad is an "element".
 
 **Elements on the attack:**
 - Each element picks its own room: the nearest uncleared room reachable through a door from outside or from a cleared room, by path length. No other element may have claimed it.
@@ -226,7 +207,7 @@ A team of more than five splits into elements (fire teams) of up to five, as bal
 **The gangs.** Kilbride Crew (dots), Corvino Family (bands), Los Halcones (diagonal hatch) and Zarya Bratva (cross-hatch). The pattern on a member's shoulders is the pattern that hatches the gang's buildings on the map.
 - Recruits are 70% untrained, 20% militia and 10% regulars ("soldiers").
 - Each gang starts with a home neighbourhood holding a school, plus one next to it. The rest of the city is unclaimed.
-- Squads of up to five hold one room each: one room in a house, up to three in the biggest buildings.
+- Squads (formed by the same rules as everyone) hold one room each, layering into the rooms behind a small one: one room in a house, up to three in the biggest buildings.
 - **Capture:** a building changes hands after a minute of domination, meaning only one gang has living members inside. Police inside, or a rival, stop the clock. Only a gang member can take a building; police clearing a building does not change its owner. Police stations can't be taken.
 - **Recruiting:**
   - The gang holding the most buildings in a neighbourhood dominates it by its share of them.
@@ -293,10 +274,10 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
 - Speeds run 0.25x to 20x. A big city fight runs at roughly 2-3x real time on a typical desktop, and the panel shows the real rate.
 - `Esc` returns to setup.
 
-## Simplifications in this slice
+## Known limits, and what comes after 1.0
 
 - **The original house:** it is the 14 x 32 ft sketch scaled up to 5 x 13 m and turned on its side so two-person teams fit through it.
-- **Doors:** every door opening is at least 0.9 m, the narrowest gap a body fits on the 0.25 m navigation grid. Doors default to open; only map 01 starts with one shut. Roll-up, dock and garage doors are open arches. A shut leaf blocks everything at once -- nothing passes part-way through a door.
+- **Doors:** every door opening is at least 0.9 m, the narrowest gap a body fits on the 0.25 m navigation grid. A door is open, shut or locked; nobody closes a door behind them or locks one during a fight. Roll-up, dock and garage doors are open arches.
 - **Path exposure (PF02):** counts doors and windows only. It is precomputed per map (on a 1 m lattice for the big maps), not updated live.
 - **Perception:** pairs more than 15 m apart re-trace sight every 0.2 s, and pairs more than 30 m apart every 0.4 s.
 - **Stoppages:** rates are raised (4 per 1,000 rounds for the rifle, 3 for the pistol) so stoppage drills show up in a short test.
@@ -307,30 +288,53 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
   - Nobody fires from a vehicle.
   - Gang members go everywhere on foot.
   - Away from any possible enemy, people skip perception and think every third tick; standing posts sleep until something comes near.
-- **Out of scope:**
-  - wall penetration;
-  - grenades;
-  - multiple floors (the apartment stairs are scenery);
-  - civilians.
+- **The city campaign map (v0.10, after 1.0):** operations still happen in the eleven hand-built buildings, not on the city's lots. The Endless Battle has no civilians yet, and its police do not judge or arrest. All three come with the campaign map, which is the next planned update.
+- **Not planned:**
+  - fragmentation grenades;
+  - multiple floors (the apartment stairs are scenery).
 
 ## Files
 
 ```
-scripts/data/habits.gd    habits, traits, Experience, sound, echelons, weapons, individual variation,
-                          the effect registry and all tuning constants
+scripts/data/habits.gd    habits, traits, Experience, sound, echelons, weapons, individual variation
 scripts/data/names.gd     the name bank (18 cultures)
-scripts/sim/memory.gd     short-term memory and the cone of attention
+scripts/data/equipment.gd the equipment database: weapons, sights, armour, the helmet, tools, kits, who may carry what
+scripts/data/squads.gd    squad formation rules, cohesion and the Lion's lag
+scripts/data/courses.gd   pay, costs, morale constants and the training courses (v0.8.5)
 scripts/city/*.gd         the city: generator, templates (police, hospital, school, parks), navigation, roads and vehicles, the director
 scripts/city_main.gd      the Endless Battle scene
-scripts/sim/geom.gd       obstacles, sight lines (with the low-cover rule), bullet traces with height
-scripts/sim/level.gd      map base: walls from room rectangles, doors, room graph, posts for 20 a side
+scripts/sim/geom.gd       obstacles, sight lines (with the low-cover rule), bullet traces with height, door leaves
+scripts/sim/level.gd      map base: walls from room rectangles, doors and their states, room graph, posts for 30 a side
 scripts/maps/*.gd         the eleven maps and the registry
 scripts/sim/nav.gd        AStarGrid2D x4 (PF01/PF02 cost layers), cover spots, cached per map
 scripts/sim/op.gd         operator state, stances and body zones
 scripts/sim/world.gd      perception, tracking, hearing, aiming, shooting, wounds, stress, bad habits
-scripts/sim/brain.gd      priorities P1-P8, elements, assault/hold/hunt, consolidation, habit hooks
-scripts/view/*            floor plan, blood and residue, operators, overlays, the ledger, the city's layers
-scripts/ui/ui.gd          setup and run panels
+scripts/sim/brain.gd      priorities P1-P8, elements, assault/hold/hunt, consolidation, habit hooks, arrests
+scripts/sim/civ_brain.gd  civilians: alarm, flee, hide, freeze, comply, film
+scripts/sim/incident.gd   the incident record: every round, findings and their evidence
+scripts/campaign/department.gd  persistent officers: the inherited roster, hiring, years of service, experience, wounds, files
+scripts/campaign/campaign.gd    the 40-week campaign: the board, commitments, canvassing, the week's end, saving
+scripts/campaign/situations.gd  wards, situation types, what is really inside, the briefing and its tips
+scripts/campaign/orders.gd      objectives, constraints, order points by the leader's experience
+scripts/campaign/operation.gd   civilians' placement; team A from the department; a planned operation built into a world
+scripts/campaign/autoplan.gd    "Suggest a plan"
+scripts/campaign/outcome.gd     the result, its score and each squad's objectives
+scripts/campaign/politics.gd    wards' trust, the four allies, the candidates, delayed consequences, the press, the election (v0.9)
+scripts/sim/recorder.gd   snapshots twice a second for rewind and the replay
+scripts/view/*            floor plan, blood and residue, operators, overlays, the ledger, the city's layers,
+                          the fog of war (fog.gd), the replay (replay_view.gd), the plan on the map (plan_marks.gd),
+                          door states (doors_view.gd), the red-ink palette and toggles (ink.gd), the walls
+                          layer above the blood (plan_walls.gd), the squads' actual routes (actual_route.gd)
+scripts/ui/ui.gd          setup, run, debrief and department panels
+scripts/ui/ops_ui.gd      operations: the board, roster, briefing, force, orders, the run and the debrief
+scripts/ui/front.gd       the title screen, pause menu, settings, manual and credits (1.0)
+scripts/ui/settings.gd    the player's settings, saved in user://settings.cfg (1.0)
+scripts/view/sound.gd     sound: effects from the simulation's events, the interface, ambience (1.0)
+scripts/ui/cutscene.gd    the opening's player (1.2)
+cinematics/               the opening cutscenes' Remotion project (see cinematics/README.md); assets/cutscenes holds the videos
+scripts/view/rig.gd       the animated figure: gait, hands, actions, recoil, hits and falls (1.1)
+scripts/campaign/save_file.gd  safe saves: temporary file, check, swap, .bak fallback (1.0)
+assets/sfx/               all sounds, synthesised by tools/make_sounds.py (1.0)
 assets/svg/               all sprites, generated by tools/make_placeholders.py
 tests/                    headless tests and an art gallery
 ```
@@ -339,51 +343,43 @@ tests/                    headless tests and an art gallery
 
 ```
 godot --headless --path . -s res://tests/maps_test.gd -- --run=1           # validate every map, then 5v5 and 20v20 on each
-godot --headless --path . -s res://tests/stall_test.gd                     # six matchups per map; time-limit stalls and frozen-state watchdogs
-godot --headless --path . -s res://tests/determinism_test.gd               # 27 seeded matches against the stored digests
-godot --headless --path . -s res://tests/determinism_test.gd -- --write    # regenerate tests/fixtures/determinism.json
-godot --headless --path . -s res://tests/habits_test.gd -- --strict        # habit coverage: registry vs call sites
-godot --headless --path . -s res://tests/habits_test.gd -- --csv           # the same report, machine-readable
-godot --headless --path . -s res://tests/playtest.gd -- --n=1 --cells=all --dump-json=/tmp/tv  # per-match JSON
+godot --headless --path . -s res://tests/stall_test.gd                     # six matchups per map; flags time-limit stalls
+godot --headless --path . -s res://tests/determinism_test.gd               # 35 seeded cases against the fixture (--write to reset)
+godot --headless --path . -s res://tests/habits_test.gd -- --strict        # every habit read somewhere, or a declared suspension
+godot --headless --path . -s res://tests/brains_test.gd -- --n=8           # the four brains, squads, pairs, dispersal, cohesion: each on and off
 godot --headless --path . -s res://tests/scale_playtest.gd -- --n=4        # Playtest 02: big fights on every map, CSV
 godot --headless --path . -s res://tests/perf.gd -- --map=10 --t=40        # where the time goes in a 20v20 fight
 godot --headless --path . -s res://tests/fuzz_test.gd -- --n=60            # random maps, sizes, habits, traits, postures
 godot --headless --path . -s res://tests/sim_test.gd -- --n=12             # matchups by echelon (map 00, 2v2)
 godot --headless --path . -s res://tests/sim_test.gd -- --ablation         # 40 habits vs none, same reflexes
-godot --headless --path . -s res://tests/sim_test.gd -- --exp-sweep --n=20 # H1: only Experience moves (5v5 hunt)
 godot --headless --path . -s res://tests/playtest.gd -- --n=40 --cells=all # Playtest 01 matrix (map 00), CSV rows
 godot --headless --path . -s res://tests/city_test.gd -- --seed=3          # build the city, check every room is reachable
 godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10  # the endless battle headless, with timings
-godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10 --gangs=sof   # H5: all gangs one echelon
+godot --headless --path . -s res://tests/civ_test.gd -- --n=40             # v0.6 gate: operations with civilians, Patrol vs police tactical
+godot --headless --path . -s res://tests/dept_test.gd                      # v0.5 gate: save, load, carry-over, replay; v0.8.5 budget, courses, cases
+xvfb-run godot --path . -s res://tests/rig_gallery.gd -- --out=g.png  # 1.1: every pose of the figure (--anim records it moving)
+godot --headless --path . -s res://tests/save_test.gd                      # 1.0: safe saves and the .bak fallback
+godot --headless --path . -s res://tests/politics_test.gd                  # v0.9 gate: stories, allies, the DA, the election, saves
+godot --headless --path . -s res://tests/balance_test.gd -- --gate --n=20   # v0.8.5: equal regulars' assault on a held house, 30-50% attacker wins
+godot --headless --path . -s res://tests/lethality_test.gd -- --type=gang  # v0.9.1 diagnostic: how officers fall in planned operations
+godot --headless --path . -s res://tests/duel_probe.gd                     # v0.9.1 diagnostic: how each side falls in an assault
+godot --headless --path . -s res://tests/orders_test.gd -- --n=8           # v0.7 gate: every order, with and without it
+godot --headless --path . -s res://tests/equip_test.gd -- --n=16           # v0.7.5 gate: every item, with and without it
+godot --headless --path . -s res://tests/op_test.gd                        # a campaign played by "Suggest a plan", week by week
+godot --headless --path . -s res://tests/hold_test.gd -- --n=30            # the hold-mode habits on and off, by matchup
+godot --headless --path . -s res://tests/hold_test.gd -- --ablate=drop --n=30   # all hold habits but one, one at a time
 TR_STEP=1 godot --headless --path . -s res://tests/trace.gd -- --map=4 --a=sof --na=8 --b=militia --nb=8   # step-by-step trace
 ```
 
 Every test takes `--map=N`. Playtest 01 results and recommended system improvements are in the second tab of the NPC CQB Bible.
 
-Regenerate the art with `python3 tools/make_placeholders.py`. All art is original and project-owned.
+Rebuild the trailers with `python3 tools/make_ads.py OUT_DIR` (xvfb-run, Godot and ffmpeg; set AD_CAMPAIGN to a campaign saved by `tests/op_test.gd -- --save` for a played election night).
 
-Two checks run without Godot at all:
+Regenerate the art with `python3 tools/make_placeholders.py` and the sounds with `python3 tools/make_sounds.py` (numpy and scipy). All art and sound is original and project-owned.
 
-```
-python3 tools/gdlint.py              # lint: indentation, bracket balance, ticker keys, habit coverage
-python3 tools/verify_attention.py    # the cone of attention, checked against its spec
-```
+## Credits
 
-And one that reads what a playtest dumped:
-
-```
-python3 tools/aggregate_playtest.py /tmp/tv        # aggregate playtest --dump-json output
-python3 tools/aggregate_playtest.py /tmp/tv --csv   # the same, machine-readable
-```
-
-`gdlint.py` checks indentation, bracket balance, that every `ticker` key used is
-declared in `op.gd`, that every habit id referenced exists, and that every declared
-habit has a call site.
-
-`verify_attention.py` re-implements `Memory.boost()` and asserts the properties the
-mechanic was specified with: 35% with the two centre lines aligned, 7.5% where the
-cones just touch, linear and monotonic between them, and zero outside either cone.
-It reads the tuning constants out of `habits.gd` rather than hard-coding them, and it
-greps `memory.gd` for the shape it ported — so if the formula is edited, the script
-stops and says so instead of quietly testing a stale copy. Pass `--verbose` for the
-curve.
+Design, code, art and sound: Ambidgen, with Claude (Anthropic).
+Built with Godot Engine 4.7 (MIT licence, godotengine.org).
+All art is generated by tools/make_placeholders.py and all sound by tools/make_sounds.py: no third-party assets.
+The version history is in CHANGELOG.md.

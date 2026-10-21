@@ -1,53 +1,51 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 cd /d "%~dp0."
 
-REM Double-click this in the project folder. It plays the files in this
-REM folder when a Godot runtime is sitting here with everything else.
-REM A standalone TheViolence.exe in this folder (or in build\) is used
-REM if no editor is present.
+REM Play The Violence from this folder (the source folder or a release folder).
+REM 1. A Godot 4.4+ editor (4.7.2 tested) sitting in this folder runs the project files here.
+REM 2. Otherwise a Godot on PATH does.
+REM 3. Otherwise the standalone TheViolence.exe here, or in build\.
+REM Anything after Play.bat is passed on, e.g.  Play.bat -- --ops
 
 set "RUNTIME="
 for %%F in (Godot*.exe godot*.exe) do (
-  if exist "%%~fF" (
-    set "RUNTIME=%%~fF"
-    goto :run_project
+  echo %%~nF | findstr /i "console" >nul || (
+    if not defined RUNTIME set "RUNTIME=%%~fF"
   )
 )
-
-where godot >nul 2>&1 && (
-  set "RUNTIME=godot"
-  goto :run_project
+if not defined RUNTIME (
+  for %%F in (Godot*console*.exe godot*console*.exe) do (
+    if not defined RUNTIME set "RUNTIME=%%~fF"
+  )
 )
-where Godot >nul 2>&1 && (
-  set "RUNTIME=Godot"
-  goto :run_project
+if not defined RUNTIME (
+  where godot >nul 2>&1 && set "RUNTIME=godot"
+)
+if defined RUNTIME if exist "%~dp0project.godot" (
+  "!RUNTIME!" --path "%~dp0." %*
+  goto :done
 )
 
 if exist "%~dp0TheViolence.exe" (
   "%~dp0TheViolence.exe" %*
-  set "ERR=%ERRORLEVEL%"
-  if not "%ERR%"=="0" pause
-  exit /b %ERR%
+  goto :done
 )
 if exist "%~dp0build\TheViolence.exe" (
   "%~dp0build\TheViolence.exe" %*
-  set "ERR=%ERRORLEVEL%"
-  if not "%ERR%"=="0" pause
-  exit /b %ERR%
+  goto :done
 )
 
 echo Could not play The Violence from this folder.
 echo.
-echo Put a Godot 4.4+ editor in this folder with the rest of the project, for example:
+echo Put a Godot 4.4 or newer editor in this folder with the project files, for example
 echo   Godot_v4.7.2-stable_win64.exe
-echo or put the standalone TheViolence.exe here ^(or in build\^), then double-click Play.bat again.
+echo or put TheViolence.exe here (or in build\), then double-click Play.bat again.
 echo.
 pause
 exit /b 1
 
-:run_project
-"%RUNTIME%" --path "%~dp0." %*
-set "ERR=%ERRORLEVEL%"
-if not "%ERR%"=="0" pause
-exit /b %ERR%
+:done
+set "ERR=!ERRORLEVEL!"
+if not "!ERR!"=="0" pause
+exit /b !ERR!
