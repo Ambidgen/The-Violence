@@ -573,8 +573,9 @@ func toggle_officer(oid: String, on: bool) -> void:
 
 
 func hire_recruit() -> void:
-	var r: Dictionary = dept.hire()
-	dept.note("Hired %s %s." % [r["rank"], r["name"]])
+	var r: Dictionary = dept.recruit(false)
+	if r.is_empty():
+		return
 	_save()
 	ui.refresh_dept(dept, dept_sel)
 
@@ -634,6 +635,24 @@ func _ops_hooks() -> void:
 			ops_ui.show_plan()
 		if _args.has("ops-run"):
 			ops_run()
+	# v0.8.5 screens: --ops-screen=roster|budget|cases [--ops-demo-cases] [--ops-open=N]
+	if _args.has("ops-demo-cases"):
+		var d = campaign.dept
+		var av: Array = d.available()
+		d.open_case(av[3], "misjudgment", "fired at a man holding a phone", "witness", "the kitchen, 39 Canal Street")
+		d.open_case(av[7], "broke_order", "broke the avoid order (chased a contact)", "radio log", "the yard")
+		d.enrol(av[9], "firearms")
+		d.recruit(false)
+	if _args.has("ops-screen"):
+		if _args.has("ops-open"):
+			ops_ui.roster_open = campaign.dept.available()[int(_args["ops-open"])]["id"]
+		match String(_args["ops-screen"]):
+			"roster":
+				ops_ui._roster()
+			"budget":
+				ops_ui._budget()
+			"cases":
+				ops_ui._cases()
 
 
 ## The operations board: the week's situations.
@@ -689,6 +708,11 @@ func _clear_op_views() -> void:
 	ledger.setup(null)
 	for c in veh_layer.get_children():
 		c.queue_free()
+
+
+## The department changed from a panel (training, hiring, a case decided): save it.
+func ops_dept_changed() -> void:
+	_save()
 
 
 func ops_end_week() -> Array:
@@ -859,6 +883,9 @@ func _op_finished() -> void:
 			if not r.is_empty():
 				r["orders_broken"] = int(r.get("orders_broken", 0)) + 1
 				r["file"].append({"week": dept.week, "text": "Broke the %s order (%s, %s)." % [b["order"], b["why"], b["where"]]})
+				if r["status"] != "dead":
+					var c: Dictionary = dept.open_case(r, "broke_order", "broke the %s order (%s)" % [b["order"], b["why"]], "radio log", String(b["where"]))
+					lines.append("Internal affairs: %s opened on %s %s (broke an order)." % [c["id"], r["rank"], r["name"]])
 	res["plan"] = plan.duplicate(true)
 	campaign.record(cur_sit["id"], res)
 	_save()

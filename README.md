@@ -1,4 +1,4 @@
-# The Violence - vertical slice (v0.8.1)
+# The Violence - vertical slice (v0.8.5)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
@@ -85,6 +85,35 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small pip beside each figure is their alert state, told apart by shape: a hollow ring (GREEN), a grey disc (YELLOW) or a red disc in a heavy ring (RED).
 - F2 switches red ink off (the monochrome proof) and F3 switches gore off. The buttons sit at the bottom right of the plan. Neither changes the fight.
+
+## New in v0.8.5: running the department
+
+The department now costs money, learns and answers for itself. Everything is on the operations board (`Roster`, `Budget`, `Internal affairs`), with the account, morale and open cases shown above the week's situations.
+
+**The budget.** The city sets a weekly allocation at the handover: the inherited payroll plus 16% ($30,500 against $26,264 for the default department), with $25,000 in the account.
+- At the end of each week the allocation comes in and the payroll goes out. Pay is by rank ($1,150 a week for an officer, $1,750 for a lieutenant) plus 1.5% a year of service.
+- As they happen: overtime ($160 per officer per operation, $60 more at night), restocking spent gear at cost, new kit, hiring, training, medical bills ($1,200, or $4,000 for a serious wound), a line-of-duty death ($8,000) and severance (two weeks' pay).
+- Kit goes through the budget: new kit is bought at cost, and kit handed back sells for half.
+- In the red, hiring, training and new kit are frozen until the account is back above zero. Each week in deficit costs morale and is counted (the council's view of it arrives in v0.9).
+
+**Hiring and dismissal.** A recruit costs $3,500 for an academy place plus their kit and reports two weeks later. A lateral hire (three to six years elsewhere) costs $6,500 plus kit and reports at once. Dismissing an officer costs two weeks' severance and 6 morale.
+
+**Training.** Open an officer's file on the roster to send them on a course. They are off the board for its length (one week, two for the tactical certification), and it takes effect when they come back.
+- Close-quarters refresher ($2,400): the next habit of a Regular's set they lack.
+- Firearms qualification ($1,800): about a year's worth of on-the-job improvement in recognition, aim and reloads; up to four times.
+- De-escalation and judgment ($3,000): Judgment +6, to 90 at most.
+- Stress inoculation ($3,200): trauma -4 and a little more stress resistance.
+- Behaviour coaching ($3,800): works one personality bad habit out of them.
+- Tactical team certification ($8,500, two weeks): qualifies an officer without five years or Experience 3 for tactical kit, and teaches two tactical habits.
+
+**Internal affairs.** Every officer the incident record ties to a finding (a civilian hit, excessive force, friendly fire, a misjudgment, shots without a threat), and every officer who broke an order, gets one case per operation, led by the gravest finding and carrying the strongest evidence. Each case is cleared, sent to a use-of-force review ($2,500, a week off the board, Judgment +5), suspended (two weeks without pay, morale -3) or dismissed. A case nobody decides lapses after three weeks. What the public makes of these decisions arrives in v0.9.
+
+**Morale** (0-100) starts at 60 and drifts back towards it, faster the further down it is. Deaths, wounds, dismissals, suspensions and weeks in deficit lower it; courses and cleared cases raise it a little. Below 60, every officer brings more stress into every operation. Below 35, officers may resign, the lowest integrity first.
+
+**The balance pass.** A new harness, `tests/balance_test.gd`, runs five-a-side assaults on a held house on maps 00, 04, 05 and 06, with each brain switched off in turn.
+- Equal regulars: the attackers win 43% over 80 fights, inside the 30-50% gate and close to the 33-44% from before the brains. v0.7.9's "12 of 20" came from a narrower sample and does not hold across these maps.
+- Equal police tactical: the attackers win 59-67%, but 72% with every brain off. The brains help the defence; the attackers' edge comes from the tactical kit (bangs especially), not the brains.
+- No combat code changed in this version.
 
 ## New in v0.8.0: red ink
 
@@ -634,8 +663,8 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
   - Nobody fires from a vehicle.
   - Gang members go everywhere on foot.
   - Away from any possible enemy, people skip perception and think every third tick; standing posts sleep until something comes near.
-- **Civilians and the department:** the city has no civilians yet, and its police do not judge or arrest (both come with the campaign map, v0.10). The department has no budget, training or discipline yet (v0.8).
-- **Operations:** situations use the hand-built maps, not the city's lots. Kit has a cost shown in the editor but no budget yet (v0.8). The election, consequences and the press arrive in v0.9.
+- **Civilians and the department:** the city has no civilians yet, and its police do not judge or arrest (both come with the campaign map, v0.10). The department's budget, training and discipline arrived in v0.8.5.
+- **Operations:** situations use the hand-built maps, not the city's lots. Kit is paid for from the budget (v0.8.5). The election, consequences and the press arrive in v0.9.
 - **Out of scope:**
   - fragmentation grenades;
   - multiple floors (the apartment stairs are scenery).
@@ -647,6 +676,7 @@ scripts/data/habits.gd    habits, traits, Experience, sound, echelons, weapons, 
 scripts/data/names.gd     the name bank (18 cultures)
 scripts/data/equipment.gd the equipment database: weapons, sights, armour, the helmet, tools, kits, who may carry what
 scripts/data/squads.gd    squad formation rules, cohesion and the Lion's lag
+scripts/data/courses.gd   pay, costs, morale constants and the training courses (v0.8.5)
 scripts/city/*.gd         the city: generator, templates (police, hospital, school, parks), navigation, roads and vehicles, the director
 scripts/city_main.gd      the Endless Battle scene
 scripts/sim/geom.gd       obstacles, sight lines (with the low-cover rule), bullet traces with height, door leaves
@@ -693,7 +723,8 @@ godot --headless --path . -s res://tests/playtest.gd -- --n=40 --cells=all # Pla
 godot --headless --path . -s res://tests/city_test.gd -- --seed=3          # build the city, check every room is reachable
 godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10  # the endless battle headless, with timings
 godot --headless --path . -s res://tests/civ_test.gd -- --n=40             # v0.6 gate: operations with civilians, Patrol vs police tactical
-godot --headless --path . -s res://tests/dept_test.gd                      # v0.5 gate: save, load, carry-over, replay
+godot --headless --path . -s res://tests/dept_test.gd                      # v0.5 gate: save, load, carry-over, replay; v0.8.5 budget, courses, cases
+godot --headless --path . -s res://tests/balance_test.gd -- --gate         # v0.8.5: equal regulars' assault on a held house, 30-50% attacker wins
 godot --headless --path . -s res://tests/orders_test.gd -- --n=8           # v0.7 gate: every order, with and without it
 godot --headless --path . -s res://tests/equip_test.gd -- --n=16           # v0.7.5 gate: every item, with and without it
 godot --headless --path . -s res://tests/op_test.gd                        # a campaign played by "Suggest a plan", week by week

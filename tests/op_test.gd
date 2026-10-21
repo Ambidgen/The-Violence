@@ -63,6 +63,7 @@ func _init() -> void:
 				for ln in lines:
 					print("    dept: ", ln)
 			w.dispose()
+		print("  week %d: account $%d, morale %d, %d open cases, %d fit" % [c.dept.week, c.dept.balance, c.dept.morale, c.dept.open_cases().size(), c.dept.available().size()])
 		for ln in c.end_week():
 			if args.has("v"):
 				print("  week: ", ln)

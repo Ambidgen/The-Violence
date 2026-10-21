@@ -225,9 +225,10 @@ static func who_of_echelon(echelon: String) -> String:
 	return "any"
 
 
-## A department officer: tactical with five years on the job or Experience 3.
+## A department officer: tactical with five years on the job, Experience 3, or the
+## tactical team certification (v0.8.5).
 static func who_of_record(r: Dictionary) -> String:
-	if float(r.get("years", 0.0)) >= 5.0 or int(r.get("exp", 1)) >= 3:
+	if float(r.get("years", 0.0)) >= 5.0 or int(r.get("exp", 1)) >= 3 or r.get("tactical", false):
 		return "tactical"
 	return "any"
 

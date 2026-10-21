@@ -12,6 +12,8 @@ const Situations = preload("res://scripts/campaign/situations.gd")
 const Operation = preload("res://scripts/campaign/operation.gd")
 const Autoplan = preload("res://scripts/campaign/autoplan.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
+const Courses = preload("res://scripts/data/courses.gd")
+const Department = preload("res://scripts/campaign/department.gd")
 const PANEL_W := 460.0
 const INK := Color("#121212")
 const GREY := Color("#737370")
@@ -30,6 +32,8 @@ var _log_shown := 0
 var _rewinding := false
 var _sliding := false        # the panel itself is moving a slider: not the player
 var kit_open := ""           # Force screen: the officer whose kit is being edited (v0.7.5)
+var roster_open := ""        # Roster: the officer whose file is open (v0.8.5)
+var flash := ""              # a one-line answer to the last thing tried (v0.8.5)
 
 
 func build(m) -> void:
@@ -157,6 +161,7 @@ func show_board(lines := []) -> void:
 	var out: int = d.officers.filter(func(r): return r["status"] == "injured").size()
 	var busy: int = c.committed().size()
 	_text(box, "Port Carrick PD: %d officers fit, %d out injured. %d committed this week. Officers sent to one situation, or out canvassing, cannot go to another." % [fit, out, busy], GREY, 11)
+	_dept_strip(box)
 	for ln in lines:
 		_text(box, String(ln), INK, 11)
 	for s in c.board:
@@ -190,6 +195,9 @@ func show_board(lines := []) -> void:
 	var hb := _h(box)
 	_btn(hb, "End week %d" % c.week(), func(): _end_week())
 	_btn(hb, "Roster", func(): _roster())
+	_btn(hb, "Budget", func(): _budget())
+	var nc: int = d.open_cases().size()
+	_btn(hb, "Internal affairs%s" % ((" (%d)" % nc) if nc > 0 else ""), func(): _cases())
 	_btn(hb, "Test range", func(): main.ops_close())
 	var hb2 := _h(box)
 	_btn(hb2, "New campaign", func(): main.ops_new_campaign())
@@ -201,12 +209,53 @@ func _end_week() -> void:
 	show_board(lines)
 
 
+## The money, morale and open cases at a glance (v0.8.5).
+func _dept_strip(parent: Control) -> void:
+	var d = main.campaign.dept
+	var v := _card(parent)
+	var red: bool = d.balance < 0
+	_text(v, "ACCOUNT  $%s%s   ·   allocation $%s a week   ·   payroll $%s" % [Department.money(d.balance),
+		"  (FROZEN)" if red else "", Department.money(d.allocation), Department.money(d.payroll())],
+		Ink.accent(0.9) if red else INK, 12)
+	var nc: int = d.open_cases().size()
+	_text(v, "Morale %d%s   ·   %d internal affairs case%s open" % [d.morale,
+		" (low: more stress in every operation)" if d.morale < Courses.MORALE0 else "",
+		nc, "" if nc == 1 else "s"], GREY, 11)
+
+
+const STATUS_WORDS := {"injured": "out injured until week %d", "training": "on a course until week %d",
+	"academy": "at the academy until week %d", "suspended": "suspended until week %d"}
+
+
+func _status_of(r: Dictionary, busy: Dictionary) -> String:
+	if STATUS_WORDS.has(r["status"]):
+		return STATUS_WORDS[r["status"]] % int(r["out_until"])
+	match r["status"]:
+		"dead":
+			return "killed"
+		"fired":
+			return "dismissed"
+		"resigned":
+			return "resigned"
+	if busy.has(r["id"]):
+		return "committed (%s)" % busy[r["id"]]
+	return "fit"
+
+
 func _roster() -> void:
 	mode = "roster"
 	_clear()
 	var d = main.campaign.dept
 	_title("ROSTER  ·  week %d" % d.week)
-	var order: Array = d.officers.duplicate()
+	_dept_strip(box)
+	if flash != "":
+		_text(box, flash, INK, 11)
+		flash = ""
+	var hh := _h(box)
+	_btn(hh, "Hire a recruit ($%s)" % Department.money(Courses.RECRUIT + Equipment.cost(Equipment.default_kit())), func(): _hire(false))
+	_btn(hh, "Hire laterally ($%s)" % Department.money(Courses.LATERAL + Equipment.cost(Equipment.default_kit())), func(): _hire(true))
+	_text(box, "A recruit spends two weeks at the academy; a lateral hire has three to six years elsewhere and reports at once. Click an officer to open their file: training, and dismissal.", GREY, 10)
+	var order: Array = d.officers.filter(func(r): return r["status"] not in ["dead", "fired", "resigned"])
 	order.sort_custom(func(a, b):
 		var ra: int = Orders.rank_i(a)
 		var rb: int = Orders.rank_i(b)
@@ -215,18 +264,156 @@ func _roster() -> void:
 		return int(a["xp"]) > int(b["xp"]))
 	var busy: Dictionary = main.campaign.committed()
 	for r in order:
-		var st: String = "fit"
-		if r["status"] == "injured":
-			st = "out until week %d" % int(r["out_until"])
-		elif r["status"] == "dead":
-			st = "killed"
-		elif busy.has(r["id"]):
-			st = "committed (%s)" % busy[r["id"]]
-		var l := _text(box, "%s %s  ·  %d yr  ·  %s %d xp  ·  J %d  ·  %s" % [r["rank"], r["name"], int(r.get("years", 0)),
-			Habits.EXP_NAMES[int(r["exp"])], int(r["xp"]), int(r["judgment"]), st], INK if r["status"] == "active" else GREY, 11)
-		l.mouse_filter = Control.MOUSE_FILTER_PASS
-		l.tooltip_text = UI.officer_file(r)
+		var st: String = _status_of(r, busy)
+		var oid: String = r["id"]
+		var b := _btn(box, "%s %s  ·  %d yr  ·  %s %d xp  ·  J %d  ·  $%s/wk  ·  %s" % [r["rank"], r["name"], int(r.get("years", 0)),
+			Habits.EXP_NAMES[int(r["exp"])], int(r["xp"]), int(r["judgment"]), Department.money(Courses.pay(r)), st],
+			func(): roster_open = "" if roster_open == oid else oid; _roster())
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.clip_text = true
+		b.custom_minimum_size = Vector2(10, 0)
+		b.add_theme_font_size_override("font_size", 11)
+		b.tooltip_text = UI.officer_file(r)
+		if r["status"] != "active":
+			b.add_theme_color_override("font_color", GREY)
+		if roster_open == oid:
+			_officer_card(r, busy)
+	var gone: Array = d.officers.filter(func(r): return r["status"] in ["dead", "fired", "resigned"])
+	if not gone.is_empty():
+		_text(box, "No longer serving: " + ", ".join(gone.map(func(r): return "%s %s (%s)" % [r["rank"], r["name"], _status_of(r, {})])), GREY, 10)
 	_btn(box, "<  Back to the board", func(): show_board())
+
+
+func _officer_card(r: Dictionary, busy: Dictionary) -> void:
+	var d = main.campaign.dept
+	var v := _card(box)
+	var good: Array = r["good"]
+	_text(v, "%d good habits%s. Personality: %s. Trauma %.1f. Courses: %s." % [good.size(),
+		", tactical certified" if r.get("tactical", false) else "", String(r["personality"]) if r["personality"] != "" else "none",
+		float(r["trauma"]), ", ".join(r.get("courses", []).map(func(c): return Courses.COURSES[c]["name"])) if not r.get("courses", []).is_empty() else "none"], INK, 11)
+	if r["status"] == "active" and not busy.has(r["id"]):
+		_text(v, "TRAINING (the officer is off the board for the course)", GREY, 10)
+		for cid in Courses.COURSE_ORDER:
+			if cid == "uof":
+				continue
+			var c: Dictionary = Courses.COURSES[cid]
+			var why: String = Courses.blocked(r, cid)
+			if why == "" and d.frozen():
+				why = "account in the red"
+			var h := _h(v)
+			var cb := _btn(h, "%s  $%s  %dw" % [c["name"], Department.money(int(c["cost"])), int(c["weeks"])], func(): _train(r, cid))
+			cb.disabled = why != ""
+			cb.add_theme_font_size_override("font_size", 11)
+			cb.tooltip_text = String(c["desc"]) + (("\nNot now: " + why) if why != "" else "")
+			if why != "":
+				_lab(h, why, GREY, 10)
+	elif r["status"] == "active":
+		_text(v, "Committed this week: no courses until the week ends.", GREY, 10)
+	var h2 := _h(v)
+	var fb := _btn(h2, "Dismiss ($%s severance)" % Department.money(Courses.pay(r) * Courses.SEVERANCE_WEEKS), func(): _dismiss(r))
+	fb.add_theme_font_size_override("font_size", 11)
+	_lab(h2, "the union remembers: morale -6", GREY, 10)
+
+
+func _train(r: Dictionary, cid: String) -> void:
+	var why: String = main.campaign.dept.enrol(r, cid)
+	flash = ("%s %s is on the %s course." % [r["rank"], r["name"], Courses.COURSES[cid]["name"].to_lower()]) if why == "" else ("Not possible: " + why + ".")
+	main.ops_dept_changed()
+	_roster()
+
+
+func _hire(lateral: bool) -> void:
+	var r: Dictionary = main.campaign.dept.recruit(lateral)
+	flash = ("Hired %s %s." % [r["rank"], r["name"]]) if not r.is_empty() else "Hiring is frozen while the account is in the red."
+	main.ops_dept_changed()
+	_roster()
+
+
+func _dismiss(r: Dictionary) -> void:
+	main.campaign.dept.fire(r)
+	roster_open = ""
+	flash = "%s %s has been dismissed." % [r["rank"], r["name"]]
+	main.ops_dept_changed()
+	_roster()
+
+
+## The account: this week and the last few, line by line (v0.8.5).
+func _budget() -> void:
+	mode = "budget"
+	_clear()
+	var d = main.campaign.dept
+	_title("BUDGET  ·  week %d" % d.week)
+	_dept_strip(box)
+	_text(box, "The city's allocation comes in and the payroll goes out at the end of each week. Overtime, restocking, kit, hiring, training, medical bills and death benefits come out as they happen. In the red, hiring, training and new kit are frozen.", GREY, 10)
+	var bb := ""
+	var shown := 0
+	for wk in range(d.week, maxi(0, d.week - 6), -1):
+		var rows: Array = d.ledger.filter(func(le): return int(le["week"]) == wk)
+		if rows.is_empty():
+			continue
+		var net := 0
+		for le in rows:
+			net += int(le["amount"])
+		bb += "[b]WEEK %d[/b]   net %s$%s\n" % [wk, "+" if net >= 0 else "-", Department.money(absi(net))]
+		for le in rows:
+			var a: int = int(le["amount"])
+			bb += ("   %s$%s   %s\n" % ["+" if a >= 0 else "-", Department.money(absi(a)), le["item"]]) if a >= 0 else ("   [color=#b31f26]-$%s[/color]   %s\n" % [Department.money(absi(a)), le["item"]])
+		shown += 1
+	if shown == 0:
+		bb = "Nothing spent yet this campaign."
+	_rich(box, bb)
+	_btn(box, "<  Back to the board", func(): show_board())
+
+
+## Internal affairs: every open case and its four answers (v0.8.5).
+func _cases() -> void:
+	mode = "cases"
+	_clear()
+	var d = main.campaign.dept
+	_title("INTERNAL AFFAIRS  ·  week %d" % d.week)
+	_dept_strip(box)
+	if flash != "":
+		_text(box, flash, INK, 11)
+		flash = ""
+	_text(box, "Every finding the incident record ties to an officer, and every broken order, opens a case. Clear it, send the officer to a use-of-force review, suspend them for two weeks without pay, or dismiss them. A case nobody decides lapses after three weeks. (What the public makes of your decisions arrives in v0.9.)", GREY, 10)
+	var open: Array = d.open_cases()
+	if open.is_empty():
+		_text(box, "No open cases.", INK, 12)
+	for c in open:
+		var r: Dictionary = d.get_officer(c["officer"])
+		var v := _card(box)
+		_text(v, "%s  ·  %s %s  ·  week %d" % [c["id"], r.get("rank", ""), r.get("name", "?"), int(c["week"])], INK, 13)
+		_text(v, "%s: %s (%s). Evidence: %s." % [Department.CASE_KINDS.get(c["kind"], c["kind"]), c["text"], c["place"], c["strength"]], INK, 11)
+		_text(v, "Judgment %d  ·  integrity %d  ·  %d earlier case%s" % [int(r.get("judgment", 0)), int(r.get("integrity", 0)),
+			d.cases.filter(func(x): return x["officer"] == c["officer"] and x["status"] == "closed").size(),
+			"" if d.cases.filter(func(x): return x["officer"] == c["officer"] and x["status"] == "closed").size() == 1 else "s"], GREY, 10)
+		var h := _h(v)
+		var cid: String = c["id"]
+		_btn(h, "Clear", func(): _decide(cid, "clear"))
+		var rb := _btn(h, "Review ($%s)" % Department.money(int(Courses.COURSES["uof"]["cost"])), func(): _decide(cid, "retrain"))
+		rb.disabled = r.get("status", "") != "active" or d.frozen() or main.campaign.committed().has(c["officer"])
+		_btn(h, "Suspend", func(): _decide(cid, "suspend"))
+		_btn(h, "Dismiss", func(): _decide(cid, "fire"))
+	var closed: Array = d.cases.filter(func(c): return c["status"] == "closed")
+	if not closed.is_empty():
+		var bb := ""
+		for k in range(closed.size() - 1, maxi(-1, closed.size() - 13), -1):
+			var c2: Dictionary = closed[k]
+			var r2: Dictionary = d.get_officer(c2["officer"])
+			bb += "%s  %s  ·  %s  ·  %s\n" % [c2["id"], r2.get("name", "?"), Department.CASE_KINDS.get(c2["kind"], c2["kind"]).to_lower(), c2["decision"]]
+		_text(box, "CLOSED", GREY, 10)
+		_rich(box, bb)
+	_btn(box, "<  Back to the board", func(): show_board())
+
+
+func _decide(cid: String, decision: String) -> void:
+	var d = main.campaign.dept
+	for c in d.cases:
+		if c["id"] == cid:
+			var ln: String = d.decide(c, decision)
+			flash = ln if ln != "" else "That could not be done this week."
+	main.ops_dept_changed()
+	_cases()
 
 
 # ================================================================== briefing, force, orders
@@ -242,6 +429,13 @@ func show_plan() -> void:
 		b.set_pressed_no_signal(i == tab)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_sep()
+	if flash != "":
+		_text(box, flash, INK, 11)
+		flash = ""
+	if tab == 1:
+		var d = main.campaign.dept
+		_text(box, "Account $%s%s. New kit is bought at cost; kit handed back sells for half." % [Department.money(d.balance),
+			" (frozen: no new kit)" if d.frozen() else ""], Ink.accent(0.9) if d.frozen() else GREY, 10)
 	match tab:
 		0:
 			_briefing(s)
@@ -445,7 +639,7 @@ func _set_kit(r: Dictionary, field: String, value) -> void:
 	k[field] = value
 	if field == "armour":
 		k["plates"] = 2 if value == "plates" else 0
-	r["kit"] = Equipment.validate(k, Equipment.who_of_record(r))
+	_issue(r, Equipment.validate(k, Equipment.who_of_record(r)))
 	main.plan_changed()
 	main._save()
 	show_plan()
@@ -454,9 +648,10 @@ func _set_kit(r: Dictionary, field: String, value) -> void:
 func _set_gear(r: Dictionary, gid: String, n: int) -> void:
 	var k: Dictionary = Equipment.normalize(r.get("kit", Equipment.default_kit()))
 	k["gear"][gid] = n
-	r["kit"] = Equipment.validate(k, Equipment.who_of_record(r))
+	_issue(r, Equipment.validate(k, Equipment.who_of_record(r)))
 	main.plan_changed()
 	main._save()
+	show_plan()
 
 
 ## A ready-made kit for a whole squad: the first officer listed takes the point man's.
@@ -465,10 +660,21 @@ func _squad_kit(si: int, key: String) -> void:
 	var recs := _recs(main.plan["squads"][si]["members"])
 	for k in recs.size():
 		var r: Dictionary = recs[k]
-		r["kit"] = Equipment.validate(spec["point"] if k == 0 else spec["rest"], Equipment.who_of_record(r))
+		_issue(r, Equipment.validate(spec["point"] if k == 0 else spec["rest"], Equipment.who_of_record(r)))
 	main.plan_changed()
 	main._save()
 	show_plan()
+
+
+## Kit goes through the budget (v0.8.5): new kit is bought, kit handed back sold for half.
+func _issue(r: Dictionary, kit: Dictionary) -> void:
+	var res = main.campaign.dept.reissue(r, kit)
+	if res is String:
+		flash = "No new kit: " + res + "."
+	elif int(res) > 0:
+		flash = "Kit for %s: $%s." % [r["name"], Department.money(int(res))]
+	elif int(res) < 0:
+		flash = "Kit returned by %s: $%s back." % [r["name"], Department.money(-int(res))]
 
 
 func _recs(ids: Array) -> Array:

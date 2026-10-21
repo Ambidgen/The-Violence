@@ -10,6 +10,8 @@ const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
 const Department = preload("res://scripts/campaign/department.gd")
 const Operation = preload("res://scripts/campaign/operation.gd")
+const Courses = preload("res://scripts/data/courses.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 
 const PATH := "user://dept_test.json"
 var problems := 0
@@ -136,6 +138,68 @@ func _init() -> void:
 	_check(JSON.stringify(da.to_data()) == JSON.stringify(db.to_data()), "and the department after it")
 	wa.dispose()
 	wb.dispose()
+	_running_the_department()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
 	print("problems: %d" % problems)
 	quit()
+
+
+## v0.8.5: the budget, training and internal affairs.
+func _running_the_department() -> void:
+	print("  -- running the department (v0.8.5)")
+	var d = Department.new()
+	d.found(77)
+	_check(d.allocation > d.payroll() and d.balance == Courses.RESERVE, "the city's allocation covers the inherited payroll ($%d > $%d)" % [d.allocation, d.payroll()])
+	var b0: int = d.balance
+	var pr: int = d.payroll()
+	d.next_week()
+	_check(d.balance == b0 + d.allocation - pr, "a week: allocation in, payroll out")
+	# training: a refresher teaches the next habit and takes the officer off the board
+	var r: Dictionary = d.available().back()
+	var g := Courses.next_cqb(r)
+	var n0: int = r["good"].size()
+	var b1: int = d.balance
+	_check(d.enrol(r, "cqb") == "" and r["status"] == "training" and d.balance == b1 - int(Courses.COURSES["cqb"]["cost"]), "a course is paid for and takes the officer off the board")
+	_check(not d.available().has(r), "an officer on a course is not available")
+	d.next_week()
+	_check(r["status"] == "active" and r["good"].has(g) and r["good"].size() == n0 + 1, "the refresher taught %s" % g)
+	var t0 := float(r["ech"]["t_rec0"])
+	d.enrol(r, "firearms")
+	d.next_week()
+	_check(float(r["ech"]["t_rec0"]) < t0, "firearms qualification makes recognition faster")
+	# kit: bought at cost, handed back for half
+	var kit: Dictionary = Equipment.normalize(r["kit"])
+	kit["armour"] = "plates"
+	kit["plates"] = 2
+	var b2: int = d.balance
+	var paid = d.reissue(r, Equipment.validate(kit, Equipment.who_of_record(r)))
+	_check(paid is int and paid > 0 and d.balance == b2 - paid, "new kit is bought ($%s)" % str(paid))
+	var back = d.reissue(r, Equipment.default_kit())
+	_check(back is int and back < 0 and -back == int(round(paid * Courses.SURPLUS)), "and sold back for half")
+	# internal affairs
+	var r2: Dictionary = d.available()[2]
+	var c: Dictionary = d.open_case(r2, "misjudgment", "test", "witness", "here")
+	_check(d.open_cases().size() == 1, "a case opens")
+	var m0: int = d.morale
+	var pr_before: int = d.payroll()
+	d.decide(c, "suspend")
+	_check(r2["status"] == "suspended" and d.morale < m0 and c["status"] == "closed", "a suspension: off the board, morale down")
+	_check(d.payroll() == pr_before - Courses.pay(r2) and not d.available().has(r2), "a suspended officer is unpaid and unavailable")
+	d.next_week()
+	d.next_week()
+	_check(r2["status"] == "active", "back after two weeks")
+	var c2: Dictionary = d.open_case(r2, "excessive_force", "test", "video", "here")
+	d.decide(c2, "fire")
+	_check(r2["status"] == "fired" and not d.available().has(r2), "a dismissal")
+	var c3: Dictionary = d.open_case(d.available()[0], "friendly_fire", "test", "none", "here")
+	for k in Department.CASE_WEEKS:
+		d.next_week()
+	_check(c3["status"] == "closed" and c3["decision"] == "lapsed", "an undecided case lapses")
+	# the red: everything that costs money is frozen
+	d.balance = -100
+	_check(d.recruit(false).is_empty() and d.enrol(d.available()[0], "judgment") != "", "in the red, hiring and training are frozen")
+	# it all survives a save
+	var j1 := JSON.stringify(d.to_data())
+	var d2 = Department.new()
+	d2.from_data(JSON.parse_string(j1))
+	_check(JSON.stringify(d2.to_data()) == j1, "the budget, courses and cases survive a save")
