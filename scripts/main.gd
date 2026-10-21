@@ -14,6 +14,7 @@ const FloorPlan = preload("res://scripts/view/floor_plan.gd")
 const PlanWalls = preload("res://scripts/view/plan_walls.gd")
 const ActualRoute = preload("res://scripts/view/actual_route.gd")
 const Ink = preload("res://scripts/view/ink.gd")
+const Cutscene = preload("res://scripts/ui/cutscene.gd")
 const Front = preload("res://scripts/ui/front.gd")
 const Settings = preload("res://scripts/ui/settings.gd")
 const Decals = preload("res://scripts/view/decals.gd")
@@ -228,6 +229,8 @@ func _ready() -> void:
 		start_city.call_deferred(int(_args.get("seed", "1001")), 60, 108)
 	if _args.has("ops"):
 		_ops_hooks.call_deferred()
+	cutscene = Cutscene.new()
+	add_child(cutscene)
 	front = Front.new()
 	add_child(front)
 	front.build(self)
@@ -1129,6 +1132,25 @@ func set_overlay(nm: String, on: bool) -> void:
 
 
 # ------------------------------------------------------------------ loop
+var cutscene                     # the opening (1.2)
+var _after_opening: Callable
+
+
+## The opening cutscenes, then `after`.
+func play_opening(after: Callable, which: Array = []) -> void:
+	_after_opening = after
+	if cutscene.finished.is_connected(_opening_done):
+		cutscene.finished.disconnect(_opening_done)
+	cutscene.finished.connect(_opening_done, CONNECT_ONE_SHOT)
+	sound.ambience("")
+	cutscene.play(which)
+
+
+func _opening_done() -> void:
+	if _after_opening.is_valid():
+		_after_opening.call()
+
+
 var _perf := {"frames": 0, "sim": 0, "view": 0, "steps": 0, "draws": 0}
 var _pf0 := 0
 var _sim_us := 0
@@ -1137,7 +1159,7 @@ var _sim_us := 0
 func _process(delta: float) -> void:
 	_pf0 = Time.get_ticks_usec()
 	_sim_us = 0
-	sound.ambience("amb_city" if mode == "run" and not replay_on else "amb_office")
+	sound.ambience("" if cutscene.visible else ("amb_city" if mode == "run" and not replay_on else "amb_office"))
 	if replay_on and world != null:
 		if replay_play:
 			replay_t = minf(replay_t + delta * replay_speed, world.t)
@@ -1369,6 +1391,12 @@ static func _redraw_all(n: Node) -> void:
 
 
 func _test_hooks() -> void:
+	if _args.has("cutscene"):        # 1.2: --cutscene=c3_the_plan --cutscene-shot=path --cutscene-at=frames
+		if Engine.get_process_frames() == 6:
+			play_opening(func(): get_tree().quit(), [] if _args["cutscene"] == "all" else [_args["cutscene"]])
+		if _args.has("cutscene-shot") and Engine.get_process_frames() == int(_args.get("cutscene-at", "120")):
+			_shot(_args["cutscene-shot"])
+			get_tree().quit()
 	if _args.has("hold") and Engine.get_process_frames() >= int(_args["hold"]):
 		get_tree().quit()      # recordings (1.1): hold a screen for N frames, then stop
 	if op_mode and world != null and _args.has("ops-abort-at") and world.t >= float(_args["ops-abort-at"]) and not world.aborted:

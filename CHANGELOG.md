@@ -2,6 +2,11 @@
 
 Newest first. The README covers the game as it stands; this file keeps the history.
 
+## v1.2.0: the opening
+
+- **Four opening cutscenes**, made with Remotion (cinematics/), drawn in the red-ink hand and scored with the game's own sounds: *Port Carrick* (the city, the closing mill, the wards and crews, gunfire on the map, headquarters), *The Outgoing Chief* (the desk, his note, what you inherit, the phone), *The Plan* (a briefing drawn with total confidence, then the same house when the plan meets the room) and *Forty Weeks* (the calendar, the candidates, the allies, the first front page, the title). About two and a half minutes in all.
+- They play before a new campaign; Space or a click skips one, Esc skips the rest. Settings > "The opening cutscenes before a new campaign" turns them off, and the title's **Prologue** plays them again.
+
 ## v1.1.0: figures that move
 
 - **Animated figures.** The plan's figures are now a rig (scripts/view/rig.gd) instead of one still sprite: torso and mark, a head that turns on its own, and arms, hands and feet drawn in code. Walking and running step the feet and swing the free arms; stance changes ease in; aiming puts both hands on the weapon and follows its traverse; each round kicks it back with a paper-white muzzle flash (no colour: red stays for consequence). Actions have their own hands: reload (canted rifle, the support hand to the pouch and back with a magazine), stoppage (tap, rack), the swap to the sidearm, doors (open, ram, kick), throwing a bang, sting-ball or gas, cuffing, treating, OC spray, the baton. Hands up, cuffed, filming, frozen and hiding civilians, the stunned, blinded and gassed each have a pose. A hit staggers; a fall plays out over half a second; the wounded on the floor breathe and the dead do not. The replay drives the same rig from the recorder, with recoil for each round fired. City figures step their feet.

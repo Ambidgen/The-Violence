@@ -9,7 +9,7 @@ const Ink = preload("res://scripts/view/ink.gd")
 const Settings = preload("res://scripts/ui/settings.gd")
 const Campaign = preload("res://scripts/campaign/campaign.gd")
 
-const VERSION := "1.1.0"
+const VERSION := "1.2.0"
 
 var main
 var shade: ColorRect
@@ -146,6 +146,8 @@ func show_title() -> void:
 	var gap3 := Control.new()
 	gap3.custom_minimum_size = Vector2(0, 12)
 	v.add_child(gap3)
+	if main.cutscene != null and main.cutscene.available():
+		_menu_btn(v, "Prologue", func(): _prologue())
 	_menu_btn(v, "How to play", func(): show_manual("title"))
 	_menu_btn(v, "Settings", func(): show_settings("title"))
 	_menu_btn(v, "Credits", func(): show_credits("title"))
@@ -192,8 +194,19 @@ func _new_campaign_ask() -> void:
 func _new_campaign() -> void:
 	hide_front()
 	main.ops_new_campaign()
-	main.ops_open()
-	main.ops_ui.show_board(["Week 1. The department is yours."])
+	var begin := func():
+		main.ops_open()
+		main.ops_ui.show_board(["Week 1. The department is yours."])
+	# 1.2: the opening cutscenes first, unless turned off in Settings
+	if bool(Settings.get_v("intro")) and main.cutscene != null and main.cutscene.available():
+		main.play_opening(begin)
+	else:
+		begin.call()
+
+
+func _prologue() -> void:
+	hide_front()
+	main.play_opening(func(): show_title())
 
 
 func _test_range() -> void:
@@ -246,6 +259,7 @@ func show_settings(from: String) -> void:
 	_check(v, "Red ink (F2): off is the monochrome proof", "red_ink")
 	_check(v, "Gore (F3): off keeps the evidence markers", "gore")
 	_check(v, "Tips in the first weeks of a campaign", "tips")
+	_check(v, "The opening cutscenes before a new campaign", "intro")
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 8)
 	v.add_child(h)

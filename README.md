@@ -1,4 +1,4 @@
-# The Violence (v1.1.0)
+# The Violence (v1.2.0)
 
 You are the new chief of police in Port Carrick, a rust-belt city on the edge of collapse. You have forty weeks, an inherited department, a budget that does not cover it, and a contested election at the end.
 
@@ -14,9 +14,9 @@ Two more ways to play sit on the title screen:
 
 ## Run it
 
-**Windows:** unpack `TheViolence-v1.1.0-windows.7z` and double-click `TheViolence.exe`. It is the whole game in one file; nothing else is needed. The exe is unsigned, so the first launch may show a SmartScreen warning: choose "More info", then "Run anyway".
+**Windows:** unpack `TheViolence-v1.2.0-windows.7z` and double-click `TheViolence.exe`. It is the whole game in one file; nothing else is needed. The exe is unsigned, so the first launch may show a SmartScreen warning: choose "More info", then "Run anyway".
 
-**Linux:** unpack `TheViolence-v1.1.0-linux.7z` and run `./TheViolence.x86_64`.
+**Linux:** unpack `TheViolence-v1.2.0-linux.7z` and run `./TheViolence.x86_64`.
 
 **From source:** install Godot 4.4 or newer (tested on 4.7.2), open `project.godot` and press F5. `Play.bat` / `play.sh` run the project with a Godot found beside it or on the PATH.
 
@@ -26,7 +26,7 @@ Saves, the department and settings live in Godot's user folder (`%APPDATA%\Godot
 
 ## Your first campaign
 
-1. **New campaign** on the title screen. The outgoing chief leaves a note on the board for the first two weeks.
+1. **New campaign** on the title screen. The opening plays first (four short scenes; Space skips one, Esc skips them all; Prologue on the title plays them again). The outgoing chief leaves a note on the board for the first two weeks.
 2. Pick a situation and read the briefing. The tips under it are what your people believe, not what is true.
 3. Press **Suggest a plan** to see a reasonable one, then change what you disagree with: who goes, the squads, each squad's entry, objective and limits.
 4. **RUN.** Watch at any speed, pause, rewind to look again. **Abort** is the only order you can give.
@@ -330,6 +330,8 @@ scripts/ui/ops_ui.gd      operations: the board, roster, briefing, force, orders
 scripts/ui/front.gd       the title screen, pause menu, settings, manual and credits (1.0)
 scripts/ui/settings.gd    the player's settings, saved in user://settings.cfg (1.0)
 scripts/view/sound.gd     sound: effects from the simulation's events, the interface, ambience (1.0)
+scripts/ui/cutscene.gd    the opening's player (1.2)
+cinematics/               the opening cutscenes' Remotion project (see cinematics/README.md); assets/cutscenes holds the videos
 scripts/view/rig.gd       the animated figure: gait, hands, actions, recoil, hits and falls (1.1)
 scripts/campaign/save_file.gd  safe saves: temporary file, check, swap, .bak fallback (1.0)
 assets/sfx/               all sounds, synthesised by tools/make_sounds.py (1.0)
