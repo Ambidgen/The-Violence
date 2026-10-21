@@ -87,6 +87,9 @@ class Overview extends Node2D:
 
 
 func _ready() -> void:
+	for a0 in OS.get_cmdline_user_args():
+		if a0.begins_with("--ui-scale="):      # recordings (1.1): everything drawn larger
+			get_tree().root.content_scale_factor = float(a0.substr(11))
 	get_window().title = "The Violence - Endless Battle"
 	RenderingServer.set_default_clear_color(Color("#d6d6d3"))
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
@@ -401,11 +404,15 @@ func _camera_follow(delta: float) -> void:
 	var fz := float(_args.get("follow-zoom", "0.5"))
 	if cam.zoom.x < fz * 0.7 or _args.has("follow-zoom"):
 		cam.zoom = cam.zoom.lerp(Vector2(fz, fz), minf(1.0, delta * 2.0))
-	var want: Vector2 = (h["p"] as Vector2) * PX + Vector2(CityUI.PANEL_W / 2.0 / cam.zoom.x, 0)
+	var pan := 0.0 if _args.has("clean") else CityUI.PANEL_W / 2.0 / cam.zoom.x
+	var want: Vector2 = (h["p"] as Vector2) * PX + Vector2(pan, 0)
 	cam.position = cam.position.lerp(want, minf(1.0, delta * 1.5))
 
 
 func _test_hooks() -> void:
+	if _args.has("clean"):          # recordings (1.1): no panels
+		ui.visible = false
+		ledger_layer.visible = false
 	if _args.has("shot"):
 		var at := float(_args.get("shot-at", "5"))
 		if world.t >= at:

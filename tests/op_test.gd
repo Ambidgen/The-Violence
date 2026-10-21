@@ -134,4 +134,7 @@ func _init() -> void:
 	print("officer deaths: ", tot_causes)
 	print("officers per operation: %.2f killed, %.2f down (%d operations)" % [float(tot_off_k) / maxf(1, tot_ops), float(tot_off_d) / maxf(1, tot_ops), tot_ops])
 	print("done in %d ms" % (Time.get_ticks_msec() - t_all))
+	if args.has("save"):        # 1.1: keep the played campaign (the trailer's election night)
+		c.save()
+		print("saved the campaign to ", Campaign.SAVE_PATH)
 	quit()

@@ -371,6 +371,8 @@ TR_STEP=1 godot --headless --path . -s res://tests/trace.gd -- --map=4 --a=sof -
 
 Every test takes `--map=N`. Playtest 01 results and recommended system improvements are in the second tab of the NPC CQB Bible.
 
+Rebuild the trailers with `python3 tools/make_ads.py OUT_DIR` (xvfb-run, Godot and ffmpeg; set AD_CAMPAIGN to a campaign saved by `tests/op_test.gd -- --save` for a played election night).
+
 Regenerate the art with `python3 tools/make_placeholders.py` and the sounds with `python3 tools/make_sounds.py` (numpy and scipy). All art and sound is original and project-owned.
 
 ## Credits

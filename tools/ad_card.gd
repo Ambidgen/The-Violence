@@ -26,6 +26,7 @@ func _init() -> void:
 			args[a.substr(2, i - 2)] = a.substr(i + 1)
 	var w := int(args.get("w", "1920"))
 	var h := int(args.get("h", "1080"))
+	get_root().content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	get_root().size = Vector2i(w, h)
 	RenderingServer.set_default_clear_color(PAPER)
 	var c := Card.new()
@@ -36,6 +37,8 @@ func _init() -> void:
 
 func _process(_dt: float) -> bool:
 	frame += 1
+	if frame == 2:
+		get_root().get_child(0).queue_redraw()
 	if frame == 6:
 		get_root().get_texture().get_image().save_png(args.get("out", "user://card.png"))
 		return true
@@ -47,6 +50,7 @@ class Card extends Node2D:
 	var size := Vector2(1920, 1080)
 
 	func _draw() -> void:
+		size = get_viewport_rect().size       # the canvas, whatever the window stretch
 		var font: Font = ThemeDB.fallback_font
 		var k := size.y / 1080.0
 		draw_rect(Rect2(Vector2.ZERO, size), PAPER)
@@ -73,7 +77,7 @@ class Card extends Node2D:
 				var t := "T H E   V I O L E N C E"
 				var fs := int(118 * k)
 				var tw := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-				var top := size.y * (0.36 if kind == "title" else 0.30)
+				var top := size.y * (0.40 if kind == "title" else 0.36)
 				_text(font, "PORT CARRICK POLICE DEPARTMENT  ·  OFFICE OF THE CHIEF", Vector2(size.x / 2.0, top - 70 * k), int(24 * k), MID)
 				draw_string(font, Vector2((size.x - tw) / 2.0, top + fs * 0.35), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, INK)
 				draw_rect(Rect2(Vector2((size.x - tw) / 2.0, top + fs * 0.55), Vector2(tw, 9 * k)), RED)
@@ -92,7 +96,7 @@ class Card extends Node2D:
 				var st: PackedStringArray = String(args.get("stamp", "FILED|NOT RESOLVED")).split("|")
 				_stamp(font, st, Vector2(size.x * 0.70, size.y * 0.72), k)
 			_:
-				var fs3 := int(float(args.get("size", "84")) * k)
+				var fs3 := int(float(args.get("size", "110")) * k)
 				var gap := fs3 * 1.35
 				var yy3 := size.y / 2.0 - (lines.size() - 1) * gap / 2.0 + fs3 * 0.35
 				for i in lines.size():

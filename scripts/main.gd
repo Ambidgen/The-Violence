@@ -115,6 +115,9 @@ var _paused_before_menu := false
 
 
 func _ready() -> void:
+	for a0 in OS.get_cmdline_user_args():
+		if a0.begins_with("--ui-scale="):      # recordings (1.1): everything drawn larger
+			get_tree().root.content_scale_factor = float(a0.substr(11))
 	get_window().title = "The Violence"
 	Settings.load_all()
 	Settings.apply()
@@ -845,7 +848,7 @@ func ops_run() -> void:
 	overlay.setup(world)
 	overlay.fog = fog
 	sound.fog = fog
-	fog.setup(world, true)
+	fog.setup(world, not _args.has("nofog"))      # --nofog: recordings (1.1)
 	ledger.setup(world, 8)
 	replay_view.clear()
 	_clear_views()
@@ -1230,6 +1233,19 @@ func _director(delta: float) -> void:
 		var o = world.by_id.get(mode.substr(7), null)
 		if o != null:
 			pts.append(o.pos)
+	elif mode == "team":       # team A (the police), and anyone shooting near them
+		var c0 := Vector2.ZERO
+		var n0 := 0
+		for o in world.ops:
+			if o.alive() and not o.gone and o.team == 0:
+				c0 += o.pos
+				n0 += 1
+		if n0 > 0:
+			c0 /= n0
+			pts.append(c0)
+			for o in world.ops:
+				if o.alive() and o.team != 0 and world.t - o.last_shot_t < 1.5 and o.pos.distance_to(c0) < 14.0:
+					pts.append(o.pos)
 	else:
 		for o in world.ops:
 			if o.alive() and not o.gone and (world.t - o.last_shot_t < 2.5 or (o.team == 0 and o.moving)):
@@ -1353,6 +1369,8 @@ static func _redraw_all(n: Node) -> void:
 
 
 func _test_hooks() -> void:
+	if _args.has("hold") and Engine.get_process_frames() >= int(_args["hold"]):
+		get_tree().quit()      # recordings (1.1): hold a screen for N frames, then stop
 	if op_mode and world != null and _args.has("ops-abort-at") and world.t >= float(_args["ops-abort-at"]) and not world.aborted:
 		ops_abort()
 	if _args.has("ops-replay-at") and _op_done and not replay_on:
@@ -1379,7 +1397,7 @@ func _test_hooks() -> void:
 		if world.t >= at or world.over:
 			if not _args.has("_shot_wait"):
 				_args["_shot_wait"] = Engine.get_process_frames()
-			elif Engine.get_process_frames() - int(_args["_shot_wait"]) > 3:
+			elif Engine.get_process_frames() - int(_args["_shot_wait"]) > int(_args.get("shot-wait", "3")):
 				_shot(_args["shot"])
 				if _args.has("perf"):
 					var fr: float = maxf(1.0, _perf["frames"])
