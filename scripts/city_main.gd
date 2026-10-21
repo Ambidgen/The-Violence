@@ -17,6 +17,8 @@ const CityLabels = preload("res://scripts/view/city_labels.gd")
 const CityThings = preload("res://scripts/view/city_things.gd")
 const CrowdView = preload("res://scripts/view/crowd_view.gd")
 const Decals = preload("res://scripts/view/decals.gd")
+const Sound = preload("res://scripts/view/sound.gd")
+const Settings = preload("res://scripts/ui/settings.gd")
 const Overlay = preload("res://scripts/view/overlay.gd")
 const Ledger = preload("res://scripts/view/ledger.gd")
 const CityUI = preload("res://scripts/ui/city_ui.gd")
@@ -54,6 +56,7 @@ var overview: Node2D
 var terr_static
 var terr_dynamic
 var decals
+var sound
 var crowd
 var things
 var canopy
@@ -96,6 +99,12 @@ func _ready() -> void:
 	cam = Camera2D.new()
 	add_child(cam)
 	cam.make_current()
+	Settings.apply()
+	sound = Sound.new()
+	add_child(sound)
+	sound.cam = cam
+	sound.ambience("amb_city")
+	get_tree().node_added.connect(sound.hook_buttons)
 	_loading_screen()
 	_build()
 
@@ -293,6 +302,7 @@ func _process(delta: float) -> void:
 		_meas_sim = 0.0
 	var captured := false
 	for ev in world.events:
+		sound.handle(ev)
 		match ev["type"]:
 			"blood", "drip", "impact", "casing", "plate", "down":
 				decals.handle(ev)

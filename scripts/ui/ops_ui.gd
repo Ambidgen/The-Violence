@@ -15,6 +15,7 @@ const Equipment = preload("res://scripts/data/equipment.gd")
 const Courses = preload("res://scripts/data/courses.gd")
 const Department = preload("res://scripts/campaign/department.gd")
 const Politics = preload("res://scripts/campaign/politics.gd")
+const Settings = preload("res://scripts/ui/settings.gd")
 const PANEL_W := 460.0
 const INK := Color("#121212")
 const GREY := Color("#737370")
@@ -166,6 +167,8 @@ func show_board(lines := []) -> void:
 	var busy: int = c.committed().size()
 	_text(box, "Port Carrick PD: %d officers fit, %d out injured. %d committed this week. Officers sent to one situation, or out canvassing, cannot go to another." % [fit, out, busy], GREY, 11)
 	_dept_strip(box)
+	if bool(Settings.get_v("tips")) and c.week() <= 2:
+		_first_weeks(box)
 	_front_page(box, c.politics, c.week() - 1 if c.week() > 1 else 1)
 	for ln in lines:
 		_text(box, String(ln), INK, 11)
@@ -204,15 +207,29 @@ func show_board(lines := []) -> void:
 	_btn(hb, "Budget", func(): _budget())
 	var nc: int = d.open_cases().size()
 	_btn(hb, "Internal affairs%s" % ((" (%d)" % nc) if nc > 0 else ""), func(): _cases())
-	_btn(hb, "Test range", func(): main.ops_close())
 	var hb2 := _h(box)
-	_btn(hb2, "New campaign", func(): main.ops_new_campaign())
+	_btn(hb2, "<  Main menu", func(): main.go_title())
 	_text(box, "One save slot: the campaign is saved after every operation and every week.", GREY, 10)
 
 
 func _end_week() -> void:
 	var lines: Array = main.ops_end_week()
 	show_board(lines)
+
+
+## A note from the outgoing chief (1.0): the first two weeks, unless tips are off.
+func _first_weeks(parent: Control) -> void:
+	var v := _card(parent)
+	_text(v, "FROM THE OUTGOING CHIEF", INK, 12)
+	for ln in [
+		"You will not answer everything. Pick what matters: a hostage taking or a crew house left alone comes back; a quiet warrant can wait a week.",
+		"Brief and plan opens the situation. Suggest a plan gives you a sensible start: read it, change it, then Run.",
+		"Send at least four through a door. Plates and a helmet for anyone going in. Rookies shoot slower and crack sooner.",
+		"After each operation: the debrief, then Internal affairs. What you clear, the press may find. What you punish, the union remembers.",
+		"End week when you are done. Check City Hall now and then: the election is in forty weeks.",
+	]:
+		_text(v, "·  " + ln, INK, 11)
+	_text(v, "(These notes stop after week 2; turn tips off in Settings.)", GREY, 10)
 
 
 ## The Carrick Ledger: last week's front page (v0.9).
@@ -342,7 +359,9 @@ func _election_night(lines: Array) -> void:
 	_btn(hb, "City Hall", func(): _city_hall())
 	_btn(hb, "Roster", func(): _roster())
 	_btn(hb, "Budget", func(): _budget())
-	_btn(box, "New campaign", func(): main.ops_new_campaign())
+	var hb3 := _h(box)
+	_btn(hb3, "<  Main menu", func(): main.go_title())
+	_btn(hb3, "New campaign", func(): main.ops_new_campaign())
 
 
 ## The money, morale and open cases at a glance (v0.8.5).
@@ -568,6 +587,10 @@ func show_plan() -> void:
 	if flash != "":
 		_text(box, flash, INK, 11)
 		flash = ""
+	if bool(Settings.get_v("tips")) and main.campaign.week() <= 2:
+		_text(box, ["Tip: the briefing is never complete. Estimates say how sure they are; canvassing buys two more tips at the cost of an officer for the week.",
+			"Tip: each officer's list sets their squad (or none). The leader is the highest rank; the squad follows as many orders as the leader's experience allows. Kit is bought from the budget.",
+			"Tip: give each squad its objectives and constraints. Click the map to place them. The red line is the plan: it will not survive the house."][tab], GREY, 10)
 	if tab == 1:
 		var d = main.campaign.dept
 		_text(box, "Account $%s%s. New kit is bought at cost; kit handed back sells for half." % [Department.money(d.balance),
@@ -1300,6 +1323,8 @@ func refresh_run(w, fog) -> void:
 		_log_shown += 1
 		if not _radio(ln, w):
 			continue
+		if ln["kind"] in ["comms", "kill", "bad", "end"] and main.sound != null:
+			main.sound.radio()
 		var txt: String = String(ln["text"]).replace("[", "(")
 		match ln["kind"]:
 			"kill":

@@ -14,7 +14,10 @@ const FloorPlan = preload("res://scripts/view/floor_plan.gd")
 const PlanWalls = preload("res://scripts/view/plan_walls.gd")
 const ActualRoute = preload("res://scripts/view/actual_route.gd")
 const Ink = preload("res://scripts/view/ink.gd")
+const Front = preload("res://scripts/ui/front.gd")
+const Settings = preload("res://scripts/ui/settings.gd")
 const Decals = preload("res://scripts/view/decals.gd")
+const Sound = preload("res://scripts/view/sound.gd")
 const ActorView = preload("res://scripts/view/actor_view.gd")
 const Overlay = preload("res://scripts/view/overlay.gd")
 const DoorsView = preload("res://scripts/view/doors_view.gd")
@@ -60,6 +63,7 @@ var floorplan
 var props_layer: Node2D
 var marks
 var decals
+var sound
 var actors_layer: Node2D
 var canopy_layer: Node2D
 var overlay
@@ -105,10 +109,14 @@ var _op_done := false
 
 # command-line test hooks: --autorun --seed=N --speed=X --shot=path --shot-at=T --setup-shot=path
 var _args := {}
+var front                         # the title screen, settings, manual and pause menu (1.0)
+var _paused_before_menu := false
 
 
 func _ready() -> void:
 	get_window().title = "The Violence"
+	Settings.load_all()
+	Settings.apply()
 	RenderingServer.set_default_clear_color(Color("#d4d4cf"))
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	for a in OS.get_cmdline_user_args():
@@ -129,6 +137,10 @@ func _ready() -> void:
 	# red ink draw order (v0.8): floor, blood, walls, furniture, lettering, actors, markers
 	decals = Decals.new()
 	add_child(decals)
+	sound = Sound.new()
+	add_child(sound)
+	sound.cam = cam
+	get_tree().node_added.connect(sound.hook_buttons)
 	floorplan.walls = PlanWalls.new()
 	floorplan.walls.plan = floorplan
 	add_child(floorplan.walls)
@@ -173,6 +185,8 @@ func _ready() -> void:
 		Ink.set_red_ink(false)
 	if _args.has("nogore"):
 		Ink.set_gore(false)
+	if not _args.has("speed"):
+		speed = float(Settings.get_v("speed"))
 	night = _args.has("night")
 	ui = UI.new()
 	add_child(ui)
@@ -210,6 +224,16 @@ func _ready() -> void:
 		start_city.call_deferred(int(_args.get("seed", "1001")), 60, 108)
 	if _args.has("ops"):
 		_ops_hooks.call_deferred()
+	front = Front.new()
+	add_child(front)
+	front.build(self)
+	# the title on launch (1.0), unless a command-line hook asked for something else
+	var hooks: Array = _args.keys().filter(func(k): return not k in ["mono", "nogore", "title", "setup-shot"])
+	if hooks.is_empty() or _args.has("title"):
+		go_title.call_deferred()
+	# screenshots of the front end: --front=manual|settings|credits|pause [--page=N]
+	if _args.has("front"):
+		_front_hook.call_deferred()
 
 
 # ------------------------------------------------------------------ configuration
@@ -715,6 +739,7 @@ func _clear_op_views() -> void:
 	decals.setup_empty()
 	overlay.setup(null)
 	overlay.fog = null
+	sound.fog = null
 	ledger.setup(null)
 	for c in veh_layer.get_children():
 		c.queue_free()
@@ -818,6 +843,7 @@ func ops_run() -> void:
 	_stamp_t = -9.0
 	overlay.setup(world)
 	overlay.fog = fog
+	sound.fog = fog
 	fog.setup(world, true)
 	ledger.setup(world, 8)
 	replay_view.clear()
@@ -908,6 +934,7 @@ func _op_finished() -> void:
 	fog.visible = false
 	decals.reveal(true)
 	_update_stamp(true)
+	sound.play_ui("stamp", -2.0)
 	_views_by_fog()
 	ui.show_banner("%s   ·   %d" % [String(res["label"]).to_upper(), int(res["score"])])
 	ops_ui.show_debrief(res, world, lines)
@@ -1099,6 +1126,7 @@ func set_overlay(nm: String, on: bool) -> void:
 
 # ------------------------------------------------------------------ loop
 func _process(delta: float) -> void:
+	sound.ambience("amb_city" if mode == "run" and not replay_on else "amb_office")
 	if replay_on and world != null:
 		if replay_play:
 			replay_t = minf(replay_t + delta * replay_speed, world.t)
@@ -1131,6 +1159,8 @@ func _process(delta: float) -> void:
 			_meas_sim = 0.0
 		for ev in world.events:
 			decals.handle(ev)
+			if view_t < 0.0:
+				sound.handle(ev)
 			if _ev_visible(ev):
 				overlay.handle(ev)
 			if ev["type"] == "blood" and views.has(ev["id"]):
@@ -1191,12 +1221,66 @@ func _update_stamp(filed := false) -> void:
 ## Presentation toggles (v0.8): the monochrome proof and gore. Neither touches the world.
 func set_red_ink(on: bool) -> void:
 	Ink.set_red_ink(on)
+	Settings.data["red_ink"] = on
+	Settings.save_all()
 	_ink_changed()
 
 
 func set_gore(on: bool) -> void:
 	Ink.set_gore(on)
+	Settings.data["gore"] = on
+	Settings.save_all()
 	_ink_changed()
+
+
+## The front end (1.0) -------------------------------------------------------------
+## Back to the title: whatever was on the plan is put away. Campaign progress is saved
+## after every operation and every week, so nothing is lost.
+func go_title() -> void:
+	if world != null and not (op_mode and not world.over):
+		world.dispose()
+		world = null
+	_clear_views()
+	_clear_op_views()
+	ops_ui.hide_all()
+	ui.root.visible = false
+	ui.banner.visible = false
+	setup_marks.visible = false
+	op_mode = false
+	mode = "title"
+	paused = false
+	floorplan.set_state("theory")
+	_fit_camera()
+	front.show_title()
+
+
+func _front_hook() -> void:
+	front.manual_page = int(_args.get("page", "0"))
+	match String(_args["front"]):
+		"manual":
+			front.show_manual("title")
+		"settings":
+			front.show_settings("title")
+		"credits":
+			front.show_credits("title")
+		"pause":
+			_open_pause()
+
+
+func front_closed() -> void:
+	paused = _paused_before_menu
+	if ui.pause_btn != null:
+		ui.pause_btn.set_pressed_no_signal(paused)
+
+
+func settings_changed() -> void:
+	_ink_changed()
+
+
+func _open_pause() -> void:
+	_paused_before_menu = paused
+	paused = true
+	front.show_pause()
 
 
 func _ink_changed() -> void:
@@ -1288,6 +1372,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		cam.position -= (event as InputEventMouseMotion).relative / cam.zoom.x
 	elif event is InputEventKey and event.pressed and not event.echo:
 		var k := (event as InputEventKey).keycode
+		# Esc (1.0): a step back on the front end; otherwise the pause menu
+		if k == KEY_ESCAPE:
+			if front.is_open():
+				front.escape()
+			elif mode == "run" and not op_mode:
+				back_to_setup()
+			elif mode != "title":
+				_open_pause()
+			return
+		if front.is_open():
+			return
 		if mode == "run":
 			if k == KEY_SPACE:
 				paused = not paused
@@ -1296,8 +1391,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				var i := k - KEY_1
 				speed = UI.SPEEDS[i]
 				ui.speed_buttons[i].set_pressed_no_signal(true)
-			elif k == KEY_ESCAPE and not op_mode:
-				back_to_setup()
 		if k == KEY_HOME:
 			_fit_camera()
 		elif k == KEY_F2:

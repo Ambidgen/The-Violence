@@ -266,10 +266,10 @@ func _build_setup() -> void:
 	map_opt.select(main.map_i)
 	map_opt.item_selected.connect(func(i): main.set_map(i))
 	hm.add_child(map_opt)
-	var opsb := _btn(s, "OPERATIONS   >   the week's board (planned operations, v0.7)", func(): main.ops_open())
+	var opsb := _btn(s, "<   MAIN MENU   ·   the test range is a sandbox: nothing here touches the campaign", func(): main.go_title())
 	opsb.custom_minimum_size = Vector2(0, 34)
 	opsb.add_theme_font_size_override("font_size", 14)
-	opsb.tooltip_text = "The campaign: forty weeks to the election. Each week, situations to brief, staff, order and run,\nwith the fog of war, rewind, abort and a debrief."
+	opsb.tooltip_text = "Back to the title: the campaign, the Endless Battle, settings and the manual."
 	_heading(s, "1  PLACE  ·  click the plan to place the selected operator; right-click sets facing; wheel zooms, middle-drag pans")
 	var group := ButtonGroup.new()
 	for k in 2:

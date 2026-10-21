@@ -191,23 +191,12 @@ static func _ints(s: Dictionary) -> void:
 
 
 func save(path := SAVE_PATH) -> bool:
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f == null:
-		return false
-	f.store_string(JSON.stringify(to_data(), "\t"))
-	f.close()
-	return true
+	return load("res://scripts/campaign/save_file.gd").write_json(path, to_data())
 
 
 static func load_from(path := SAVE_PATH):
-	if not FileAccess.file_exists(path):
-		return null
-	var f := FileAccess.open(path, FileAccess.READ)
-	if f == null:
-		return null
-	var d = JSON.parse_string(f.get_as_text())
-	f.close()
-	if typeof(d) != TYPE_DICTIONARY:
+	var d = load("res://scripts/campaign/save_file.gd").read_json(path)
+	if d == null:
 		return null
 	var c = load("res://scripts/campaign/campaign.gd").new()
 	if not c.from_data(d):

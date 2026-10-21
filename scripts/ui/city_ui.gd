@@ -82,7 +82,7 @@ func build(m) -> void:
 	feed_box.scroll_following = true
 	feed_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var hb := _h(v)
-	_btn(hb, "Back to setup", func(): main.back_to_setup())
+	_btn(hb, "<  Main menu", func(): main.back_to_setup())
 	_btn(hb, "Fit the city", func(): main.fit_camera())
 	_btn(hb, "Find selected", func(): main.focus_selected())
 

@@ -4,7 +4,7 @@ extends SceneTree
 ## time it shows which one moves the balance.
 ##   godot --headless --path . -s res://tests/balance_test.gd -- [--n=10] [--ech=regular] [--off=wolf,lion] [--each] [--gate]
 ##
-## --gate passes when equal regulars' attackers win 30-50% (the hold layer's 33% before
+## --gate (run it with --n=20: at the default 40 fights the share wobbles past 50%) passes when equal regulars' attackers win 30-50% (the hold layer's 33% before
 ## the brains, v0.7.9's 60% after).
 
 const Maps = preload("res://scripts/maps/registry.gd")
