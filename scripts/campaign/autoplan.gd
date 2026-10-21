@@ -54,9 +54,19 @@ static func share(board: Array, sid: String, free: int) -> int:
 		total += w
 		if s["id"] == sid:
 			mine = w
+	# v0.9.1: nobody suggests sending fewer than four officers through a door, or fewer
+	# than six into a crew house or a hostage taking; short of that, the suggestion is to
+	# send nobody and leave the call to the chief
+	var me: Dictionary = {}
+	for s2 in board:
+		if s2["id"] == sid:
+			me = s2
+	var floor_n: int = {"gang": 6, "hostage": 6, "warrant": 4, "barricade": 4}.get(me.get("type", ""), 2)
+	if free < floor_n:
+		return 0
 	if mine == 0 or total <= free:
 		return mini(mine if mine > 0 else 8, free)
-	return clampi(int(round(float(free) * mine / total)), mini(3, free), mine)
+	return clampi(int(round(float(free) * mine / total)), floor_n, mine)
 
 
 ## cap: the most officers to take (-1: as many as the situation wants).

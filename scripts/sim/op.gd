@@ -160,6 +160,7 @@ var kit := {}           # Equipment kit: primary, secondary, optic, armour, plat
 var gear := {}          # gear id -> uses left (flashbangs, ram, breaching rounds, shots)
 var kit_speed := 1.0    # pace lost to carried weight
 var helmet := false     # the special operations helmet is on and not yet spent
+var helmet_ballistic := false   # a handgun-rated police helmet (v0.9.1)
 var shield := false     # carries the ballistic shield
 var light := false      # weapon light
 var defiant := false    # will not give up when covered and challenged (a taser's job)
@@ -240,6 +241,7 @@ func reset() -> void:
 	stress = 0.0
 	gear = Equipment.gear_counts(kit)
 	helmet = kit["head"] == "sof_helmet"
+	helmet_ballistic = kit["head"] == "ballistic_helmet"
 	weapons = {
 		"rifle": {"mag": wdef("rifle")["mag"], "spare": wdef("rifle")["spare"], "jam": false, "lost": false},
 		"pistol": {"mag": wdef("pistol")["mag"], "spare": wdef("pistol")["spare"], "jam": false, "lost": false},

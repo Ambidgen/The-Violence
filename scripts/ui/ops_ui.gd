@@ -723,7 +723,8 @@ func _kit_editor(parent: Control, r: Dictionary) -> void:
 	var v := VBoxContainer.new()
 	parent.add_child(v)
 	var rows := [["Primary", "primary", [""] + Equipment.PRIMARY_ORDER], ["Sidearm", "secondary", [""] + Equipment.SECONDARY_ORDER],
-		["Sight", "optic", ["red_dot", "irons", "magnified"]], ["Armour", "armour", ["none", "vest", "plates"]]]
+		["Sight", "optic", ["red_dot", "irons", "magnified"]], ["Armour", "armour", ["none", "vest", "plates"]],
+		["Helmet", "head", ["none", "ballistic_helmet", "sof_helmet"]]]
 	for row in rows:
 		var h := _h(v)
 		_lab(h, row[0], GREY, 11)
@@ -742,6 +743,9 @@ func _kit_editor(parent: Control, r: Dictionary) -> void:
 					nm = Equipment.OPTICS[item]["name"]
 				"armour":
 					nm = Equipment.ARMOUR[item]["name"] + (" (2 plates)" if item == "plates" else "")
+				"head":
+					nm = Equipment.HEAD[item]["name"]
+					ok = Equipment.allowed(Equipment.HEAD[item]["who"], who)
 			ob.add_item(nm + ("" if ok else "  (tactical training)"))
 			ob.set_item_metadata(ob.item_count - 1, item)
 			ob.set_item_disabled(ob.item_count - 1, not ok)

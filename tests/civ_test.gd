@@ -102,6 +102,14 @@ func _init() -> void:
 			if verbose:
 				for ln in s["lines"]:
 					print("        ", ln["text"])
+			if "--excess" in OS.get_cmdline_user_args():
+				for sh in w.incident.shots:
+					if sh["pol"] and sh["verdict"] in ["excessive", "overkill"]:
+						var x = w.by_id.get(sh["by"], null)
+						var tg = w.by_id.get(sh["tgt"], null)
+						print("    %s %.1f s %s -> %s (%s): shooter %s/%s, target %s, down %.1f s ago, gave up %.1f s ago" % [sh["verdict"], sh["t"], sh["by"], sh["tgt"], sh["weapon"],
+							x.mind if x != null else "?", String(x.dbg).substr(0, 24) if x != null else "?", tg.state if tg != null else "?",
+							sh["t"] - float(tg.ticker.get("down_t", 9999.0)) if tg != null else -1.0, sh["t"] - float(tg.ticker.get("gave_up_t", 9999.0)) if tg != null else -1.0])
 			w.dispose()
 	print("civ test: %d operations per echelon, %d civilians each%s, %d ms" % [n, n_civ, " (night)" if night else "", Time.get_ticks_msec() - t0])
 	for ech in echs:

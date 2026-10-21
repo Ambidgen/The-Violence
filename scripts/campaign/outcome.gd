@@ -60,9 +60,13 @@ static func evaluate(sit: Dictionary, w) -> Dictionary:
 			elif escaped == 0 and resolved == suspects.size():
 				kind = "success"
 				goal = "every member arrested or down"
-			elif resolved + escaped == suspects.size() and escaped * 2 <= suspects.size():
+			elif (suspects.size() - resolved) * 2 <= suspects.size():
+				# most of the crew is in custody or down; whoever got away or stayed hidden
+				# keeps it from a success (v0.9.1: a member never found no longer fails it)
 				kind = "partial"
-				goal = "%d of %d got away" % [escaped, suspects.size()]
+				var hid: int = suspects.size() - resolved - escaped
+				goal = "%d of %d %s" % [suspects.size() - resolved, suspects.size(),
+					"got away" if hid == 0 else ("never found" if escaped == 0 else "got away or were never found")]
 			else:
 				goal = "%d arrested or down, %d got away, %d still inside" % [resolved, escaped, suspects.size() - resolved - escaped]
 		"hostage":

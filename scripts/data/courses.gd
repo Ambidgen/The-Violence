@@ -16,9 +16,9 @@ const RECRUIT := 3500           # academy place for a rookie (two weeks before t
 const RECRUIT_WEEKS := 2
 const LATERAL := 6500           # signing an experienced officer from another force
 const SEVERANCE_WEEKS := 2
-const DEATH_BENEFIT := 8000     # line-of-duty death: the funeral and the family liaison (the pension board pays the rest)
-const MEDICAL := 1200           # wounded (workers' compensation pays the rest)
-const MEDICAL_SERIOUS := 4000   # seriously wounded
+const DEATH_BENEFIT := 3000     # line-of-duty death: the funeral (the pension board pays the family; v0.9.1)
+const MEDICAL := 500            # wounded: what workers' compensation does not cover
+const MEDICAL_SERIOUS := 1500   # seriously wounded
 const SURPLUS := 0.5            # kit handed back is sold for half what it cost
 
 ## Department morale (0-100). It starts and drifts back towards MORALE0; below it every

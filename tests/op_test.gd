@@ -32,8 +32,19 @@ func _init() -> void:
 	for wk in weeks:
 		if c.over():
 			break
-		for s in c.board:
+		# --chief=sensible (v0.9.1): the gravest first, at most two operations a week, and
+		# quiet warrants left alone while the department is short
+		var order: Array = c.board.duplicate()
+		var sensible: bool = args.get("chief", "") == "sensible"
+		var runs_left := 99
+		if sensible:
+			runs_left = 2
+			var pri := {"hostage": 0, "event": 1, "gang": 2, "barricade": 3, "warrant": 4}
+			order.sort_custom(func(a, b): return pri[a["type"]] * 10 - int(a["visibility"]) < pri[b["type"]] * 10 - int(b["visibility"]))
+		for s in order:
 			if only != "" and s["type"] != only:
+				continue
+			if sensible and (runs_left <= 0 or (s["type"] == "warrant" and int(s["visibility"]) <= 1 and c.dept.available().size() < 12)):
 				continue
 			if args.has("no-events") and s["type"] == "event":
 				continue
@@ -59,6 +70,7 @@ func _init() -> void:
 				w.step()
 				w.events.clear()
 				guard += 1
+			runs_left -= 1
 			var res: Dictionary = Outcome.evaluate(s, w)
 			var lines: Array = c.dept.apply_result(w, lv.map_name)
 			lines.append_array(c.after_operation(s["id"], res, w))
@@ -89,7 +101,7 @@ func _init() -> void:
 			for cs in c.dept.open_cases():
 				c.decide_case(cs, pol)
 		if args.has("hire"):
-			while c.dept.available().size() + c.dept.officers.filter(func(r): return r["status"] == "academy").size() < 14 and c.dept.balance > 12000:
+			while c.dept.available().size() + c.dept.officers.filter(func(r): return r["status"] == "academy").size() < 16 and c.dept.balance > (3000 if sensible else 8000):
 				if c.dept.recruit(false).is_empty():
 					break
 		var p = c.politics
@@ -97,6 +109,14 @@ func _init() -> void:
 			c.dept.open_cases().size(), c.dept.available().size(), p.avg_trust(),
 			" ".join(p.ALLY_ORDER.map(func(a): return "%s%d%s" % [{"council": "CL", "union": "UN", "coalition": "CC", "da": "DA"}[a], p.standing(a), "x" if p.lost(a) else ""])),
 			p.share("kettering"), p.share("okonjo"), p.share("pell"), p.pending.size()])
+		if args.has("ledger"):
+			var cats := {}
+			for le in c.dept.ledger:
+				if int(le["week"]) != c.dept.week:
+					continue
+				var cat: String = String(le["item"]).split(":")[0].split(",")[0]
+				cats[cat] = cats.get(cat, 0) + int(le["amount"])
+			print("    ledger week %d: %s" % [c.dept.week, str(cats)])
 		var wk_now: int = c.dept.week
 		for ln in c.end_week():
 			if args.has("v") or String(ln).begins_with("LOST") or String(ln).begins_with("Election"):

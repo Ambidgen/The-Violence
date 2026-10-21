@@ -453,7 +453,9 @@ func to_cfg(r: Dictionary, slot: int, level, alert := 1) -> Dictionary:
 	ech["stress0"] = minf(0.3, float(r["trauma"]) * 0.015)
 	# low department morale: everyone brings more of it in (v0.8.5)
 	if morale < Courses.MORALE0:
-		ech["stress0"] = minf(0.4, float(ech["stress0"]) + float(Courses.MORALE0 - morale) / 500.0)
+		# v0.9.1: at most +0.05 (it was +0.12, which fed a death spiral: low morale, more
+		# stress habits under fire, more officers killed, lower morale)
+		ech["stress0"] = minf(0.4, float(ech["stress0"]) + float(Courses.MORALE0 - morale) / 1200.0)
 	var kit: Dictionary = Equipment.validate(r.get("kit", Equipment.default_kit()), Equipment.who_of_record(r))
 	return {"id": id, "team": 0, "slot": slot, "echelon": r["echelon"], "good": good, "bad": bad,
 		"plates": int(kit["plates"]), "exp": int(r["exp"]), "traits": traits, "pos": level.spawns[id]["p"], "face": level.spawns[id]["face"],
@@ -549,10 +551,12 @@ func apply_result(w, map_name: String) -> Array:
 			lines.append("%s was killed." % who)
 			note("%s killed in operation %d." % [who, ops_run])
 			spend("Line-of-duty death benefit: %s" % r["name"], Courses.DEATH_BENEFIT)
-			shift_morale(-5)
+			shift_morale(-3)
 		elif o.state == "down":
 			r["status"] = "injured"
-			r["out_until"] = week + 8 + rng.randi_range(0, 6)
+			# v0.9.1: four to eight weeks (it was eight to fourteen, which kept most of the
+			# department out at once); "down" is every incapacitating hit, limbs included
+			r["out_until"] = week + 4 + rng.randi_range(0, 4)
 			r["wounded"] += 1
 			r["file"].append({"week": week, "text": "Seriously wounded; out until week %d." % r["out_until"]})
 			spend("Medical: %s" % r["name"], Courses.MEDICAL_SERIOUS)
@@ -560,7 +564,7 @@ func apply_result(w, map_name: String) -> Array:
 			lines.append("%s is seriously wounded: out until week %d." % [who, r["out_until"]])
 		elif hurt:
 			r["status"] = "injured"
-			r["out_until"] = week + 2 + rng.randi_range(0, 3)
+			r["out_until"] = week + 1 + rng.randi_range(0, 2)
 			r["wounded"] += 1
 			r["file"].append({"week": week, "text": "Wounded; out until week %d." % r["out_until"]})
 			spend("Medical: %s" % r["name"], Courses.MEDICAL)

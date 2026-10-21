@@ -2392,7 +2392,14 @@ func _aim_update(o) -> void:
 			return
 		if t < o.ticker.get("lift_until", -1.0):
 			return
-	if o.has("WD10") and friend_in_line(o, e.pos):
+	# the instinct everyone has (v0.9.1): nobody fires through the back of a friend squarely
+	# in front of them; police are taught what lies beyond too. WD10 widens the lane and
+	# steps aside; a defender firing through the counter (BH26) does neither.
+	if not o.has("WD10") and not o.hb("BH26") and friend_in_line(o, e.pos, 0.3, 4.0 if o.judges else 0.0):
+		o.aim["held_t"] = t
+		return
+	if o.has("WD10") and friend_in_line(o, e.pos, 0.5, 4.0 if o.judges else 0.0):
+		o.aim["held_t"] = t
 		o.aim["hold"] += DT
 		if o.aim["hold"] > 0.3 and o.sidestep.is_empty() and o.action.is_empty():
 			var side := Vector2.from_angle(bearing + PI / 2.0)
@@ -2402,6 +2409,12 @@ func _aim_update(o) -> void:
 			o.aim["hold"] = 0.0
 		return
 	o.aim["hold"] = 0.0
+	# a shot held for a friend in the lane is judged again when the lane clears: the man
+	# may have gone down or given up meanwhile (unless overkill is this shooter's habit)
+	if o.aim.has("held_t") and t - float(o.aim["held_t"]) < 0.5 and not o.hb("BH03"):
+		if e.complying or (not e.alive() and t - float(e.ticker.get("down_t", t)) > 0.3):
+			o.aim["fire"] = false
+			return
 	fire_at(o, e, o.aim["zone"], o.aim["settle"])
 	# the round can set off a chain (a stray shot in reply) that ends this shooter's aim
 	if o.aim.is_empty():
@@ -2418,16 +2431,18 @@ func _aim_update(o) -> void:
 			o.aim["pair"] = 0
 
 
-func friend_in_line(o, target: Vector2) -> bool:
+## A teammate in the lane to the target: within `lateral` of the line, in front of the
+## muzzle and short of the target (or up to `beyond` metres past it).
+func friend_in_line(o, target: Vector2, lateral := 0.5, beyond := 0.0) -> bool:
 	var u: Vector2 = (target - o.pos)
 	var L := u.length()
 	if L < 0.01:
 		return false
 	u /= L
-	for m in mates_near(o, L + 0.5):
+	for m in mates_near(o, L + 0.5 + beyond):
 		var rel: Vector2 = m.pos - o.pos
 		var s := rel.dot(u)
-		if s > 0.2 and s < L and absf(rel.cross(u)) < 0.5:
+		if s > 0.2 and s < L + beyond and absf(rel.cross(u)) < lateral:
 			return true
 	return false
 
@@ -2729,6 +2744,11 @@ func _hit(a, zn: Array, lat: float, u: Vector2, shooter, energy := 1.0, walls :=
 			if a.helmet:
 				_helmet_stop(a, shooter, u)
 				return
+			# a handgun-rated helmet (v0.9.1): handgun rounds and buckshot, not rifles;
+			# from the front the face is open
+			if a.helmet_ballistic and VEST_STOPS.has(sw["pen"]) and rng.randf() < (0.6 if front else 0.92):
+				_helmet_deflect(a, shooter, u)
+				return
 			power = 1.6
 			_down(a, shooter, true, "head")
 		"chest":
@@ -2764,6 +2784,18 @@ func _hit(a, zn: Array, lat: float, u: Vector2, shooter, energy := 1.0, walls :=
 	if not a.aim.is_empty():
 		a.aim["settle"] = 0.0
 	emit({"type": "blood", "p": a.pos, "dir": u, "power": power, "zone": zone, "id": a.id, "side": side})
+
+
+## A handgun round stopped by a police helmet (v0.9.1): a quarter-second's flinch, aim
+## unsettled, a little stress. The helmet is not spent.
+func _helmet_deflect(a, shooter, u: Vector2) -> void:
+	a.ticker["flinch_until"] = maxf(a.ticker.get("flinch_until", -1.0), t + rng.randf_range(0.2, 0.35))
+	if not a.aim.is_empty():
+		a.aim["settle"] = 0.0
+	add_stress(a, 0.08, "helmet hit")
+	stat["helmet"] = stat.get("helmet", 0) + 1
+	emit({"type": "plate", "p": a.pos, "id": a.id, "dir": u})
+	say("%s: helmet stops %s's round to the head" % [a.id, shooter.id], "hit")
 
 
 ## The special operations helmet takes a round (v0.7.5): spent, and the wearer is

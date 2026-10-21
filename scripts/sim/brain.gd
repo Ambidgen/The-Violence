@@ -1706,6 +1706,10 @@ func _think(o) -> void:
 	# BH09: shoots at half-recognized movement, and sometimes at friends
 	if o.hb("BH09") and _jumpy(o):
 		return
+	# LIZARD first when the shot is blocked (v0.9.1): holding fire for a friend in the lane
+	# while someone unseen shoots at you is no reason to stand there
+	if features["lizard"] and float(o.aim.get("held_t", -9.0)) > w.t - 0.2 and _lizard_cover(o):
+		return
 	# P1: Rule 1
 	var close = _close_threat(o)
 	if close != null:
@@ -2796,6 +2800,13 @@ func _task_hold(o) -> void:
 	if not w.at(o, o.spawn, 0.6):
 		# HD14 peel back: one half moves while the other covers
 		var el := _el(o)
+		# in contact, a defender knocked off the post does not walk back across the lanes
+		# in the open (v0.9.1): cover where he is, facing the threat, until it goes quiet
+		if w.t - float(el.get("contact_t", -99.0)) < LION_WINDOW:
+			var lk = _team_lkp(w.teams[o.team], 40.0, o.pos)
+			if lk != null and el.get("peel_until", -1.0) <= w.t:
+				_cover_facing(o, lk, "holding where he is")
+				return
 		if el.get("peel_until", -1.0) > w.t and o.has("HD14") and o.eslot % 2 != int(el.get("peel_half", 0)):
 			w.stop(o)
 			o.dbg = "covering the peel"

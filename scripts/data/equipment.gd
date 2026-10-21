@@ -95,6 +95,9 @@ const ARMOUR := {
 
 const HEAD := {
 	"none": {"name": "No helmet", "kg": 0.0, "cost": 0, "who": "any"},
+	# v0.9.1: what a police tactical team actually wears
+	"ballistic_helmet": {"name": "Ballistic helmet (handgun-rated)", "kg": 1.3, "cost": 650, "who": "any",
+		"desc": "Stops handgun rounds and buckshot to the head (rifle rounds go through); from the front the face is open, so about four in ten frontal hits still get through. A stopped round makes the wearer flinch for a quarter of a second. It is not spent."},
 	"sof_helmet": {"name": "Special operations helmet", "kg": 1.4, "cost": 4000, "who": "sof",
 		"desc": "Stops the first head hit and is spent. The wearer is stunned: down on one knee, 2.5-4 s without aim or recognition, hearing gone for 15 s, stress +0.4. A second head hit kills as any would."},
 }
@@ -183,14 +186,14 @@ const SQUAD_KITS := {
 	"patrol": {"name": "Patrol", "point": DEPT_DEFAULT, "rest": DEPT_DEFAULT},
 	"entry": {"name": "Entry",
 		"point": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
-			"head": "none", "gear": {"ram": 1, "medkit": 1, "light": 1}},
+			"head": "ballistic_helmet", "gear": {"ram": 1, "medkit": 1, "light": 1}},
 		"rest": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
-			"head": "none", "gear": {"flashbang": 1, "medkit": 1, "light": 1}}},
+			"head": "ballistic_helmet", "gear": {"flashbang": 1, "medkit": 1, "light": 1}}},
 	"shield": {"name": "Shield",
 		"point": {"primary": "", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
-			"head": "none", "gear": {"shield": 1, "light": 1}},
+			"head": "ballistic_helmet", "gear": {"shield": 1, "light": 1}},
 		"rest": {"primary": "sbr", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
-			"head": "none", "gear": {"flashbang": 1, "medkit": 1, "light": 1}}},
+			"head": "ballistic_helmet", "gear": {"flashbang": 1, "medkit": 1, "light": 1}}},
 	"less": {"name": "Less-lethal",
 		"point": {"primary": "shotgun", "secondary": "service_pistol", "optic": "red_dot", "armour": "vest", "plates": 0,
 			"head": "none", "gear": {"beanbag": 1, "launcher": 1, "oc_spray": 1, "baton": 1, "medkit": 1}},
@@ -198,9 +201,9 @@ const SQUAD_KITS := {
 			"head": "none", "gear": {"taser": 1, "pepperball": 1, "oc_spray": 1, "baton": 1, "medkit": 1, "light": 1}}},
 	"gas": {"name": "Gas",
 		"point": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
-			"head": "none", "gear": {"gas": 2, "gas_mask": 1, "ram": 1, "medkit": 1}},
+			"head": "ballistic_helmet", "gear": {"gas": 2, "gas_mask": 1, "ram": 1, "medkit": 1}},
 		"rest": {"primary": "carbine", "secondary": "service_pistol", "optic": "red_dot", "armour": "plates", "plates": 2,
-			"head": "none", "gear": {"gas_mask": 1, "stingball": 1, "taser": 1, "oc_spray": 1, "medkit": 1, "light": 1}}},
+			"head": "ballistic_helmet", "gear": {"gas_mask": 1, "stingball": 1, "taser": 1, "oc_spray": 1, "medkit": 1, "light": 1}}},
 }
 
 
@@ -353,6 +356,8 @@ static func describe(kit: Dictionary) -> String:
 			parts.append("plates (%d)" % k["plates"])
 	if k["head"] == "sof_helmet":
 		parts.append("SOF helmet")
+	elif k["head"] == "ballistic_helmet":
+		parts.append("helmet")
 	var g: Array = []
 	for gid in GEAR_ORDER:
 		if k["gear"].has(gid):

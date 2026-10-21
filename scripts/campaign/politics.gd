@@ -237,8 +237,8 @@ func on_operation(week: int, sit: Dictionary, res: Dictionary, w, dept) -> Array
 				_ally("council", 1, dept, lines)
 		"failure":
 			record["failures"] += 1
-			_poll("kettering", 0.6 + 0.5 * vis)
-			_poll("pell", -0.3 * vis)
+			_poll("kettering", 0.4 + 0.3 * vis)
+			_poll("pell", -0.2 * vis)
 			_trust(wi, -1 - vis / 2)
 			if vis >= 3:
 				_headline(week, "POLICE OPERATION IN %s ENDS IN FAILURE" % where.to_upper(), "The %s at %s did not go to plan. Kettering: 'Our officers deserve leadership.'" % [what, sit.get("address", "")], "op")
@@ -246,7 +246,7 @@ func on_operation(week: int, sit: Dictionary, res: Dictionary, w, dept) -> Array
 	if off_killed > 0:
 		_ally("union", -4 * off_killed, dept, lines)
 		_ally("council", -2 * off_killed, dept, lines)
-		_poll("kettering", 1.5 * off_killed)
+		_poll("kettering", 1.0 * off_killed)
 		_headline(week, "%s OFFICER%s KILLED IN %s" % [_num(off_killed), "" if off_killed == 1 else "S", where.to_upper()],
 			"The department lowers its flags. Rourke (union): 'Somebody sent them in there.'", "op")
 	if sus_killed > 0 and vis >= 2:
@@ -350,9 +350,11 @@ func week_end(week: int, board: Array, dept) -> Array:
 			continue
 		record["unattended"] += 1
 		var wi: int = int(s["ward_i"])
-		_trust(wi, -2)
-		_poll("kettering", 0.5 + 0.2 * int(s["visibility"]))
-		if s["type"] in ["gang", "hostage"] or int(s["visibility"]) >= 3:
+		# v0.9.1: a quiet warrant left for next week barely registers; a crew house or a
+		# hostage taking left alone, or anything people were watching, does
+		_trust(wi, -2 if int(s["visibility"]) >= 3 else -1)
+		_poll("kettering", 0.15 * int(s["visibility"]) + (0.3 if s["type"] in ["gang", "hostage"] else 0.0))
+		if (s["type"] in ["gang", "hostage"] and int(s["visibility"]) >= 2) or int(s["visibility"]) >= 4:
 			pending.append({"due": week + rng.randi_range(1, 3), "kind": "neglect", "ward": s["ward"], "ward_i": wi,
 				"type": s["type"], "address": s.get("address", ""), "vis": int(s["visibility"])})
 	# the budget committee watches the account
@@ -380,9 +382,13 @@ func week_end(week: int, board: Array, dept) -> Array:
 		elif standing("council") < 45:
 			dept.allocation = int(round(dept.allocation * 0.97 / 100.0)) * 100
 			lines.append("Quarterly review: the budget committee trims the allocation to $%s a week." % dept.money(dept.allocation))
-	# the polls drift a little on their own; the trailing campaigns try harder
+	# a balanced book is Pell's whole platform
+	if dept.balance >= 0:
+		_poll("pell", 0.3)
+	# the polls drift a little on their own, and a little back towards where the city
+	# started (v0.9.1: no lead runs away on momentum alone); the trailing campaigns try harder
 	for c in CAND_ORDER:
-		_poll(c, rng.randfn(0.0, 0.7) + (0.25 if c != leader() else -0.15))
+		_poll(c, rng.randfn(0.0, 0.7) + (0.25 if c != leader() else -0.15) + 0.04 * (float(CANDIDATES[c]["start"]) - float(polls[c])))
 	_front_page(week)
 	if week >= ELECTION_WEEK and not ended:
 		lines.append_array(hold_election(dept))
@@ -438,7 +444,7 @@ func _land(week: int, p: Dictionary, dept) -> Array:
 		"neglect":
 			_trust(int(p["ward_i"]), -3)
 			_ally("coalition", -2, dept, lines)
-			_poll("kettering", 1.0)
+			_poll("kettering", 0.6)
 			var head2: String = {"gang": "SHOTS FIRED NEAR %s; RESIDENTS SAY POLICE NEVER CAME", "hostage": "FAMILY HELD FOR HOURS AT %s; 'WHERE WERE THE POLICE?'"}.get(
 				p["type"], "%s: POLICE A NO-SHOW") % String(p["address"]).to_upper()
 			_headline(week, head2, "Kettering: 'Under my administration, the police will come when you call.' He did not say how.", "story")

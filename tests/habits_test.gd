@@ -26,7 +26,6 @@ const PURE_SUSPENSION := {
 	"BH08": "comms blackout: no callouts (GD04), status (GD08) or re-sectoring (GD09) is the whole habit",
 	"BH17": "skip the checks: the suspension of WD01/WD02/WD04 is the whole habit",
 	"BH21": "first sight, first shot: without HD08-HD10 the ambush opens on the first silhouette",
-	"BH26": "fire through the counter: without HD11/GD03/WD10 nothing holds fire for a mate in the lane",
 }
 
 var _sites := {}     # id -> ["file:line"]

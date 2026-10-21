@@ -212,7 +212,8 @@ func path_length(pts: PackedVector2Array) -> float:
 	return s
 
 
-func find_path(prof: int, a: Vector2, b: Vector2) -> PackedVector2Array:
+## avoid (v0.9.1): the building pathfinder's avoided rooms; the city has none, so it is ignored.
+func find_path(prof: int, a: Vector2, b: Vector2, _avoid := "") -> PackedVector2Array:
 	path_calls += 1
 	var t0 := Time.get_ticks_usec()
 	var res := _find_path(prof, a, b)

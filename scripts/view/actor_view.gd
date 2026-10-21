@@ -46,7 +46,7 @@ func setup(o, w) -> void:
 		armour = Sprite2D.new()
 		armour.texture = Decals.tex("kit/plates" if kit["armour"] == "plates" else "kit/vest")
 		body.add_child(armour)
-	if kit.get("head", "none") == "sof_helmet":
+	if kit.get("head", "none") in ["sof_helmet", "ballistic_helmet"]:
 		helmet = Sprite2D.new()
 		helmet.texture = Decals.tex("kit/helmet")
 		body.add_child(helmet)
@@ -138,7 +138,7 @@ func sync(force := false) -> void:
 		down_body.texture = Decals.tex("op/%s_down" % lk)
 	body.rotation = op.body_dir
 	if helmet != null:
-		helmet.modulate.a = 1.0 if op.helmet else 0.45
+		helmet.modulate.a = 1.0 if (op.helmet or op.helmet_ballistic) else 0.45
 	if shield != null:
 		shield.rotation = op.body_dir
 		shield.position = Vector2.from_angle(op.body_dir) * 13.0

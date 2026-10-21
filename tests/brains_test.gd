@@ -90,7 +90,14 @@ func g_formation(_n: int) -> void:
 
 ## Shot at by someone it cannot see: the share of the 2.5 s after that an operator is
 ## still in that shooter's line of fire. 5v5 regulars, assault against hold, map 04.
+## Time fighting a visible enemy (Rule 1) or frozen by BH07 is left out: both override
+## the reflex by design.
+var why_h := {}
+
+
 func g_lizard(n: int) -> void:
+	# a 15% effect in a noisy measure: at least twenty seeds (v0.9.1)
+	n = maxi(n, 20)
 	var res := {}
 	for on in [true, false]:
 		var acc := {"exp": 0.0, "all": 0.0}
@@ -103,13 +110,25 @@ func g_lizard(n: int) -> void:
 					var ft: float = float(o.ticker.get("fire_t", -99.0))
 					if ww.t - ft > 2.5 or not o.ticker.has("fire_from") or not ww.visible_enemies(o).is_empty():
 						continue
+					# a bad habit holding them frozen (BH07 flinch and turtle) overrides the
+					# reflex by design, as Rule 1 does (v0.9.1): not the Lizard's time
+					if o.hb("BH07") and float(o.ticker.get("flinch_until", -1.0)) > ww.t:
+						continue
 					acc["all"] += 1.0 / 30.0
 					var ff: Vector2 = o.ticker["fire_from"]
 					if ww.geom.sight_clear(ff, 1.65, o.pos, 1.2 if o.stance == 0 else 0.82):
-						acc["exp"] += 1.0 / 30.0)
+						acc["exp"] += 1.0 / 30.0
+						if on and args.has("why"):
+							var key: String = "%s/%s" % [o.mind, String(o.dbg).split(" >")[0].substr(0, 26)]
+							why_h[key] = why_h.get(key, 0) + 1)
 			w.dispose()
 		res[on] = acc["exp"] / maxf(0.01, acc["all"])
 	_row("lizard", "share of time under unseen fire still in its line (less)", res[true], res[false], res[true] < res[false] * 0.85)
+	if args.has("why"):
+		var ks: Array = why_h.keys()
+		ks.sort_custom(func(a, b): return why_h[a] > why_h[b])
+		for k in ks.slice(0, 14):
+			print("    %5d  %s" % [why_h[k], k])
 
 
 ## The leader's order (cover, fall back) and when each subordinate acts on it: the mean

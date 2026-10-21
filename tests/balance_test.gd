@@ -14,6 +14,7 @@ const Teams = preload("res://tests/teams.gd")
 
 const MAPS := [0, 4, 5, 6]
 var _navs := {}
+var only_enabled := false
 
 
 func _nav(mi: int, lv):
@@ -30,6 +31,8 @@ func run(n: int, ech: String, off: Array) -> Dictionary:
 		var lv = Maps.get_level(mi)
 		for sd in n:
 			var cfgs: Array = Teams.team(lv, 0, {"n": 5, "ech": ech}) + Teams.team(lv, 1, {"n": 5, "ech": ech})
+			if only_enabled:
+				cfgs = cfgs.filter(func(c): return c["enabled"])
 			var w = World.new()
 			w.keep_events = false
 			w.setup(lv, _nav(mi, lv), cfgs, ["assault", "hold"], 9100 + sd * 13 + mi, [1, 1], {})
@@ -61,6 +64,7 @@ func _init() -> void:
 	var ech: String = args.get("ech", "regular")
 	var off: Array = String(args.get("off", "")).split(",", false)
 	var n_all := n * MAPS.size()
+	only_enabled = args.has("enabled")
 	var base := run(n, ech, off)
 	_line("%s%s" % [ech, (" -" + ",".join(off)) if not off.is_empty() else ""], base, n_all)
 	if args.has("each"):

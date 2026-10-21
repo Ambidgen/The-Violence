@@ -1,4 +1,4 @@
-# The Violence - vertical slice (v0.9.0)
+# The Violence - vertical slice (v0.9.1)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
@@ -86,6 +86,47 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - The small pip beside each figure is their alert state, told apart by shape: a hollow ring (GREEN), a grey disc (YELLOW) or a red disc in a heavy ring (RED).
 - F2 switches red ink off (the monochrome proof) and F3 switches gore off. The buttons sit at the bottom right of the plan. Neither changes the fight.
 
+## New in v0.9.1: debugging and balancing
+
+A full pass over every suite, every screen and two new diagnostics. These were run on 20 suggested-plan operations per type, from fresh and all-rookie departments, and on 40-week campaigns:
+- `tests/lethality_test.gd` takes apart every officer hit: who fired, at what range, whether the officer had recognised the shooter, what they were doing, and whether they bled out.
+- `tests/duel_probe.gd` does the same for both sides of an assault on a held house.
+
+**Friendly fire was killing officers (fixed).** Half of all officers hit in gang raids were hit by other officers: 21 of 43, and 30 of the 32 police rounds that hit police were aimed at a suspect with another officer in the way. The only rule that made anyone hold fire for a teammate in the lane was the WD10 habit, which no department officer under nine years had. So a rookie fired straight through the back of the colleague in front of him.
+- Everyone now has the instinct not to fire with a friend squarely in the line (within 0.3 m of it, between the muzzle and the target).
+- Police also hold fire with a colleague up to 4 m beyond the target: know your target and what is beyond it.
+- WD10 keeps its wider lane and the step aside. A defender firing through the counter (BH26) still ignores it all.
+- Officers killed per gang raid fell from 1.25 to 0.30, and police rounds hitting police from 32 to 2 in 20 raids.
+
+**Defenders walked back to their posts mid-fight (fixed).** A defender knocked off his post walked straight back to it, in the open, while the fight went on. That was 22 of 163 defender deaths. Now, while his squad is in contact, he takes cover where he is, facing the threat, and goes back once it is quiet.
+
+**What the friendly-fire fix changed elsewhere.**
+- **A shot held for a friend is judged again** when the lane clears, in case the man went down or gave up meanwhile. Officers with the Overkill habit (BH03) still fire.
+- **A fighter whose shot is blocked** by a friend in the lane, while someone unseen is shooting at him, now takes cover first (the Lizard) instead of standing there in Rule 1.
+- **Longer fights mean more stress,** so stress habits show up more. Patrol officers' excessive-force findings rose from 7 to 39 in the civilian test's 40 operations; nearly all were overkill by BH03 under fire. Police tactical stayed at 0. Without friendly fire to end fights early, rookies stay under fire longer and some crack. That is what the habit models, so it is not tuned away. It feeds internal affairs and the press.
+- **The Lizard's measured effect shrank.** Its cover reflex now cuts the time spent in an unseen shooter's line by about 15%, down from about 19%: more fighters are frozen by BH07 (flinch and turtle). The check leaves out BH07-frozen time, as it already left out Rule 1 time, and runs 20 seeds.
+
+**The attack-defence balance.** With friendly fire gone, attacking stacks stopped shooting each other. Equal regulars' attackers went from 43% to 63%, then back to 48% with the defenders' fix (80 fights, inside the 30-50% gate). Equal police tactical attackers win 60%, an edge their kit gives them.
+
+**Gang raids judged fairly.** One member hidden and never found no longer turns a raid with everyone else in custody into a failure. A raid is a partial success whenever no more than half the crew is unaccounted for.
+
+**The campaign no longer collapses.** Before this pass, a 40-week campaign played with the suggested plans lost 23-30 officers, and by week 10 there was nobody left to send. Two campaigns with a sensible scripted chief now lose 14 and 17 (0.19 and 0.29 per operation), keep 8-13 officers fit, and end in close races (Kettering 40-44, Okonjo-Vale 32-34, Pell 22-28). The causes, in order of weight:
+- **Morale fed a death spiral.** Low morale added up to 0.12 to every officer's starting stress, which pushed them into their stress habits sooner under fire. Gang raids killed 0.47 officers each at morale 10, against 0.17 at morale 60. The effect is now at most +0.05 (0.28 per raid at morale 10), and a death costs 3 morale instead of 5.
+- **Wounds kept the department out.** A serious wound kept an officer out 8-14 weeks. At 0.6-0.9 officers down per operation, that held about 15 officers out at once. "Down" covers every incapacitating hit, limbs included, so it is now 4-8 weeks, and a lesser wound 1-3.
+- **Staffing floor.** The suggested plan sends nobody rather than fewer than four officers through a door, or fewer than six into a crew house or a hostage taking. Four officers in a gang house lost 0.40 each raid, ten lost 0.27. The briefing says so, and you can still assign officers yourself.
+- **A handgun-rated police helmet** ($650, open to anyone) is now in the entry, gas and shield kits and in the kit editor's new Helmet row. Until now the only helmet was the special-operations one. It stops handgun rounds and buckshot to the head, not rifle rounds: 82% of handgun rounds to the head are survived, about 60% from the front (the face is open) and 92% otherwise. A stopped round costs a quarter-second flinch. In gang raids it comes out about even (0.32 officers killed per raid with it, 0.31 without, over 80 raids), because officers mostly fall to hits it cannot stop. Its first version, with a one-second stagger and a large jolt of stress, made things worse and was cut back.
+- **Who pays for casualties.** The pension board and workers' compensation carry most of a line-of-duty death or injury. The department pays $3,000 for the funeral and $500 or $1,500 in medical bills, instead of $8,000 and $1,200-4,000. Losses still cost you officers, morale, the union and the polls.
+- **The politics.** About 50 situations a campaign go unattended whatever you do, and each one fed Kettering, so he won every run.
+  - A quiet warrant left undone now barely registers. A crew house or a hostage taking left alone, or anything people were watching, still costs trust and feeds him.
+  - Officers killed and failed operations feed him a little less.
+  - Pell gains a little every week the books balance.
+  - The polls drift slightly back towards where the city started, so no lead runs away on momentum alone.
+  - The hands-off test campaign is now close through week 20 (Kettering 37, Pell 35). It goes to Kettering, 46 to 29, only after the union and the council are lost.
+
+**Other bugs fixed.**
+- **City mode:** a holding unit going back to its post called the city's pathfinder with an argument it did not take, and failed. That was 64,000 errors a minute in the Endless Battle, and those units never moved. It had been there since v0.7.
+- **Equipment checks:** three of them (heavy pistol, battle rifle, iron sights) had been failing since before v0.7.9. Their margins were above what the design gives (a heavier round raises the outright kill on an unplated chest hit from 20% to 24%). They are now pooled over twelve times the seeds against margins the design reaches.
+
 ## New in v0.9.0: the city, the press and the election
 
 The campaign now ends. At the end of week 40 Port Carrick elects a mayor, and whoever wins decides what happens to you. Until then the city remembers what the department does, and some of it comes back weeks later. All of it is in `City Hall` on the operations board, and in the Carrick Ledger's front page above the week's situations.
@@ -132,7 +173,7 @@ The election night screen shows the vote, your ending and the record behind it. 
 - The election ends the campaign.
 - The city replays and saves exactly, and a v0.8 save loads.
 
-`tests/op_test.gd` now plays the chief too (`--decide`, `--hire`) and prints the city each week and the ending at week 40.
+`tests/op_test.gd` now plays the chief too (`--decide`, `--hire`, and from v0.9.1 `--chief=sensible`: the gravest situations first, at most two operations a week, quiet warrants left while short-handed) and prints the city each week and the ending at week 40.
 
 ## New in v0.8.5: running the department
 
@@ -140,7 +181,7 @@ The department now costs money, learns and answers for itself. Everything is on 
 
 **The budget.** The city sets a weekly allocation at the handover: the inherited payroll plus 16% ($30,500 against $26,264 for the default department), with $25,000 in the account.
 - At the end of each week the allocation comes in and the payroll goes out. Pay is by rank ($1,150 a week for an officer, $1,750 for a lieutenant) plus 1.5% a year of service.
-- As they happen: overtime ($160 per officer per operation, $60 more at night), restocking spent gear at cost, new kit, hiring, training, medical bills ($1,200, or $4,000 for a serious wound), a line-of-duty death ($8,000) and severance (two weeks' pay).
+- As they happen: overtime ($160 per officer per operation, $60 more at night), restocking spent gear at cost, new kit, hiring, training, medical bills ($500, or $1,500 for a serious wound; v0.9.1), a line-of-duty death ($3,000; v0.9.1) and severance (two weeks' pay).
 - Kit goes through the budget: new kit is bought at cost, and kit handed back sells for half.
 - In the red, hiring, training and new kit are frozen until the account is back above zero. Each week in deficit costs morale and is counted (the council's view of it arrives in v0.9).
 
@@ -774,7 +815,9 @@ godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10  # the
 godot --headless --path . -s res://tests/civ_test.gd -- --n=40             # v0.6 gate: operations with civilians, Patrol vs police tactical
 godot --headless --path . -s res://tests/dept_test.gd                      # v0.5 gate: save, load, carry-over, replay; v0.8.5 budget, courses, cases
 godot --headless --path . -s res://tests/politics_test.gd                  # v0.9 gate: stories, allies, the DA, the election, saves
-godot --headless --path . -s res://tests/balance_test.gd -- --gate         # v0.8.5: equal regulars' assault on a held house, 30-50% attacker wins
+godot --headless --path . -s res://tests/balance_test.gd -- --gate
+godot --headless --path . -s res://tests/lethality_test.gd -- --type=gang  # v0.9.1 diagnostic: how officers fall in planned operations
+godot --headless --path . -s res://tests/duel_probe.gd                     # v0.9.1 diagnostic: how each side falls in an assault         # v0.8.5: equal regulars' assault on a held house, 30-50% attacker wins
 godot --headless --path . -s res://tests/orders_test.gd -- --n=8           # v0.7 gate: every order, with and without it
 godot --headless --path . -s res://tests/equip_test.gd -- --n=16           # v0.7.5 gate: every item, with and without it
 godot --headless --path . -s res://tests/op_test.gd                        # a campaign played by "Suggest a plan", week by week

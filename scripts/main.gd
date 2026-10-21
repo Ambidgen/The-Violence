@@ -752,6 +752,8 @@ func ops_select(sid: String) -> void:
 		var av: Array = campaign.available_for(sid)
 		cur_sit["plan"] = Autoplan.suggest(cur_sit, av, level, dept.bodycams, Autoplan.share(campaign.board, sid, av.size()))
 		dept.settle_kits()
+		if campaign.plan_members(cur_sit).is_empty():
+			ops_ui.flash = "Too few officers are free for this (four through a door, six into a crew house or a hostage taking): the suggestion is to send nobody. You can still assign officers yourself on the Force tab."
 	plan = cur_sit["plan"]
 	mode = "plan"
 	_clear_views()

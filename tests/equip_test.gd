@@ -46,7 +46,7 @@ func _init() -> void:
 		var wv: Array = []
 		var wo: Array = []
 		# the range is cheap and its effects small: four times the seeds
-		for k in (n * 4 if spec.get("range", false) else n):
+		for k in (n * int(spec.get("seeds", 4)) if spec.get("range", false) else n):
 			var a = call("t_" + tn, true, 700 + k)
 			var b = call("t_" + tn, false, 700 + k)
 			if a != null:
@@ -67,14 +67,17 @@ func _init() -> void:
 ## measure, direction (+1: higher with the item), smallest difference that counts
 const GATES := {
 	"compact_pistol": {"measure": "s to the first shot from the holster (less)", "dir": -1, "margin": 0.08, "range": true},
-	"heavy_pistol": {"measure": "targets killed outright per hit, 6 m (more)", "dir": 1, "margin": 0.03, "range": true},
+	# v0.9.1: lethality only moves the outright kill on an unplated chest hit (20% to 24% for
+	# the heavy pistol, 23% for the battle rifle), about 0.02-0.03 across all hits: pooled
+	# over twelve times the seeds, against a margin the design can actually reach
+	"heavy_pistol": {"measure": "targets killed outright per hit, 6 m (more)", "dir": 1, "margin": 0.02, "range": true, "pooled": true, "seeds": 12},
 	"smg": {"measure": "police rounds that met a wall and went through (less)", "dir": -1, "margin": 0.05, "pooled": true},
 	"sbr": {"measure": "s on target per acquisition, 6 m (less)", "dir": -1, "margin": 0.01, "range": true},
 	"assault_rifle": {"measure": "targets killed outright per hit, 15 m (more)", "dir": 1, "margin": 0.02, "range": true},
-	"battle_rifle": {"measure": "targets killed outright per hit, 15 m (more)", "dir": 1, "margin": 0.04, "range": true},
+	"battle_rifle": {"measure": "targets killed outright per hit, 15 m (more)", "dir": 1, "margin": 0.015, "range": true, "pooled": true, "seeds": 12},
 	"shotgun": {"measure": "hits per round, 12 m (more)", "dir": 1, "margin": 0.08, "range": true},
 	"marksman": {"measure": "hits per round, 38 m (more)", "dir": 1, "margin": 0.08, "range": true},
-	"irons": {"measure": "s on target per acquisition, 18 m (more)", "dir": 1, "margin": 0.02, "range": true},
+	"irons": {"measure": "s on target per acquisition, 18 m (more)", "dir": 1, "margin": 0.02, "range": true, "seeds": 12},
 	"magnified": {"measure": "hits per round, 38 m (more)", "dir": 1, "margin": 0.08, "range": true},
 	"flashbang": {"measure": "officers hit in the entry of a room held by 3 rifles (fewer)", "dir": -1, "margin": 0.3},
 	"ram": {"measure": "s to the first officer inside, outer doors locked (less)", "dir": -1, "margin": 3.0},
@@ -92,6 +95,7 @@ const GATES := {
 	"gas": {"measure": "barricaded suspects who end alive in cuffs (more)", "dir": 1, "margin": 0.3},
 	"gas_mask": {"measure": "officer-seconds gassed taking a gassed room (less)", "dir": -1, "margin": 3.0},
 	"sof_helmet": {"measure": "head hits survived: first, second", "dir": 1, "margin": 0},
+	"ballistic_helmet": {"measure": "handgun rounds to the head survived, any side (more)", "dir": 1, "margin": 0.5},
 }
 
 
@@ -223,7 +227,8 @@ func t_compact_pistol(on: bool, sd: int):
 
 
 func t_heavy_pistol(on: bool, sd: int):
-	return _kill_per_hit(_range(_kit("", "heavy_pistol" if on else "service_pistol"), 6.0, sd))
+	var r := _range(_kit("", "heavy_pistol" if on else "service_pistol"), 6.0, sd)
+	return [r["dead"], r["hits"]]
 
 
 func t_sbr(on: bool, sd: int):
@@ -236,7 +241,8 @@ func t_assault_rifle(on: bool, sd: int):
 
 
 func t_battle_rifle(on: bool, sd: int):
-	return _kill_per_hit(_range(_kit("battle_rifle" if on else "carbine"), 15.0, sd))
+	var r := _range(_kit("battle_rifle" if on else "carbine"), 15.0, sd)
+	return [r["dead"], r["hits"]]
 
 
 func t_shotgun(on: bool, sd: int):
@@ -531,6 +537,26 @@ func t_smg(on: bool, sd: int):
 # ------------------------------------------------------------------ the helmet
 ## Two head hits on a Special operations officer with the helmet: the first is stopped
 ## (alive, stunned, helmet spent), the second kills. And without the helmet, one kills.
+## v0.9.1: a handgun round to the head, from the front on even seeds and from behind on
+## odd ones: survived (1) or not (0). Rifles are not stopped, so a pistol shooter.
+func t_ballistic_helmet(on: bool, sd: int):
+	var lv = Maps.get_level(11)
+	var lane := _lane(8.0)
+	var kit_h := _kit("carbine", "service_pistol", {}, {"armour": "plates", "plates": 2, "head": "ballistic_helmet" if on else "none"})
+	var cfgs: Array = [_cfg("A1", 0, 0, "police", kit_h, lane[0], 0.0, true), _cfg("B1", 1, 0, "regular", _kit("", "service_pistol"), lane[1][1], PI)]
+	var w = World.new()
+	w.keep_events = false
+	w.setup(lv, _nav(11), cfgs, ["hold", "hold"], 950 + sd, [1, 1], {"a_posted": true, "b_stay": true, "b_posted": true})
+	var a = w.by_id["A1"]
+	var b = w.by_id["B1"]
+	var u: Vector2 = (a.pos - b.pos).normalized()
+	a.body_dir = (-u).angle() if sd % 2 == 0 else u.angle()
+	w._hit(a, a.zone_at(a.zone_centre("head")), 0.0, u, b, 1.0, 0)
+	var ok: int = 1 if a.alive() and a.state == "ok" else 0
+	w.dispose()
+	return ok
+
+
 func _helmet_unit() -> Array:
 	var lv = Maps.get_level(11)
 	var lane := _lane(8.0)
