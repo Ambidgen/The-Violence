@@ -1,32 +1,28 @@
 #!/bin/sh
-# Play The Violence from this folder.
-# Uses a runtime sitting here with the project files, then a Godot on PATH,
-# then the embedded build/TheViolence.x86_64 if that is all that is present.
+# Play The Violence from this folder (the source folder or a release folder).
+# 1. A Godot 4.4+ binary (4.7.2 tested) sitting in this folder runs the project files here.
+# 2. Otherwise a godot on PATH does.
+# 3. Otherwise the standalone TheViolence.x86_64 here, or in build/ or build/linux/.
+# Anything after play.sh is passed on, e.g.  ./play.sh -- --ops
 cd "$(dirname "$0")" || exit 1
 
-run_project() {
-  runtime=$1
-  shift
-  exec "$runtime" --path "$PWD" "$@"
-}
+if [ -f ./project.godot ]; then
+  for candidate in ./Godot* ./godot*; do
+    if [ -f "$candidate" ] && [ -x "$candidate" ]; then
+      exec "$candidate" --path "$PWD" "$@"
+    fi
+  done
+  if command -v godot >/dev/null 2>&1; then
+    exec godot --path "$PWD" "$@"
+  fi
+fi
 
-for candidate in ./Godot* ./godot*; do
-  if [ -f "$candidate" ] && [ -x "$candidate" ]; then
-    run_project "$candidate" "$@"
+for bin in ./TheViolence.x86_64 ./build/TheViolence.x86_64 ./build/linux/TheViolence.x86_64; do
+  if [ -x "$bin" ]; then
+    exec "$bin" "$@"
   fi
 done
 
-if command -v godot >/dev/null 2>&1; then
-  run_project godot "$@"
-fi
-
-if [ -x ./TheViolence.x86_64 ]; then
-  exec ./TheViolence.x86_64 "$@"
-fi
-if [ -x ./build/TheViolence.x86_64 ]; then
-  exec ./build/TheViolence.x86_64 "$@"
-fi
-
 echo "Could not play The Violence from this folder." >&2
-echo "Put a Godot 4.4+ binary in this folder with the rest of the project, or build/TheViolence.x86_64." >&2
+echo "Put a Godot 4.4+ binary here with the project files, or TheViolence.x86_64 (or build/)." >&2
 exit 1
