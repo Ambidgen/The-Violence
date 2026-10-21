@@ -14,6 +14,7 @@ const Autoplan = preload("res://scripts/campaign/autoplan.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const Courses = preload("res://scripts/data/courses.gd")
 const Department = preload("res://scripts/campaign/department.gd")
+const Politics = preload("res://scripts/campaign/politics.gd")
 const PANEL_W := 460.0
 const INK := Color("#121212")
 const GREY := Color("#737370")
@@ -156,12 +157,16 @@ func show_board(lines := []) -> void:
 	_clear()
 	var c = main.campaign
 	var d = c.dept
+	if c.over():
+		_election_night(lines)
+		return
 	_title("OPERATIONS  ·  week %d of %d" % [c.week(), c.WEEKS])
 	var fit: int = d.available().size()
 	var out: int = d.officers.filter(func(r): return r["status"] == "injured").size()
 	var busy: int = c.committed().size()
 	_text(box, "Port Carrick PD: %d officers fit, %d out injured. %d committed this week. Officers sent to one situation, or out canvassing, cannot go to another." % [fit, out, busy], GREY, 11)
 	_dept_strip(box)
+	_front_page(box, c.politics, c.week() - 1 if c.week() > 1 else 1)
 	for ln in lines:
 		_text(box, String(ln), INK, 11)
 	for s in c.board:
@@ -194,6 +199,7 @@ func show_board(lines := []) -> void:
 	_sep()
 	var hb := _h(box)
 	_btn(hb, "End week %d" % c.week(), func(): _end_week())
+	_btn(hb, "City Hall", func(): _city_hall())
 	_btn(hb, "Roster", func(): _roster())
 	_btn(hb, "Budget", func(): _budget())
 	var nc: int = d.open_cases().size()
@@ -207,6 +213,136 @@ func show_board(lines := []) -> void:
 func _end_week() -> void:
 	var lines: Array = main.ops_end_week()
 	show_board(lines)
+
+
+## The Carrick Ledger: last week's front page (v0.9).
+func _front_page(parent: Control, p, week: int) -> void:
+	var items: Array = p.week_press(week)
+	if items.is_empty():
+		return
+	var v := _card(parent)
+	var mast := _text(v, "T H E   C A R R I C K   L E D G E R   ·   week %d" % week, INK, 11)
+	mast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	for it in items.slice(0, 3):
+		var hot: bool = it["kind"] in ["story", "case"] or (it["kind"] == "op" and String(it["head"]).find("KILLED") >= 0)
+		_text(v, String(it["head"]), Ink.accent(0.9) if hot else INK, 13)
+		_text(v, String(it["body"]), GREY, 10)
+
+
+## Poll bars, told apart by pattern: Kettering solid ink, Okonjo-Vale hatched, Pell outline.
+class PollBars extends Control:
+	var p
+
+	func _init(pol) -> void:
+		p = pol
+		custom_minimum_size = Vector2(0, 66)
+
+	func _draw() -> void:
+		var font := ThemeDB.fallback_font
+		var w := size.x - 190.0
+		var y := 4.0
+		for c in Politics.CAND_ORDER:
+			var sh: float = p.share(c)
+			var r := Rect2(150, y, w * sh / 60.0, 14)
+			match c:
+				"kettering":
+					draw_rect(r, Ink.INK)
+				"okonjo":
+					draw_rect(r, Ink.INK, false, 1.2)
+					var x := r.position.x
+					while x < r.end.x:
+						draw_line(Vector2(x, r.end.y), Vector2(minf(x + 10, r.end.x), r.position.y + (14.0 * maxf(0.0, x + 10 - r.end.x) / 10.0)), Ink.INK, 1.0)
+						x += 5.0
+				_:
+					draw_rect(r, Ink.INK, false, 1.4)
+			draw_string(font, Vector2(0, y + 12), Politics.CANDIDATES[c]["name"], HORIZONTAL_ALIGNMENT_LEFT, 146, 12, Ink.INK)
+			draw_string(font, Vector2(r.end.x + 6, y + 12), "%d%%" % int(round(sh)), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Ink.INK)
+			y += 21.0
+
+
+## A standing bar for an ally: ink to their standing, the lost line marked.
+class StandBar extends Control:
+	var v := 50
+	var lost := false
+
+	func _init(val: int, is_lost: bool) -> void:
+		v = val
+		lost = is_lost
+		custom_minimum_size = Vector2(0, 12)
+
+	func _draw() -> void:
+		var w := size.x
+		draw_rect(Rect2(0, 2, w, 8), Ink.FLOOR)
+		draw_rect(Rect2(0, 2, w * v / 100.0, 8), Ink.accent(0.85) if lost else Ink.DARK)
+		var lx := w * Politics.LOST / 100.0
+		draw_line(Vector2(lx, 0), Vector2(lx, 12), Ink.INK, 1.0)
+
+
+## City Hall (v0.9): the polls, the allies and what each holds, the wards' trust.
+func _city_hall() -> void:
+	mode = "city_hall"
+	_clear()
+	var c = main.campaign
+	var p = c.politics
+	_title("CITY HALL  ·  week %d of %d" % [c.week(), c.WEEKS])
+	_text(box, "The election is held at the end of week %d. Whoever wins decides what happens to you." % Politics.ELECTION_WEEK, GREY, 10)
+	_text(box, "THE POLLS", INK, 12)
+	box.add_child(PollBars.new(p))
+	for cid in Politics.CAND_ORDER:
+		var cd: Dictionary = Politics.CANDIDATES[cid]
+		_text(box, "%s (%s): %s" % [cd["name"], cd["ticket"], cd["blurb"]], GREY, 10)
+	_sep()
+	_text(box, "ALLIES  ·  below the line an ally is lost, and what they hold goes with them", INK, 12)
+	for a in Politics.ALLY_ORDER:
+		var al: Dictionary = Politics.ALLIES[a]
+		var v := _card(box)
+		var is_lost: bool = p.lost(a)
+		_text(v, "%s  ·  %s%s" % [al["name"], al["title"], "   ·   LOST" if is_lost else ""], Ink.accent(0.9) if is_lost else INK, 12)
+		v.add_child(StandBar.new(p.standing(a), is_lost))
+		_text(v, ("Standing %d. Holds %s." % [p.standing(a), al["holds"]]) + ((" " + String(al["lost"])) if is_lost else ""), GREY, 10)
+	_sep()
+	_text(box, "TRUST IN POLICE, BY WARD  ·  it sets how many tips each ward's community group gives (none below 25)", INK, 12)
+	var bb := ""
+	for i in Situations.WARDS.size():
+		var t: int = int(p.trust[i])
+		var start: int = int(Situations.WARDS[i]["trust"])
+		var d := t - start
+		bb += "%-10s %3d   %s\n" % [Situations.WARDS[i]["name"], t, ("(%s%d since you took command)" % ["+" if d > 0 else "", d]) if d != 0 else ""]
+	_rich(box, "[code]" + bb + "[/code]")
+	var stories: int = p.pending.filter(func(x): return x["kind"] in ["story", "leak", "neglect"]).size()
+	var suits: Array = p.pending.filter(func(x): return x["kind"] == "lawsuit")
+	var owed := 0
+	for su in suits:
+		owed += int(su["cost"])
+	_text(box, "The press is looking into %d thing%s. %d lawsuit%s pending%s." % [stories, "" if stories == 1 else "s", suits.size(), "" if suits.size() == 1 else "s",
+		(" (about $%s)" % Department.money(owed)) if owed > 0 else ""], INK, 11)
+	_btn(box, "<  Back to the board", func(): show_board())
+
+
+## The election is over (v0.9).
+func _election_night(lines: Array) -> void:
+	var c = main.campaign
+	var p = c.politics
+	var e: Dictionary = p.result.get("ending", {})
+	_title("ELECTION NIGHT")
+	var votes: Dictionary = p.result.get("votes", {})
+	var bb := ""
+	for cid in Politics.CAND_ORDER:
+		bb += "%s%s   %.1f%%%s\n" % ["[b]" if cid == e.get("winner", "") else "", Politics.CANDIDATES[cid]["name"], float(votes.get(cid, 0.0)), "[/b]" if cid == e.get("winner", "") else ""]
+	_rich(box, bb)
+	var hv := _card(box)
+	_text(hv, String(e.get("head", "")), Ink.accent(0.9) if not e.get("keep", false) else INK, 16)
+	for ln in e.get("lines", []):
+		_text(hv, String(ln), INK if ln != "FILED. NOT RESOLVED." else Ink.accent(0.9), 12)
+	_front_page(box, p, Politics.ELECTION_WEEK)
+	for ln2 in lines:
+		_text(box, String(ln2), GREY, 10)
+	_sep()
+	var hb := _h(box)
+	_btn(hb, "City Hall", func(): _city_hall())
+	_btn(hb, "Roster", func(): _roster())
+	_btn(hb, "Budget", func(): _budget())
+	_btn(box, "New campaign", func(): main.ops_new_campaign())
 
 
 ## The money, morale and open cases at a glance (v0.8.5).
@@ -375,7 +511,7 @@ func _cases() -> void:
 	if flash != "":
 		_text(box, flash, INK, 11)
 		flash = ""
-	_text(box, "Every finding the incident record ties to an officer, and every broken order, opens a case. Clear it, send the officer to a use-of-force review, suspend them for two weeks without pay, or dismiss them. A case nobody decides lapses after three weeks. (What the public makes of your decisions arrives in v0.9.)", GREY, 10)
+	_text(box, "Every finding the incident record ties to an officer, and every broken order, opens a case. Clear it, send the officer to a use-of-force review, suspend them for two weeks without pay, or dismiss them. A case nobody decides lapses after three weeks. The city watches: the union your discipline, the coalition and the DA what you clear.", GREY, 10)
 	var open: Array = d.open_cases()
 	if open.is_empty():
 		_text(box, "No open cases.", INK, 12)
@@ -410,7 +546,7 @@ func _decide(cid: String, decision: String) -> void:
 	var d = main.campaign.dept
 	for c in d.cases:
 		if c["id"] == cid:
-			var ln: String = d.decide(c, decision)
+			var ln: String = main.campaign.decide_case(c, decision)
 			flash = ln if ln != "" else "That could not be done this week."
 	main.ops_dept_changed()
 	_cases()
@@ -1197,7 +1333,7 @@ func show_debrief(res: Dictionary, w, dept_lines: Array) -> void:
 	_title("%s  ·  %d" % [res["label"], int(res["score"])], 20)
 	var goal: String = res["goal"]
 	_text(box, goal.substr(0, 1).to_upper() + goal.substr(1) + ".", INK, 13)
-	_text(box, "Score: success 100, partial 65, failure (an abort included) 30; every death costs 15 and every officer down 5. Force is a separate reputation (from v0.9).", GREY, 10)
+	_text(box, "Score: success 100, partial 65, failure (an abort included) 30; every death costs 15 and every officer down 5. Force is not in the score: it is what the city remembers (City Hall).", GREY, 10)
 	var bb := ""
 	for sq in res.get("squads", []):
 		bb += "[b]SQUAD %d[/b]  %d of %d standing\n" % [int(sq["i"]) + 1, int(sq["alive"]), int(sq["n"])]
@@ -1261,7 +1397,7 @@ func show_debrief(res: Dictionary, w, dept_lines: Array) -> void:
 		bb += "\n[b]THE DEPARTMENT[/b]\n"
 		for d in dept_lines:
 			bb += String(d).replace("[", "(") + "\n"
-	bb += "\n[b]FILES OPENED[/b]  %d. What comes of them lands later (consequences arrive in v0.9).\n" % int(sm["findings"])
+	bb += "\n[b]FILES OPENED[/b]  %d. What comes of them lands later: in the papers, in court, at City Hall.\n" % int(sm["findings"])
 	_rich(box, bb)
 	_sep()
 	_text(box, "REPLAY  ·  the whole operation with the fog lifted", INK, 12)

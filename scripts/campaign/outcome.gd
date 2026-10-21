@@ -8,7 +8,7 @@ extends RefCounted
 ## included) at 30. Every death costs 15 (officers, civilians, hostages) and every
 ## officer down 5. So a failure with everyone alive always scores better than one
 ## with deaths. Force (excessive force, civilians hit by police) is not in this score:
-## it is the department's other reputation, and lands as consequences from v0.9.
+## it is the department's other reputation, which the city remembers (Politics, v0.9).
 
 const BASE := {"success": 100, "partial": 65, "failure": 30, "quiet": 100}
 const LABELS := {"success": "Success", "partial": "Partial success", "failure": "Failure", "quiet": "Passed quietly"}

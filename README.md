@@ -1,4 +1,4 @@
-# The Violence - vertical slice (v0.8.5)
+# The Violence - vertical slice (v0.9.0)
 
 A test range for the NPC CQB Bible, and the first steps toward the police command game (see "The Violence - Police Command Roadmap"). Three modes:
 
@@ -85,6 +85,54 @@ Maps climb in complexity. Pick one from the Map list at the top of the setup pan
 - The ledger of the dead runs down the left side: when, who, how, by whom and where.
 - The small pip beside each figure is their alert state, told apart by shape: a hollow ring (GREEN), a grey disc (YELLOW) or a red disc in a heavy ring (RED).
 - F2 switches red ink off (the monochrome proof) and F3 switches gore off. The buttons sit at the bottom right of the plan. Neither changes the fight.
+
+## New in v0.9.0: the city, the press and the election
+
+The campaign now ends. At the end of week 40 Port Carrick elects a mayor, and whoever wins decides what happens to you. Until then the city remembers what the department does, and some of it comes back weeks later. All of it is in `City Hall` on the operations board, and in the Carrick Ledger's front page above the week's situations.
+
+**Trust in police, ward by ward.** Each ward starts where it was (Ironworks 24, Old Town 62) and now moves:
+- Clean successes raise it, failures lower it, and suspects killed where people were watching lower it.
+- Situations nobody went to lower it.
+- Stories about civilians hurt by police lower it most.
+- Trust sets how many tips the ward's community group gives a briefing (none below 25).
+
+**Four allies, each holding something.** Below 25 an ally is lost and what they hold goes with them; above 40 they can be won back.
+- **Marguerite Duff, budget chair:** the allocation. Lost: the allocation is cut by 8%. She likes balanced accounts and clean results, and dislikes deficits, settlements and dead officers. Every eight weeks her committee reviews the allocation (+4% at 70 or more, -3% below 45).
+- **Tommy Rourke, police union:** the officers' goodwill. Lost: morale settles at 45 instead of 60. He dislikes dismissals, suspensions, low morale and officers killed.
+- **Rev. Alma Mbeki-Shaw, community coalition:** the community tips. Lost: no community tips in any ward. She watches civilians hurt, cases cleared, situations ignored and dismissals.
+- **Paul Varga, district attorney:** the benefit of the doubt. Lost: every serious case you clear with video or witnesses behind it gets the officer charged (six weeks suspended, morale -4).
+
+**Consequences that land later.**
+- **Stories.** A civilian hit or killed by police, or excessive force, becomes a story. On video, or at visibility 4-5, it makes the next front page. At visibility 3 or with witnesses it takes a week or two. Out of sight it takes three to nine weeks, and at visibility 1 with no witnesses half of them never land. A story costs trust in its ward and standing with the coalition, the council and the DA, and it moves the polls.
+- **Lawsuits.** Every civilian police hit brings a lawsuit that settles six to ten weeks later, out of the department's account: $10,000 for someone hurt, $40,000 for someone killed.
+- **Leaks.** Clearing a serious case can leak (55% with video, 25% with witnesses).
+- **Neglect.** An ignored gang house or hostage taking, or anything highly visible, comes back as a story about police who never came.
+
+**Three candidates.** Their polls move with all of the above and drift a little each week, the trailing campaigns pushing harder.
+- **Royce Kettering (Safe Streets).** A corrupt, very pro-police councilman. He gains from failures, ignored situations and officers killed.
+- **Dana Okonjo-Vale (Carrick Together).** A democratic socialist who wants to help the city, is openly critical of the police and wants you gone over the Bridge Street evictions. She gains from every story of police harm and from deaths at rallies.
+- **Gordon Pell (Independent).** Aggressively boring and competent. He gains from clean successes and loses from deficits and chaos.
+
+**The election and its endings.** Election day adds a little noise to the final poll. Then:
+- **Kettering** keeps you on. With a heavy force record he makes you Deputy Mayor for Public Safety.
+- **Okonjo-Vale** fires you on her first morning, unless average trust is 60 or more, the coalition is still with you and your force record is nearly clean. Then she keeps you, in writing, for ninety days.
+- **Pell** keeps you, subject to review, if the budget is balanced and you spent no more than four weeks in deficit. Otherwise your position is reviewed out of existence.
+
+The election night screen shows the vote, your ending and the record behind it. The campaign is then over, and `New campaign` starts another.
+
+**The Carrick Ledger.** Three headlines a week: what landed, then the campaign, then the city. The city is mostly closures, potholes and a bakery's prize-winning rye.
+
+**Two fixes.** The suggested plan's squad kits are now paid for: any kit that changes outside the editor is settled at the same terms (bought at cost, handed back for half). And the past weeks' situations now keep their whole numbers through a save.
+
+**Test.** `tests/politics_test.gd` checks the following:
+- Stories land by visibility and evidence, and some never land.
+- Lawsuits settle.
+- Each ally's loss does what it says, and the council's return restores the allocation.
+- The DA charges what you clear.
+- The election ends the campaign.
+- The city replays and saves exactly, and a v0.8 save loads.
+
+`tests/op_test.gd` now plays the chief too (`--decide`, `--hire`) and prints the city each week and the ending at week 40.
 
 ## New in v0.8.5: running the department
 
@@ -387,7 +435,7 @@ Press `OPERATIONS` on the setup panel. The campaign is saved after every operati
 
 Public events come more often as the election nears (35% of weeks at the start, about 80% by week 40). Almost always nothing happens. When something does, attackers hidden in the crowd show their weapons at a random moment.
 
-The week ends with `End week`. Situations nobody went to are written down, wounds heal and a new board fills. The campaign runs 40 weeks to the election; the election itself arrives in v0.9.
+The week ends with `End week`. Situations nobody went to are written down, wounds heal and a new board fills. The campaign runs 40 weeks to the election; the election at the end of week 40 ends the campaign (v0.9).
 
 **1 Briefing.** The situation, the floor plan, visibility, time pressure and the ward. What is known about who is inside is listed fact by fact. Each fact is either a tip (confirmed) or an estimate with a confidence, and estimates can be wrong. Rooms named by the briefing are tagged on the plan.
 - Tips come from the public (more at high visibility) and from the ward's community group (more where trust is high).
@@ -429,7 +477,7 @@ Bad habits can break orders. A rusher (BH11) won't wait out a consolidation. A c
 
 **Debrief.** The result and its score, each squad's objectives (met or failed, and why), the timeline, every officer's rounds and hits, the civilians, and what the department gained or lost. Then the whole operation replays with the fog lifted, from 1x to 10x, with a slider.
 - Score: success 100, partial 65, failure (an abort included) 30. Every death (officer, civilian or hostage) costs 15 and every officer down 5.
-- Excessive force and civilians hit by police are not in this score. They are the department's other reputation, which lands as consequences from v0.9.
+- Excessive force and civilians hit by police are not in this score. They are the department's other reputation, which the city remembers (v0.9: City Hall).
 
 **New in the sim for operations.**
 - **Suspects run.** A suspect who knows police are there (a knock, a radio call, a sound) and sees none of them may run for the edge of the lot; a knock makes it much more likely. Anyone who gets away is out of the operation.
@@ -664,7 +712,7 @@ All vehicles drive on rails: the right-hand lane of every street, turning at int
   - Gang members go everywhere on foot.
   - Away from any possible enemy, people skip perception and think every third tick; standing posts sleep until something comes near.
 - **Civilians and the department:** the city has no civilians yet, and its police do not judge or arrest (both come with the campaign map, v0.10). The department's budget, training and discipline arrived in v0.8.5.
-- **Operations:** situations use the hand-built maps, not the city's lots. Kit is paid for from the budget (v0.8.5). The election, consequences and the press arrive in v0.9.
+- **Operations:** situations use the hand-built maps, not the city's lots. Kit is paid for from the budget (v0.8.5). The election, consequences and the press arrived in v0.9.
 - **Out of scope:**
   - fragmentation grenades;
   - multiple floors (the apartment stairs are scenery).
@@ -695,6 +743,7 @@ scripts/campaign/orders.gd      objectives, constraints, order points by the lea
 scripts/campaign/operation.gd   civilians' placement; team A from the department; a planned operation built into a world
 scripts/campaign/autoplan.gd    "Suggest a plan"
 scripts/campaign/outcome.gd     the result, its score and each squad's objectives
+scripts/campaign/politics.gd    wards' trust, the four allies, the candidates, delayed consequences, the press, the election (v0.9)
 scripts/sim/recorder.gd   snapshots twice a second for rewind and the replay
 scripts/view/*            floor plan, blood and residue, operators, overlays, the ledger, the city's layers,
                           the fog of war (fog.gd), the replay (replay_view.gd), the plan on the map (plan_marks.gd),
@@ -724,6 +773,7 @@ godot --headless --path . -s res://tests/city_test.gd -- --seed=3          # bui
 godot --headless --path . -s res://tests/city_sim.gd -- --seed=3 --min=10  # the endless battle headless, with timings
 godot --headless --path . -s res://tests/civ_test.gd -- --n=40             # v0.6 gate: operations with civilians, Patrol vs police tactical
 godot --headless --path . -s res://tests/dept_test.gd                      # v0.5 gate: save, load, carry-over, replay; v0.8.5 budget, courses, cases
+godot --headless --path . -s res://tests/politics_test.gd                  # v0.9 gate: stories, allies, the DA, the election, saves
 godot --headless --path . -s res://tests/balance_test.gd -- --gate         # v0.8.5: equal regulars' assault on a held house, 30-50% attacker wins
 godot --headless --path . -s res://tests/orders_test.gd -- --n=8           # v0.7 gate: every order, with and without it
 godot --headless --path . -s res://tests/equip_test.gd -- --n=16           # v0.7.5 gate: every item, with and without it

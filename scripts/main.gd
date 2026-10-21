@@ -643,6 +643,14 @@ func _ops_hooks() -> void:
 		d.open_case(av[7], "broke_order", "broke the avoid order (chased a contact)", "radio log", "the yard")
 		d.enrol(av[9], "firearms")
 		d.recruit(false)
+	# --ops-weeks=N: end N weeks straight away (nobody sent anywhere), for screenshots
+	if _args.has("ops-weeks"):
+		var last: Array = []
+		for k in int(_args["ops-weeks"]):
+			if campaign.over():
+				break
+			last = ops_end_week()
+		ops_ui.show_board(last)
 	if _args.has("ops-screen"):
 		if _args.has("ops-open"):
 			ops_ui.roster_open = campaign.dept.available()[int(_args["ops-open"])]["id"]
@@ -653,6 +661,8 @@ func _ops_hooks() -> void:
 				ops_ui._budget()
 			"cases":
 				ops_ui._cases()
+			"cityhall":
+				ops_ui._city_hall()
 
 
 ## The operations board: the week's situations.
@@ -741,6 +751,7 @@ func ops_select(sid: String) -> void:
 	if cur_sit.get("plan", {}).is_empty():
 		var av: Array = campaign.available_for(sid)
 		cur_sit["plan"] = Autoplan.suggest(cur_sit, av, level, dept.bodycams, Autoplan.share(campaign.board, sid, av.size()))
+		dept.settle_kits()
 	plan = cur_sit["plan"]
 	mode = "plan"
 	_clear_views()
@@ -761,6 +772,7 @@ func plan_changed() -> void:
 func ops_suggest() -> void:
 	var av: Array = campaign.available_for(cur_sit["id"])
 	plan = Autoplan.suggest(cur_sit, av, level, dept.bodycams, Autoplan.share(campaign.board, cur_sit["id"], av.size()))
+	dept.settle_kits()
 	cur_sit["plan"] = plan
 	plan_marks.setup(level, nav, cur_sit, plan)
 	ops_ui.show_plan()
@@ -887,6 +899,7 @@ func _op_finished() -> void:
 					var c: Dictionary = dept.open_case(r, "broke_order", "broke the %s order (%s)" % [b["order"], b["why"]], "radio log", String(b["where"]))
 					lines.append("Internal affairs: %s opened on %s %s (broke an order)." % [c["id"], r["rank"], r["name"]])
 	res["plan"] = plan.duplicate(true)
+	lines.append_array(campaign.after_operation(cur_sit["id"], res, world))
 	campaign.record(cur_sit["id"], res)
 	_save()
 	fog.enabled = false

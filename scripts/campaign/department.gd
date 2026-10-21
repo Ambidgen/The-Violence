@@ -59,6 +59,7 @@ var morale := Courses.MORALE0
 var cases: Array = []         # internal affairs: [{id, officer, week, kind, text, strength, place, status, decision}]
 var case_serial := 0
 var deficit_weeks := 0
+var morale_home := Courses.MORALE0   # v0.9: where morale settles (the union's goodwill)
 var _founding := false
 var rng := RandomNumberGenerator.new()
 var names
@@ -275,6 +276,26 @@ func reissue(r: Dictionary, kit: Dictionary):
 	var back := int(round(-d * Courses.SURPLUS))
 	income("Kit returned: %s" % r["name"], back)
 	return -back
+
+
+## Settle any kit that changed without going through reissue (the suggested plan hands
+## out squad kits directly): bought at cost, handed back for half. Returns the net cost.
+func settle_kits() -> int:
+	var net := 0
+	for r in officers:
+		if r["status"] in ["dead", "fired", "resigned"]:
+			continue
+		var was: int = int(r.get("issued", Equipment.cost(r["kit"])))
+		var now: int = Equipment.cost(r["kit"])
+		if now > was:
+			spend("Kit: %s" % r["name"], now - was)
+			net += now - was
+		elif now < was:
+			var back := int(round((was - now) * Courses.SURPLUS))
+			income("Kit returned: %s" % r["name"], back)
+			net -= back
+		r["issued"] = now
+	return net
 
 
 ## Send an officer on a course. Returns "" or why not.
@@ -637,11 +658,11 @@ func next_week() -> Array:
 		lines.append("The account is $%s in the red: hiring, training and new kit are frozen. The council has noticed (%d week%s in deficit)." % [money(-balance), deficit_weeks, "" if deficit_weeks == 1 else "s"])
 		note("Week %d: in deficit ($%s)." % [week, money(balance)])
 	# morale drifts home; very low morale costs people
-	if morale < Courses.MORALE0:
+	if morale < morale_home:
 		# the further down, the faster it comes back: people get on with it
-		morale = mini(Courses.MORALE0, morale + Courses.MORALE_DRIFT + (Courses.MORALE0 - morale) / 10)
-	elif morale > Courses.MORALE0:
-		morale = maxi(Courses.MORALE0, morale - Courses.MORALE_DRIFT)
+		morale = mini(morale_home, morale + Courses.MORALE_DRIFT + (morale_home - morale) / 10)
+	elif morale > morale_home:
+		morale = maxi(morale_home, morale - Courses.MORALE_DRIFT)
 	if morale < Courses.MORALE_QUIT:
 		var cand: Array = officers.filter(func(r): return r["status"] == "active")
 		if not cand.is_empty() and rng.randf() < float(Courses.MORALE_QUIT - morale) / 50.0:
@@ -688,7 +709,7 @@ func to_data() -> Dictionary:
 		"bodycams": bodycams, "rng_state": str(rng.state), "officers": officers.duplicate(true),
 		"history": history.duplicate(true), "notes": notes.duplicate(true), "bonds": bonds.duplicate(),
 		"allocation": allocation, "balance": balance, "ledger": ledger.duplicate(true), "morale": morale,
-		"cases": cases.duplicate(true), "case_serial": case_serial, "deficit_weeks": deficit_weeks}
+		"cases": cases.duplicate(true), "case_serial": case_serial, "deficit_weeks": deficit_weeks, "morale_home": morale_home}
 
 
 func from_data(d: Dictionary) -> bool:
@@ -738,6 +759,7 @@ func from_data(d: Dictionary) -> bool:
 		morale = int(d.get("morale", Courses.MORALE0))
 		case_serial = int(d.get("case_serial", 0))
 		deficit_weeks = int(d.get("deficit_weeks", 0))
+		morale_home = int(d.get("morale_home", Courses.MORALE0))
 		ledger = d.get("ledger", [])
 		for le in ledger:
 			le["week"] = int(le["week"])

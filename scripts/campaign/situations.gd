@@ -43,7 +43,9 @@ const PRESSURE_NAMES := {"none": "None: you pick the hour", "low": "Low", "high"
 
 ## This week's board: two or three situations, and a public event most weeks in
 ## election season. Deterministic for the campaign seed and the week.
-static func board(seed_val: int, week: int) -> Array:
+## v0.9: trusts (one per ward, from Politics) replace the wards' starting trust, and
+## community false (the coalition lost) means no community tips anywhere.
+static func board(seed_val: int, week: int, trusts := [], community := true) -> Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_val * 7919 + week * 104729
 	var types: Array = ["warrant", "gang", "barricade", "hostage"]
@@ -68,12 +70,12 @@ static func board(seed_val: int, week: int) -> Array:
 		picks.append("event")
 	var out: Array = []
 	for i in picks.size():
-		out.append(make(picks[i], rng.randi(), week, i))
+		out.append(make(picks[i], rng.randi(), week, i, trusts, community))
 	return out
 
 
 ## One situation of a type, from a seed.
-static func make(type: String, seed_val: int, week := 1, idx := 0) -> Dictionary:
+static func make(type: String, seed_val: int, week := 1, idx := 0, trusts := [], community := true) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_val
 	var spec: Dictionary = TYPES[type]
@@ -92,7 +94,8 @@ static func make(type: String, seed_val: int, week := 1, idx := 0) -> Dictionary
 	var names = Names.new(seed_val)
 	var addr := "%d %s Street" % [rng.randi_range(3, 240), STREETS[rng.randi() % STREETS.size()]]
 	var s := {"id": "W%d-%d" % [week, idx + 1], "week": week, "type": type, "seed": seed_val, "map": mi,
-		"ward": ward["name"], "ward_i": ward_i, "trust": ward["trust"], "visibility": vis, "pressure": spec["pressure"],
+		"ward": ward["name"], "ward_i": ward_i, "trust": int(trusts[ward_i]) if ward_i < trusts.size() else ward["trust"], "visibility": vis, "pressure": spec["pressure"],
+		"community": community,
 		"address": addr if type != "event" else "Civic Plaza", "status": "open", "assigned": [], "canvass": [],
 		"night": false, "plan": {}, "result": {}, "occupants": [], "intel": [], "tips": [], "named": ""}
 	var rooms := _rooms(lv)
@@ -331,8 +334,8 @@ static func room_title(lv, rm: String) -> String:
 ## the ward's community group (more where trust is high, none below 25).
 static func _first_tips(s: Dictionary, rng: RandomNumberGenerator) -> void:
 	var n := 0
-	if int(s["trust"]) >= 25:
-		n += int(s["trust"]) / 30
+	var groups: int = int(s["trust"]) / 30 if int(s["trust"]) >= 25 and s.get("community", true) else 0
+	n += groups
 	if int(s["visibility"]) >= 3:
 		n += 1
 	if rng.randf() < 0.4:
@@ -341,7 +344,7 @@ static func _first_tips(s: Dictionary, rng: RandomNumberGenerator) -> void:
 		n = mini(n, 2)
 	s["tip_count"] = n
 	for k in n:
-		tip(s, rng, "community" if int(s["trust"]) >= 25 and k < int(s["trust"]) / 30 else "public")
+		tip(s, rng, "community" if k < groups else "public")
 
 
 ## One tip: turns an estimate into a fact (or, for a rally, moves the threat estimate
