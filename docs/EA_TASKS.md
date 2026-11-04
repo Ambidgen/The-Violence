@@ -544,6 +544,23 @@ Two copies had split from the same 2 Nov tree: the **Phase 1 copy** (P1.D–P1.I
 
 **Consequence for the roadmap:** the Phase 1 copy's P1.D–P1.I work had never run, because `ops_ui.gd` never loaded; its "built, exit measured by the next matrix" status lines are unmeasured. CL3's reference (8 seeds × 4 policies) is to be taken **on this merged tree**, and it doubles as the first measurement of P1.D–P1.H.
 
+### Stage 0: CL3, re-baseline on the merged tree (2026-11-04)
+
+**CL3.a: campaign determinism re-run** (`determinism_test.gd --verbose`, Godot 4.7.2, 277 s): **35 of 35 cases changed** against `tests/fixtures/determinism.json`, which predates 1.3 (22 of 35 had changed at Gate 0). The test-range fixture (`test_range_determinism_test`) passes unchanged on the merged tree; CL2's two refreshed cases (motel, shield) are already in it. The campaign fixture is **not rewritten**: it stays `xfail` until P1.I1, as the runner says. Logs: `tests/results/cl3-2026-11-04/determinism/` (merged, Phase 1 copy, Stage 0 copy).
+
+**CL3.b: every changed case tagged to a cause.** The same test was run on the two copies the merge came from, and each case's outcome (winner, time, shots, hits) compared:
+
+| Cause | Cases | Which |
+|---|---|---|
+| Before the 2 Nov split (1.3 simulation changes and everything both copies share) | 28 | every case not listed below: the outcome is identical on both copies and on the merge |
+| Stage 0 copy (B3b–B3d surrender and arrest, B7 less-lethal line, B8 struggle, CL2 approach and entry) | 5 | `m00_5v5_regular_regular_assault_1001`, `m07_12v12_sof_regular_assault_1001/2002/3003`, `op2002_W1-2_warrant_m05`: the merge matches the Stage 0 copy, not the Phase 1 copy |
+| Phase 1 copy (B1 wolf dwell, B3 `cuffable()` and the 30 s cuff wait, P1.D–H) | 2 | `m01_4v4_regular_untrained_assault_3003`, `m04_5v5_police_regular_assault_2002`: the merge matches the Phase 1 copy |
+| Interaction of the two (differs from both copies) | **0** | — |
+
+No case is untagged, so the merge introduced no outcome that neither side had. The 28 pre-split cases cannot be split further without the 2 Nov base tree (neither copy is it); they are the "fixture predates 1.3" set and are rebaselined with the rest at P1.I1.
+
+**CL3.c: the 8-seed × 4-policy reference** runs in CI on branch `arena/cl3-merged-2026-11-04` (the merged tree; GitHub `main` is still the 21 Oct tree and has no workflows, so the matrix cannot be dispatched there). `ci.yml` now makes a push to `arena/cl3-*` run 8 seeds instead of the 2-seed pilot and commit the report to `tests/results/cl3-2026-11-04/balance/`. CI run 41915644631: two shards of four seeds (1001–4004, 5005–8008).
+
 ## Order and overlap
 
 ```
