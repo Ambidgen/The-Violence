@@ -1,0 +1,32 @@
+PCK /tmp/violence-browser/web-campaign/index.pck 86 3272048
+Adapted op_test as Node for Web template with arguments: ['--weeks=4', '--seed=1001', '--chief=sensible', '--rogue']
+GODOT log Engine missing features []
+GODOT log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+GODOT log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+GODOT log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+GODOT log [officers 0 killed, 0 down of 6; suspects 0 down, 0 killed]
+GODOT log W1-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 198040 ms, 6 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log [officers 0 killed, 0 down of 5; suspects 1 down, 1 killed]
+GODOT log W1-1 barricade map 03 vis 2  Partial success  65  Valentin Bondarenko killed  (51 s sim, 1791 ms, 5 officers, 104 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log   week 1: account $23890, morale 60, 0 open cases, 20 fit  |  trust 43  allies CL56 UN60 CC45 DA55  polls K 33 O 31 P 36  pending 0
+GODOT log [officers 0 killed, 0 down of 4; suspects 0 down, 0 killed]
+GODOT log W2-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 167211 ms, 4 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log [officers 1 killed, 2 down of 7; suspects 5 down, 0 killed]
+GODOT log W2-1 gang      map 08 vis 2  Partial success, at a cost  45  2 of 8 got away  (92 s sim, 4501 ms, 7 officers, 186 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log   week 2: account $16226, morale 55, 0 open cases, 18 fit  |  trust 43  allies CL55 UN56 CC45 DA55  polls K 35 O 30 P 35  pending 1
+GODOT log [officers 0 killed, 0 down of 7; suspects 2 down, 1 killed]
+GODOT log W3-1 gang      map 10 vis 2  Partial success  65  1 of 3 got away  (103 s sim, 5190 ms, 7 officers, 208 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log [officers 0 killed, 0 down of 6; suspects 3 down, 2 killed]
+GODOT log W3-2 gang      map 08 vis 1  Success         100  every member arrested or down  (66 s sim, 2783 ms, 6 officers, 133 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log   week 3: account $15310, morale 57, 0 open cases, 18 fit  |  trust 40  allies CL56 UN61 CC35 DA55  polls K 35 O 30 P 35  pending 1
+GODOT log [officers 0 killed, 0 down of 5; suspects 0 down, 0 killed]
+GODOT log W4-3 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 133110 ms, 5 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log [officers 2 killed, 4 down of 8; suspects 5 down, 2 killed]
+GODOT log W4-1 gang      map 08 vis 2  Partial success, at a cost  25  2 of 8 got away  (122 s sim, 14181 ms, 8 officers, 245 snaps, broken 0, less 0, gas 0, sting 0)
+GODOT log   week 4: account $9534, morale 46, 0 open cases, 14 fit  |  trust 40  allies CL53 UN47 CC35 DA55  polls K 35 O 29 P 35  pending 1
+GODOT log TOTALS chief=sensible train=false: mean score 75, 9 findings, deficit weeks 0; courses/officer 0.00, officers still carrying a bad habit 5/17.
+GODOT log officer deaths: { "killed outright": 2, "bled out": 1 }
+GODOT log officers per operation: 0.38 killed, 0.75 down (8 operations)
+GODOT log done in 529151 ms
+GODOT log PROBE_DONE
+PROBE_FINISHED errors= 0

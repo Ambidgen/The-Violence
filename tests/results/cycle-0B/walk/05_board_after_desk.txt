@@ -1,0 +1,48 @@
+THE CAMPAIGN FILE  ·  week 1 of 40
+PORT CARRICK PD  ·  20 fit, 0 injured, 0 committed this week. An officer sent to one call cannot answer another.
+ACCOUNT  $20,000   ·   allocation $30,500 a week   ·   payroll $26,264
+Morale 60   ·   0 internal affairs cases open
+THE DESK
+Nothing waiting. No training program running.
+ACT 1  ·  THE INHERITANCE  ·  WEEK 1
+A SIGNATURE
+The last chief left his chair, not his account of Bridge Street. You signed the order; he gave the briefing.
+THIS WEEK  ·  Old Town: the warrant names Cormac Keane; it does not say who will answer the door.
+“I put it on your desk. You put your name on it. The minutes only have room for one of us.”
+— Outgoing chief
+THE RECORD  ·  No civilian harm is on the current record. That is a fact so far, not a promise.
+FROM THE OUTGOING CHIEF
+·  The board is a week, not a queue. You will not have enough officers for every call.
+·  Open the file before you plan. Estimates are marked with confidence; canvassing costs an officer for the week.
+·  Suggest a plan is a starting point. Change the people, the entry, the orders—or start with a blank plan in Settings.
+·  After an operation, read the debrief and the internal affairs file. A clean score does not erase what the city saw.
+·  End the week when you are ready. The budget, the roster and the wards carry every decision forward.
+These notes stop after week 2. Tips can be turned off in Settings.
+T H E   C A R R I C K   L E D G E R   ·   week 1
+NEW CHIEF INHERITS BRIDGE STREET FILE
+The deputy chief signed the eviction order that cleared Bridge Street. The outgoing chief gave the briefing. The election is forty weeks away.
+Submachine guns contract signed: Submachine gun (9 mm) in the armoury.
+1  ·  Barricaded: Colm Kavanagh, 599 S Hopyard Place
+Brass Rail tavern  ·  599 S Hopyard Place
+Barricaded suspect  ·  Ironworks ward (trust 24)  ·  visibility ●●○○○  ·  pressure: low
+Open: nobody assigned yet
+[Brief and plan  >]
+2  ·  Barricaded: Mykola Vinogradov, 1758 N Harlan Avenue
+Harlan Avenue bungalow  ·  1758 N Harlan Avenue
+Barricaded suspect  ·  Northgate ward (trust 58)  ·  visibility ●●●○○  ·  pressure: low
+Open: nobody assigned yet
+[Brief and plan  >]
+3  ·  Warrant: Cormac Keane, 261 W Front Street
+Front Street flat  ·  261 W Front Street
+Warrant service  ·  Old Town ward (trust 62)  ·  visibility ●●●●○  ·  pressure: none
+Open: nobody assigned yet
+[Brief and plan  >]
+[End week 1]
+[City Hall]
+[Roster]
+[Budget]
+[Internal affairs]
+[Armoury and programs]
+[Campaign file]
+[<  Main menu]
+One campaign is kept. The file is saved after each operation and each week.

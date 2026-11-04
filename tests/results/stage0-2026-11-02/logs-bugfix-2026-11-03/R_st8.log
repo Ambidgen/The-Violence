@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+map 08  5v5  regular  regular  assault/hold  -> A      121.7 s  alive  2/0   cleared  1  0.55 ms/tick
+map 08 12v12 police   militia  assault/hold  -> A       48.1 s  alive 11/0   cleared  0  1.35 ms/tick
+map 08 20v20 regular  regular  assault/hold  -> B      114.6 s  alive  0/11  cleared  2  1.67 ms/tick
+map 08  8v16 sof      militia  assault/hold  -> A       94.2 s  alive  7/0   cleared  5  1.18 ms/tick
+map 08 10v10 regular  militia  hunt   /hunt  -> A       24.7 s  alive  9/0   cleared  0  1.70 ms/tick
+map 08 16v8  militia  sof      assault/hold  -> B       54.0 s  alive  0/5   cleared  1  1.11 ms/tick
+stalls: 0   (16 s)

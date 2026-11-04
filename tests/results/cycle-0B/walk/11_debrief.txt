@@ -1,0 +1,61 @@
+DEBRIEF  ·  Barricaded: Colm Kavanagh, 599 S Hopyard Place
+FIRST OPERATION  ·  4/4  ·  DEBRIEF
+Read the score arithmetic, then click a timeline event to seek the replay. The department consequences and any IA cases are below. Back to the board finishes the guide.
+Partial success  ·  65
+Colm Kavanagh shot and taken to hospital.
+SCORE ARITHMETIC  ·  65 - 0 - 0 = 65
+Goal base (partial success)  ·  +65
+Deaths (0 × -15)  ·  +0
+Nonfatal officer downs (0 × -5)  ·  +0
+TOTAL  ·  +65
+Deaths include officers and civilians; only nonfatal officer downs use the -5 term. Force is not in this score: it is what the city remembers (City Hall).
+SQUAD 1  4 of 4 standing
+    Arrest: failed (B1 down)
+    Clear: met (rooms clear)
+SQUAD 2  3 of 3 standing
+    Contain: met (held to the end)
+
+YOUR EDITS
+    You ran the suggestion unchanged.
+
+OFFICERS
+A1 Giulia Bernardi: standing; 0 rounds, 0 hit
+    Carbine, pistol; vest; light, med, oc, baton, taser
+A2 Pedro Villagrande: standing; 1 rounds, 1 hit
+    Carbine, pistol; vest; light, med, oc, baton, taser
+A3 Reginald Battle: standing; 1 rounds, 1 hit
+    Carbine, pistol; vest; light, med, oc, baton, taser
+A4 John Carter: standing; 0 rounds, 0 hit
+    Carbine, pistol; vest; light, med, oc, baton, taser
+A5 Ashley Stanton: standing; 0 rounds, 0 hit
+    Carbine, pistol; vest; light, med, oc, baton, taser
+A6 Sarah Wright: standing; 0 rounds, 0 hit
+    Carbine, pistol; vest; light, med, oc, baton, taser
+A7 Keisha Spearman: standing; 0 rounds, 0 hit
+    Carbine, pistol; vest; light, med, oc, baton, taser
+
+CIVILIANS  0 present, 0 hurt, 0 killed; 0 rounds from police struck a civilian.
+Suspects: 1, 1 down, 0 gave up, 0 cuffed, 0 got away.
+
+THE DEPARTMENT
+Cost: $805 overtime, $0 to restock. Account: $19,195.
+Training: 0 on a course, 0 queued; 20 officers could start one now.
+
+FILES OPENED  0. What comes of them lands later: in the papers, in court, at City Hall.
+
+TIMELINE  ·  click an event to seek the replay
+[00:10.0  [ORDER]  Squad 2 in position]
+[00:10.0  [ORDER]  Squad 1 crossed its phase line]
+[00:16.4  [DOOR]  A2 kicks in the shop floor door]
+[00:33.1  [DOOR]  A2 kicks in the storeroom door]
+[00:38.3  [CASUALTY]  B1 down (chest, by A3)]
+[00:38.3  [OBJECTIVE]  Squad 1: arrest failed (B1 down)]
+[00:38.3  [END]  Operation over: the police hold the scene]
+REPLAY  ·  the whole operation with the fog lifted
+[Play]
+[1x]
+[2x]
+[5x]
+[10x]
+
+[<  Back to the board]

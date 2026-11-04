@@ -1,0 +1,37 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+matrix untrained_vs_regular: A/B/draw 0/4/0 (4 games); 1 cases, 5.4 s elapsed
+matrix militia_vs_patrol: A/B/draw 0/4/0 (4 games); 2 cases, 10.1 s elapsed
+matrix patrol_vs_militia: A/B/draw 1/3/0 (4 games); 3 cases, 17.4 s elapsed
+matrix regular_vs_untrained: A/B/draw 3/1/0 (4 games); 4 cases, 30.8 s elapsed
+matrix regular_vs_regular: A/B/draw 2/2/0 (4 games); 5 cases, 45.3 s elapsed
+matrix police_vs_sof: A/B/draw 0/4/0 (4 games); 6 cases, 54.7 s elapsed
+matrix sof_vs_police: A/B/draw 3/1/0 (4 games); 7 cases, 64.7 s elapsed
+matrix sof_vs_sof: A/B/draw 3/1/0 (4 games); 8 cases, 80.7 s elapsed
+DONE matrix: 8 cases, 32 matches -> user://final-debug-matrix.jsonl
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+size 1v1: A/B/draw 3/1/0 (4 games); 1 cases, 5.3 s elapsed
+size 3v3: A/B/draw 3/1/0 (4 games); 2 cases, 13.3 s elapsed
+size 5v5: A/B/draw 2/2/0 (4 games); 3 cases, 30.6 s elapsed
+size 10v10: A/B/draw 2/2/0 (4 games); 4 cases, 70.8 s elapsed
+size 2v5: A/B/draw 2/2/0 (4 games); 5 cases, 78.9 s elapsed
+size 5v2: A/B/draw 3/1/0 (4 games); 6 cases, 91.1 s elapsed
+DONE size: 6 cases, 24 matches -> user://final-debug-size.jsonl
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+mixed A_sof+militia+militia+militia+militia: A/B/draw 3/1/0 (4 games); 1 cases, 11.8 s elapsed
+mixed B_sof+militia+militia+militia+militia: A/B/draw 1/3/0 (4 games); 2 cases, 20.5 s elapsed
+DONE mixed: 2 cases, 8 matches -> user://final-debug-mixed.jsonl

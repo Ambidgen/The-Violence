@@ -1,0 +1,19 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+map 00 Test Range 01 - Shotgun House            36x24 m  rooms 4  doors 5  windows 8  obstacles 75  build 321 ms  nav 543 ms
+map 01 Lone Cabin                               30x20 m  rooms 1  doors 1  windows 5  obstacles 42  build 261 ms  nav 205 ms
+map 02 Bunkhouse                                36x22 m  rooms 2  doors 3  windows 8  obstacles 55  build 318 ms  nav 337 ms
+map 03 Corner Store                             40x26 m  rooms 3  doors 5  windows 6  obstacles 50  build 348 ms  nav 475 ms
+map 04 Center-Hall Bungalow                     40x28 m  rooms 7  doors 10  windows 11  obstacles 85  build 246 ms  nav 780 ms
+map 05 Duplex                                   44x30 m  rooms 12  doors 17  windows 14  obstacles 115  build 47 ms  nav 424 ms
+map 06 L-Shaped Ranch                           48x34 m  rooms 12  doors 18  windows 15  obstacles 120  build 110 ms  nav 470 ms
+map 07 Roadside Motel                           56x34 m  rooms 14  doors 16  windows 16  obstacles 131  build 62 ms  nav 448 ms
+map 08 Warehouse & Offices                      64x44 m  rooms 12  doors 20  windows 12  obstacles 114  build 123 ms  nav 656 ms
+map 09 Walled Compound                          64x50 m  rooms 16  doors 26  windows 19  obstacles 153  build 108 ms  nav 826 ms
+map 10 Apartment Block                          60x36 m  rooms 43  doors 44  windows 32  obstacles 295  build 73 ms  nav 870 ms
+map 11 Civic Plaza                              64x46 m  rooms 7  doors 10  windows 9  obstacles 96  build 123 ms  nav 495 ms
+problems: 0

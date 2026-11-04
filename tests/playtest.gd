@@ -90,7 +90,6 @@ func _init() -> void:
 	var n := 20
 	var sel := "all"
 	var out := ""
-	var dump_dir := ""
 	var set_name := "main"
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--set="):
@@ -101,8 +100,6 @@ func _init() -> void:
 			sel = a.trim_prefix("--cells=")
 		elif a.begins_with("--out="):
 			out = a.trim_prefix("--out=")
-		elif a.begins_with("--dump-json="):
-			dump_dir = a.trim_prefix("--dump-json=")
 	var map_i := 0
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--map="):
@@ -116,6 +113,7 @@ func _init() -> void:
 	elif set_name == "ablate":
 		all = ablation()
 	var pick: Array = []
+	var rows := 0   # P0.A1
 	if sel == "all":
 		pick = range(all.size())
 	else:
@@ -133,46 +131,18 @@ func _init() -> void:
 		if idx >= all.size():
 			continue
 		var cell: Array = all[idx]
-		var r := run_cell(lv, nav, cell, n, dump_dir)
+		var r := run_cell(lv, nav, cell, n)
 		var line := "%d,%s,%.1f,%.1f,%.1f,%.1f,%.2f,%.2f,%.2f,%.2f,%.1f,%.1f,%.2f,%.1f,%.1f" % [idx, cell[0],
 			r["a"], r["b"], r["d"], r["t"], r["ad"], r["bd"], r["ex"], r["ff"], r["ah"], r["bh"], r["stray"], r["as"], r["bs"]]
 		print(line)
+		rows += 1
 		if f != null:
 			f.store_line(line)
 			f.flush()
-	quit()
+	quit(0 if rows > 0 else 1)   # P0.A1: a matrix; fails only if no cell ran
 
 
-## Tier 0 #1 -- the JSON dump. One file per cell per match, with the event
-## timeline, a per-operator summary and the per-room clear times, so that any
-## claim about the simulation can be checked against data instead of argued.
-##   godot --headless --path . -s res://tests/playtest.gd -- --dump-json=/tmp/tv
-func dump_match(w, path: String, cell: Array, seed_v: int) -> void:
-	var ops_out: Array = []
-	for o in w.ops:
-		ops_out.append({"id": o.id, "team": o.team, "name": o.name, "echelon": o.echelon,
-			"exp": o.exp, "state": o.state, "shots": o.shots, "hits": o.hits, "kills": o.kills,
-			"wounds": o.wounds, "blood": snappedf(o.blood, 0.001), "watched_die": o.watched.size(),
-			"mem": o.mem.size(), "stress": snappedf(o.stress, 0.001),
-			"suppress": snappedf(o.suppress, 0.001), "alert": o.alert,
-			"pos": [snappedf(o.pos.x, 0.01), snappedf(o.pos.y, 0.01)], "room": o.room})
-	var rooms: Array = []
-	for tm in w.teams:
-		rooms.append({"team": tm["tag"], "cleared": tm["cleared"].keys(),
-			"skipped": tm["skipped"].keys()})
-	var body := {"cell": cell[0], "seed": seed_v, "t": snappedf(w.t, 0.01), "winner": w.winner,
-		"stat": w.stat, "postures": [cell[3], cell[4]], "ops": ops_out, "teams": rooms,
-		"deaths": w.deaths, "log": w.log_lines}
-	DirAccess.make_dir_recursive_absolute(path)
-	var f := FileAccess.open(path.path_join("m_%s_%d.json" % [cell[0].replace(" ", "_"), seed_v]),
-		FileAccess.WRITE)
-	if f == null:
-		return
-	f.store_string(JSON.stringify(body, "  "))
-	f.close()
-
-
-func run_cell(lv, nav, cell: Array, n: int, dump_dir := "") -> Dictionary:
+func run_cell(lv, nav, cell: Array, n: int) -> Dictionary:
 	var wins := [0, 0, 0]
 	var tot := {"t": 0.0, "ad": 0, "bd": 0, "ff": 0, "as": 0, "ah": 0, "bs": 0, "bh": 0, "stray": 0}
 	for s in n:
@@ -182,8 +152,6 @@ func run_cell(lv, nav, cell: Array, n: int, dump_dir := "") -> Dictionary:
 		w.setup(lv, nav, cfgs, [cell[3], cell[4]], 7000 + s)
 		while not w.over:
 			w.step()
-		if dump_dir != "" and s == 0:
-			dump_match(w, dump_dir, cell, 7000 + s)
 		wins[w.winner] += 1
 		tot["t"] += w.t
 		tot["ff"] += w.stat["friendly"]

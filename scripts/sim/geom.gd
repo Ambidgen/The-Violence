@@ -15,6 +15,9 @@ enum {WALL, COVER, CONCEAL, WINDOW, LOW}
 const LOW_COVER_H := 1.3
 const LOW_NEAR := 0.4
 const LOW_FULL := 3.0
+# Swept-body radius used by both movement and path validation. The navigation
+# lattice is inflated by 0.30 m, leaving 2 cm of slack for its cell centres.
+const MOVE_CLEARANCE := 0.28
 
 var obs: Array = []        # [{r: Rect2, kind, h, sill, lintel, move: bool, name}]
 var width := 0.0
@@ -33,25 +36,24 @@ var _sill := PackedFloat32Array()
 var _lintel := PackedFloat32Array()
 var _mv := PackedByteArray()
 
-## Obstacles that appear and disappear during a match: door leaves. They are
-## outside the CSR index and tested with a short linear scan, which is only paid
-## for when at least one is closed -- a map with every door open pays nothing.
+## Obstacles that appear and disappear during a match (v0.7.5): door leaves, ported from
+## the v0.4 line's doors-as-state work. They sit outside the bucket index and are tested
+## with a short linear scan, paid for only while at least one is shut: a map with every
+## door open costs nothing. A shut leaf blocks sight and movement; rounds go through it
+## by its material ("door" hollow-core interior, "door_ext" solid exterior).
 var dyn_rect: Array[Rect2] = []
 var dyn_kind := PackedInt32Array()
 var dyn_h := PackedFloat32Array()
-var dyn_sill := PackedFloat32Array()
-var dyn_lintel := PackedFloat32Array()
+var dyn_mat: Array[String] = []
 var dyn_on := PackedByteArray()
 var dyn_active := 0
 
 
-func add_dynamic(r: Rect2, kind: int, h: float = 2.1, sill: float = 0.0,
-		lintel: float = 2.1) -> int:
+func add_dynamic(r: Rect2, kind: int, h: float = 2.1, mat: String = "door") -> int:
 	dyn_rect.append(r)
 	dyn_kind.append(kind)
 	dyn_h.append(h)
-	dyn_sill.append(sill)
-	dyn_lintel.append(lintel)
+	dyn_mat.append(mat)
 	dyn_on.append(0)
 	return dyn_rect.size() - 1
 
@@ -66,61 +68,39 @@ func set_dynamic(idx: int, on: bool) -> void:
 	dyn_active += 1 if on else -1
 
 
-## Every door open again: used when a map is reloaded or the nav cache is reused.
+## Every leaf open again.
 func reset_dynamic() -> void:
 	dyn_on.fill(0)
 	dyn_active = 0
 
 
-## Apply the closed door leaves to a sight result. Only ever removes bits.
-func _dyn_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float, mask: int) -> int:
+## The rectangle of an obstacle index as trace_shot returns it (negative: a leaf).
+func rect_of(idx: int) -> Rect2:
+	if idx < 0:
+		return dyn_rect[-1 - idx]
+	return _rect[idx]
+
+
+## Apply the shut leaves to a sight result. Only ever removes bits.
+func _dyn_mask(a: Vector2, b: Vector2, mask: int) -> int:
 	var d := b - a
-	var L := d.length()
 	for i in dyn_rect.size():
 		if dyn_on[i] == 0:
-			continue
-		var kind: int = dyn_kind[i]
-		if kind == LOW:
 			continue
 		var r: Rect2 = dyn_rect[i]
 		if r.has_point(a) or r.has_point(b):
 			continue
-		var tt := seg_rect(a, d, r)
-		if tt.x < 0.0:
-			continue
-		if kind == WALL:
-			return 0
-		for k in 2:
-			if mask & (1 << k) == 0:
-				continue
-			var zb: float = zb1 if k == 0 else zb2
-			var z0 := lerpf(za, zb, tt.x)
-			var z1 := lerpf(za, zb, tt.y)
-			var stop := false
-			if kind == WINDOW:
-				stop = minf(z0, z1) < dyn_sill[i] or maxf(z0, z1) > dyn_lintel[i]
-			else:
-				var h: float = dyn_h[i]
-				if h <= LOW_COVER_H and za > h:
-					h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
-				stop = minf(z0, z1) < h
-			if stop:
-				mask &= ~(1 << k)
-		if mask == 0:
+		if seg_rect(a, d, r).x >= 0.0:
 			return 0
 	return mask
 
 
-## The nearest closed leaf on a->b, or -1.
-func _dyn_trace(a: Vector2, za: float, b: Vector2, zb: float, best_t: float) -> Array:
+## The nearest shut leaf on a->b before best_t: [leaf index or -1, t, face].
+func _dyn_trace(a: Vector2, b: Vector2, best_t: float) -> Array:
 	var d := b - a
-	var L := d.length()
 	var out := [-1, best_t, -1]
 	for i in dyn_rect.size():
 		if dyn_on[i] == 0:
-			continue
-		var kind: int = dyn_kind[i]
-		if kind == LOW or kind == CONCEAL:
 			continue
 		var r: Rect2 = dyn_rect[i]
 		if r.has_point(a):
@@ -128,23 +108,153 @@ func _dyn_trace(a: Vector2, za: float, b: Vector2, zb: float, best_t: float) -> 
 		var tt := seg_rect(a, d, r)
 		if tt.x < 0.0 or tt.x >= out[1]:
 			continue
-		var z0 := lerpf(za, zb, tt.x)
-		var z1 := lerpf(za, zb, tt.y)
-		var stop := false
-		if kind == WALL:
-			stop = true
-		elif kind == WINDOW:
-			stop = minf(z0, z1) < dyn_sill[i] or maxf(z0, z1) > dyn_lintel[i]
-		else:
-			var h: float = dyn_h[i]
-			if h <= LOW_COVER_H and za > h:
-				h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
-			stop = minf(z0, z1) < h
-		if stop:
-			out[0] = i
-			out[1] = tt.x
-			out[2] = int(tt.z)
+		out[0] = i
+		out[1] = tt.x
+		out[2] = int(tt.z)
 	return out
+
+
+## The first shut leaf a body moving from a to b would walk into (radius rad), or -1.
+## Only a leaf the body is going *through* is in the way: the move has to close on the
+## leaf's face or cross it. Someone sliding along a shut door — down a 2 m hall, round a
+## corner, past a closed bathroom door a hand's width away — used to be caught by the
+## grown leaf and stopped dead to open a door he was only walking past (v1.2.1).
+func leaf_in_way(a: Vector2, b: Vector2, rad := 0.25) -> int:
+	if dyn_active <= 0:
+		return -1
+	var best := -1
+	var best_t := INF
+	var d := b - a
+	for i in dyn_rect.size():
+		if dyn_on[i] == 0:
+			continue
+		var leaf: Rect2 = dyn_rect[i]
+		# the leaf is thin across the door and wide along the opening: its face is the
+		# thin axis, and the body has to move closer to that face (or past it)
+		var ax := 0 if leaf.size.x <= leaf.size.y else 1
+		var face: float = leaf.get_center()[ax]
+		var da: float = a[ax] - face
+		var db: float = b[ax] - face
+		if da * db > 0.0 and absf(db) >= absf(da) - 0.0001:
+			continue
+		var tt := seg_rect(a, d, leaf.grow(rad))
+		if tt.x >= 0.0 and tt.x < best_t:
+			best_t = tt.x
+			best = i
+	return best
+
+
+## Does a body of radius rad sliding from a to b keep clear of every obstacle that blocks
+## movement? The body is grown into the obstacle and the leg tested against it, so a leg
+## that would only clip the corner of a wall or a door frame is refused. (The navigation
+## cell test alone cannot see that: cells are 0.25 m across and it samples one point per
+## cell, so a leg can pass between two samples.)
+func path_clear(a: Vector2, b: Vector2, rad := 0.30) -> bool:
+	if rad <= 0.0:
+		return true
+	for idx in candidates(a, b, 1):
+		if _mv[idx] == 0:
+			continue
+		if seg_rect_dist(a, b, _rect[idx]) < rad:
+			return false
+	return true
+
+
+## A swept movement or path leg, including separation and sidesteps. The destination
+## may not reduce a body's existing clearance: a group pressing against a wall must not
+## push someone through it. A body already overlapping an obstacle can move out, but not
+## farther in. Door leaves are checked separately by the world.
+func move_clear(a: Vector2, b: Vector2, rad := MOVE_CLEARANCE) -> bool:
+	if not a.is_finite() or not b.is_finite():
+		return false
+	# Allow recovery from an existing edge overlap, but not a move farther off-map.
+	if b.x < minf(a.x, rad) or b.y < minf(a.y, rad) \
+		or b.x > maxf(a.x, width - rad) or b.y > maxf(a.y, height - rad):
+		return false
+	for idx in candidates(a, b, 1):
+		if _mv[idx] == 0:
+			continue
+		var r: Rect2 = _rect[idx]
+		var d0 := _rect_dist(a, r)
+		var d1 := _rect_dist(b, r)
+		if d0 < 0.00001:
+			# A spawn or old save may start inside an obstacle. Check the initial
+			# direction as well as the endpoint: a long step can otherwise cross a
+			# thin wall and end less deeply embedded on its far side.
+			var depth0 := _rect_depth(a, r)
+			var depth1 := _rect_depth(b, r)
+			var left := a.x - r.position.x
+			var right := r.end.x - a.x
+			var top := a.y - r.position.y
+			var bottom := r.end.y - a.y
+			var nearest := minf(minf(left, right), minf(top, bottom))
+			var delta := b - a
+			var outward := (left <= nearest + 0.00001 and delta.x < -0.00001) \
+				or (right <= nearest + 0.00001 and delta.x > 0.00001) \
+				or (top <= nearest + 0.00001 and delta.y < -0.00001) \
+				or (bottom <= nearest + 0.00001 and delta.y > 0.00001)
+			if not outward or depth1 >= depth0 - 0.00001:
+				return false
+		elif d0 < rad:
+			if d1 < d0 - 0.00001 or seg_rect_dist(a, b, r) < d0 - 0.00001:
+				return false
+		elif seg_rect_dist(a, b, r) < rad:
+			return false
+	return true
+
+
+## Positive inside a rectangle, zero on the edge, negative outside it.
+static func _rect_depth(p: Vector2, r: Rect2) -> float:
+	if not r.has_point(p):
+		return -_rect_dist(p, r)
+	return minf(minf(p.x - r.position.x, r.end.x - p.x), minf(p.y - r.position.y, r.end.y - p.y))
+
+
+## The same for one leg of a path: it may hug whatever it already touches at either end,
+## so the radius shrinks to the clearance of the nearer end. A path that starts with a
+## shoulder against a wall is still smoothed away from it, but nothing that would take the
+## body deeper in is allowed. Actual movement and path validation use move_clear instead.
+func path_clear_leg(a: Vector2, b: Vector2, rad := 0.30) -> bool:
+	if a.distance_squared_to(b) < 0.0004:
+		return true
+	for idx in candidates(a, b, 1):
+		if _mv[idx] == 0:
+			continue
+		var r: Rect2 = _rect[idx]
+		var lim: float = minf(rad, minf(_rect_dist(a, r), _rect_dist(b, r))) - 0.01
+		if lim <= 0.01:
+			continue
+		if seg_rect_dist(a, b, r) < lim:
+			return false
+	return true
+
+
+## Distance from the segment a->b to the rectangle r: 0 when the segment crosses it,
+## otherwise the shortest way from the segment to the rectangle's edges or corners.
+static func seg_rect_dist(a: Vector2, b: Vector2, r: Rect2) -> float:
+	if seg_rect(a, b - a, r).x >= 0.0:
+		return 0.0
+	var best := INF
+	var corners: Array[Vector2] = [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]
+	for corner in corners:
+		best = minf(best, _seg_point_dist(a, b, corner))
+	best = minf(best, _rect_dist(a, r))
+	return minf(best, _rect_dist(b, r))
+
+
+## Distance from p to the segment a->b.
+static func _seg_point_dist(a: Vector2, b: Vector2, p: Vector2) -> float:
+	var ab := b - a
+	var l2 := ab.length_squared()
+	if l2 < 1e-12:
+		return a.distance_to(p)
+	return (a + ab * clampf((p - a).dot(ab) / l2, 0.0, 1.0)).distance_to(p)
+
+
+## Distance from p to the nearest point of an axis-aligned rectangle (0 inside it).
+static func _rect_dist(p: Vector2, r: Rect2) -> float:
+	var q := Vector2(clampf(p.x, r.position.x, r.end.x), clampf(p.y, r.position.y, r.end.y))
+	return q.distance_to(p)
 
 
 func setup(w: float, h: float) -> void:
@@ -217,8 +327,12 @@ func _collect(cx: int, cy: int, out: Array) -> void:
 			out.append(idx)
 
 
-## Obstacle indices whose buckets the segment a->b passes through (2D DDA).
-func candidates(a: Vector2, b: Vector2) -> Array:
+## Obstacle indices whose buckets the segment a->b passes through (2D DDA). With halo,
+## the buckets that far around each of them are collected too: a query that has to be
+## sure it has every obstacle within `halo` metres of the line (clearance tests) cannot
+## rely on the walk alone, because a bucket's edge is where an obstacle is filed, not
+## where it is.
+func candidates(a: Vector2, b: Vector2, halo := 0) -> Array:
 	_stamp_id += 1
 	var out: Array = []
 	var x := int(floor(a.x))
@@ -240,7 +354,12 @@ func candidates(a: Vector2, b: Vector2) -> Array:
 		t_dy = absf(1.0 / d.y)
 	var guard := 0
 	while true:
-		_collect(x, y, out)
+		if halo == 0:
+			_collect(x, y, out)
+		else:
+			for hy in range(-halo, halo + 1):
+				for hx in range(-halo, halo + 1):
+					_collect(x + hx, y + hy, out)
 		if (x == xe and y == ye) or guard > 512:
 			break
 		if t_max_x < t_max_y:
@@ -375,8 +494,8 @@ func sight_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float) -> in
 						stop = zlo < h
 					if stop:
 						mask &= ~(1 << k)
-			if mask == 0:
-				return 0
+				if mask == 0:
+					return 0
 		if (x == xe and y == ye) or guard > 512:
 			break
 		if t_max_x < t_max_y:
@@ -387,8 +506,89 @@ func sight_mask(a: Vector2, za: float, b: Vector2, zb1: float, zb2: float) -> in
 			y += step_y
 		guard += 1
 	if mask != 0 and dyn_active > 0:
-		mask = _dyn_mask(a, za, b, zb1, zb2, mask)
+		mask = _dyn_mask(a, b, mask)
 	return mask
+
+
+## How far along a->b sight carries before something blocks it (v0.7, the fog of war):
+## the fraction 0..1 of the segment, 1.0 when nothing does. One sight line, from height
+## za to zb, with the same rules as sight_mask.
+func sight_reach(a: Vector2, za: float, b: Vector2, zb: float) -> float:
+	_stamp_id += 1
+	var d := b - a
+	var L := d.length()
+	if L < 0.001:
+		return 1.0
+	var x := int(floor(a.x))
+	var y := int(floor(a.y))
+	var xe := int(floor(b.x))
+	var ye := int(floor(b.y))
+	var step_x := 1 if d.x > 0.0 else -1
+	var step_y := 1 if d.y > 0.0 else -1
+	var t_max_x := INF
+	var t_max_y := INF
+	var t_dx := INF
+	var t_dy := INF
+	if absf(d.x) > 1e-9:
+		t_max_x = ((x + (1 if d.x > 0.0 else 0)) - a.x) / d.x
+		t_dx = absf(1.0 / d.x)
+	if absf(d.y) > 1e-9:
+		t_max_y = ((y + (1 if d.y > 0.0 else 0)) - a.y) / d.y
+		t_dy = absf(1.0 / d.y)
+	var best := 1.0
+	var t_cell := 0.0
+	var guard := 0
+	while true:
+		if t_cell > best:
+			break
+		if x >= 0 and y >= 0 and x < _cw and y < _ch:
+			var cc := y * _cw + x
+			for kk in range(_cstart[cc], _cstart[cc + 1]):
+				var idx: int = _citems[kk]
+				if _stamp[idx] == _stamp_id:
+					continue
+				_stamp[idx] = _stamp_id
+				var kind: int = _kind[idx]
+				if kind == LOW:
+					continue
+				var r: Rect2 = _rect[idx]
+				if r.has_point(a):
+					continue
+				var tt := seg_rect(a, d, r)
+				if tt.x < 0.0 or tt.x >= best:
+					continue
+				var stop := false
+				if kind == WALL:
+					stop = true
+				else:
+					var z0 := lerpf(za, zb, tt.x)
+					var z1 := lerpf(za, zb, tt.y)
+					var zlo := minf(z0, z1)
+					if kind == WINDOW:
+						stop = zlo < _sill[idx] or maxf(z0, z1) > _lintel[idx]
+					else:
+						var h: float = _h[idx]
+						if h <= LOW_COVER_H and za > h:
+							h *= clampf((tt.x * L - LOW_NEAR) / (LOW_FULL - LOW_NEAR), 0.0, 1.0)
+						stop = zlo < h
+				if stop:
+					best = tt.x
+		if (x == xe and y == ye) or guard > 512:
+			break
+		if t_max_x < t_max_y:
+			t_cell = t_max_x
+			t_max_x += t_dx
+			x += step_x
+		else:
+			t_cell = t_max_y
+			t_max_y += t_dy
+			y += step_y
+		guard += 1
+	if dyn_active > 0:
+		var dd: Array = _dyn_trace(a, b, best)
+		if dd[0] >= 0:
+			best = float(dd[1])
+	return best
 
 
 ## First obstacle that stops a bullet on a->b. Returns {hit, t, p, n, idx, kind}.
@@ -427,13 +627,13 @@ func trace_shot(a: Vector2, za: float, b: Vector2, zb: float) -> Dictionary:
 			best_face = int(tt.z)
 	var best_kind: int = _kind[best_idx] if best_idx >= 0 else -1
 	if dyn_active > 0:
-		var dd: Array = _dyn_trace(a, za, b, zb, best_t)
+		var dd: Array = _dyn_trace(a, b, best_t)
 		if dd[0] >= 0:
 			best_t = float(dd[1])
 			best_face = int(dd[2])
 			best_idx = -1 - int(dd[0])
 			best_kind = dyn_kind[int(dd[0])]
-	if best_idx < 0 and best_kind < 0:
+	if best_kind < 0:
 		return {"hit": false, "t": 1.0, "p": b, "n": Vector2.ZERO, "idx": -1, "kind": -1, "z": zb}
 	var n := Vector2.ZERO
 	if best_face == 0:
@@ -444,11 +644,34 @@ func trace_shot(a: Vector2, za: float, b: Vector2, zb: float) -> Dictionary:
 		"z": lerpf(za, zb, best_t)}
 
 
-## Does a disc of radius rad at p overlap any movement-blocking obstacle?
-## `with_dyn` includes the dynamic set (shut door leaves). Pass false to ask
-## about the static map alone -- nav's cost layers must, or a leaf that starts
-## shut gets baked into the grid and can never be reopened (map 01).
-func blocked_disc(p: Vector2, rad: float, with_dyn := true) -> bool:
+## What a wall is made of (v0.6), for rounds going through it: partitions (up to 0.15 m)
+## are drywall, exterior walls of houses (up to 0.25 m) timber frame, yard fences fence;
+## anything thicker, tree trunks and named masonry are solid.
+func material(idx: int) -> String:
+	if idx < 0 and -1 - idx < dyn_mat.size():
+		return dyn_mat[-1 - idx]
+	if idx < 0 or idx >= obs.size():
+		return "solid"
+	var o: Dictionary = obs[idx]
+	if o["kind"] != WALL:
+		return "solid"
+	var nm: String = o["name"]
+	if nm == "fence":
+		return "fence"
+	if nm != "wall":
+		return "solid"
+	var r: Rect2 = o["r"]
+	var th := minf(r.size.x, r.size.y)
+	if th <= 0.15:
+		return "drywall"
+	if th <= 0.25:
+		return "frame"
+	return "solid"
+
+
+## Does a disc of radius rad at p overlap any movement-blocking obstacle? with_dyn
+## includes shut door leaves (the navigation grid is built without them).
+func blocked_disc(p: Vector2, rad: float, with_dyn := false) -> bool:
 	if p.x < rad or p.y < rad or p.x > width - rad or p.y > height - rad:
 		return true
 	var x0 := clampi(int(floor(p.x - rad)), 0, _cw - 1)

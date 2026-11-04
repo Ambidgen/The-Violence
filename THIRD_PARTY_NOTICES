@@ -1,0 +1,122 @@
+THIRD_PARTY_NOTICES
+The Violence — version 1.3.0 (Early Access), 2026-10-28
+Copyright (c) 2026 Ambidgen. All rights reserved. See LICENSE.
+
+The Violence is built with, and ships, work by other people. Every component below keeps
+its own licence; those licences govern the component and win over the game's own licence
+where they apply. This file is included in every export (export_presets.cfg
+include_filter) and is summarised in the game's Credits screen.
+
+Nothing here grants rights in The Violence itself.
+
+================================================================================
+1. GODOT ENGINE — MIT LICENCE  (ships inside the executable)
+================================================================================
+Every build of the game embeds a Godot Engine 4 runtime: 4.7.2 is the primary target and
+4.4.1 the compatibility target. https://godotengine.org
+
+Copyright (c) 2014-present Godot Engine contributors.
+Copyright (c) 2007-2014 Juan Linietsky, Ariel Manzur.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+================================================================================
+2. PATRICK HAND — SIL OPEN FONT LICENCE 1.1  (ships inside the executable)
+================================================================================
+fonts/PatrickHand.woff2 — Copyright (c) 2010-2012 Patrick Wagesreiter.
+The full licence text is in fonts/PatrickHand-OFL.txt (also included in every export via
+the fonts/*.txt include filter) and is reproduced at https://scripts.sil.org/OFL.
+
+================================================================================
+3. REMOTION 4.0.537 — REMOTION FREE LICENCE  (development time only)
+================================================================================
+cinematics/ renders the opening and the fourteen shorts with Remotion.
+https://www.remotion.dev — https://www.remotion.dev/docs/license/faq
+
+Remotion is free for an individual, an organisation of up to three people, or a
+non-profit; above that a paid company licence is required (P0.D3, decided 2026-10-28:
+this project qualifies for the free licence, so no company licence is required and no
+re-render is planned).
+
+What ships in the game is the rendered video: four opening scenes and fourteen shorts as
+Ogg Theora files (assets/cutscenes/), i.e. output, not Remotion itself. Remotion and its
+packages are not distributed with the game. Small commercial restrictions in the Remotion
+licence are accepted by the project as they apply; they do not pass on to players.
+
+The Remotion project also uses, at render time only:
+
+  react 19.3.1, react-dom 19.3.1            MIT — Copyright (c) Meta Platforms, Inc. and
+                                             affiliates. https://react.dev
+  @remotion/bundler, @remotion/cli,
+  @remotion/renderer 4.0.537                 Remotion licence, see above.
+  @fontsource/courier-prime 5.2.8            SIL OFL 1.1 — Courier Prime, Copyright (c)
+  @fontsource/oswald 5.2.8                   Alan Dague-Greene.
+  @fontsource/open-sans 5.2.7                SIL OFL 1.1 — Oswald, Copyright (c) Vernon
+                                             Adams; Open Sans, Copyright (c) Steve
+                                             Matteson. Fonts are used to render the films
+                                             only; OFL does not restrict the resulting
+                                             video, and the attribution is kept here.
+
+Video encoding used an ffmpeg build with libtheora and libvorbis to produce the .ogv files
+(ffmpeg is LGPL/GPL depending on the build; it is not distributed with the game).
+
+================================================================================
+4. PYTHON ASSET TOOLS  (development time only; not shipped)
+================================================================================
+tools/ generates sounds and character sheets. The game needs none of it at runtime.
+
+  numpy            BSD-3-Clause      https://numpy.org
+  scipy            BSD-3-Clause      https://scipy.org
+  Pillow 13.0.0    MIT-CMU (HPND)    https://python-pillow.org
+
+Everything else in tools/ (gd47_check.py, sync_version.py, inspect_pck.py, inspect_exe.py,
+make_placeholders.py, level_port.py, nav_probe.py, patch_rc.py, campaign_report.py,
+playtest.sh, run_tests.sh) runs on a bare Python 3 standard library.
+
+================================================================================
+5. TRAILER PROTOTYPES  (development and review; not part of the game export)
+================================================================================
+trailers/ contains five rendered review videos and their editable compositions. In
+addition to Remotion and React (section 3), the render-time tools include Revideo
+0.11.0 (MIT), Motion Canvas 3.17.2 (MIT), HyperFrames 0.8.214 (Apache-2.0),
+GSAP 3.15.0 (GreenSock standard licence: https://gsap.com/standard-license), p5.js
+1.11.10 (LGPL-2.1), Puppeteer (Apache-2.0), Chromium, Vite (MIT), and FFmpeg. The
+bundled FFmpeg used by these Linux render scripts is configured with GPL components.
+The tools and their dependency licences are installed separately with npm; they are
+not embedded in the MP4 output or shipped with the game. Review applicable terms
+before redistributing tools or publishing the trailers.
+
+The screening room and trailer sources include copies of Courier Prime (Copyright 2015
+The Courier Prime Project Authors), Oswald (Copyright 2016 The Oswald Project Authors),
+and Patrick Hand (Copyright 2010–2012 Patrick Wagesreiter), all under SIL OFL 1.1.
+The full copyright and licence texts are in trailers/media/fonts/*-OFL.txt.
+The trailer city illustration is AI-generated concept art; visual-prototype material
+and gameplay captures are identified in trailers/README.md and in the videos.
+
+================================================================================
+6. EVERYTHING ELSE IN THE GAME IS ORIGINAL
+================================================================================
+The simulation, maps, data, city model (port-carrick/, including the generated
+city.json), crayon art and its bake pipeline, character sprites, sound effects (all
+synthesised by tools/make_sounds.py — no samples), music (none yet in the game), text,
+icon and documentation were made for this project.
+
+================================================================================
+7. CONTACT
+================================================================================
+Third-party attribution errors are bugs: report them through the repository's hosting
+service and they will be corrected in the next build.

@@ -1,0 +1,28 @@
+Barricaded: Colm Kavanagh, 599 S Hopyard Place
+[Pause]
+00:22.2
+[0.25x]
+[0.5x]
+[1x]
+[2x]
+[5x]
+[10x]
+[20x]
+
+REWIND (a way of looking: the operation itself never goes back)
+[Live]
+Fog of war: what 7 of 7 officers can see. 0 people in view, 0 radio last-known positions.
+SQUAD 1  4/4  ·  clearing  ·  Arrest
+SQUAD 2  3/3  ·  holding  ·  Contain
+
+RADIO
+00:00.0  Police: 2 squads (4 + 3)
+00:10.0  Squad 2 in position
+00:10.0  Squad 1 crosses the phase line
+00:10.0  Squad 1 moves on the shop floor
+00:12.0  Squad 1 forces the shop floor door
+00:16.4  A2 kicks in the shop floor door
+00:16.4  Squad 1 enters the shop floor
+
+[ABORT  ·  cut losses]
+Abort: every squad breaks contact and withdraws to its vehicles, still under fire until it gets there. A failure, but a failure with everyone alive always scores better than one with deaths.

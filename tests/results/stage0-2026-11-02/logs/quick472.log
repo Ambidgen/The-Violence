@@ -1,0 +1,16 @@
+the violence: tier 'quick', 22 suites, engine: 4.7.2.stable.official.ed1daf0bf
+logs: /sessions/rcw-01xjze36brlebuus1kge2nyu/work/proj/build/test-logs
+
+  PASS    _check                          3s
+  PASS    godot472_test                   1s
+  PASS    city_integration_test           1s
+  PASS    character_assets_test           1s
+  PASS    group_movement_test             3s
+  PASS    clearance_model_test            1s
+  PASS    test_range_mechanics_test       1s
+  PASS    test_range_regression_test      1s
+  PASS    test_range_replays_test         3s
+  PASS    test_range_determinism_test    10s
+  PASS    improvements_test               1s
+  PASS    ops_ui_test                     1s
+  PASS    dept_test                       7s

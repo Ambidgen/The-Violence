@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Violence — The Front Page</title>
+<style>
+@font-face{font-family:Oswald;src:url('../media/fonts/Oswald-Semibold.woff2')}@font-face{font-family:Type;src:url('../media/fonts/CourierPrime.woff2')}@font-face{font-family:Hand;src:url('../media/fonts/PatrickHand.woff2')}
+*{box-sizing:border-box}body{margin:0;background:#111}#root{position:relative;width:1280px;height:720px;overflow:hidden;background:#ede8da;color:#1b1b19}.shot{position:absolute;inset:0;overflow:hidden;visibility:hidden}.photo{position:absolute;inset:0;background-size:cover;background-position:center}.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,16,15,.9),rgba(15,16,15,.1))}.small{font:16px Type,monospace;letter-spacing:1.8px}.caps{font-family:Oswald,sans-serif;font-weight:600;text-transform:uppercase}.topline{position:absolute;left:65px;right:65px;top:42px;padding-bottom:14px;border-bottom:1px solid currentColor;display:flex;justify-content:space-between;z-index:5}.red{color:#b43133}.paper{background:#eee9db;color:#1b1b19}.paper:after{content:"";pointer-events:none;position:absolute;inset:0;opacity:.07;background:repeating-linear-gradient(115deg,transparent 0 5px,#6f6d60 6px,transparent 7px)}.end-note{position:absolute;bottom:43px;left:65px;right:65px;display:flex;justify-content:space-between;font:15px Type;letter-spacing:1px}.stamp{border:4px solid #b43133;color:#b43133;padding:9px 16px;transform:rotate(-4deg);font:600 20px Oswald;letter-spacing:1px;display:inline-block}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="root" data-width="1280" data-height="720" data-duration="20" data-fps="24">
+  <section class="shot" id="s1">
+    <div class="photo" id="city" style="background-image:url('../media/city-art.jpg')"></div><div class="shade"></div>
+    <div class="topline small" style="color:#f0ebdf"><span>THE CARRICK LEDGER &nbsp; / &nbsp; SPECIAL EDITION</span><span>CONCEPT ART</span></div>
+    <div id="opening" style="position:absolute;left:76px;top:180px;color:#f3ecdd">
+      <div class="small" style="letter-spacing:3px;color:#d6cdbb">PORT CARRICK &nbsp; / &nbsp; ELECTION YEAR</div>
+      <div class="caps" style="font-size:103px;line-height:.98;margin-top:24px">THE CITY<br>IS WATCHING.</div>
+      <div style="width:420px;height:5px;background:#b43133;margin:27px 0 20px"></div>
+      <div class="small">EVERY CALL LEAVES A RECORD.</div>
+    </div>
+    <div class="end-note" style="color:#eee8db"><span>01 / THE FRONT PAGE</span><span>THE VIOLENCE</span></div>
+  </section>
+  <section class="shot paper" id="s2">
+    <div class="topline small"><span>THE CHIEF'S DESK</span><span>WEEKLY BOARD / IN-GAME CAPTURE</span></div>
+    <div id="s2copy" style="position:absolute;left:76px;top:166px;z-index:1">
+      <div class="small red">YOU CHOOSE WHAT TO ANSWER</div>
+      <div class="caps" style="font-size:87px;line-height:1;margin-top:20px">EVERY<br>CALL MATTERS.</div>
+      <p class="small" style="line-height:1.6;margin-top:26px">Six wards. Limited officers.<br>A city that keeps score.</p>
+    </div>
+    <div id="board" style="position:absolute;left:660px;top:156px;width:572px;height:340px;background:#bdb5a4;border:9px solid #292926;box-shadow:12px 12px 0 #aaa495;transform:rotate(2deg);overflow:hidden"><img src="../media/game-board.jpg" style="width:100%;height:100%;object-fit:cover;object-position:left"></div>
+    <div class="end-note"><span>02 / THE SITUATIONS</span><span class="red">PORT CARRICK</span></div>
+  </section>
+  <section class="shot paper" id="s3">
+    <div id="newspaper" style="position:absolute;left:177px;top:50px;width:926px;height:620px;background:#e6dfcf;border:4px solid #1b1b19;padding:30px 40px;box-shadow:15px 15px 0 #b9b2a2;transform:rotate(-1deg)">
+      <div class="small" style="display:flex;justify-content:space-between;border-bottom:2px solid #222;padding-bottom:10px"><span>PORT CARRICK, ELECTION YEAR</span><span>SPECIAL EDITION &nbsp; / &nbsp; 50¢</span></div>
+      <div class="caps" style="text-align:center;font-size:68px;letter-spacing:5px;line-height:1.2;border-bottom:7px double #222">THE CARRICK LEDGER</div>
+      <div class="caps" id="headline" style="font-size:68px;line-height:1.02;margin-top:24px">THE PLAN IS ONLY<br>THE BEGINNING.</div>
+      <div style="height:5px;background:#b43133;margin:18px 0"></div>
+      <div style="display:flex;gap:25px"><img src="../media/game-briefing.jpg" style="width:346px;height:190px;object-fit:cover;border:3px solid #222"><div style="flex:1"><div class="small" style="line-height:1.55;font-size:18px">Assign the people. Set the orders. Watch the operation play out.</div><div style="margin-top:20px" class="stamp">THE CITY REMEMBERS</div></div></div>
+      <div class="small" style="margin-top:18px;font-size:14px">ILLUSTRATIVE EDITORIAL LAYOUT &nbsp; • &nbsp; GAME BRIEFING CAPTURE</div>
+    </div>
+  </section>
+  <section class="shot" id="s4">
+    <div class="photo" id="street" style="background-image:url('../media/election-prototype.jpg')"></div><div class="shade" style="background:linear-gradient(90deg,rgba(15,16,15,.91),rgba(15,16,15,.15))"></div>
+    <div class="topline small" style="color:#f0ebdf"><span>THE CITY / THE CONSEQUENCES</span><span>VISUAL PROTOTYPE</span></div>
+    <div id="votes" style="position:absolute;left:76px;top:185px;color:#f3ecdd"><div class="small" style="color:#e1d4c1">THE CAMPAIGN ENDS ON ELECTION NIGHT.</div><div class="caps" style="font-size:92px;line-height:.98;margin-top:24px">40 WEEKS.<br>ONE VERDICT.</div><div style="width:445px;height:5px;background:#b43133;margin-top:28px"></div></div>
+    <div class="end-note" style="color:#eee8db"><span>04 / THE ELECTION</span><span>TRUST HAS CONSEQUENCES</span></div>
+  </section>
+  <section class="shot paper" id="s5">
+    <div class="topline small"><span>THE CARRICK LEDGER</span><span>FINAL EDITION / TRAILER PROTOTYPE</span></div>
+    <div id="final" style="position:absolute;top:190px;left:0;right:0;text-align:center"><div class="small" style="letter-spacing:3px">FORTY WEEKS TO THE ELECTION</div><div style="font:134px/.97 Hand;margin-top:22px">THE VIOLENCE</div><div style="height:6px;background:#b43133;width:695px;margin:18px auto 28px;transform:rotate(-.4deg)"></div><div class="caps" style="font-size:27px;letter-spacing:4px">A TACTICAL COMMAND AUTOBATTLER</div><div class="small" style="margin-top:50px">EARLY ACCESS &nbsp; • &nbsp; WORK IN PROGRESS</div></div>
+    <div class="end-note"><span>PORT CARRICK</span><span class="red">EVERY DECISION IS ON THE RECORD.</span></div>
+  </section>
+</div>
+<script src="../node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const tl=gsap.timeline({paused:true});
+// Hard editorial cuts; the content within each page has its own kinetic motion.
+tl.set('#s1',{visibility:'visible'},0).fromTo('#opening',{y:32,opacity:0},{y:0,opacity:1,duration:.7,ease:'power3.out'},0.1).fromTo('#city',{scale:1},{scale:1.08,duration:4,ease:'none'},0);
+tl.set('#s1',{visibility:'hidden'},4).set('#s2',{visibility:'visible'},4).fromTo('#s2copy',{x:-35,opacity:0},{x:0,opacity:1,duration:.55,ease:'power3.out'},4.05).fromTo('#board',{x:90,opacity:0,rotation:5},{x:0,opacity:1,rotation:2,duration:.65,ease:'power2.out'},4.15);
+tl.set('#s2',{visibility:'hidden'},8).set('#s3',{visibility:'visible'},8).fromTo('#newspaper',{y:90,opacity:0,rotation:-3},{y:0,opacity:1,rotation:-1,duration:.55,ease:'power3.out'},8).fromTo('#headline',{opacity:0,y:15},{opacity:1,y:0,duration:.4},8.5);
+tl.set('#s3',{visibility:'hidden'},12).set('#s4',{visibility:'visible'},12).fromTo('#votes',{y:32,opacity:0},{y:0,opacity:1,duration:.6,ease:'power3.out'},12.1).fromTo('#street',{scale:1.02},{scale:1.12,duration:3.8,ease:'none'},12);
+tl.set('#s4',{visibility:'hidden'},15.9).set('#s5',{visibility:'visible'},15.9).fromTo('#final',{scale:.97,opacity:0},{scale:1,opacity:1,duration:.7,ease:'power2.out'},16).to({}, {duration:.1}, 19.9);
+window.__timelines=window.__timelines||{};window.__timelines.root=tl;
+</script>
+</body>
+</html>

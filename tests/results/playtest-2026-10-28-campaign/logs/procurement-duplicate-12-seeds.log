@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+seed 1 ["doctrine:pie,reserve,plates", "procurement:smg,plates,shotgun"] | wasted-purchase combos: ["plates -> plates wasted $6000"]
+seed 2 ["doctrine:plates,reserve,pie", "procurement:helmets,bangs,gas"] | wasted-purchase combos: []
+seed 3 ["doctrine:plates,pie,reserve", "procurement:helmets,pistols,plates"] | wasted-purchase combos: ["plates -> plates wasted $6000"]
+seed 4 ["doctrine:plates,reserve,pie", "procurement:pistols,bangs,gas"] | wasted-purchase combos: []
+seed 5 ["doctrine:reserve,plates,pie", "procurement:helmets,plates,gas"] | wasted-purchase combos: ["plates -> plates wasted $6000"]
+seed 6 ["doctrine:plates,reserve,pie", "procurement:plates,smg,bangs"] | wasted-purchase combos: ["plates -> plates wasted $6000"]
+seed 7 ["doctrine:reserve,plates,pie", "procurement:shotgun,helmets,bangs"] | wasted-purchase combos: []
+seed 8 ["doctrine:reserve,pie,plates", "procurement:smg,helmets,pistols"] | wasted-purchase combos: []
+seed 9 ["doctrine:reserve,pie,plates", "procurement:pistols,bangs,smg"] | wasted-purchase combos: []
+seed 10 ["doctrine:reserve,pie,plates", "procurement:shotgun,smg,helmets"] | wasted-purchase combos: []
+seed 11 ["doctrine:reserve,pie,plates", "procurement:plates,pistols,smg"] | wasted-purchase combos: ["plates -> plates wasted $6000"]
+seed 12 ["doctrine:reserve,pie,plates", "procurement:helmets,plates,shotgun"] | wasted-purchase combos: ["plates -> plates wasted $6000"]

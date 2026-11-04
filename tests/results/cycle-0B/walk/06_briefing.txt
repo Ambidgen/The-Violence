@@ -1,0 +1,37 @@
+Barricaded: Colm Kavanagh, 599 S Hopyard Place
+FIRST OPERATION  ·  1/4  ·  BRIEFING
+Read what is known and what is only estimated. The readiness range is a planning index, not a win chance. When you have the briefing, continue to Force.
+[Next: Force  >]
+[Skip guide]
+[1 Briefing]
+[2 Force]
+[3 Orders]
+Tip: confirmed facts and estimates are marked separately. Canvassing adds two tips, but takes an officer for the week.
+An armed suspect is holding at the site. The clock may lower the risk; it cannot guarantee a safe exit.
+Suggested plans use the officers' current equipment. Issue or change kit on the Force tab.
+Brass Rail tavern  ·  corner tavern. The tactical layout is a schematic proxy, not a surveyed floor plan.
+599 S Hopyard Place, Ironworks ward. Trust in police: 24 of 100.
+Visibility ●●○○○: A small number of neighbours may see it.
+Time pressure: Low
+FACTS, ESTIMATES, AND SOURCES
+Where he is holed up: storeroom? (estimate, 50% confidence)
+Weapons: a handgun, he says (estimate, 40% confidence)
+Anyone else inside: nobody, probably (estimate, 40% confidence)
+Background: ex-military  (confirmed)
+Doors: locked, probably (estimate, 40% confidence)
+
+TIPS
+· A neighbour: background, ex-military
+
+READINESS 37–78 / 100  ·  contested
+A planning index, not a win probability. Unconfirmed rooms, people and intent remain uncertain.
+ASSUMPTIONS  ·  7 officers assigned; planning baseline 7  ·  Threat read: not established
+KNOWN  ·  Background: ex-military
+STILL UNCERTAIN  ·  Where he is holed up, Weapons, Anyone else inside, Doors, armed threat
+[Off. Jean McKenzie (Blooded)]
+[Canvass]
+Canvassing brings two more tips; the officer is gone for the week.
+[Body cameras: not issued]
+[<  Board]
+[Suggest a plan]
+[RUN   >   7 officers]

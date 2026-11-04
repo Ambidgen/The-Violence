@@ -1,16 +1,28 @@
 extends RefCounted
-## Faction marks for the city. The plan stays greyscale (blood is the only colour), so
-## each faction has a tone and a pattern: the pattern on its members' shoulders is the
-## pattern that hatches its buildings on the map.
-##   police: solid dark   Kilbride Crew: dots   Corvino Family: bands
-##   Los Halcones: diagonal hatch   Zarya Bratva: cross-hatch   paramedics: white cross
+## Faction marks for the city plan: police solid, Kilbride dots, Corvino bands,
+## Los Halcones hatch, Zarya cross-hatch, and paramedics a cross. In the crayon
+## character view each gang also gets a distinct clothing family.
 
 const TONE := {0: Color("#2e2e2e"), 1: Color("#4c4c4c"), 2: Color("#5e5e5e"), 3: Color("#3e3e3e"),
 	4: Color("#555555"), 5: Color("#8a8a8a")}
 const PATTERN := {0: "solid", 1: "dots", 2: "bands", 3: "hatch", 4: "check", 5: "cross"}
 const NEUTRAL := Color("#9a9a96")
-## Alert pips are interface, not art: the three states the rules name.
-const ALERT := [Color("#4f9d5a"), Color("#d4b13a"), Color("#b8322f")]
+const Ink = preload("res://scripts/view/ink.gd")
+
+
+## The alert pip (v0.8, red ink): the three states the rules name told apart by shape,
+## so they read without colour. GREEN a hollow ring, YELLOW a grey disc, RED a red disc
+## in a heavy ink ring.
+static func alert_pip(ci: CanvasItem, p: Vector2, lvl: int) -> void:
+	ci.draw_circle(p, 4.6, Color(Ink.PAPER, 0.95))
+	match lvl:
+		0:
+			ci.draw_arc(p, 3.0, 0.0, TAU, 14, Ink.MID, 1.2)
+		1:
+			ci.draw_circle(p, 3.4, Ink.MID)
+		_:
+			ci.draw_circle(p, 3.4, Ink.accent(0.9))
+			ci.draw_arc(p, 4.3, 0.0, TAU, 16, Ink.INK, 1.4)
 
 
 static func faction(fi: int) -> Color:
@@ -25,17 +37,48 @@ static func hexs(fi: int) -> String:
 	return "#" + faction(fi).to_html(false)
 
 
-## Sprite set for an operator: police (patrol or QRF), paramedics, the four gangs, or the
-## two teams of a normal match.
-static func look(o, w) -> String:
-	if w == null or not w.city:
+## Pure presentation choices: stable per person/operation and never consume the
+## simulation RNG. A concealed attacker keeps a civilian look until revealed.
+const CRIMINAL_LOOKS := ["hood", "leather", "workcoat", "track", "vestlook"]
+const POLICE_LOOKS := ["patrol", "swat", "riot"]
+
+
+static func look(o, w, reveal_attacker := false) -> String:
+	if o.civ and not (reveal_attacker and o.attacker):
+		return "c"
+	if w == null:
 		return "a" if o.team == 0 else "b"
 	if o.medic:
 		return "pmed" if o.faction == 0 else "med"
-	if o.faction == 0:
+	var police: bool = o.judges or o.police
+	if police:
+		if not w.event.is_empty():
+			return "riot"
 		var tm: Dictionary = w.teams[o.team] if o.team >= 0 and o.team < w.teams.size() else {}
-		return "qrf" if tm.get("kind", "") == "qrf" else "pd"
-	return "g%d" % clampi(o.faction, 1, 4)
+		var kit: Dictionary = o.kit
+		if tm.get("kind", "") == "qrf" or o.echelon in ["police", "sof"] or kit.get("armour", "none") == "plates" or kit.get("head", "none") in ["ballistic_helmet", "sof_helmet"]:
+			return "swat"
+		return "patrol"
+	if w.city:
+		# City factions keep a recognizable clothing family, rather than changing each frame.
+		return CRIMINAL_LOOKS[posmod(o.faction - 1, CRIMINAL_LOOKS.size())]
+	if not w.factions.is_empty() and bool(w.factions[0].get("police", false)) and o.team == 1:
+		return CRIMINAL_LOOKS[posmod(hash("%s:%s" % [o.id, w.seed_used]), CRIMINAL_LOOKS.size())]
+	# The test range can still stage non-police military teams.
+	return "a" if o.team == 0 else "b"
+
+
+## A concealed event attacker needs a civilian-looking label as well as clothing.
+## Put it after the real civilians' IDs so it does not alias an actual person.
+static func disguise_id(o, w) -> String:
+	var civilians := 0
+	if w != null and w.teams.size() > 2:
+		civilians = w.teams[2].get("members", []).size()
+	return "C%d" % (civilians + maxi(0, int(o.slot)) + 1)
+
+
+static func display_id(o, w) -> String:
+	return disguise_id(o, w) if o.attacker and o.civ else String(o.id)
 
 
 ## Fill a rectangle (canvas pixels) with a faction's pattern. Hairlines, so the pattern

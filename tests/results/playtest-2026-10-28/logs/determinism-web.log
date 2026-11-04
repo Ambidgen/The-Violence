@@ -1,0 +1,45 @@
+PCK /tmp/violence-browser/web-determinism/index.pck 88 3276272
+GODOT log Engine missing features []
+GODOT log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+GODOT log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+GODOT log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+GODOT log   DIFF  m00_2v2_sof_untrained_assault_1001           winner 0.0 -> 0, t 40.6 -> 40.6, shots 3.0 -> 3, hits 3.0 -> 3
+GODOT log   ok    m00_2v2_sof_untrained_assault_2002           1640e2fd5f638236
+GODOT log   DIFF  m00_2v2_sof_untrained_assault_3003           winner 0.0 -> 0, t 40.6 -> 40.6, shots 2.0 -> 2, hits 2.0 -> 2
+GODOT log   DIFF  m00_3v5_police_militia_assault_1001          winner 0.0 -> 0, t 47.1 -> 46.8, shots 21.0 -> 21, hits 11.0 -> 11
+GODOT log   DIFF  m00_3v5_police_militia_assault_2002          winner 0.0 -> 0, t 53.1 -> 50.0, shots 12.0 -> 10, hits 8.0 -> 7
+GODOT log   DIFF  m00_3v5_police_militia_assault_3003          winner 0.0 -> 0, t 42.9 -> 42.4, shots 31.0 -> 20, hits 11.0 -> 13
+GODOT log   DIFF  m00_5v5_regular_regular_assault_1001         winner 1.0 -> 0, t 69.7 -> 49.3, shots 40.0 -> 23, hits 14.0 -> 7
+GODOT log   DIFF  m00_5v5_regular_regular_assault_2002         winner 0.0 -> 1, t 59.7 -> 60.5, shots 58.0 -> 51, hits 11.0 -> 10
+GODOT log   DIFF  m00_5v5_regular_regular_assault_3003         winner 0.0 -> 0, t 54.8 -> 60.7, shots 28.0 -> 44, hits 6.0 -> 8
+GODOT log   ok    m01_2v2_sof_militia_assault_1001             1bc7ec009dce2484
+GODOT log   ok    m01_2v2_sof_militia_assault_2002             1dc3cb8e547b0c34
+GODOT log   ok    m01_2v2_sof_militia_assault_3003             d894300f7e222c01
+GODOT log   DIFF  m01_4v4_regular_untrained_assault_1001       winner 0.0 -> 0, t 8.8 -> 14.6, shots 17.0 -> 17, hits 9.0 -> 6
+GODOT log   DIFF  m01_4v4_regular_untrained_assault_2002       winner 0.0 -> 0, t 18.7 -> 6.6, shots 48.0 -> 10, hits 12.0 -> 5
+GODOT log   DIFF  m01_4v4_regular_untrained_assault_3003       winner 0.0 -> 0, t 10.4 -> 12.7, shots 18.0 -> 18, hits 7.0 -> 6
+GODOT log   DIFF  m04_5v5_police_regular_assault_1001          winner 0.0 -> 1, t 70.0 -> 20.7, shots 44.0 -> 44, hits 14.0 -> 17
+GODOT log   DIFF  m04_5v5_police_regular_assault_2002          winner 0.0 -> 1, t 85.7 -> 42.1, shots 30.0 -> 22, hits 11.0 -> 8
+GODOT log   DIFF  m04_5v5_police_regular_assault_3003          winner 1.0 -> 1, t 68.1 -> 20.6, shots 27.0 -> 26, hits 12.0 -> 10
+GODOT log   DIFF  m04_8v8_regular_militia_hunt_1001            winner 0.0 -> 0, t 17.2 -> 13.4, shots 20.0 -> 23, hits 12.0 -> 10
+GODOT log   DIFF  m04_8v8_regular_militia_hunt_2002            winner 0.0 -> 0, t 22.4 -> 16.0, shots 47.0 -> 32, hits 15.0 -> 12
+GODOT log   DIFF  m04_8v8_regular_militia_hunt_3003            winner 0.0 -> 0, t 21.5 -> 24.3, shots 54.0 -> 83, hits 17.0 -> 18
+GODOT log   DIFF  m07_12v12_sof_regular_assault_1001           winner 0.0 -> 0, t 62.2 -> 145.9, shots 176.0 -> 187, hits 22.0 -> 30
+GODOT log   DIFF  m07_12v12_sof_regular_assault_2002           winner 0.0 -> 0, t 129.7 -> 87.0, shots 230.0 -> 200, hits 29.0 -> 39
+GODOT log   DIFF  m07_12v12_sof_regular_assault_3003           winner 0.0 -> 1, t 64.2 -> 155.3, shots 184.0 -> 229, hits 22.0 -> 38
+GODOT log   ok    m10_6v6_police_militia_assault_1001          b5dbf9df53caaf6d
+GODOT log   ok    m10_6v6_police_militia_assault_2002          11fe28c6d014e250
+GODOT log   ok    m10_6v6_police_militia_assault_3003          3aa4150a6ab32ec5
+GODOT log   DIFF  op1001_W1-1_barricade_m03                    winner 0.0 -> 0, t 170.0 -> 323.8, shots 11.0 -> 10, hits 5.0 -> 4
+GODOT log   ok    op1001_W1-2_warrant_m06                      771423ada2e84cb7
+GODOT log   ok    op1001_W1-3_warrant_m05                      b01972299f7c0145
+GODOT log   ok    op1001_W1-4_event_m11                        5b64b65493e1372d
+GODOT log   ok    op2002_W1-1_gang_m08                         2f215634950b590a
+GODOT log   DIFF  op2002_W1-2_warrant_m05                      winner 0.0 -> 0, t 54.3 -> 54.3, shots 9.0 -> 18, hits 3.0 -> 3
+GODOT log   ok    op2002_W1-3_warrant_m06                      ab0312d30c11279b
+GODOT log   ok    op2002_W1-4_event_m11                        70939829af77bfa4
+GODOT log
+GODOT log 35 case(s), 22 changed, 233401 ms
+GODOT log FAIL: 22 case(s) changed. If intended, re-run with --write and read the diff.
+GODOT log PROBE_DONE fail
+PROBE_FINISHED errors= 0

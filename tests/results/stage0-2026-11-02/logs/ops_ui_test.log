@@ -1,0 +1,21 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+  ok   the board displays this week's canonical city pins
+  ok   an unlocated call does not display fabricated ward trust
+  ok   the city overview is hidden on other management screens
+  ok   one Hire button for each of the 2 visible applicants
+  ok   the removed blind-hire buttons stay removed
+  ok   clicking Hire adds the chosen applicant to the roster
+  ok   the hire reports to the academy or duty with a department id
+  ok   the unchosen applicants walk after one hire
+  ok   the UI propagates one department change
+  ok   a fresh applicant pool appears the next week
+  ok   an empty save slot offers no continue
+  ok   the unreadable-save UI fixture writes
+  ok   a placeholder with an existing unreadable save is identified
+  ok   an unreadable save never offers a fake Continue
+  ok   starting over an unreadable save requires confirmation without changing the file
+  ok   the valid-save UI fixture writes
+  ok   a loaded campaign still offers Continue
+  ok   an in-progress loaded campaign still asks before replacement
+ops ui test: ALL OK

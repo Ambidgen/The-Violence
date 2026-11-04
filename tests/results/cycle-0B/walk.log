@@ -1,0 +1,42 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 20.1.2, 256 bits)
+
+WALK window 1600x900, layout 1600x900 (text drawn at x1.00), rendering true, steps title,desk,brief,run,endweek,screens, seed 410255
+WALK ok   the title has a New run button
+WALK no button 'Start a new story'
+WALK ok   New run starts a roguelike run
+WALK week 1, account $25000, 20 fit, desk ["doctrine:plates,reserve,pie", "procurement:smg,pistols,bangs"]
+WALK ok   the board draws the city map
+WALK ok   Brief and plan waits for the inheritance
+WALK KNOWN the first call's Brief and plan is disabled with its reason in a tooltip only (EA_TASKS P3.B1)
+WALK ok   the desk opens the inheritance
+WALK KNOWN management screens sit over the last tactical map, not the city (EA_TASKS P3.A1)
+WALK ok   an inheritance can be chosen
+WALK ok   the inheritance is settled
+WALK ok   the desk opens procurement
+WALK ok   a contract can be signed
+WALK ok   a paid contract adds to the armoury
+WALK ok   the first call can be briefed after the desk
+WALK ok   opening a briefing spends nothing (account change $0)
+WALK ok   the Force tab opens
+WALK ok   the Orders tab opens
+WALK ok   the plan can be run
+WALK ok   the operation ends (38 s sim in 20257 ms wall)
+WALK ok   the debrief returns to the board
+WALK ok   End week advances to week 2 (now 2)
+WALK ok   the board opens Roster
+WALK ok   Roster returns to the board
+WALK ok   the board opens Budget
+WALK ok   Budget returns to the board
+WALK ok   the board opens Internal affairs
+WALK ok   Internal affairs returns to the board
+WALK ok   the board opens City Hall
+WALK ok   City Hall returns to the board
+WALK ok   the board opens Armoury and programs
+WALK no button 'Back to the board'
+WALK ok   Armoury and programs returns to the board
+WALK ok   the board opens Campaign file
+WALK ok   Campaign file returns to the board
+ui_walk: 0 failure(s), 2 known, 18 screenshot(s) in /home/claude/w/proj/tests/results/cycle-0B/walk

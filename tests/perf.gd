@@ -21,33 +21,15 @@ func _init() -> void:
 	w.profiling = true
 	var cfgs: Array = Teams.team(lv, 0, {"n": int(opt["na"]), "ech": opt["a"]}) + Teams.team(lv, 1, {"n": int(opt["nb"]), "ech": opt["b"]})
 	w.setup(lv, nav, cfgs, [opt["pa"], opt["pb"]], int(opt["seed"]))
+	if opt.has("fine"):
+		w.brain.fine = true
 	var t0 := Time.get_ticks_usec()
 	var ticks := 0
 	var sc0: int = w.geom.sight_calls
 	var pc0: int = nav.path_calls
-	# H3 (analysis 5.3): time moving vs distance to the nearest living enemy.
-	# The P1/P4 boundary at 10 m should show as a step in the move fraction.
-	var t_move := []
-	var t_all := []
-	for i in 25:
-		t_move.append(0.0)
-		t_all.append(0.0)
 	while not w.over and w.t < float(opt["t"]):
 		w.step()
 		ticks += 1
-		for o in w.ops:
-			if not o.alive():
-				continue
-			var dmin := 1e9
-			for e in w.ops:
-				if e.alive() and e.team != o.team:
-					dmin = minf(dmin, o.pos.distance_to(e.pos))
-			if dmin >= 25.0:
-				continue
-			var b := int(dmin)
-			t_all[b] += 1.0 / 30.0
-			if o.moving and o.speed > 0.0:
-				t_move[b] += 1.0 / 30.0
 	var us := Time.get_ticks_usec() - t0
 	print("%d ticks, %.2f ms/tick, sim %.1f s, realtime factor %.1fx" % [ticks, us / 1000.0 / ticks, w.t, w.t / (us / 1e6)])
 	for k in w.prof:
@@ -58,10 +40,5 @@ func _init() -> void:
 		if o.alive():
 			alive[o.team] += 1
 	print("  alive %d/%d at %.1f s" % [alive[0], alive[1], w.t])
-	print("movement vs distance to nearest living enemy (H3):")
-	print("  dist_m  time_s  moving_s  moving%")
-	for b in 25:
-		if t_all[b] <= 0.0:
-			continue
-		print("  %2d-%2d   %6.1f   %6.1f    %3.0f%%" % [b, b + 1, t_all[b], t_move[b], 100.0 * t_move[b] / t_all[b]])
-	quit()
+	w.dispose()   # P0.A1: an undisposed World leaves 'resources still in use' (an engine ERROR line)
+	quit(0 if ticks > 0 else 1)   # P0.A1: a profile; fails only if nothing ran

@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+launcher          s until an unarmed man who will not give up is cuffed (less) 240.00   221.76   FAIL
+pepperball        s until an unarmed man who will not give up is cuffed (less) 210.07   221.76   PASS
+1 of 2 items change the outcome (12 runs each way, 27 s)

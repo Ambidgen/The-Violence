@@ -1,0 +1,51 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+=== 60.0 s; shots 28, hits 9; over false winner -1 ===
+  A1 patrol at (13.1, 13.4) room=LIVING shots=3 pos_goal=(13.0, 13.35) dbg= mind=lion last_seen=10.4 path=2/3
+  A3 patrol at (12.7, 13.7) room=LIVING shots=4 pos_goal=(12.875, 13.875) dbg=engage > B5 mind=lizard last_seen=60.0 path=3/4
+  A4 patrol at (13.3, 12.8) room=LIVING shots=4 pos_goal=(13.5, 12.65) dbg= mind=lion last_seen=10.4 path=4/5
+  A5 patrol at (11.2, 9.1) room=OUT shots=15 pos_goal=(11.45, 9.200001) dbg=rear security mind=lion last_seen=3.7 path=4/5
+  B1 regular at (22.4, 12.5) room=BEDROOM shots=0 pos_goal=(22.20818, 13.37525) dbg=holding where he is mind=lion last_seen=-99.0 path=1/4
+  B5 regular at (23.9, 12.7) room=BEDROOM shots=0 pos_goal=(24.54636, 13.21303) dbg=engage > A3 mind=lizard last_seen=60.0 path=3/4
+  squad Team A mode=assault task={ "door": "FRONT", "into": "LIVING", "check": false } phase=clear
+  squad Team B mode=hold task={  } phase=
+=== 120.0 s; shots 28, hits 9; over false winner -1 ===
+  A1 patrol at (13.1, 13.4) room=LIVING shots=3 pos_goal=(13.0, 13.35) dbg= mind=lion last_seen=10.4 path=2/3
+  A3 patrol at (12.7, 13.7) room=LIVING shots=4 pos_goal=(12.875, 13.875) dbg=engage > B5 mind=lizard last_seen=120.0 path=3/4
+  A4 patrol at (13.3, 12.8) room=LIVING shots=4 pos_goal=(13.5, 12.65) dbg= mind=lion last_seen=10.4 path=4/5
+  A5 patrol at (11.2, 9.1) room=OUT shots=15 pos_goal=(11.45, 9.200001) dbg=rear security mind=lion last_seen=3.7 path=4/5
+  B1 regular at (22.4, 12.5) room=BEDROOM shots=0 pos_goal=(22.20818, 13.37525) dbg=holding where he is mind=lion last_seen=-99.0 path=1/4
+  B5 regular at (23.9, 12.7) room=BEDROOM shots=0 pos_goal=(24.54636, 13.21303) dbg=engage > A3 mind=lizard last_seen=120.0 path=3/4
+  squad Team A mode=assault task={ "door": "FRONT", "into": "LIVING", "check": false } phase=clear
+  squad Team B mode=hold task={  } phase=
+=== 180.0 s; shots 28, hits 9; over false winner -1 ===
+  A1 patrol at (13.1, 13.4) room=LIVING shots=3 pos_goal=(13.0, 13.35) dbg= mind=lion last_seen=10.4 path=2/3
+  A3 patrol at (12.7, 13.7) room=LIVING shots=4 pos_goal=(12.875, 13.875) dbg=engage > B5 mind=lizard last_seen=180.0 path=3/4
+  A4 patrol at (13.3, 12.8) room=LIVING shots=4 pos_goal=(13.5, 12.65) dbg= mind=lion last_seen=10.4 path=4/5
+  A5 patrol at (11.2, 9.1) room=OUT shots=15 pos_goal=(11.45, 9.200001) dbg=rear security mind=lion last_seen=3.7 path=4/5
+  B1 regular at (22.4, 12.5) room=BEDROOM shots=0 pos_goal=(22.20818, 13.37525) dbg=holding where he is mind=lion last_seen=-99.0 path=1/4
+  B5 regular at (23.9, 12.7) room=BEDROOM shots=0 pos_goal=(24.54636, 13.21303) dbg=engage > A3 mind=lizard last_seen=180.0 path=3/4
+  squad Team A mode=assault task={ "door": "FRONT", "into": "LIVING", "check": false } phase=clear
+  squad Team B mode=hold task={  } phase=
+=== 240.0 s; shots 28, hits 9; over false winner -1 ===
+  A1 patrol at (13.1, 13.4) room=LIVING shots=3 pos_goal=(13.0, 13.35) dbg= mind=lion last_seen=10.4 path=2/3
+  A3 patrol at (12.7, 13.7) room=LIVING shots=4 pos_goal=(12.875, 13.875) dbg=engage > B5 mind=lizard last_seen=240.0 path=3/4
+  A4 patrol at (13.3, 12.8) room=LIVING shots=4 pos_goal=(13.5, 12.65) dbg= mind=lion last_seen=10.4 path=4/5
+  A5 patrol at (11.2, 9.1) room=OUT shots=15 pos_goal=(11.45, 9.200001) dbg=rear security mind=lion last_seen=3.7 path=4/5
+  B1 regular at (22.4, 12.5) room=BEDROOM shots=0 pos_goal=(22.20818, 13.37525) dbg=holding where he is mind=lion last_seen=-99.0 path=1/4
+  B5 regular at (23.9, 12.7) room=BEDROOM shots=0 pos_goal=(24.54636, 13.21303) dbg=engage > A3 mind=lizard last_seen=240.0 path=3/4
+  squad Team A mode=assault task={ "door": "FRONT", "into": "LIVING", "check": false } phase=clear
+  squad Team B mode=hold task={  } phase=
+=== 300.0 s; shots 28, hits 9; over true winner 2 ===
+  A1 patrol at (13.1, 13.4) room=LIVING shots=3 pos_goal=(13.0, 13.35) dbg= mind=lion last_seen=10.4 path=2/3
+  A3 patrol at (12.7, 13.7) room=LIVING shots=4 pos_goal=(12.875, 13.875) dbg=engage > B5 mind=lizard last_seen=300.0 path=3/4
+  A4 patrol at (13.3, 12.8) room=LIVING shots=4 pos_goal=(13.5, 12.65) dbg= mind=lion last_seen=10.4 path=4/5
+  A5 patrol at (11.2, 9.1) room=OUT shots=15 pos_goal=(11.45, 9.200001) dbg=rear security mind=lion last_seen=3.7 path=4/5
+  B1 regular at (22.4, 12.5) room=BEDROOM shots=0 pos_goal=(22.20818, 13.37525) dbg=holding where he is mind=lion last_seen=-99.0 path=1/4
+  B5 regular at (23.9, 12.7) room=BEDROOM shots=0 pos_goal=(24.54636, 13.21303) dbg=engage > A3 mind=lizard last_seen=300.0 path=3/4
+  squad Team A mode=assault task={ "door": "FRONT", "into": "LIVING", "check": false } phase=clear
+  squad Team B mode=hold task={  } phase=

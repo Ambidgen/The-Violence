@@ -1,0 +1,28 @@
+{
+  "frames": 801,
+  "harness": "tests/cutscene_capture.gd",
+  "secs": 200.0,
+  "stills": [
+    {
+      "at": 8.0,
+      "file": "still_008.00s.png"
+    },
+    {
+      "at": 50.0,
+      "file": "still_050.00s.png"
+    },
+    {
+      "at": 100.0,
+      "file": "still_100.00s.png"
+    },
+    {
+      "at": 150.0,
+      "file": "still_150.00s.png"
+    },
+    {
+      "at": 195.0,
+      "file": "still_195.00s.png"
+    }
+  ],
+  "viewport": "1600x900"
+}

@@ -1,0 +1,13 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+PASS  suggesting changes nobody's kit and spends nothing
+PASS  a gang raid's door squads are proposed the Entry kit (6 of 6 going)
+PASS  a public event is proposed nothing
+PASS  the Run charges the price the Force tab showed ($3680): ["Entry kit issued to 6 officers ($3,680)."]
+PASS  and the officers going in carry it (6 of 6)
+PASS  the proposal is spent: a second Run buys nothing
+PASS  "keep their current kit": nothing issued, nothing spent
+PASS  a kit the chief changed by hand after the proposal stays the chief's
+PASS  an officer taken off the plan is issued nothing
+PASS  a frozen account issues nothing and says so: ["The suggested kit was not issued: the account is in the red: no new kit until it is back above zero."]
+kit_proposal_test: 0 failures

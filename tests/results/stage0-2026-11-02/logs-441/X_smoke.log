@@ -1,0 +1,14 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+rogue_balance: 4 run(s) — 1 seed(s) x 4 policy(ies), 2 weeks, 2 at a time -> /sessions/rcw-01xjze36brlebuus1kge2nyu/work/p441/build/balance-smoke
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+
+RUN seed=1001 policy=minimal ops=2 kept=false score=0 min_fit=20 below0=0 unattended=6 wall_ms=87370
+RUN seed=1001 policy=cautious ops=4 kept=false score=0 min_fit=13 below0=1 unattended=4 wall_ms=88329
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+RUN seed=1001 policy=military ops=6 kept=false score=0 min_fit=16 below0=1 unattended=2 wall_ms=83188

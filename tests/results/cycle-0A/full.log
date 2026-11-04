@@ -1,0 +1,39 @@
+the violence: tier 'full', 28 suites, engine: 4.7.2.stable.official.ed1daf0bf
+logs: /home/claude/w/proj/build/test-logs
+
+  PASS    _check                          3s
+  PASS    godot472_test                   1s
+  PASS    city_integration_test           1s
+  PASS    character_assets_test           1s
+  PASS    test_range_mechanics_test       1s
+  PASS    test_range_regression_test      1s
+  PASS    test_range_replays_test         8s
+  PASS    test_range_determinism_test    12s
+  PASS    improvements_test               1s
+  PASS    ops_ui_test                     1s
+  PASS    dept_test                       6s
+  PASS    orders_test                   233s
+  PASS    save_test                       0s
+  PASS    story_test                      1s
+  PASS    politics_test                   1s
+  PASS    rogue_test                      1s
+  KNOWN   determinism_test              123s  fixture predates the 1.3 simulation changes (22/35 differ); rebaseline in P1.I1
+  PASS    habits_test                     0s
+  FAIL    brains_test                    70s  /home/claude/w/proj/build/test-logs/brains_test.log
+          7:wolf        share of a lone fighter's unseen fight spent hidden (more)    0.19     0.28   FAIL
+  PASS    civ_test                      109s
+  FAIL    equip_test                    341s  /home/claude/w/proj/build/test-logs/equip_test.log
+          17:shield            rounds through to an officer facing 3 rifles, 10 m (fewer)   1.02     0.69   FAIL
+          25:beanbag           s until an unarmed man who will not give up is cuffed (less) 224.10   208.28   FAIL
+  PASS    lethality_test                 70s
+  PASS    maps_test                       4s
+  PASS    nav_door_test                   3s
+  PASS    op_test                       809s
+  PASS    hold_test                     336s
+  PASS    stall_test                    201s
+  PASS    fuzz_test                     124s
+
+----------------------------------------------------------------
+suites: 28   pass: 25   fail: 2   timeout: 0   known failures: 1
+failed: brains_test.gd equip_test.gd
+logs are in /home/claude/w/proj/build/test-logs

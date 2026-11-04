@@ -1,0 +1,229 @@
+{
+ "sites": [
+  {
+   "id": "bridge-st-eviction",
+   "name": "Bridge Street eviction",
+   "ward": "ironworks",
+   "type": "WS",
+   "archetype": "walk-up apartment block",
+   "visibility": 2,
+   "notes": "The inherited file. Occupants have organised and the coalition is watching."
+  },
+  {
+   "id": "civic-plaza-rally",
+   "name": "Civic Plaza rally",
+   "ward": "oldtown",
+   "type": "PE",
+   "archetype": "open plaza",
+   "visibility": 5,
+   "notes": "Campaign events land here as the election nears. Rarely erupts; catastrophic if it does."
+  },
+  {
+   "id": "city-hall-steps",
+   "name": "Council hearing protest",
+   "ward": "oldtown",
+   "type": "PE",
+   "archetype": "civic steps",
+   "visibility": 5,
+   "notes": "Budget hearings draw both unions and tenants."
+  },
+  {
+   "id": "veterans-bridge-march",
+   "name": "Veterans Bridge march",
+   "ward": "oldtown",
+   "type": "PE",
+   "archetype": "bridge approach",
+   "visibility": 4,
+   "notes": "Marches cross here toward the plaza. The bridge is a chokepoint."
+  },
+  {
+   "id": "front-st-flat",
+   "name": "Front Street flat",
+   "ward": "oldtown",
+   "type": "WS",
+   "archetype": "flat above shop",
+   "visibility": 4,
+   "notes": "Fraud warrant on a downtown apartment. Daylight, witnesses, phones."
+  },
+  {
+   "id": "mill-squat",
+   "name": "Mill No. 3 squat",
+   "ward": "ironworks",
+   "type": "GH",
+   "archetype": "industrial hall",
+   "visibility": 1,
+   "notes": "Gang using the closed mill. Long sightlines, catwalks, no witnesses."
+  },
+  {
+   "id": "foundry-row-warrant",
+   "name": "Foundry Row warrant",
+   "ward": "ironworks",
+   "type": "WS",
+   "archetype": "rowhouse",
+   "visibility": 1,
+   "notes": "Narrow two-storey rowhouse on Foundry Road."
+  },
+  {
+   "id": "brass-rail",
+   "name": "Brass Rail tavern",
+   "ward": "ironworks",
+   "type": "BS",
+   "archetype": "corner tavern",
+   "visibility": 2,
+   "notes": "Barricaded suspect behind the bar. Regulars still inside."
+  },
+  {
+   "id": "yard-office",
+   "name": "Yard office hostage",
+   "ward": "ironworks",
+   "type": "HT",
+   "archetype": "rail yard office",
+   "visibility": 1,
+   "notes": "Hostage in the dispatcher's office. Standing trains block two approaches."
+  },
+  {
+   "id": "riverside-homes-block",
+   "name": "Riverside Homes block",
+   "ward": "riverside",
+   "type": "GH",
+   "archetype": "public-housing walk-up",
+   "visibility": 2,
+   "notes": "Gang house in a occupied building; families in adjacent units."
+  },
+  {
+   "id": "floodwall-shed",
+   "name": "Floodwall tool shed",
+   "ward": "riverside",
+   "type": "BS",
+   "archetype": "outbuilding",
+   "visibility": 1,
+   "notes": "Isolated, low visibility, one door."
+  },
+  {
+   "id": "ebenezer-hall",
+   "name": "Ebenezer hall meeting",
+   "ward": "riverside",
+   "type": "PE",
+   "archetype": "church hall",
+   "visibility": 3,
+   "notes": "Coalition meeting. Officers present are noticed."
+  },
+  {
+   "id": "bluff-rd-bungalow",
+   "name": "Bluff Road bungalow",
+   "ward": "kilbride",
+   "type": "BS",
+   "archetype": "center-hall bungalow",
+   "visibility": 2,
+   "notes": "Domestic barricade on the bluff. Neighbours are police families."
+  },
+  {
+   "id": "st-brendan-hall",
+   "name": "St. Brendan's hall memorial",
+   "ward": "kilbride",
+   "type": "PE",
+   "archetype": "parish hall",
+   "visibility": 3,
+   "notes": "Memorial gathering. Union attention."
+  },
+  {
+   "id": "holy-cross-funeral",
+   "name": "Holy Cross funeral",
+   "ward": "kilbride",
+   "type": "PE",
+   "archetype": "cemetery",
+   "visibility": 4,
+   "notes": "Officer funeral procession. Press at the gate."
+  },
+  {
+   "id": "kilbride-corner-store",
+   "name": "Kilbride Avenue corner store",
+   "ward": "kilbride",
+   "type": "HT",
+   "archetype": "corner store",
+   "visibility": 3,
+   "notes": "Hostage taken during a robbery. Houses on both sides."
+  },
+  {
+   "id": "warehouse-row-7",
+   "name": "Warehouse Row unit 7",
+   "ward": "eastport",
+   "type": "GH",
+   "archetype": "warehouse",
+   "visibility": 2,
+   "notes": "Stash house in a loading-dock unit."
+  },
+  {
+   "id": "hale-records",
+   "name": "Hale Armour records warrant",
+   "ward": "eastport",
+   "type": "WS",
+   "archetype": "dealership and workshop",
+   "visibility": 2,
+   "notes": "Politically loaded. Kettering's ticket will react either way."
+  },
+  {
+   "id": "container-stack",
+   "name": "Container stack standoff",
+   "ward": "eastport",
+   "type": "BS",
+   "archetype": "container yard",
+   "visibility": 1,
+   "notes": "Barricaded among stacked containers. Cover everywhere, sightlines nowhere."
+  },
+  {
+   "id": "grain-elevator-hostage",
+   "name": "Grain elevator hostage",
+   "ward": "eastport",
+   "type": "HT",
+   "archetype": "grain elevator",
+   "visibility": 1,
+   "notes": "Vertical building: stairs, catwalks, a long fall."
+  },
+  {
+   "id": "wharf-st-flat",
+   "name": "Wharf Street flat",
+   "ward": "eastport",
+   "type": "HT",
+   "archetype": "upper flat",
+   "visibility": 2,
+   "notes": "Hostage in a flat beside the rail line."
+  },
+  {
+   "id": "heights-villa",
+   "name": "Heights Boulevard villa",
+   "ward": "northgate",
+   "type": "WS",
+   "archetype": "large villa",
+   "visibility": 4,
+   "notes": "Financial-crimes warrant at a wealthy address. Lawyers arrive first."
+  },
+  {
+   "id": "harlan-park-concert",
+   "name": "Harlan Park concert",
+   "ward": "northgate",
+   "type": "PE",
+   "archetype": "open park",
+   "visibility": 5,
+   "notes": "Large outdoor event. Many families, few exits."
+  },
+  {
+   "id": "ch6-occupation",
+   "name": "Channel 6 lobby occupation",
+   "ward": "northgate",
+   "type": "BS",
+   "archetype": "office lobby",
+   "visibility": 5,
+   "notes": "Occupation of a TV station. Live cameras are already inside."
+  },
+  {
+   "id": "harlan-ave-bungalow",
+   "name": "Harlan Avenue bungalow",
+   "ward": "northgate",
+   "type": "BS",
+   "archetype": "center-hall bungalow",
+   "visibility": 3,
+   "notes": "Domestic barricade on a residential street."
+  }
+ ]
+}

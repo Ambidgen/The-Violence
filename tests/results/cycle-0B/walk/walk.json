@@ -1,0 +1,65 @@
+{
+  "engine": "4.7.2-stable (official)",
+  "facts": {
+    "armoury_items_added": 1,
+    "backdrop_desk": "tactical map",
+    "backdrop_screen_armoury_and_programs": "tactical map",
+    "backdrop_screen_budget": "tactical map",
+    "backdrop_screen_campaign_file": "tactical map",
+    "backdrop_screen_city_hall": "tactical map",
+    "backdrop_screen_internal_affairs": "tactical map",
+    "backdrop_screen_roster": "tactical map",
+    "first_action_reason_visible": false,
+    "inheritance_cost": 0,
+    "op_sim_s": 38.3,
+    "op_wall_ms": 20257,
+    "procurement_cost": 5000,
+    "rendering": true,
+    "ui_scale": 1.0,
+    "viewport": "1600x900",
+    "wall_ms": 64090,
+    "week1_drafts": [
+      "doctrine:plates,reserve,pie",
+      "procurement:smg,pistols,bangs"
+    ],
+    "week2_desk": [
+      "program",
+      "event"
+    ],
+    "window": "1600x900"
+  },
+  "failures": [],
+  "known": [
+    "the first call's Brief and plan is disabled with its reason in a tooltip only (EA_TASKS P3.B1)",
+    "management screens sit over the last tactical map, not the city (EA_TASKS P3.A1)"
+  ],
+  "seed": 410255,
+  "shots": [
+    "01_title.jpg",
+    "02_board_week1.jpg",
+    "03_desk_inheritance.jpg",
+    "04_desk_procurement.jpg",
+    "05_board_after_desk.jpg",
+    "06_briefing.jpg",
+    "07_tab_force.jpg",
+    "08_tab_orders.jpg",
+    "09_run_start.jpg",
+    "10_run_mid.jpg",
+    "11_debrief.jpg",
+    "12_board_week2.jpg",
+    "13_screen_roster.jpg",
+    "14_screen_budget.jpg",
+    "15_screen_internal_affairs.jpg",
+    "16_screen_city_hall.jpg",
+    "17_screen_armoury_and_programs.jpg",
+    "18_screen_campaign_file.jpg"
+  ],
+  "steps": [
+    "title",
+    "desk",
+    "brief",
+    "run",
+    "endweek",
+    "screens"
+  ]
+}

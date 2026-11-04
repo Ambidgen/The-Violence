@@ -1,0 +1,90 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ok    project.godot declares the 4.7 feature tag
+ok    project.godot keeps the 4.4 feature tag (both engines supported)
+ok    project.godot is still config_version 5
+ok    project version follows Version.VALUE
+ok    export file version follows Version.WINDOWS
+ok    export product version follows Version.WINDOWS
+ok    department loads a save with empty object (no throw)
+ok      ...and still has an officers list (empty object)
+ok    department loads a save with null officers (no throw)
+ok      ...and still has an officers list (null officers)
+ok    department loads a save with officers with a non-dictionary entry (no throw)
+ok      ...and still has an officers list (officers with a non-dictionary entry)
+ok    department loads a save with an officer record with no file (no throw)
+ok      ...and still has an officers list (an officer record with no file)
+ok    department loads a save with an officer record with a null kit (no throw)
+ok      ...and still has an officers list (an officer record with a null kit)
+ok    department loads a save with a kit with no plates or gear (no throw)
+ok      ...and still has an officers list (a kit with no plates or gear)
+ok    department loads a save with null bonds (no throw)
+ok      ...and still has an officers list (null bonds)
+ok    department loads a save with null notes (no throw)
+ok      ...and still has an officers list (null notes)
+ok    department loads a save with budget block with null ledger and cases (no throw)
+ok      ...and still has an officers list (budget block with null ledger and cases)
+ok    department loads a save with ledger with junk entries (no throw)
+ok      ...and still has an officers list (ledger with junk entries)
+ok    a real campaign builds a department
+ok    campaign loads with malformed board/past and a stale pressure key (no throw)
+ok    a non-array board degrades to empty
+ok    junk past entries are dropped, not loaded
+ok    a save with no run block loads as a classic campaign
+ok    a null short history degrades to {}
+ok    campaign refuses a save with no department block (no throw)
+ok    a save from a newer version is still refused
+ok    a v0 department save is still refused
+ok    politics loads with no keys at all (no throw)
+ok      ...and a lost read (no keys at all)
+ok      ...and a poll share (no keys at all)
+ok      ...and the week's press (no keys at all)
+ok      ...and the ward average (no keys at all)
+ok      ...and six wards of trust (no keys at all)
+ok    campaign loads the same save with no keys at all (no throw)
+ok    politics loads with null trust, allies, polls, press (no throw)
+ok      ...and a lost read (null trust, allies, polls, press)
+ok      ...and a poll share (null trust, allies, polls, press)
+ok      ...and the week's press (null trust, allies, polls, press)
+ok      ...and the ward average (null trust, allies, polls, press)
+ok      ...and six wards of trust (null trust, allies, polls, press)
+ok    campaign loads the same save with null trust, allies, polls, press (no throw)
+ok    politics loads with an ally with no standing (no throw)
+ok      ...and a lost read (an ally with no standing)
+ok      ...and a poll share (an ally with no standing)
+ok      ...and the week's press (an ally with no standing)
+ok      ...and the ward average (an ally with no standing)
+ok      ...and six wards of trust (an ally with no standing)
+ok    campaign loads the same save with an ally with no standing (no throw)
+ok    politics loads with junk in the trust list (no throw)
+ok      ...and a lost read (junk in the trust list)
+ok      ...and a poll share (junk in the trust list)
+ok      ...and the week's press (junk in the trust list)
+ok      ...and the ward average (junk in the trust list)
+ok      ...and six wards of trust (junk in the trust list)
+ok    campaign loads the same save with junk in the trust list (no throw)
+ok    politics loads with press and pending holding junk (no throw)
+ok      ...and a lost read (press and pending holding junk)
+ok      ...and a poll share (press and pending holding junk)
+ok      ...and the week's press (press and pending holding junk)
+ok      ...and the ward average (press and pending holding junk)
+ok      ...and six wards of trust (press and pending holding junk)
+ok    campaign loads the same save with press and pending holding junk (no throw)
+ok    politics loads with polls with non-numbers (no throw)
+ok      ...and a lost read (polls with non-numbers)
+ok      ...and a poll share (polls with non-numbers)
+ok      ...and the week's press (polls with non-numbers)
+ok      ...and the ward average (polls with non-numbers)
+ok      ...and six wards of trust (polls with non-numbers)
+ok    campaign loads the same save with polls with non-numbers (no throw)
+ok    politics loads with junk record and result (no throw)
+ok      ...and a lost read (junk record and result)
+ok      ...and a poll share (junk record and result)
+ok      ...and the week's press (junk record and result)
+ok      ...and the ward average (junk record and result)
+ok      ...and six wards of trust (junk record and result)
+ok    campaign loads the same save with junk record and result (no throw)
+ok    a missing ally reads its starting standing
+ok    an unknown ally id reads a default, not an error
+ok    an unbuilt navigator fails closed instead of inventing an unchecked route
+godot472_test: PASS

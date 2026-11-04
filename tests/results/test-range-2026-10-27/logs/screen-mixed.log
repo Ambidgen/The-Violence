@@ -1,0 +1,17 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+mixed A_sof+militia+militia+militia+militia: A/B/draw 5/1/0 (6 games); 1 cases, 12.5 s elapsed
+mixed B_sof+militia+militia+militia+militia: A/B/draw 3/3/0 (6 games); 2 cases, 24.8 s elapsed
+mixed A_militia+sof+sof+sof+sof: A/B/draw 5/1/0 (6 games); 3 cases, 37.2 s elapsed
+mixed B_militia+sof+sof+sof+sof: A/B/draw 0/6/0 (6 games); 4 cases, 51.5 s elapsed
+mixed A_sof+sof+militia+militia+militia: A/B/draw 4/2/0 (6 games); 5 cases, 60.5 s elapsed
+mixed B_sof+sof+militia+militia+militia: A/B/draw 3/3/0 (6 games); 6 cases, 72.9 s elapsed
+mixed A_police+police+patrol+patrol+patrol: A/B/draw 5/1/0 (6 games); 7 cases, 82.4 s elapsed
+mixed B_police+police+patrol+patrol+patrol: A/B/draw 2/4/0 (6 games); 8 cases, 96.1 s elapsed
+mixed A_regular+regular+regular+regular+regular: A/B/draw 4/2/0 (6 games); 9 cases, 112.1 s elapsed
+mixed B_regular+regular+regular+regular+regular: A/B/draw 4/2/0 (6 games); 10 cases, 128.1 s elapsed
+DONE mixed: 10 cases, 60 matches -> /project_study_a/study-mixed.jsonl

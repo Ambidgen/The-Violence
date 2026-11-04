@@ -1,0 +1,59 @@
+Copyright (c) 2026 Ambidgen. All rights reserved.
+
+THE VIOLENCE — PROPRIETARY LICENCE
+
+This repository, and everything in it that Ambidgen owns — the game The Violence, its
+source code in GDScript, its maps, data, text, story and characters, the Port Carrick
+city model and its generated data, the crayon art and the tools that bake it, the
+synthesised sound effects, the cutscenes and the Remotion sources that render them, the
+fonts' usage, the icon and the documentation — is proprietary software. It is published
+here so that the work can be read, reviewed and discussed. Publication is not a grant of
+rights.
+
+YOU MAY
+
+1. Read, clone and fork this repository, and run the game and its test harnesses for
+   your own private evaluation, review, study or reporting.
+2. Quote short excerpts — code, screenshots, text — in reviews, criticism, news
+   reporting, academic work or videos about the game, with attribution to The Violence
+   and Ambidgen and, where practical, a link to this repository.
+3. Submit issues and pull requests through the repository's hosting service; by doing so
+   you grant Ambidgen a non-exclusive, irrevocable, worldwide, royalty-free licence to
+   use, modify and distribute your contribution under this licence.
+
+YOU MAY NOT, without prior written permission from Ambidgen
+
+1. Copy, redistribute, publish, sublicense, sell, rent or otherwise make the game or any
+   part of it available to anyone else, as a whole or in part, in source or binary form.
+2. Use the game, its code or its content for a commercial purpose, including as part of
+   another product, service, course or stream-for-pay that redistributes the game.
+3. Create derivative works from the code, art, audio, text, data, city model, cutscenes
+   or story, or incorporate any of them into another project.
+4. Use the name "The Violence", "The Violence — Port Carrick", the icon, or the names of
+   its characters, wards, sites or candidates in a way that suggests endorsement or
+   affiliation, or as the name of another product.
+5. Remove or alter this notice, the copyright lines, or THIRD_PARTY_NOTICES.
+
+THIRD-PARTY COMPONENTS
+
+This repository contains, uses or was built with third-party components that are not
+owned by Ambidgen — the Godot Engine, fonts, and development-time tools. They keep their
+own licences, and those licences govern them and win over this file where they apply.
+They are listed, with their licence texts, in THIRD_PARTY_NOTICES, which ships with the
+game and is shown in its credits. Nothing in this file restricts rights those licences
+grant you.
+
+NO WARRANTY
+
+THE SOFTWARE AND ALL CONTENT IN THIS REPOSITORY ARE PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+EVENT SHALL AMBIDGEN OR THE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN IT.
+
+The game depicts police violence, death and political corruption in a fictional city.
+Port Carrick, its wards, its institutions, its people and its candidates are invented.
+
+For licensing, press or store enquiries, contact Ambidgen through the repository's
+hosting service.

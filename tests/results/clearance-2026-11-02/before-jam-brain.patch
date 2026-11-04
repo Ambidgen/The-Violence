@@ -1,0 +1,79 @@
+--- a/scripts/sim/brain.gd
++++ b/scripts/sim/brain.gd
+@@ -417,0 +418,2 @@
++		elif not tm["skipped"].is_empty():
++			w.say("%s: search ended with %d unchecked room(s), hunting" % [tm["tag"], tm["skipped"].size()], "info")
+@@ -896,0 +899,15 @@
++## Where the PF10 checker stands on the near side of the small room's door.
++func _check_point(el: Dictionary) -> Vector2:
++	var st: Dictionary = el["task"]
++	var door: Dictionary = w.level.doors[st["door"]]
++	return w.nav.snap(door["c"] - w.level.inward(st["door"], st["into"]) * 1.1 + door["t"] * 0.35)
++
++
++func _skip_check(tm: Dictionary, el: Dictionary) -> void:
++	var into: String = el["task"]["into"]
++	el["last_room"] = into
++	tm["skipped"][into] = true
++	w.say("%s: %s not checked" % [_tag(tm, el), w.level.rooms[into]["title"].to_lower()], "info")
++	_next_task(tm, el)
++
++
+@@ -911,2 +928,20 @@
+-			if ctl.has("check_done_t") and w.t >= ctl["check_done_t"]:
+-				_room_done(tm, el, "checked")
++			# The check can be a long walk from the preceding room. The old 12 s
++			# deadline started at assignment and skipped a reachable room while the
++			# checker was still making progress (notably the Plaza kiosk). Watch the
++			# remaining route instead, with a separate key from hunt/cover progress.
++			var checker = w.by_id.get(ctl.get("checker", ""), null)
++			if checker != null and (not checker.fighting() or checker.el != el["i"] or not checker.has("PF10")):
++				ctl.erase("checker")
++				ctl.erase("check_done_t")
++				checker = null
++			if checker != null:
++				var cp := _check_point(el)
++				var interrupted: bool = w.in_combat(checker) or w.blocks_move(checker)
++				if interrupted or not w.at(checker, cp, 0.3) or w.level.door_shut(st["door"]):
++					ctl.erase("check_done_t")
++				if ctl.has("check_done_t") and w.t >= ctl["check_done_t"]:
++					_room_done(tm, el, "checked")
++				elif interrupted:
++					checker.ticker.erase("check_prog")
++				elif _stuck_on(checker, cp, "check_prog", 12.0) and w.t - el["phase_t"] > 12.0:
++					_skip_check(tm, el)
+@@ -914,3 +949,6 @@
+-				el["last_room"] = st["into"]
+-				tm["skipped"][st["into"]] = true
+-				_next_task(tm, el)
++				var available := false
++				for m in al:
++					if m.fighting() and m.has("PF10"):
++						available = true
++				if not available:
++					_skip_check(tm, el)
+@@ -2984,0 +3023,2 @@
++				if best != null:
++					best.ticker.erase("check_prog")
+@@ -2986 +3026 @@
+-				var cp: Vector2 = w.nav.snap(c - n_in * 1.1 + D["t"] * 0.35)
++				var cp := _check_point(el)
+@@ -2994 +3034,5 @@
+-					if not ctl.has("check_done_t"):
++					if w.level.door_shut(st["door"]):
++						# A closed leaf cannot be checked through. Work it using the same
++						# key/breach rules as an ordinary entry before starting the check.
++						w.work_door(o, st["door"])
++					elif not ctl.has("check_done_t"):
+@@ -3198 +3242 @@
+-func _stuck_on(o, p: Vector2) -> bool:
++func _stuck_on(o, p: Vector2, tracker := "prog", timeout := 8.0) -> bool:
+@@ -3206 +3250 @@
+-	var g: Dictionary = o.ticker.get("prog", {})
++	var g: Dictionary = o.ticker.get(tracker, {})
+@@ -3208 +3252 @@
+-		o.ticker["prog"] = {"key": key, "best": d, "t": w.t, "routed": routed}
++		o.ticker[tracker] = {"key": key, "best": d, "t": w.t, "routed": routed}
+@@ -3214 +3258 @@
+-	return w.t - g["t"] > 8.0
++	return w.t - g["t"] > timeout

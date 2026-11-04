@@ -1,0 +1,15 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+lane replay: t=63.20 winner=0 shots=60 limit=300 events={ "pf04_entry_plan": 9, "gd02_sector_plan": 41, "gd02_scan": 194, "lane_hold_start": 11, "lane_hold_end": 11, "habit_transition": 163, "lane_recovery": 1, "reload_started": 2, "pf04_entry_move": 7 }
+ok    map 00 seed 717920 advances beyond the old 28-shot, 300-second stalemate
+cover replay: t=183.07 winner=0 shots=258 limit=900 events={ "pf04_entry_plan": 12, "gd02_sector_plan": 190, "habit_transition": 270, "cover_search_start": 34, "reload_blocked": 10, "reload_started": 15, "pf04_entry_move": 5, "lane_hold_start": 74, "lane_recovery": 124, "lane_hold_end": 73, "cover_replan": 3 }
+ok    map 11 seed 721001 advances beyond the old 141-shot, 900-second stalemate
+ok    replay diagnostics did not overflow
+ok    enabling decision telemetry leaves terminal state and RNG state identical
+ok    instrumented replay records GD02 opportunities
+ok    a full instrumented replay records actual room-entry movement, not just plans
+test range replays: PASS

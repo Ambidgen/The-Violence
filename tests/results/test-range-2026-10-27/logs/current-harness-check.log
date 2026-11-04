@@ -1,0 +1,8 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+habits good_off:PF01:B: A/B/draw 4/2/0 (6 games); 1 cases, 8.4 s elapsed
+DONE habits: 1 cases, 6 matches -> /project_trial/current-harness-check.jsonl

@@ -1,0 +1,16 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+ok   lane_repro       10ceef8799d4b279  winner=0 time=63.20 shots=60
+ok   cover_repro      c2c2fc48c7afe295  winner=0 time=183.07 shots=258
+ok   sof_control      b73bdac0ee2380e9  winner=0 time=60.17 shots=11
+ok   militia_patrol   257d05c80be3bdd9  winner=1 time=26.00 shots=9
+ok   unequal          69cdcf73e9aa5c93  winner=1 time=39.27 shots=20
+ok   motel            a20d8d669016bbf0  winner=0 time=47.73 shots=166
+ok   shield           2ab7c6b0fea2cada  winner=0 time=68.27 shots=79
+ok   large_team       665f9ffaab786b72  winner=0 time=44.83 shots=127
+Wrote 8 range-only digests to res://tests/fixtures/test_range_determinism.json
+range determinism: PASS

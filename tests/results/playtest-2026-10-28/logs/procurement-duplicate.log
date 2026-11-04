@@ -1,0 +1,12 @@
+PCK /tmp/violence-browser/web-duplicate/index.pck 86 3261536
+GODOT log Engine missing features []
+GODOT log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+GODOT log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+GODOT log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+GODOT log DUPLICATE SEED 1 initial drafts=[{ "kind": "doctrine", "week": 1, "cards": ["pie", "reserve", "plates"] }, { "kind": "procurement", "week": 1, "cards": ["smg", "plates", "shotgun"] }]
+GODOT log DOCTRINE RESULT ["Inheritance: Plate carriers on day one."]
+GODOT log AFTER DOCTRINE stock_has_plates=true contracts=["plates"] procurement_cards=["smg", "plates", "shotgun"] balance=25000
+GODOT log BUY RESULT ["Plate carriers contract signed: Plate carrier in the armoury."]
+GODOT log AFTER DUPLICATE balance=19000 charged=6000 unchanged_stock=true contracts=["plates", "plates"]
+GODOT log PROBE_DONE found=true
+PROBE_FINISHED errors= 0

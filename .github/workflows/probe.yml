@@ -1,0 +1,96 @@
+# A one-purpose workflow: ask the engine which block of scripts/ui/ops_ui.gd it
+# cannot parse (EA_TASKS B6). The static checks accept the file; Godot refuses it
+# with "Unindent doesn't match the previous indentation level" and prints no line,
+# so tools/parse_bisect.py bisects the file with `--check-only`. Runs only when the
+# probe itself changes, so it never adds time to the release gate.
+name: parse probe
+
+on:
+  push:
+    branches: ["arena/**"]
+    paths: ["tools/parse_bisect.py", ".github/workflows/probe.yml"]
+  workflow_dispatch:
+
+jobs:
+  bisect:
+    name: bisect ops_ui.gd
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-4.7.2-stable
+      - name: install Godot 4.7.2
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot || true
+          chmod +x ~/godot/godot
+      - name: import the project
+        run: ~/godot/godot --headless --path . --import || true
+      - name: bisect
+        # The log of a job is not reachable from the sandbox this was written in, so the
+        # answer is committed like the balance results are: one file the branch can read.
+        run: |
+          set -uo pipefail
+          mkdir -p build/probe
+          {
+            for f in scripts/ui/ops_ui.gd scripts/main.gd scripts/ui/city_map.gd; do
+              echo "===== $f"
+              GODOT=$HOME/godot/godot python3 tools/parse_bisect.py "$f" || true
+              echo
+            done
+          } > build/probe/parse.txt 2>&1
+          cat build/probe/parse.txt
+      - name: say the answer
+        # The job log is not reachable from the environment this was written in, but a
+        # workflow annotation is: the block the engine refuses is announced there.
+        if: always()
+        run: |
+          [ -f build/probe/parse.txt ] || exit 0
+          grep -E "^(=====|block [0-9]+ of|the fault is in|the engine does NOT|not localised)" \
+            build/probe/parse.txt | head -20 | while IFS= read -r line; do
+              echo "::warning file=scripts/ui/ops_ui.gd::$line"
+            done
+      - name: commit the answer
+        if: always()
+        # checkout leaves a detached HEAD, so `git pull` cannot be used here; the file is
+        # staged onto a local branch built from the remote tip, and the push is retried
+        # because the release gate may commit results for the same SHA meanwhile.
+        run: |
+          set -uo pipefail
+          REF="${{ github.ref_name }}"
+          DEST=tests/results/parse-probe
+          mkdir -p "$DEST"
+          cp build/probe/parse.txt "$DEST/parse.txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch -q origin "$REF"
+          git checkout -q -B probe-commit FETCH_HEAD
+          git add "$DEST"
+          if git diff --cached --quiet; then
+            echo "no change since the last probe"
+            exit 0
+          fi
+          git commit -q -m "probe: the block the engine refuses [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:refs/heads/$REF"; then
+              echo "committed on attempt $attempt"
+              exit 0
+            fi
+            sleep 10
+            git fetch -q origin "$REF"
+            git rebase -X theirs FETCH_HEAD || exit 1
+          done
+          echo "::error::could not push the probe result"
+          exit 1

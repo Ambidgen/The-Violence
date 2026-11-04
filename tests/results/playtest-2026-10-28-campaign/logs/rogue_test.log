@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS  the classic campaign has no run layer and an open armoury
+PASS  the same seed deals the same desk for ten weeks
+PASS  the inheritance was drafted (pie)
+PASS  the desk decided things (16 entries)
+PASS  a run loads from its save
+PASS  and its desk comes back unchanged
+PASS  and so does the academy curriculum
+PASS  locked weapons and sights fall back to patrol stock
+PASS  plates only with a contract (vest)
+PASS  locked gear is left in the armoury
+PASS  signed contracts open the armoury
+PASS  every inherited officer's kit is already in patrol stock
+PASS  activating a classic campaign opens the armoury again
+PASS  a finished program teaches every officer (20)
+PASS  and the academy teaches it to the next hire
+PASS  run 9000 reaches the election in 40 weeks (score -300, 8 contracts, 5 programs, 53 desk entries)
+PASS  run 9001 reaches the election in 40 weeks (score -312, 11 contracts, 5 programs, 54 desk entries)
+PASS  run 9002 reaches the election in 40 weeks (score -315, 7 contracts, 7 programs, 57 desk entries)
+PASS  run 9003 reaches the election in 40 weeks (score -309, 7 contracts, 5 programs, 54 desk entries)
+PASS  every finished run is in the legacy file (4)
+PASS  finished runs unlock more doctrines (8)
+rogue_test: 0 failures

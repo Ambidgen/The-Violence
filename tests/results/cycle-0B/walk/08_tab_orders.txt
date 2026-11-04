@@ -1,0 +1,44 @@
+Barricaded: Colm Kavanagh, 599 S Hopyard Place
+FIRST OPERATION  ·  3/4  ·  ORDERS
+Give each squad an objective and any constraints its leader can afford. Check the readiness range again, then choose RUN below. The operation itself cannot be rewound.
+[Skip guide]
+[1 Briefing]
+[2 Force]
+[3 Orders]
+Tip: set objectives and constraints for each squad, then place them on the map. The plan is a proposal. The rooms are still unknown.
+READINESS 37–78 / 100  ·  contested
+A planning index, not a win probability. Unconfirmed rooms, people and intent remain uncertain.
+ASSUMPTIONS  ·  7 officers assigned; planning baseline 7  ·  Threat read: not established
+[Squad 1]
+[Squad 2]
+Order points: 3 of 5 used  ·  leader Giulia Bernardi
+Objective 1  (free)
+[Arrest]
+Clear the building to arrest the named suspect: officers hold fire on them unless they attack, and challenge instead.
+Target: Colm Kavanagh
+Objective 2  (1 point)
+[Clear]
+Clear the building, or only the rooms you pick (and the rooms on the way to them). Done when they are clear.
+the whole building
+[Pick rooms]
+[All]
+CONSTRAINTS
+[Avoid (1)]
+[Consolidate (1)]
+[Phase line (1)]
+[until squad 2 is done / in position]
+[Entry point (1)]
+[Pace (1)]
+[Weapons tight (1)]
+[Less-lethal first (1)]
+[Knock and announce (1)]
+[Pistols only (1)]
+SQUAD 1
+· Arrest the named suspect
+· Then: Clear the building
+· Phase line: wait for squad 2
+· Weapons tight
+
+[<  Board]
+[Suggest a plan]
+[RUN   >   7 officers]

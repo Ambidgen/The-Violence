@@ -1,0 +1,69 @@
+{
+  "cases": {
+    "cover_repro": {
+      "digest": "880d36053bf88821",
+      "hits": 14,
+      "shots": 135,
+      "time": 87.1,
+      "timeout": false,
+      "winner": 1
+    },
+    "lane_repro": {
+      "digest": "5c2d6a42960f92f2",
+      "hits": 16,
+      "shots": 66,
+      "time": 24.133,
+      "timeout": false,
+      "winner": 0
+    },
+    "large_team": {
+      "digest": "6866e7f59d65fee1",
+      "hits": 18,
+      "shots": 60,
+      "time": 21.867,
+      "timeout": false,
+      "winner": 0
+    },
+    "militia_patrol": {
+      "digest": "2bdcd3bcafee0f8f",
+      "hits": 7,
+      "shots": 17,
+      "time": 26.867,
+      "timeout": false,
+      "winner": 1
+    },
+    "motel": {
+      "digest": "6a1a07d04439d846",
+      "hits": 18,
+      "shots": 63,
+      "time": 131.367,
+      "timeout": false,
+      "winner": 0
+    },
+    "shield": {
+      "digest": "9a0a53ce7b69baad",
+      "hits": 13,
+      "shots": 100,
+      "time": 118.533,
+      "timeout": false,
+      "winner": 0
+    },
+    "sof_control": {
+      "digest": "4141c639f505ff77",
+      "hits": 6,
+      "shots": 10,
+      "time": 58.733,
+      "timeout": false,
+      "winner": 0
+    },
+    "unequal": {
+      "digest": "da15e1d8e47d243c",
+      "hits": 6,
+      "shots": 17,
+      "time": 39.367,
+      "timeout": false,
+      "winner": 1
+    }
+  },
+  "model": "test-range-2026-11-02-clearance-progress"
+}

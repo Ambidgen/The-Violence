@@ -1,0 +1,217 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[officers 0 killed, 0 down of 8; suspects 1 down, 1 killed] 
+W1-1 gang      map 08 vis 2  Success         100  every member arrested or down  (57 s sim, 1576 ms, 8 officers, 116 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 6; suspects 0 down, 0 killed] 
+W1-2 barricade map 03 vis 2  Success         100  Rodrigo Vallehermosa arrested  (15 s sim, 215 ms, 6 officers, 32 snaps, broken 0, less 0, gas 0, sting 0)
+  week 1: account $27875, morale 60, 0 open cases, 20 fit  |  trust 44  allies CL57 UN60 CC45 DA55  polls K 33 O 31 P 36  pending 0
+[officers 0 killed, 0 down of 10; suspects 2 down, 0 killed] 
+W2-1 gang      map 10 vis 2  Success         100  every member arrested or down  (121 s sim, 4504 ms, 10 officers, 243 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 7; suspects 1 down, 0 killed] 
+W2-2 warrant   map 05 vis 4  Partial success  65  Andrés Navarro shot and taken to hospital  (2 s sim, 63 ms, 7 officers, 6 snaps, broken 0, less 0, gas 0, sting 0)
+  week 2: account $15776, morale 60, 0 open cases, 20 fit  |  trust 44  allies CL58 UN60 CC45 DA55  polls K 33 O 32 P 35  pending 1
+[officers 0 killed, 0 down of 6; suspects 1 down, 1 killed] 
+W3-1 hostage   map 08 vis 1  Success         100  every hostage out alive  (222 s sim, 4164 ms, 6 officers, 446 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 5; suspects 1 down, 0 killed] 
+W3-4 event     map 11 vis 5  Partial success, at a cost  50  the attack was stopped; 1 in the crowd killed  (532 s sim, 47841 ms, 5 officers, 1066 snaps, broken 0, less 0, gas 0, sting 0)
+  week 3: account $14062, morale 60, 2 open cases, 20 fit  |  trust 42  allies CL49 UN60 CC39 DA55  polls K 33 O 34 P 33  pending 3
+  week: LOST: Rev. Alma Mbeki-Shaw (Carrick Community Coalition). The coalition tells its groups to stop talking to you: no community tips in any ward.
+[officers 0 killed, 0 down of 7; suspects 2 down, 0 killed] 
+W4-3 gang      map 10 vis 2  Success         100  every member arrested or down  (157 s sim, 7788 ms, 7 officers, 316 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 8; suspects 2 down, 2 killed] 
+W4-1 gang      map 08 vis 1  Partial success  65  1 of 4 got away  (48 s sim, 3381 ms, 8 officers, 97 snaps, broken 0, less 0, gas 0, sting 0)
+  week 4: account $15533, morale 59, 4 open cases, 19 fit  |  trust 34  allies CL31 UN60 CC0x DA42  polls K 29 O 39 P 32  pending 4
+[officers 0 killed, 0 down of 8; suspects 1 down, 1 killed] 
+W5-1 hostage   map 08 vis 1  Success         100  every hostage out alive  (167 s sim, 5953 ms, 8 officers, 336 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 5; suspects 0 down, 0 killed] 
+W5-3 event     map 11 vis 5  Failure           0  no attack came; 2 in the crowd and 0 officers killed  (900 s sim, 65543 ms, 5 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+  week 5: account $28759, morale 60, 5 open cases, 19 fit  |  trust 33  allies CL24x UN60 CC0x DA42  polls K 33 O 40 P 27  pending 5
+[officers 0 killed, 0 down of 7; suspects 1 down, 1 killed] 
+W6-1 gang      map 10 vis 2  Partial success  65  2 of 4 got away  (200 s sim, 5551 ms, 7 officers, 401 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 1 down of 7; suspects 3 down, 2 killed] 
+W6-3 gang      map 08 vis 1  Partial success, at a cost  60  3 of 6 got away  (55 s sim, 1380 ms, 7 officers, 112 snaps, broken 0, less 0, gas 0, sting 0)
+  week 6: account $24170, morale 58, 4 open cases, 18 fit  |  trust 33  allies CL5x UN60 CC0x DA29  polls K 31 O 43 P 26  pending 3
+[officers 0 killed, 0 down of 7; suspects 4 down, 4 killed] 
+W7-3 gang      map 10 vis 2  Partial success  65  1 of 6 got away  (128 s sim, 4173 ms, 7 officers, 258 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 1 killed, 5 down of 7; suspects 3 down, 0 killed] 
+W7-1 gang      map 08 vis 1  Success, at a cost  65  every member arrested or down  (145 s sim, 2636 ms, 7 officers, 291 snaps, broken 0, less 0, gas 0, sting 0)
+  week 7: account $5936, morale 47, 3 open cases, 12 fit  |  trust 32  allies CL3x UN56 CC0x DA29  polls K 31 O 43 P 25  pending 2
+[officers 3 killed, 8 down of 8; suspects 3 down, 3 killed] 
+W8-2 gang      map 08 vis 2  Failure           0  3 arrested or down, 2 got away, 2 still inside  (120 s sim, 2619 ms, 8 officers, 242 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 6; suspects 1 down, 0 killed] 
+W8-1 barricade map 04 vis 2  Partial success  65  Diarmuid Flanagan shot and taken to hospital  (1 s sim, 35 ms, 6 officers, 4 snaps, broken 0, less 0, gas 0, sting 0)
+  week 8: account $-13241, morale 31, 2 open cases, 6 fit  |  trust 30  allies CL0x UN44 CC0x DA29  polls K 33 O 43 P 25  pending 2
+[officers 0 killed, 0 down of 6; suspects 1 down, 0 killed] 
+W9-1 hostage   map 05 vis 2  Success         100  every hostage out alive  (154 s sim, 3075 ms, 6 officers, 310 snaps, broken 0, less 0, gas 0, sting 0)
+W9-2 gang      map 08 vis 1  nobody free to send
+  week 9: account $-4197, morale 29, 1 open cases, 7 fit  |  trust 30  allies CL1x UN32 CC0x DA29  polls K 32 O 42 P 26  pending 2
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W10-3 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 48114 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W10-1 gang      map 08 vis 2  nobody free to send
+  week 10: account $-49918, morale 35, 0 open cases, 7 fit  |  trust 30  allies CL1x UN30 CC0x DA29  polls K 32 O 41 P 26  pending 1
+[officers 0 killed, 0 down of 6; suspects 0 down, 0 killed] 
+W11-1 hostage   map 03 vis 3  Success         100  every hostage out alive  (95 s sim, 3798 ms, 6 officers, 192 snaps, broken 0, less 0, gas 0, sting 0)
+W11-3 event     map 11 vis 5  nobody free to send
+W11-2 barricade map 04 vis 2  nobody free to send
+  week 11: account $-35934, morale 36, 0 open cases, 7 fit  |  trust 30  allies CL1x UN28 CC0x DA25  polls K 33 O 40 P 27  pending 2
+[officers 0 killed, 0 down of 6; suspects 2 down, 0 killed] 
+W12-3 gang      map 10 vis 2  Partial success  65  3 of 6 got away  (113 s sim, 5005 ms, 6 officers, 228 snaps, broken 0, less 0, gas 0, sting 0)
+W12-1 gang      map 08 vis 1  nobody free to send
+W12-2 warrant   map 05 vis 4  nobody free to send
+  week 12: account $-30795, morale 37, 0 open cases, 8 fit  |  trust 30  allies CL0x UN26 CC0x DA30  polls K 35 O 39 P 26  pending 3
+  week: LOST: Tommy Rourke (President, Port Carrick Police Benevolent Association). The union turns on you: department morale settles at 45 instead of 60.
+[officers 0 killed, 0 down of 3; suspects 0 down, 0 killed] 
+W13-3 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 70395 ms, 3 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 1 killed, 4 down of 6; suspects 4 down, 0 killed] 
+W13-2 gang      map 10 vis 2  Partial success, at a cost  35  2 of 8 got away  (194 s sim, 3685 ms, 6 officers, 390 snaps, broken 0, less 0, gas 0, sting 0)
+  week 13: account $-83946, morale 28, 1 open cases, 6 fit  |  trust 30  allies CL0x UN20x CC0x DA30  polls K 35 O 38 P 27  pending 2
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W14-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 60469 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 3 killed, 4 down of 6; suspects 4 down, 1 killed] 
+W14-3 gang      map 10 vis 2  Success, at a cost  50  every member arrested or down  (223 s sim, 6046 ms, 6 officers, 447 snaps, broken 0, less 0, gas 0, sting 0)
+  week 14: account $-89577, morale 18, 1 open cases, 5 fit  |  trust 30  allies CL0x UN6x CC0x DA30  polls K 36 O 37 P 27  pending 1
+[officers 0 killed, 0 down of 6; suspects 0 down, 0 killed] 
+W15-3 hostage   map 03 vis 3  Success         100  every hostage out alive  (54 s sim, 1554 ms, 6 officers, 109 snaps, broken 0, less 0, gas 0, sting 0)
+W15-2 gang      map 08 vis 2  nobody free to send
+W15-1 barricade map 03 vis 2  nobody free to send
+  week 15: account $-81161, morale 18, 1 open cases, 9 fit  |  trust 29  allies CL1x UN4x CC0x DA30  polls K 36 O 36 P 27  pending 1
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W16-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 53325 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 6; suspects 3 down, 0 killed] 
+W16-1 gang      map 10 vis 2  Failure          30  3 arrested or down, 4 got away, 0 still inside  (184 s sim, 9160 ms, 6 officers, 369 snaps, broken 0, less 0, gas 0, sting 0)
+  week 16: account $-73805, morale 13, 0 open cases, 8 fit  |  trust 33  allies CL1x UN0x CC8x DA30  polls K 36 O 36 P 28  pending 2
+[officers 0 killed, 0 down of 6; suspects 0 down, 0 killed] 
+W17-3 hostage   map 03 vis 3  Success         100  every hostage out alive  (62 s sim, 3236 ms, 6 officers, 126 snaps, broken 0, less 0, gas 0, sting 0)
+W17-2 gang      map 08 vis 1  nobody free to send
+W17-1 warrant   map 05 vis 4  nobody free to send
+  week 17: account $-63144, morale 13, 0 open cases, 9 fit  |  trust 34  allies CL1x UN0x CC6x DA30  polls K 37 O 35 P 29  pending 2
+[officers 0 killed, 0 down of 3; suspects 0 down, 0 killed] 
+W18-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 84251 ms, 3 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 6; suspects 4 down, 2 killed] 
+W18-2 gang      map 10 vis 2  Partial success  65  2 of 6 got away  (205 s sim, 5715 ms, 6 officers, 411 snaps, broken 0, less 0, gas 0, sting 0)
+  week 18: account $-50806, morale 15, 0 open cases, 10 fit  |  trust 34  allies CL1x UN0x CC4x DA33  polls K 36 O 36 P 29  pending 2
+[officers 1 killed, 4 down of 6; suspects 3 down, 0 killed] 
+W19-1 gang      map 10 vis 2  Partial success, at a cost  35  1 of 4 got away  (226 s sim, 4648 ms, 6 officers, 453 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 4; suspects 0 down, 0 killed] 
+W19-2 warrant   map 05 vis 4  Failure          30  Dmitri Kovaluk escaped  (133 s sim, 1979 ms, 4 officers, 268 snaps, broken 0, less 0, gas 0, sting 0)
+  week 19: account $-47638, morale 8, 0 open cases, 6 fit  |  trust 32  allies CL0x UN0x CC4x DA30  polls K 37 O 35 P 28  pending 4
+[officers 0 killed, 0 down of 2; suspects 1 down, 1 killed] 
+W20-4 event     map 11 vis 5  Failure           0  the attack was stopped; 5 in the crowd killed  (722 s sim, 23645 ms, 2 officers, 1445 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 6; suspects 5 down, 3 killed] 
+W20-2 gang      map 10 vis 2  Partial success  65  1 of 6 got away  (92 s sim, 2493 ms, 6 officers, 186 snaps, broken 0, less 0, gas 0, sting 0)
+  week 20: account $-35947, morale 10, 2 open cases, 7 fit  |  trust 28  allies CL0x UN3x CC0x DA30  polls K 38 O 40 P 22  pending 8
+  week: LOST: Paul Varga (District Attorney). The DA's office reviews every case you clear: with evidence behind it, the officer is charged.
+[officers 2 killed, 3 down of 6; suspects 2 down, 1 killed] 
+W21-1 gang      map 10 vis 2  Partial success, at a cost  30  2 of 4 got away  (201 s sim, 4159 ms, 6 officers, 404 snaps, broken 0, less 0, gas 0, sting 0)
+W21-2 barricade map 04 vis 3  nobody free to send
+  week 21: account $-31240, morale 2, 2 open cases, 3 fit  |  trust 27  allies CL0x UN0x CC0x DA0x  polls K 33 O 46 P 21  pending 4
+W22-3 hostage   map 03 vis 3  nobody free to send
+W22-2 gang      map 08 vis 1  nobody free to send
+  week 22: account $-15154, morale 4, 2 open cases, 2 fit  |  trust 27  allies CL0x UN0x CC0x DA0x  polls K 33 O 46 P 21  pending 4
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W23-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 29775 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W23-3 gang      map 08 vis 2  nobody free to send
+W23-1 warrant   map 05 vis 4  nobody free to send
+W23-2 warrant   map 06 vis 4  nobody free to send
+  week 23: account $-258, morale 8, 0 open cases, 3 fit  |  trust 26  allies CL1x UN0x CC0x DA0x  polls K 33 O 45 P 22  pending 3
+W24-3 gang      map 08 vis 1  nobody free to send
+[officers 0 killed, 0 down of 4; suspects 1 down, 0 killed] 
+W24-2 barricade map 04 vis 3  Partial success  65  Frankie Farina shot and taken to hospital  (49 s sim, 632 ms, 4 officers, 100 snaps, broken 0, less 0, gas 0, sting 0)
+W24-1 warrant   map 05 vis 4  nobody free to send
+  week 24: account $3548, morale 19, 0 open cases, 6 fit  |  trust 25  allies CL0x UN4x CC0x DA0x  polls K 34 O 45 P 22  pending 6
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W25-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 38176 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W25-1 gang      map 10 vis 2  nobody free to send
+W25-3 barricade map 04 vis 2  nobody free to send
+W25-2 warrant   map 05 vis 4  nobody free to send
+  week 25: account $9387, morale 16, 0 open cases, 5 fit  |  trust 26  allies CL1x UN0x CC0x DA0x  polls K 34 O 44 P 23  pending 7
+W26-3 hostage   map 08 vis 1  nobody free to send
+W26-1 gang      map 10 vis 2  nobody free to send
+[officers 0 killed, 0 down of 4; suspects 0 down, 0 killed] 
+W26-2 warrant   map 06 vis 4  Failure          30  José Quintero escaped  (96 s sim, 1217 ms, 4 officers, 194 snaps, broken 0, less 0, gas 0, sting 0)
+  week 26: account $20801, morale 20, 0 open cases, 5 fit  |  trust 25  allies CL1x UN0x CC0x DA0x  polls K 35 O 43 P 22  pending 6
+W27-1 hostage   map 05 vis 2  nobody free to send
+[officers 0 killed, 0 down of 4; suspects 0 down, 0 killed] 
+W27-2 barricade map 01 vis 1  Success         100  Paolo LoRusso arrested  (22 s sim, 256 ms, 4 officers, 46 snaps, broken 0, less 0, gas 1, sting 0)
+  week 27: account $23580, morale 24, 0 open cases, 6 fit  |  trust 26  allies CL2x UN0x CC0x DA0x  polls K 36 O 42 P 22  pending 4
+[officers 0 killed, 0 down of 6; suspects 1 down, 0 killed] 
+W28-1 hostage   map 08 vis 1  Success         100  every hostage out alive  (229 s sim, 4110 ms, 6 officers, 460 snaps, broken 0, less 0, gas 0, sting 0)
+W28-2 gang      map 08 vis 1  nobody free to send
+W28-3 warrant   map 06 vis 4  nobody free to send
+  week 28: account $17206, morale 28, 0 open cases, 8 fit  |  trust 25  allies CL1x UN0x CC0x DA0x  polls K 37 O 41 P 23  pending 3
+[officers 0 killed, 0 down of 6; suspects 1 down, 1 killed] 
+W29-1 hostage   map 08 vis 1  Partial success  65  2 of 3 hostages out  (241 s sim, 4400 ms, 6 officers, 483 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 1 killed, 2 down of 3; suspects 1 down, 0 killed] 
+W29-3 event     map 11 vis 5  Success, at a cost  80  the attack was stopped with no one in the crowd killed  (258 s sim, 9207 ms, 3 officers, 517 snaps, broken 0, less 0, gas 0, sting 0)
+  week 29: account $19336, morale 26, 1 open cases, 7 fit  |  trust 24  allies CL0x UN0x CC0x DA0x  polls K 38 O 40 P 23  pending 4
+[officers 1 killed, 2 down of 6; suspects 3 down, 0 killed] 
+W30-1 hostage   map 05 vis 2  Failure          10  no hostage got out  (206 s sim, 3673 ms, 6 officers, 414 snaps, broken 0, less 0, gas 0, sting 0)
+W30-4 event     map 11 vis 5  nobody free to send
+W30-2 barricade map 01 vis 1  nobody free to send
+  week 30: account $-113780, morale 22, 1 open cases, 5 fit  |  trust 23  allies CL0x UN0x CC0x DA0x  polls K 38 O 38 P 23  pending 3
+W31-2 hostage   map 03 vis 3  nobody free to send
+[officers 0 killed, 0 down of 2; suspects 1 down, 0 killed] 
+W31-3 event     map 11 vis 5  Partial success, at a cost  35  the attack was stopped; 2 in the crowd killed  (448 s sim, 17589 ms, 2 officers, 898 snaps, broken 0, less 0, gas 0, sting 0)
+W31-1 gang      map 08 vis 1  nobody free to send
+  week 31: account $-96298, morale 21, 1 open cases, 5 fit  |  trust 22  allies CL0x UN0x CC0x DA0x  polls K 39 O 40 P 22  pending 3
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W32-3 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 31919 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W32-1 gang      map 08 vis 2  nobody free to send
+W32-2 warrant   map 05 vis 4  nobody free to send
+  week 32: account $-77734, morale 22, 0 open cases, 5 fit  |  trust 24  allies CL1x UN0x CC0x DA0x  polls K 39 O 39 P 22  pending 2
+[officers 0 killed, 0 down of 4; suspects 1 down, 1 killed] 
+W33-3 barricade map 04 vis 3  Success         100  Pawel Lytsenko gave up  (3 s sim, 46 ms, 4 officers, 7 snaps, broken 0, less 0, gas 0, sting 0)
+W33-2 barricade map 03 vis 2  nobody free to send
+W33-1 barricade map 01 vis 1  nobody free to send
+  week 33: account $-60710, morale 23, 0 open cases, 5 fit  |  trust 23  allies CL1x UN0x CC0x DA0x  polls K 39 O 38 P 23  pending 3
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W34-3 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 27878 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W34-2 gang      map 10 vis 2  nobody free to send
+W34-1 barricade map 04 vis 3  nobody free to send
+  week 34: account $-40146, morale 24, 0 open cases, 5 fit  |  trust 23  allies CL1x UN0x CC0x DA0x  polls K 39 O 38 P 23  pending 1
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W35-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 37750 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W35-3 gang      map 08 vis 2  nobody free to send
+W35-2 barricade map 04 vis 3  nobody free to send
+W35-1 warrant   map 05 vis 4  nobody free to send
+  week 35: account $-21582, morale 25, 1 open cases, 5 fit  |  trust 23  allies CL1x UN0x CC0x DA0x  polls K 38 O 38 P 24  pending 2
+W36-2 hostage   map 08 vis 1  nobody free to send
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W36-4 event     map 11 vis 5  Failure          15  no attack came; 1 in the crowd and 0 officers killed  (900 s sim, 33216 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W36-3 gang      map 10 vis 2  nobody free to send
+W36-1 barricade map 04 vis 3  nobody free to send
+  week 36: account $-3018, morale 26, 2 open cases, 5 fit  |  trust 21  allies CL0x UN0x CC0x DA0x  polls K 40 O 38 P 22  pending 5
+[officers 0 killed, 0 down of 2; suspects 1 down, 1 killed] 
+W37-3 event     map 11 vis 5  Failure           0  the attack was stopped; 3 in the crowd killed  (714 s sim, 32664 ms, 2 officers, 1429 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 4; suspects 0 down, 0 killed] 
+W37-1 warrant   map 06 vis 4  Failure          30  Ramón Pacheco escaped  (55 s sim, 713 ms, 4 officers, 112 snaps, broken 0, less 0, gas 0, sting 0)
+  week 37: account $7951, morale 29, 3 open cases, 6 fit  |  trust 20  allies CL0x UN0x CC0x DA0x  polls K 40 O 42 P 18  pending 6
+[officers 0 killed, 1 down of 6; suspects 2 down, 0 killed] 
+W38-3 hostage   map 08 vis 1  Partial success, at a cost  60  2 of 3 hostages out  (270 s sim, 5558 ms, 6 officers, 541 snaps, broken 0, less 0, gas 0, sting 0)
+W38-4 event     map 11 vis 5  nobody free to send
+W38-2 gang      map 08 vis 1  nobody free to send
+W38-1 warrant   map 06 vis 4  nobody free to send
+  week 38: account $-4380, morale 28, 3 open cases, 6 fit  |  trust 19  allies CL0x UN0x CC0x DA0x  polls K 39 O 42 P 19  pending 6
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W39-3 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 39169 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+W39-2 gang      map 08 vis 1  nobody free to send
+[officers 0 killed, 0 down of 4; suspects 1 down, 0 killed] 
+W39-1 barricade map 03 vis 2  Partial success  65  Matthew Phillips shot and taken to hospital  (1 s sim, 23 ms, 4 officers, 3 snaps, broken 0, less 0, gas 0, sting 0)
+  week 39: account $637, morale 31, 2 open cases, 8 fit  |  trust 18  allies CL1x UN0x CC0x DA0x  polls K 40 O 41 P 19  pending 7
+[officers 0 killed, 0 down of 2; suspects 0 down, 0 killed] 
+W40-4 event     map 11 vis 5  Passed quietly  100  nothing happened  (900 s sim, 41166 ms, 2 officers, 1802 snaps, broken 0, less 0, gas 0, sting 0)
+[officers 0 killed, 0 down of 6; suspects 2 down, 0 killed] 
+W40-1 gang      map 10 vis 2  Success         100  every member arrested or down  (315 s sim, 7889 ms, 6 officers, 631 snaps, broken 0, less 0, gas 0, sting 0)
+  week 40: account $8476, morale 34, 1 open cases, 8 fit  |  trust 18  allies CL2x UN0x CC0x DA0x  polls K 40 O 40 P 20  pending 3
+  week: Election day. Royce Kettering wins with 41%.
+ELECTION: Royce Kettering  (K 41%, O 35%, P 24%)  kept: true
+  Kettering keeps you. The equipment budget doubles.
+  On his first morning, the new mayor signs the equipment increase. The first contract goes to a firm owned by his brother-in-law.
+  He points to your force record as proof the city needs fewer limits. The coalition's lawyer files a federal complaint before the budget meeting ends.
+  Varga's office keeps charging officers. Kettering keeps pardoning them. Both offices keep the files.
+  Forty weeks: 29 operations succeeded, 10 failed, 69 situations went unattended. 13 officers killed. 8 stories reached the papers; 5 lawsuits settled; 0 cases leaked.
+  FILED. NOT RESOLVED.
+TOTALS chief=sensible train=false: mean score 69, 106 findings, deficit weeks 21; courses/officer 0.00, officers still carrying a bad habit 5/9.
+officer deaths: { "killed outright": 8, "bled out": 5 }
+officers per operation: 0.23 killed, 0.60 down (57 operations)
+done in 921622 ms

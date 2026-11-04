@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ok    first save writes
+ok    no backup after the first save
+ok    second save writes
+ok    the previous save is kept as .bak
+ok    no temporary file left behind
+ok    the save loads with the latest balance
+ok    a damaged save falls back to the backup
+ok    a missing save with a backup still loads
+ok    erase removes everything
+ok    recovery fixture primary writes
+ok    recovery fixture backup writes
+ok    a parseable but invalid primary falls back to the backup
+ok    the first recovery save preserves the good backup
+ok    a future-version primary is refused even when an older backup exists
+save_test: PASS

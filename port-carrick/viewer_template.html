@@ -1,0 +1,635 @@
+<title>Port Carrick Master Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#d8d3c6; --panel:#ece6d5; --panel2:#e2dbc8; --ink:#1d1b19; --ink2:#5a554b; --rule:#b9b2a0;
+  --red:#b8262a; --cobalt:#3d63b2; --ok:#2f6b3a; --paper:#8d8a83; --chip:#1d1b19; --chipfg:#ece6d5;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#171614; --panel:#1f1e1b; --panel2:#2a2824; --ink:#ece6d5; --ink2:#a39d8e; --rule:#3d3a33;
+  --red:#e0545a; --cobalt:#7d9be0; --ok:#7bc28a; --chip:#ece6d5; --chipfg:#1d1b19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171614; --panel:#1f1e1b; --panel2:#2a2824; --ink:#ece6d5; --ink2:#a39d8e; --rule:#3d3a33;
+  --red:#e0545a; --cobalt:#7d9be0; --ok:#7bc28a; --chip:#ece6d5; --chipfg:#1d1b19; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 "Patrick Hand","Comic Sans MS",system-ui,sans-serif;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow:hidden}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+#app{display:grid;grid-template-rows:auto 1fr auto;height:100%;gap:8px;padding-block:8px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+h1{font-size:22px;margin:0;letter-spacing:.14em;text-transform:uppercase;font-weight:400}
+h1 small{display:block;font:400 11px/1.2 "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:none;color:var(--ink2)}
+.grow{flex:1 1 220px;min-width:0}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:3px;overflow:hidden}
+.seg button{background:transparent;color:var(--ink);border:0;padding:5px 12px;font:inherit;font-size:15px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--chip);color:var(--chipfg)}
+button.b{background:transparent;color:var(--ink);border:1.5px solid var(--ink);border-radius:3px;padding:4px 10px;font:inherit;cursor:pointer}
+button.b:hover{background:var(--panel2)}
+input[type=search],input[type=text]{width:100%;background:var(--panel);color:var(--ink);border:1.5px solid var(--ink);border-radius:3px;padding:6px 9px;font:13px "IBM Plex Mono",monospace}
+.search{position:relative}
+#sugg{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--panel);border:1.5px solid var(--ink);border-top:0;display:none;max-height:260px;overflow:auto}
+#sugg div{padding:5px 9px;cursor:pointer;border-bottom:1px dotted var(--rule);font-size:15px}
+#sugg div:hover,#sugg div.on{background:var(--panel2)}
+#sugg span{font:11px "IBM Plex Mono",monospace;color:var(--ink2);margin-left:6px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:10px;min-height:0}
+#mapwrap{position:relative;border:2px solid var(--ink);background:#8d8a83;min-height:0;overflow:hidden;touch-action:none}
+canvas{display:block;width:100%;height:100%;cursor:grab}
+canvas.drag{cursor:grabbing}
+.zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px}
+.zoom button{width:32px;height:32px;font-size:20px;line-height:1;background:#e6dfcd;color:#1d1b19;border:1.5px solid #1d1b19;border-radius:3px;cursor:pointer}
+#tip{position:absolute;pointer-events:none;background:#e6dfcd;color:#1d1b19;border:1.5px solid #1d1b19;padding:4px 8px;font-size:14px;max-width:260px;display:none;z-index:5}
+#legend{position:absolute;left:8px;bottom:8px;background:rgba(230,223,205,.92);color:#1d1b19;border:1.5px solid #1d1b19;padding:6px 9px;font-size:13px;max-width:230px}
+#legend i{display:inline-block;width:14px;height:10px;border:1.2px solid #1d1b19;margin-right:6px;vertical-align:-1px}
+#layers{position:absolute;left:8px;top:8px;background:rgba(230,223,205,.94);color:#1d1b19;border:1.5px solid #1d1b19;padding:6px 9px;font-size:14px;display:none;columns:2;column-gap:14px}
+#layers label{display:block;white-space:nowrap;cursor:pointer}
+aside{display:flex;flex-direction:column;min-height:0;background:var(--panel);border:2px solid var(--ink)}
+.tabs{display:flex;border-bottom:2px solid var(--ink)}
+.tabs button{flex:1;background:transparent;color:var(--ink);border:0;border-right:1px solid var(--rule);padding:7px 1px;font:inherit;font-size:14px;cursor:pointer;min-width:0}
+.tabs button:last-child{border-right:0}
+.tabs button[aria-selected=true]{background:var(--chip);color:var(--chipfg)}
+.pane{display:none;padding:10px 12px;overflow:auto;min-height:0;flex:1}
+.pane.on{display:block}
+.pane h2{font-size:17px;margin:12px 0 4px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;border-bottom:1.5px solid var(--ink)}
+.pane h2:first-child{margin-top:0}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{padding:2px 5px 2px 0;text-align:left;vertical-align:top;border-bottom:1px dotted var(--rule)}
+th{font-weight:400;color:var(--ink2);font-size:12px}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:1px 8px;font-size:14px}
+.kv dt{color:var(--ink2)} .kv dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:12.5px;overflow-wrap:anywhere}
+.big{font-size:21px;line-height:1.15;margin:2px 0 6px}
+.tag{display:inline-block;font:11px "IBM Plex Mono",monospace;border:1px solid var(--ink);padding:0 5px;margin-right:4px;border-radius:2px}
+.tag.red{border-color:var(--red);color:var(--red)}
+.row{cursor:pointer}.row:hover{background:var(--panel2)}
+.pass{color:var(--ok)}.fail{color:var(--red);font-weight:700}
+.chk{padding:3px 0;border-bottom:1px dotted var(--rule);font-size:14px}
+.chk code{font:11px "IBM Plex Mono",monospace;color:var(--ink2);margin-right:5px}
+.chk .d{font:11px "IBM Plex Mono",monospace;color:var(--ink2);display:block;overflow-wrap:anywhere}
+.warn{color:var(--red)}
+.yr{display:flex;align-items:center;gap:8px;flex:1 1 300px;min-width:0}
+.yr input{flex:1;min-width:0;accent-color:var(--ink)}
+#yrv{font-size:12px;white-space:nowrap;min-width:170px}
+.scn label{display:block;cursor:pointer;padding:2px 0}
+.ev{display:grid;grid-template-columns:44px 1fr;gap:6px;padding:3px 4px 3px 0;border-bottom:1px dotted var(--rule);cursor:pointer;font-size:14px}
+.ev:hover{background:var(--panel2)}.ev b{font:500 12px "IBM Plex Mono",monospace}.ev.on{background:var(--panel2)}
+.ev.flood b,.ev.peak b{color:var(--red)}
+svg text{fill:currentColor}
+.note{color:var(--ink2);font-size:13px}
+.bar{height:8px;background:var(--panel2);border:1px solid var(--ink);position:relative;margin:2px 0}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
+.bar b{position:absolute;left:0;top:0;bottom:0;background:var(--red);opacity:.35}
+footer{display:flex;flex-wrap:wrap;gap:2px 16px;font:12px "IBM Plex Mono",monospace;color:var(--ink2);min-height:18px}
+footer b{color:var(--ink);font-weight:500}
+textarea{width:100%;height:120px;background:var(--panel2);color:var(--ink);border:1.5px solid var(--ink);font:11px "IBM Plex Mono",monospace;padding:6px}
+@media (max-width:860px){
+  body{overflow:auto}
+  #app{height:auto;min-height:100%}
+  main{grid-template-columns:1fr;grid-template-rows:62vh auto}
+  aside{max-height:none}
+  .pane{max-height:60vh}
+  #legend{display:none}
+}
+</style>
+
+<div id="app">
+ <header>
+  <h1>Port Carrick, PA<small class="mono">master map v0.4 · datum 0.000000°, 0.000000° = Carrick Bridge, centre span</small></h1>
+  <div class="grow search"><input id="q" type="search" placeholder="Address, landmark, street…  e.g. 120 N Bridge Street" autocomplete="off" aria-label="Search"><div id="sugg"></div></div>
+  <div class="seg" role="group" aria-label="Time"><button id="mNow" aria-pressed="true">Now</button><button id="mPeak" aria-pressed="false">Peak</button></div>
+  <div class="yr"><button class="b" id="bPlay" aria-label="Play the city's history">▶</button><input id="yr" type="range" min="1794" max="2026" step="1" value="2026" aria-label="Year"><span id="yrv" class="mono"></span></div>
+  <button class="b" id="bLayers">Layers</button>
+  <button class="b" id="bReset">Fit</button>
+ </header>
+ <main>
+  <div id="mapwrap">
+   <canvas id="cv"></canvas>
+   <div class="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button></div>
+   <div id="layers"></div>
+   <div id="tip"></div>
+   <div id="legend"></div>
+  </div>
+  <aside>
+   <div class="tabs" role="tablist">
+    <button role="tab" data-t="inspect" aria-selected="true">Info</button>
+    <button role="tab" data-t="wards" aria-selected="false">Wards</button>
+    <button role="tab" data-t="history" aria-selected="false">History</button>
+    <button role="tab" data-t="systems" aria-selected="false">Systems</button>
+    <button role="tab" data-t="book" aria-selected="false">Book</button>
+    <button role="tab" data-t="checks" aria-selected="false">Checks</button>
+    <button role="tab" data-t="edit" aria-selected="false">Edit</button>
+   </div>
+   <div class="pane on" id="p-inspect"></div>
+   <div class="pane" id="p-wards"></div>
+   <div class="pane" id="p-history"></div>
+   <div class="pane" id="p-systems"></div>
+   <div class="pane" id="p-book"></div>
+   <div class="pane" id="p-checks"></div>
+   <div class="pane" id="p-edit"></div>
+  </aside>
+ </main>
+ <footer id="foot"><span>Hover the map</span></footer>
+</div>
+<script type="application/json" id="data">/*DATA*/</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById('data').textContent);
+const Bd = D.buildings, N = Bd.n, META = D.meta, WN = META.wards, TYPES = META.types;
+const FR = META.frame, MLAT = FR.m_per_deg_lat, MLON = FR.m_per_deg_lon;
+const toGeo = (x,y)=>[y/MLAT, x/MLON], toXY = (lat,lon)=>[lon*MLON, lat*MLAT];
+const WARD_NAME = {oldtown:"Old Town",riverside:"Riverside",ironworks:"Ironworks",eastport:"Eastport",kilbride:"Kilbride",northgate:"Northgate"};
+const WARD_COL = {oldtown:"#c9a45c",riverside:"#5f9a93",ironworks:"#9a5f44",eastport:"#3d63b2",kilbride:"#8c9a4a",northgate:"#8a78b0"};
+const PRE = "NSEW";
+const ST = D.streets, ROADS = ST.filter(s=>s.cls!=="B");
+const $ = id=>document.getElementById(id);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = n=>Number(n).toLocaleString('en-US');
+
+/* ---------------------------------------------------------------- geometry helpers */
+function pip(ring,x,y){let c=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];
+  if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+const wardRings = Object.fromEntries(WN.map(w=>[w,D.wards[w]]));
+function wardAt(x,y){for(const w of WN){for(const r of wardRings[w])if(pip(r,x,y))return w}return null}
+function inWater(x,y){for(const r of D.water.river)if(pip(r,x,y))return true;
+  for(const [n,b] of Object.entries(D.water.basins)){const [x0,y0,x1,y1]=b.rect;
+    if(x>=x0&&x<=x1&&y>=y0&&y<=y1){let onPier=false;for(const p of b.piers)if(x>=p[0]&&x<=p[2]&&y>=p[1]&&y<=p[3])onPier=true;if(!onPier)return true}}
+  return false}
+/* terrain, identical to pc_geo.terrain (self-tested against every stored ground height) */
+function yc(x){return 55*(1-Math.cos(x/1250))+3.2*Math.pow(x/1000,3)}
+function rwidth(x){return 330+1100*Math.pow(Math.abs(x)/4000,2.2)}
+const sm=t=>{t=Math.min(1,Math.max(0,t));return t*t*(3-2*t)};
+function terrain(x,y){const dy=y-yc(x);if(Math.abs(dy)<=rwidth(x)/2)return 215;const n=Math.max(dy,0),s=Math.max(-dy,0);
+  let z=215+(dy>=0?8*(1-Math.exp(-n/300))+92*Math.pow(sm((n-1100)/1250),1.3):6*(1-Math.exp(-s/300))+66*Math.pow(sm((s-650)/1450),1.2));
+  z+=34*Math.exp(-((Math.pow(x+2400,2)+Math.pow(y+900,2))/(2*260*260)));
+  z+=11*Math.exp(-((Math.pow(x-1500,2)+Math.pow(y+1150,2))/(2*340*340)));
+  const k=Math.min(1,Math.abs(dy)/600);z+=k*(4*Math.sin(x/410+1.3)*Math.sin(y/530+0.4)+2.5*Math.sin(x/170+y/230));return z}
+
+/* ---------------------------------------------------------------- address scheme (mirrors pc_addr.py) */
+function makeNumber(a,even){let n=Math.floor(Math.abs(a));const t=even?0:1;if(n%2!==t)n-=1;if(n<1)n=even?2:1;return n}
+function prefixFor(axis,a){return axis==="EW"?(a>=0?"E":"W"):(a>=0?"N":"S")}
+const GRID=150, segIdx=new Map();
+ROADS.forEach(s=>{for(let i=0;i<s.pts.length-1;i++){const a=s.pts[i],b=s.pts[i+1];
+  const x0=Math.floor(Math.min(a[0],b[0])/GRID),x1=Math.floor(Math.max(a[0],b[0])/GRID),y0=Math.floor(Math.min(a[1],b[1])/GRID),y1=Math.floor(Math.max(a[1],b[1])/GRID);
+  for(let gx=x0;gx<=x1;gx++)for(let gy=y0;gy<=y1;gy++){const k=gx+","+gy;let l=segIdx.get(k);if(!l)segIdx.set(k,l=[]);l.push([s.id,i])}}});
+function projSeg(s,i,x,y){const a=s.pts[i],b=s.pts[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;let t=((x-a[0])*dx+(y-a[1])*dy)/L2;t=Math.max(0,Math.min(1,t));
+  const qx=a[0]+t*dx,qy=a[1]+t*dy,L=Math.sqrt(L2);return{qx,qy,d:Math.hypot(x-qx,y-qy),tx:dx/L,ty:dy/L}}
+function addrOn(s,x,y,seg){let best=null;const segs=seg!=null?[seg]:null;
+  if(segs){best=projSeg(s,seg,x,y)}else{for(let i=0;i<s.pts.length-1;i++){const p=projSeg(s,i,x,y);if(!best||p.d<best.d)best=p}}
+  const cross=best.tx*(y-best.qy)-best.ty*(x-best.qx);const a=s.axis==="EW"?best.qx:best.qy;const even=s.axis==="EW"?cross>0:cross<0;
+  return{n:makeNumber(a,even),pre:prefixFor(s.axis,a),even,a,dist:best.d,street:s}}
+function reverse(x,y){let best=null,bd=1e18;const gx=Math.floor(x/GRID),gy=Math.floor(y/GRID);
+  for(let r=0;r<=6&&!best;r++){for(let ix=gx-r;ix<=gx+r;ix++)for(let iy=gy-r;iy<=gy+r;iy++){if(r&&Math.abs(ix-gx)<r&&Math.abs(iy-gy)<r)continue;
+    const l=segIdx.get(ix+","+iy);if(!l)continue;for(const [sid,i] of l){const p=projSeg(ST[sid],i,x,y);if(p.d<bd){bd=p.d;best=[sid,i]}}}
+    if(best&&bd>r*GRID)best=null}
+  if(!best)return null;const s=ST[best[0]];const r=addrOn(s,x,y,best[1]);r.text=`${r.n} ${r.pre} ${s.name}`;return r}
+function forward(text){const m=/^\s*(\d+)\s+([NSEW])\s+(.+?)\s*$/i.exec(text);if(!m)return null;const n=+m[1],pre=m[2].toUpperCase(),name=m[3].toLowerCase();
+  const target=(pre==="E"||pre==="N"?1:-1)*n,ew=(pre==="E"||pre==="W");
+  for(const s of ROADS){if(s.name.toLowerCase()!==name||s.axis!==(ew?"EW":"NS"))continue;const k=ew?0:1;
+    for(let i=0;i<s.pts.length-1;i++){const a0=s.pts[i][k],a1=s.pts[i+1][k],lo=Math.min(a0,a1),hi=Math.max(a0,a1);
+      if(lo<=target&&target<=hi&&hi>lo){const t=(target-a0)/(a1-a0),x=s.pts[i][0]+t*(s.pts[i+1][0]-s.pts[i][0]),y=s.pts[i][1]+t*(s.pts[i+1][1]-s.pts[i][1]);
+        const dx=s.pts[i+1][0]-s.pts[i][0],dy=s.pts[i+1][1]-s.pts[i][1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,even=n%2===0;
+        const left=ew?even:!even;const nx=left?-uy:uy,ny=left?ux:-ux,off=s.w/2+s.yard;return{x:x+nx*off,y:y+ny*off,cx:x,cy:y,street:s,n,pre}}}}
+  return null}
+
+/* ---------------------------------------------------------------- building spatial index and per-street stats */
+const BG=100,bIdx=new Map();
+for(let i=0;i<N;i++){const k=Math.floor(Bd.x[i]/BG)+","+Math.floor(Bd.y[i]/BG);let l=bIdx.get(k);if(!l)bIdx.set(k,l=[]);l.push(i)}
+function inRect(i,x,y,pad){const dx=x-Bd.x[i],dy=y-Bd.y[i],c=Math.cos(Bd.a[i]),s=Math.sin(Bd.a[i]);const u=dx*c+dy*s,v=-dx*s+dy*c;return Math.abs(u)<=Bd.w[i]/2+pad&&Math.abs(v)<=Bd.d[i]/2+pad}
+function buildingAt(x,y,pad=0){const gx=Math.floor(x/BG),gy=Math.floor(y/BG);let best=-1,bd=1e9;
+  for(let ix=gx-1;ix<=gx+1;ix++)for(let iy=gy-1;iy<=gy+1;iy++){const l=bIdx.get(ix+","+iy);if(!l)continue;for(const i of l){if(Bd.yr[i]>year)continue;if(inRect(i,x,y,pad)){const d=Math.hypot(Bd.x[i]-x,Bd.y[i]-y);if(d<bd){bd=d;best=i}}}}return best}
+const streetVac=new Float32Array(ST.length),streetCnt=new Uint16Array(ST.length);
+for(let i=0;i<N;i++){streetCnt[Bd.st[i]]++;if(Bd.status[i]!==0)streetVac[Bd.st[i]]++}
+const LMs=D.landmarks, lmByB=new Map();LMs.forEach((l,i)=>{if(l.bi>=0)lmByB.set(l.bi,i)});
+const SITES=D.sites;
+const heightM=i=>Bd.lv[i]*META.level_m;
+/* state of a building in the selected year: -1 not yet built, 0 occupied, 1 derelict, 2 cleared */
+function stAt(i){if(Bd.yr[i]>year)return -1;if(year<=PEAKY)return 0;return Bd.abn[i]<=year?Bd.status[i]:0}
+function popAt(Y){let s=0;for(let i=0;i<N;i++){if(Bd.yr[i]>Y)continue;s+=Y<=PEAKY?Bd.peak[i]:(Bd.abn[i]<=Y?Bd.now[i]:Bd.peak[i])}return s}
+
+/* ---------------------------------------------------------------- state / view */
+const cv=$('cv'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1,k=0.12,cx=0,cy=0,mode="now",sel=null,hover=null,editOn=false;
+const view={}; const PEAKY=D.history.year_peak, NOWY=D.history.year_now, WALLY=D.wall.year; let year=NOWY, scen=0, playing=0;
+const L={wards:true,contours:true,storeys:true,streets:true,names:true,landmarks:true,sites:true,grid:true,rail:true,ghosts:true,bridge:true,flood:true,wall:true,cross:true,util:false,resp:false};
+const LAYER_LABELS={wards:"Ward tint",contours:"Terrain contours",storeys:"Storey contours",streets:"Streets",names:"Street names",landmarks:"Landmarks",sites:"Situation sites",grid:"Lat/lon grid",rail:"Rail",ghosts:"Ghost districts",bridge:"Bridge detail",flood:"Flood zone",wall:"Floodwall + gates",cross:"Crossings",util:"Water + sewer",resp:"Fire response"};
+const X=x=>(x-cx)*k+W/2, Y=y=>H/2-(y-cy)*k;
+const wx=px=>(px-W/2)/k+cx, wy=py=>cy-(py-H/2)/k;
+function resize(){const r=$('mapwrap').getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(10,r.width);H=Math.max(10,r.height);cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);draw()}
+function fit(){const [x0,y0,x1,y1]=[-3900,-2300,3900,2300];k=Math.min(W/(x1-x0),H/(y1-y0))*0.97;cx=0;cy=0;draw()}
+let raf=0;function draw(){if(!raf)raf=requestAnimationFrame(()=>{raf=0;render()})}
+
+/* ---------------------------------------------------------------- paper & patterns */
+function mkPattern(w,h,fn){const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);return ctx.createPattern(c,'repeat')}
+let patPaper,patHatch,patWater;
+function mkPatterns(){
+  patPaper=mkPattern(180,180,(g,w,h)=>{g.fillStyle='#8d8a83';g.fillRect(0,0,w,h);let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
+    for(let i=0;i<1100;i++){g.fillStyle=r()<.5?'rgba(255,250,235,.07)':'rgba(20,18,15,.06)';g.fillRect(r()*w,r()*h,1+r()*1.6,1+r()*1.6)}
+    g.strokeStyle='rgba(20,18,15,.045)';g.lineWidth=.6;for(let i=0;i<46;i++){g.beginPath();const y=r()*h,x=r()*w;g.moveTo(x,y);g.lineTo(x+14+r()*40,y+(r()-.5)*5);g.stroke()}});
+  patHatch=mkPattern(7,7,(g)=>{g.strokeStyle='rgba(29,27,25,.75)';g.lineWidth=1.1;g.beginPath();g.moveTo(-1,8);g.lineTo(8,-1);g.moveTo(-1,1);g.lineTo(1,-1);g.moveTo(6,8);g.lineTo(8,6);g.stroke()});
+  patWater=mkPattern(9,6,(g,w,h)=>{g.fillStyle='rgba(61,99,178,.30)';g.fillRect(0,0,w,h);g.strokeStyle='rgba(235,240,255,.35)';g.lineWidth=1;g.beginPath();g.moveTo(0,3);g.bezierCurveTo(2,1,4,5,6,3);g.bezierCurveTo(7,2,8,3,9,3);g.stroke()})
+}
+
+/* flood: one pixel per 25 m cell, three pre-rendered tints */
+let floodAll,floodFlats,floodProt;
+function mkFlood(){const F=D.flood,nx=F.nx,ny=F.ny;const mk=()=>{const c=document.createElement('canvas');c.width=nx;c.height=ny;return c};
+  floodAll=mk();floodFlats=mk();floodProt=mk();const ga=floodAll.getContext('2d'),gf=floodFlats.getContext('2d'),gp=floodProt.getContext('2d');
+  for(let j=0;j<ny;j++){const row=F.rows[j];for(let i=0;i<nx;i++){const ch=row[i];if(ch==='w'||ch==='0')continue;const d=+ch,x=F.x0+i*F.step,inside=Math.abs(x)<=D.wall.x[1],py=ny-1-j;
+    ga.fillStyle=`rgba(61,99,178,${.14+.045*d})`;ga.fillRect(i,py,1,1);
+    if(inside){gp.fillStyle=`rgba(61,99,178,${.07+.02*d})`;gp.fillRect(i,py,1,1)}else{gf.fillStyle=`rgba(61,99,178,${.14+.045*d})`;gf.fillRect(i,py,1,1)}}}}
+function drawFlood(){if(!L.flood||!floodAll)return;const F=D.flood;ctx.imageSmoothingEnabled=false;
+  const dr=c=>ctx.drawImage(c,X(F.x0-F.step/2),Y(F.y0+(F.ny-.5)*F.step),F.nx*F.step*k,F.ny*F.step*k);
+  if(year<WALLY)dr(floodAll);else{dr(floodFlats);dr(floodProt)}ctx.imageSmoothingEnabled=true}
+
+/* ---------------------------------------------------------------- render */
+const C={cream:'#e6dfcd',creamD:'#cfc7b1',ink:'#1d1b19',red:'#b8262a',cobalt:'#3d63b2',road:'#b9b4a6',roadA:'#cdc7b6',derel:'#7d796f'};
+function ring(r,close=true){ctx.moveTo(X(r[0][0]),Y(r[0][1]));for(let i=1;i<r.length;i++)ctx.lineTo(X(r[i][0]),Y(r[i][1]));if(close)ctx.closePath()}
+function poly(p){ctx.beginPath();for(let i=0;i<p.length;i++){const x=X(p[i][0]),y=Y(p[i][1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}}
+function vis(x0,y0,x1,y1){return !(X(x1)<0||X(x0)>W||Y(y0)<0||Y(y1)>H)}
+function inView(x,y,m=20){const px=X(x),py=Y(y);return px>-m&&px<W+m&&py>-m&&py<H+m}
+
+function render(){
+  const t0=performance.now();
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=patPaper;ctx.fillRect(0,0,W,H);
+  const vx0=wx(0),vx1=wx(W),vy1=wy(0),vy0=wy(H);
+  // wards
+  if(L.wards){ctx.save();ctx.beginPath();ring(D.limit);ctx.clip();for(const w of WN){ctx.fillStyle=WARD_COL[w]+'26';for(const r of wardRings[w]){ctx.beginPath();ring(r);ctx.fill()}}ctx.restore()}
+  // terrain contours
+  if(L.contours){ctx.lineJoin='round';for(const c of D.contours){const idx=c.idx;ctx.strokeStyle=idx?'rgba(36,32,26,.55)':'rgba(36,32,26,.28)';ctx.lineWidth=idx?1.1:.6;
+    ctx.beginPath();const p=c.pts;let any=false;for(let i=0;i<p.length;i++){const x=X(p[i][0]),y=Y(p[i][1]);if(x>-50&&x<W+50&&y>-50&&y<H+50)any=true;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}if(any)ctx.stroke()}
+    if(k>0.07){ctx.font='11px "IBM Plex Mono",monospace';ctx.fillStyle='rgba(36,32,26,.8)';for(const c of D.contours){if(!c.idx)continue;const p=c.pts,m=p[p.length>>1];if(inView(m[0],m[1],0)){const t=String(c.z);ctx.save();ctx.translate(X(m[0]),Y(m[1]));ctx.fillStyle='#8d8a83';ctx.fillRect(-9,-6,18,12);ctx.fillStyle='#1d1b19';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,0,0);ctx.restore()}}}}
+  // flood zone under the water
+  drawFlood();
+  // water: the river always; each basin from the year it was dug; the western half of Fish Basin until it was filled
+  ctx.fillStyle=patWater;ctx.strokeStyle=C.ink;ctx.lineWidth=1.6;
+  for(const r of D.water.river){ctx.beginPath();ring(r);ctx.fill();ctx.stroke()}
+  for(const [n,b] of Object.entries(D.water.basins)){if(b.year>year)continue;const [x0,y0,x1,y1]=b.rect;ctx.fillStyle=patWater;ctx.beginPath();ctx.rect(X(x0),Y(y1),(x1-x0)*k,(y1-y0)*k);ctx.fill();ctx.fillStyle='#8d8a83';
+    ctx.lineWidth=1.3;ctx.stroke();for(const p of b.piers){ctx.fillStyle=patPaper;ctx.beginPath();ctx.rect(X(p[0]),Y(p[3]),(p[2]-p[0])*k,(p[3]-p[1])*k);ctx.fill();ctx.stroke()}}
+  {const fb=D.water.basins['Fish Basin'];if(fb&&fb.year<=year&&year<D.water.fill.year){const [x0,y0,x1,y1]=D.water.fill.rect;ctx.fillStyle=patWater;ctx.beginPath();ctx.rect(X(x0),Y(y1),(x1-x0)*k,(y1-y0)*k);ctx.fill();ctx.lineWidth=1.3;ctx.stroke()}}
+  // city limit
+  ctx.setLineDash([10,7]);ctx.strokeStyle='rgba(29,27,25,.6)';ctx.lineWidth=1.2;ctx.beginPath();ring(D.limit);ctx.stroke();ctx.setLineDash([]);
+  // graticule
+  if(L.grid)drawGrid();
+  // streets
+  if(L.streets)drawStreets();
+  // rail
+  if(L.rail){ctx.lineCap='butt';for(const r of D.rail){if(r.kind==='deck-rail'||r.era>year)continue;ctx.beginPath();poly(r.pts);ctx.strokeStyle=C.ink;ctx.lineWidth=Math.max(1,3*k);ctx.setLineDash([]);ctx.stroke();
+    ctx.strokeStyle=C.cream;ctx.lineWidth=Math.max(.6,1.6*k);ctx.setLineDash([Math.max(2,5*k+2),Math.max(2,5*k+2)]);ctx.stroke();ctx.setLineDash([])}}
+  drawBuildings(vx0,vx1,vy0,vy1);
+  if(L.wall)drawWall();
+  if(L.util)drawUtil();
+  if(L.cross)drawCrossings();
+  if(L.bridge&&year>=1958)drawBridge();
+  if(L.wards)drawWardNames();
+  if(L.ghosts&&year>=NOWY)drawGhosts();
+  if(L.names)drawStreetNames();
+  drawBasinNames();
+  if(L.landmarks)drawLandmarks();
+  if(L.sites&&year>=PEAKY)drawSites();
+  drawDatum();
+  if(sel)drawSel();
+  drawScale();
+  view.ms=performance.now()-t0;
+}
+
+function drawGrid(){const dl=0.01,dn=0.01;ctx.font='10px "IBM Plex Mono",monospace';
+  const [lat0,lon0]=toGeo(wx(0),wy(H)),[lat1,lon1]=toGeo(wx(W),wy(0));
+  let step=0.01;if(k>0.5)step=0.002;if(k>2.5)step=0.0005;if(k<0.05)step=0.02;
+  ctx.strokeStyle='rgba(29,27,25,.20)';ctx.lineWidth=.6;ctx.fillStyle='rgba(29,27,25,.75)';
+  for(let la=Math.ceil(lat0/step)*step;la<=lat1;la+=step){const y=Y(la*MLAT);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.fillText((la>=0?'+':'')+la.toFixed(4)+'°',4,y-2)}
+  for(let lo=Math.ceil(lon0/step)*step;lo<=lon1;lo+=step){const x=X(lo*MLON);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();ctx.save();ctx.translate(x+3,H-4);ctx.rotate(-Math.PI/2);ctx.fillText((lo>=0?'+':'')+lo.toFixed(4)+'°',0,0);ctx.restore()}
+  // the two datum axes
+  ctx.strokeStyle='rgba(184,38,42,.55)';ctx.lineWidth=1;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(0,Y(0));ctx.lineTo(W,Y(0));ctx.moveTo(X(0),0);ctx.lineTo(X(0),H);ctx.stroke();ctx.setLineDash([])}
+
+const CLS_PX={A:[2.4,24],C:[1.6,16],L:[1.1,10],Q:[1.8,18],S:[1.1,12],M:[2.0,16]};
+function drawStreets(){ctx.lineJoin='round';ctx.lineCap='butt';
+  const dotted=s=>year>=NOWY&&streetCnt[s.id]>=6&&streetVac[s.id]/streetCnt[s.id]>=0.72;
+  for(let pass=0;pass<2;pass++){for(const s of ROADS){if(s.era>year)continue;const [mn,wm]=CLS_PX[s.cls];const wpx=Math.max(mn,wm*k);
+    const dot=dotted(s);if(pass===0){ctx.strokeStyle=C.ink;ctx.lineWidth=wpx+1.6}else{ctx.strokeStyle=s.cls==='A'||s.cls==='Q'?C.roadA:C.road;ctx.lineWidth=wpx}
+    if(dot){ctx.setLineDash(pass===0?[1,4]:[1,4]);if(pass===1){ctx.strokeStyle='#6f6b62'}}else ctx.setLineDash([]);
+    ctx.beginPath();const p=s.pts;let any=false;for(let i=0;i<p.length;i++){const x=X(p[i][0]),y=Y(p[i][1]);if(x>-30&&x<W+30&&y>-30&&y<H+30)any=true;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}if(any)ctx.stroke()}}
+  ctx.setLineDash([])}
+
+let C_RESP=false;
+const RESP_BINS=[[120,'rgba(61,99,178,.18)'],[180,'rgba(61,99,178,.38)'],[240,'rgba(61,99,178,.60)'],[300,'rgba(61,99,178,.82)'],[1e9,'rgba(184,38,42,.9)']];
+function drawBuildings(vx0,vx1,vy0,vy1){
+  const peak=false;const m=40/k;const resp=L.resp&&year>=PEAKY;const tarr=[Bd.tf,Bd.tv,Bd.tc][scen];
+  const batches={occ:[],tall:[],der:[],clr:[]};const rb=RESP_BINS.map(()=>[]);
+  for(let i=0;i<N;i++){const x=Bd.x[i],y=Bd.y[i];if(x<vx0-m||x>vx1+m||y<vy0-m||y>vy1+m)continue;
+    const st=stAt(i);if(st<0)continue;
+    if(resp&&st!==2){const t=tarr[i];rb[RESP_BINS.findIndex(b=>t<=b[0])].push(i);continue}
+    (st===0?(Bd.lv[i]>=7?batches.tall:batches.occ):st===1?batches.der:batches.clr).push(i)}
+  const rect=(i,inset=0)=>{const c=Math.cos(Bd.a[i]),s=Math.sin(Bd.a[i]),hw=Bd.w[i]/2-inset,hd=Bd.d[i]/2-inset,x=Bd.x[i],y=Bd.y[i];
+    const ax=c*hw,ay=s*hw,bx=-s*hd,by=c*hd;ctx.moveTo(X(x-ax-bx),Y(y-ay-by));ctx.lineTo(X(x+ax-bx),Y(y+ay-by));ctx.lineTo(X(x+ax+bx),Y(y+ay+by));ctx.lineTo(X(x-ax+bx),Y(y-ay+by));ctx.closePath()};
+  const tiny=Math.max(Bd.w[0],1)*k<1.1;
+  const layer=(list,fill,stroke,lw,dash)=>{if(!list.length)return;ctx.beginPath();
+    if(k<0.22){for(const i of list){const px=X(Bd.x[i]),py=Y(Bd.y[i]),r=Math.max(.8,Math.sqrt(Bd.w[i]*Bd.d[i])*k*.5);ctx.rect(px-r,py-r,2*r,2*r)}}
+    else for(const i of list)rect(i);
+    if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke&&k>=0.22){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.stroke();ctx.setLineDash([])}};
+  layer(batches.clr,null,'rgba(235,228,208,.45)',.7,[2,3]);
+  layer(batches.der,'#7f7b71','#2a2723',.8);
+  layer(batches.occ,C.cream,C.ink,.8);
+  layer(batches.tall,C.creamD,C.ink,.9);
+  if(resp){C_RESP=true;RESP_BINS.forEach((b,j)=>{layer(rb[j],C.cream,C.ink,.5);layer(rb[j],b[1],null,0)})}
+  if(L.storeys&&k>=0.6)drawStoreys(batches,peak);
+  // crimson X on derelict when large enough
+  if(!peak&&k>=1.0){ctx.strokeStyle=C.red;ctx.lineWidth=1.1;ctx.beginPath();for(const i of batches.der){const w=Bd.w[i]*k,d=Bd.d[i]*k;if(Math.min(w,d)<9)continue;
+    const c=Math.cos(Bd.a[i]),s=Math.sin(Bd.a[i]),hw=Bd.w[i]/2*.55,hd=Bd.d[i]/2*.55,x=Bd.x[i],y=Bd.y[i];
+    for(const sg of [1,-1]){ctx.moveTo(X(x-c*hw*sg+s*hd),Y(y-s*hw*sg-c*hd));ctx.lineTo(X(x+c*hw*sg-s*hd),Y(y+s*hw*sg+c*hd))}}ctx.stroke()}
+}
+function drawStoreys(b,peak){
+  const per=Math.max(META.batter_m,3.2/k);
+  ctx.lineWidth=.6;
+  const list=[...b.occ,...b.tall];if(peak)list.push(...b.der,...b.clr);
+  for(const i of list){const wpx=Math.min(Bd.w[i],Bd.d[i])*k;if(wpx<13)continue;
+    const tr=Bd.tiers[i];if(!tr.length)continue;const half=Math.min(Bd.w[i],Bd.d[i])/2-0.35;const lv=Bd.lv[i];
+    // inset of each level = its tier's setback + batter per level, scaled to fit inside the footprint
+    const ins=[];let tier=0;for(let l=1;l<=lv;l++){while(tier*2+3<tr.length&&l>tr[tier*2+1])tier++;ins.push(tr[tier*2]+per*(l-1))}
+    const mx=ins[ins.length-1];const f=mx>half?half/mx:1;const gap=(ins.length>1?(ins[1]-ins[0])*f*k:99);
+    const stride=gap<2.4?Math.ceil(2.4/Math.max(gap,.15)):1;
+    ctx.beginPath();for(let l=1;l<=lv;l++){if(l!==lv&&((l%5)!==0)&&((l-1)%stride!==0))continue;if(l%5===0)continue;ringRect(i,ins[l-1]*f)}ctx.strokeStyle='rgba(29,27,25,.55)';ctx.stroke();
+    ctx.beginPath();for(let l=5;l<=lv;l+=5)ringRect(i,ins[l-1]*f);ctx.strokeStyle='rgba(29,27,25,.95)';ctx.lineWidth=1.1;ctx.stroke();ctx.lineWidth=.6}
+}
+function ringRect(i,inset){const c=Math.cos(Bd.a[i]),s=Math.sin(Bd.a[i]),hw=Bd.w[i]/2-inset,hd=Bd.d[i]/2-inset,x=Bd.x[i],y=Bd.y[i];if(hw<=.1||hd<=.1)return;
+  const ax=c*hw,ay=s*hw,bx=-s*hd,by=c*hd;ctx.moveTo(X(x-ax-bx),Y(y-ay-by));ctx.lineTo(X(x+ax-bx),Y(y+ay-by));ctx.lineTo(X(x+ax+bx),Y(y+ay+by));ctx.lineTo(X(x-ax+bx),Y(y-ay+by));ctx.closePath()}
+
+/* bridge: deck drawn like terrain – cross-lines every 5 m of elevation */
+function deckZ(y){const a=Math.abs(y),s=y>=0?1:-1,zl=277;if(a<=D.bridge.level_to)return zl;const zf=terrain(0,s*D.bridge.foot);return zl+(zf-zl)*Math.min(1,(a-D.bridge.level_to)/(D.bridge.foot-D.bridge.level_to))}
+function drawBridge(){const hw=D.bridge.half_w,f=D.bridge.foot;
+  const sh=Math.max(2,6*Math.min(1,k*3));ctx.fillStyle='rgba(20,18,15,.28)';ctx.fillRect(X(-hw)+sh,Y(f)+sh,2*hw*k,2*f*k);
+  ctx.fillStyle='#d9d2bd';ctx.fillRect(X(-hw),Y(f),2*hw*k,2*f*k);
+  // elevation cross-lines
+  ctx.strokeStyle='rgba(29,27,25,.65)';ctx.lineWidth=.7;ctx.font='10px "IBM Plex Mono",monospace';ctx.fillStyle='#1d1b19';
+  for(const sg of [1,-1]){const zf=terrain(0,sg*f);for(let z=Math.ceil(zf/5)*5;z<277;z+=5){const y=sg*(D.bridge.level_to+(277-z)/(277-zf)*(f-D.bridge.level_to));
+    ctx.lineWidth=z%25===0?1.2:.6;ctx.beginPath();ctx.moveTo(X(-hw),Y(y));ctx.lineTo(X(hw),Y(y));ctx.stroke();
+    if(z%25===0&&k>.09&&inView(0,y,60)){ctx.save();ctx.fillStyle='#d9d2bd';const t=z+' m';const tw=ctx.measureText(t).width;ctx.fillRect(X(hw)+3,Y(y)-6,tw+4,12);ctx.fillStyle='#1d1b19';ctx.fillText(t,X(hw)+5,Y(y)+3);ctx.restore()}}}
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.strokeRect(X(-hw),Y(f),2*hw*k,2*f*k);
+  ctx.setLineDash([8,6]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(0),Y(-f));ctx.lineTo(X(0),Y(f));ctx.stroke();ctx.setLineDash([]);
+  // towers
+  for(const t of D.bridge.towers){const x=X(t.x-t.w/2),y=Y(t.y+t.d/2),w=Math.max(4,t.w*k),h=Math.max(4,t.d*k);ctx.fillStyle=C.ink;ctx.fillRect(x,y,w,h);ctx.strokeStyle='#e6dfcd';ctx.lineWidth=1;ctx.strokeRect(x+1,y+1,w-2,h-2)}
+  if(k>.05){ctx.font='15px "Patrick Hand",cursive';ctx.fillStyle=C.ink;ctx.textAlign='center';ctx.save();ctx.translate(X(-hw)-9,Y(-760));ctx.rotate(-Math.PI/2);ctx.fillText('CARRICK BRIDGE · deck 62 m over water · towers +128 m',0,0);ctx.restore();ctx.textAlign='left'}}
+
+function drawWall(){if(year<WALLY)return;ctx.lineJoin='round';
+  for(const s of D.wall.segments){ctx.beginPath();poly(s.pts);ctx.strokeStyle=C.ink;ctx.lineWidth=Math.max(2,5*k);ctx.setLineDash([]);ctx.stroke();ctx.strokeStyle=C.cream;ctx.lineWidth=Math.max(.8,1.6*k);ctx.setLineDash([Math.max(3,6*k),Math.max(3,6*k)]);ctx.stroke();ctx.setLineDash([])}
+  if(k>.25){for(const g of D.wall.gates){if(g.year>year)continue;if(!inView(g.x,g.y,30))continue;ctx.strokeStyle=C.cobalt;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(X(g.x0),Y(g.y));ctx.lineTo(X(g.x1),Y(g.y));ctx.stroke();
+    if(k>.6){ctx.font='12px "Patrick Hand",cursive';ctx.fillStyle=C.ink;ctx.textAlign='center';ctx.fillText(g.name,X(g.x),Y(g.y)+(g.bank==='N'?-6:15));ctx.textAlign='left'}}}}
+function drawUtil(){ctx.lineCap='round';
+  for(const l of D.utilities.laterals){const a=l.up,b=l.down;if(!vis(Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[0],b[0]),Math.max(a[1],b[1])))continue;
+    const pumped=l.fall<D.utilities.sewer_min_fall;ctx.strokeStyle=pumped?C.red:C.cobalt;ctx.lineWidth=Math.max(1.2,2.2*k);ctx.setLineDash(pumped?[5,4]:[]);ctx.beginPath();ctx.moveTo(X(a[0]),Y(a[1]));ctx.lineTo(X(b[0]),Y(b[1]));ctx.stroke();ctx.setLineDash([]);
+    const dx=X(b[0])-X(a[0]),dy=Y(b[1])-Y(a[1]),L2=Math.hypot(dx,dy)||1,ux=dx/L2,uy=dy/L2,mx=X(b[0]),my=Y(b[1]);ctx.fillStyle=pumped?C.red:C.cobalt;ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(mx-ux*9-uy*4,my-uy*9+ux*4);ctx.lineTo(mx-ux*9+uy*4,my-uy*9-ux*4);ctx.closePath();ctx.fill()}
+  for(const ic of D.utilities.interceptors){ctx.beginPath();poly(ic.pts);ctx.strokeStyle=C.cobalt;ctx.lineWidth=Math.max(2,4*k);ctx.setLineDash([2,5]);ctx.stroke();ctx.setLineDash([])}
+  for(const o of D.utilities.outfalls){if(!inView(o.x,o.y,20))continue;const px=X(o.x),py=Y(o.y);ctx.fillStyle=C.cobalt;ctx.beginPath();ctx.moveTo(px,py+(o.bank==='N'?-1:1)*-2);ctx.lineTo(px-5,py+(o.bank==='N'?5:-5)*-1);ctx.lineTo(px+5,py+(o.bank==='N'?5:-5)*-1);ctx.closePath();ctx.fill()}
+  for(const f of D.utilities.facilities){if(!inView(f.x,f.y,40))continue;const px=X(f.x),py=Y(f.y);ctx.strokeStyle=C.cobalt;ctx.fillStyle='rgba(61,99,178,.2)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(px,py,9,0,7);ctx.fill();ctx.stroke();
+    if(k>.12){ctx.font='13px "Patrick Hand",cursive';ctx.fillStyle=C.ink;ctx.fillText(f.zone+' · TWL '+f.twl+' m',px+12,py+4)}}
+  ctx.lineCap='butt'}
+function drawCrossings(){
+  for(const c of D.crossings){if(c.year>year)continue;const x=c.x,yy=(c.y0+c.y1)/2;
+    if(c.kind==='ferry'){if(year>=c.closed)continue;ctx.setLineDash([6,5]);ctx.strokeStyle=C.ink;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(X(x),Y(c.y0));ctx.lineTo(X(x),Y(c.y1));ctx.stroke();ctx.setLineDash([])}
+    if(k>.22&&c.kind!=='viaduct'&&inView(x,yy,200)){ctx.font='14px "Patrick Hand",cursive';const t=c.name+' · '+(c.rebuilt&&year>=c.rebuilt?'lift bridge '+c.rebuilt:c.year);const tw=ctx.measureText(t).width;
+      const left=c.kind==='rail-lift',bx=left?X(x)-10-tw-6:X(x)+10;ctx.fillStyle='rgba(230,223,205,.92)';ctx.fillRect(bx,Y(yy)-8,tw+6,16);ctx.fillStyle=C.ink;ctx.textBaseline='middle';ctx.fillText(t,bx+3,Y(yy));ctx.textBaseline='alphabetic'}
+    const closed=(scen>=1&&c.id==='carrick-bridge')||(scen>=2&&c.id==='ferry-st-bridge');
+    if(closed&&year>=c.year&&!(c.closed&&year>=c.closed)){const px=X(x),py=Y(yy);ctx.strokeStyle=C.red;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px-12,py-12);ctx.lineTo(px+12,py+12);ctx.moveTo(px+12,py-12);ctx.lineTo(px-12,py+12);ctx.stroke()}}}
+function drawWardNames(){if(k>.5)return;ctx.textAlign='center';ctx.textBaseline='middle';
+  const pos={oldtown:[40,720],riverside:[-2000,600],ironworks:[-2000,-1050],eastport:[2500,520],kilbride:[1100,-1050],northgate:[0,1850]};
+  ctx.font=`${Math.max(16,Math.min(46,110*k+8))}px "Patrick Hand",cursive`;
+  for(const w of WN){const [x,y]=pos[w];ctx.fillStyle='rgba(29,27,25,.42)';ctx.fillText(WARD_NAME[w].toUpperCase().split('').join(' '),X(x),Y(y))}ctx.textBaseline='alphabetic';ctx.textAlign='left'}
+function drawGhosts(){ctx.setLineDash([9,6]);ctx.strokeStyle=C.red;ctx.lineWidth=1.4;ctx.font='16px "Patrick Hand",cursive';ctx.fillStyle=C.red;ctx.textAlign='center';
+  for(const g of META.ghosts){ctx.beginPath();ctx.arc(X(g.x),Y(g.y),g.r*k,0,7);ctx.stroke();if(k<1.2&&k>.1&&W>600)ctx.fillText(g.name+' · practically abandoned',X(g.x),Y(g.y)-g.r*k-5)}ctx.setLineDash([]);ctx.textAlign='left'}
+function drawStreetNames(){if(k<0.32)return;ctx.font='12px "Patrick Hand",cursive';ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const s of ROADS){if(s.era>year)continue;const p=s.pts;let len=0;for(let i=1;i<p.length;i++)len+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);const lpx=len*k;if(lpx<110)continue;
+    if(k<.7&&s.cls==='L')continue;
+    const half=len/2;let acc=0,i=1;for(;i<p.length;i++){const d=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);if(acc+d>=half)break;acc+=d}
+    if(i>=p.length)continue;const a=p[i-1],b=p[i],t=(half-acc)/Math.hypot(b[0]-a[0],b[1]-a[1]);const mx=a[0]+t*(b[0]-a[0]),my=a[1]+t*(b[1]-a[1]);if(!inView(mx,my,40))continue;
+    let ang=Math.atan2(-(b[1]-a[1]),b[0]-a[0]);if(ang>Math.PI/2)ang-=Math.PI;if(ang<-Math.PI/2)ang+=Math.PI;
+    ctx.save();ctx.translate(X(mx),Y(my));ctx.rotate(ang);const tw=ctx.measureText(s.name).width;if(tw<lpx*.9){ctx.fillStyle='rgba(185,180,166,.85)';ctx.fillRect(-tw/2-2,-6.5,tw+4,13);ctx.fillStyle='#1d1b19';ctx.fillText(s.name,0,0)}ctx.restore()}
+  ctx.textAlign='left';ctx.textBaseline='alphabetic'}
+function drawBasinNames(){if(k>.5||k<.1)return;ctx.font='15px "Patrick Hand",cursive';ctx.fillStyle='#1d1b19';ctx.textAlign='center';
+  for(const [n,b] of Object.entries(D.water.basins)){if(b.year>year)continue;const [x0,y0,x1,y1]=b.rect;ctx.fillText(n,X((x0+x1)/2),Y(b.quad[0]==='N'?y0+30:y1-30))}ctx.textAlign='left'}
+const LM_GLYPH={civic:'C',police:'P',health:'H',media:'M',commerce:'$',political:'★',housing:'⌂',faith:'†',fire:'F',school:'S',utility:'U',industry:'I',harbour:'⚓',rail:'R',plaza:'□',park:'♣',cemetery:'✝',academy:'A',bridge:'◎'};
+const MAJOR=new Set(['city-hall','police-hq','mercy-general','courthouse','ch6','power-station','grain-elevator','hale-armour','civic-plaza','bridge-st-apts','kettering-hq']);
+function drawLandmarks(){ctx.textBaseline='middle';
+  for(let i=0;i<LMs.length;i++){const l=LMs[i];if(l.id==='carrick-bridge'||l.yr>year)continue;if(!inView(l.x,l.y,60))continue;const px=X(l.x),py=Y(l.y);
+    if(l.bi>=0&&k>=.6){const b=l.bi;ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.beginPath();ctx.save();const c=Math.cos(Bd.a[b]),s=Math.sin(Bd.a[b]);const hw=Bd.w[b]/2,hd=Bd.d[b]/2,x=Bd.x[b],y=Bd.y[b];
+      ctx.moveTo(X(x-c*hw+s*hd),Y(y-s*hw-c*hd));ctx.lineTo(X(x+c*hw+s*hd),Y(y+s*hw-c*hd));ctx.lineTo(X(x+c*hw-s*hd),Y(y+s*hw+c*hd));ctx.lineTo(X(x-c*hw-s*hd),Y(y-s*hw+c*hd));ctx.closePath();ctx.restore();ctx.stroke();
+      if(l.cls==='open'){ctx.fillStyle='rgba(120,150,90,.25)';ctx.fill()}}
+    const r=k<.3?3:(MAJOR.has(l.id)||k>.9?8:4.5);ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(px,py,r,0,7);ctx.fill();
+    if(r>6){ctx.fillStyle='#e6dfcd';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(LM_GLYPH[l.kind]||'•',px,py+.5);ctx.textAlign='left'}
+    const lab=k>1.2||(k>.22&&MAJOR.has(l.id))||(k>.55);
+    if(lab){ctx.font='14px "Patrick Hand",cursive';const t=l.name;const tw=ctx.measureText(t).width;ctx.fillStyle='rgba(230,223,205,.92)';ctx.fillRect(px+r+2,py-8,tw+6,16);ctx.fillStyle=C.ink;ctx.fillText(t,px+r+5,py)}}
+  ctx.textBaseline='alphabetic'}
+function siteHost(s){return s.bi>=0?s.bi:-1}
+function drawSites(){ctx.textBaseline='middle';
+  for(const s of SITES){if(!inView(s.x,s.y,40))continue;const px=X(s.x),py=Y(s.y),r=k<.2?3.5+s.visibility*.6:7+s.visibility*1.2;
+    ctx.strokeStyle=C.red;ctx.lineWidth=2;ctx.fillStyle='rgba(184,38,42,.12)';ctx.beginPath();ctx.arc(px,py,r,0,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle=C.red;ctx.font='bold 11px "IBM Plex Mono",monospace';ctx.textAlign='center';ctx.fillText(s.type,px,py+.5);ctx.textAlign='left';
+    if(k>.9||sel&&sel.kind==='site'&&sel.o===s){ctx.font='14px "Patrick Hand",cursive';const t=s.name;const tw=ctx.measureText(t).width;ctx.fillStyle='rgba(230,223,205,.95)';ctx.fillRect(px+r+2,py-8,tw+6,16);ctx.fillStyle=C.red;ctx.fillText(t,px+r+5,py)}}
+  ctx.textBaseline='alphabetic'}
+function drawDatum(){const px=X(0),py=Y(0);ctx.strokeStyle=C.red;ctx.lineWidth=2;ctx.beginPath();ctx.arc(px,py,9,0,7);ctx.moveTo(px-16,py);ctx.lineTo(px+16,py);ctx.moveTo(px,py-16);ctx.lineTo(px,py+16);ctx.stroke();
+  ctx.fillStyle=C.red;ctx.beginPath();ctx.arc(px,py,2.5,0,7);ctx.fill();if(k>.08){ctx.font='15px "Patrick Hand",cursive';ctx.fillText('0° N, 0° E · DATUM',px+14,py+22)}}
+function drawSel(){if(sel.kind==='building'){const i=sel.i;const c=Math.cos(Bd.a[i]),s=Math.sin(Bd.a[i]),hw=Bd.w[i]/2+1,hd=Bd.d[i]/2+1,x=Bd.x[i],y=Bd.y[i];ctx.strokeStyle=C.red;ctx.lineWidth=2.5;ctx.beginPath();
+    ctx.moveTo(X(x-c*hw+s*hd),Y(y-s*hw-c*hd));ctx.lineTo(X(x+c*hw+s*hd),Y(y+s*hw-c*hd));ctx.lineTo(X(x+c*hw-s*hd),Y(y+s*hw+c*hd));ctx.lineTo(X(x-c*hw-s*hd),Y(y-s*hw+c*hd));ctx.closePath();ctx.stroke()}
+  else if(sel.kind==='street'){ctx.strokeStyle=C.red;ctx.lineWidth=3;ctx.beginPath();poly(sel.s.pts);ctx.stroke()}
+  else if(sel.x!=null){ctx.strokeStyle=C.red;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(X(sel.x),Y(sel.y),16,0,7);ctx.stroke()}}
+function drawScale(){const target=110/k;const nice=[10,20,50,100,200,500,1000,2000,5000].find(v=>v>=target)||5000;const px=nice*k;const x=W-px-80,y=H-16;
+  ctx.fillStyle='rgba(230,223,205,.9)';ctx.fillRect(x-6,y-18,px+70,26);ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x,y);ctx.lineTo(x+px,y);ctx.lineTo(x+px,y-4);ctx.stroke();
+  ctx.fillStyle=C.ink;ctx.font='12px "IBM Plex Mono",monospace';ctx.fillText(nice>=1000?nice/1000+' km':nice+' m',x+px+8,y)}
+
+/* ---------------------------------------------------------------- interaction */
+const ptrs=new Map();let drag=null,pinch=null,moved=0,dragPin=null;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.offsetX,e.offsetY]);moved=0;
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),k}}
+  else{const pin=editOn?pinAt(e.offsetX,e.offsetY):null;if(pin){dragPin=pin}else drag={x:e.offsetX,y:e.offsetY,cx,cy}}});
+cv.addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,[e.offsetX,e.offsetY]);
+  if(pinch&&ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;const bx=wx(mx),by=wy(my);k=clampK(pinch.k*d/pinch.d);cx=bx-(mx-W/2)/k;cy=by+(my-H/2)/k;draw();return}
+  if(dragPin){const x=wx(e.offsetX),y=wy(e.offsetY);movePin(dragPin,x,y);draw();return}
+  if(drag){const dx=e.offsetX-drag.x,dy=e.offsetY-drag.y;moved+=Math.abs(e.movementX||0)+Math.abs(e.movementY||0);cx=drag.cx-dx/k;cy=drag.cy+dy/k;cv.classList.add('drag');draw()}
+  else hoverAt(e.offsetX,e.offsetY)});
+const endp=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;
+  if(dragPin){finishPin(dragPin);dragPin=null}
+  else if(drag&&moved<5&&e.type==='pointerup')clickAt(e.offsetX,e.offsetY);drag=null;cv.classList.remove('drag')};
+cv.addEventListener('pointerup',endp);cv.addEventListener('pointercancel',endp);
+cv.addEventListener('pointerleave',()=>{$('tip').style.display='none'});
+const clampK=v=>Math.min(14,Math.max(0.05,v));
+function zoomAt(px,py,f){const bx=wx(px),by=wy(py);k=clampK(k*f);cx=bx-(px-W/2)/k;cy=by+(py-H/2)/k;draw()}
+cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.offsetX,e.offsetY,Math.exp(-e.deltaY*(e.ctrlKey?.01:.0016)))},{passive:false});
+$('zi').onclick=()=>zoomAt(W/2,H/2,1.6);$('zo').onclick=()=>zoomAt(W/2,H/2,1/1.6);$('bReset').onclick=fit;
+function flyTo(x,y,kk){cx=x;cy=y;if(kk)k=clampK(kk);draw()}
+
+function pickAt(px,py){const x=wx(px),y=wy(py),pad=Math.max(0,3/k);
+  for(const s of SITES)if(Math.hypot(X(s.x)-px,Y(s.y)-py)<=7+s.visibility*1.2+3&&L.sites&&year>=PEAKY)return{kind:'site',o:s,x:s.x,y:s.y};
+  for(let i=0;i<LMs.length;i++){const l=LMs[i];if(l.id!=='carrick-bridge'&&l.yr<=year&&Math.hypot(X(l.x)-px,Y(l.y)-py)<=9&&L.landmarks)return{kind:'landmark',o:l,x:l.x,y:l.y}}
+  if(year>=1958&&Math.abs(x)<=D.bridge.half_w&&Math.abs(y)<=D.bridge.foot&&L.bridge&&buildingAt(x,y,0)<0){const r2=Math.hypot(x,y);if(r2<30)return{kind:'datum',x:0,y:0}}
+  const b=buildingAt(x,y,pad);if(b>=0)return{kind:'building',i:b,x:Bd.x[b],y:Bd.y[b]};
+  const r=reverse(x,y);if(r&&r.dist<=Math.max(r.street.w/2+2,6/k))return{kind:'street',s:r.street,x,y};
+  return{kind:'point',x,y}}
+function clickAt(px,py){const p=pickAt(px,py);setSel(p)}
+function hoverAt(px,py){const x=wx(px),y=wy(py);const g=toGeo(x,y);const r=reverse(x,y);const wd=wardAt(x,y);
+  $('foot').innerHTML=`<span>LAT <b>${g[0].toFixed(6)}</b> LON <b>${g[1].toFixed(6)}</b></span><span>x <b>${x.toFixed(0)}</b> y <b>${y.toFixed(0)}</b> m</span><span>ground <b>${terrain(x,y).toFixed(1)}</b> m</span><span>${wd?WARD_NAME[wd]:'outside city'}</span><span>${inWater(x,y)?'<b>water</b>':(r?'near '+esc(r.text):'')}</span><span>${view.ms?view.ms.toFixed(0)+' ms':''}</span>`;
+  const p=pickAt(px,py);let t='';
+  if(p.kind==='building'){const i=p.i;const lm=lmByB.get(i);t=lm!=null?`<b>${esc(LMs[lm].name)}</b><br>${esc(LMs[lm].address)}`:`${Bd.num[i]} ${PRE[Bd.pre[i]]} ${esc(ST[Bd.st[i]].name)}<br>${TYPES[Bd.t[i]]} · ${Bd.lv[i]} lv`}
+  else if(p.kind==='site')t=`<b>${esc(p.o.name)}</b><br>${esc(p.o.address)}`;else if(p.kind==='landmark')t=`<b>${esc(p.o.name)}</b><br>${esc(p.o.address)}`;
+  const tip=$('tip');if(t){tip.innerHTML=t;tip.style.display='block';tip.style.left=Math.min(W-270,px+14)+'px';tip.style.top=Math.max(4,py+14)+'px'}else tip.style.display='none'}
+
+/* ---------------------------------------------------------------- inspector */
+const STATUS=['occupied','derelict','cleared'];
+function kvs(rows){return '<dl class="kv">'+rows.filter(Boolean).map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('')+'</dl>'}
+function geoRows(x,y){const g=toGeo(x,y);return[['lat / lon',`${g[0].toFixed(7)}, ${g[1].toFixed(7)}`],['x / y (m)',`${x.toFixed(1)}, ${y.toFixed(1)}`],['ground',terrain(x,y).toFixed(1)+' m'],['ward',(WARD_NAME[wardAt(x,y)]||'—')]]}
+function setSel(p,fly){sel=p;showTab('inspect');const el=$('p-inspect');let h='';
+  if(!p||p.kind==='point'){h=`<h2>Point</h2>${p?kvs(geoRows(p.x,p.y).concat([['address',(()=>{const r=reverse(p.x,p.y);return r?esc(r.text):'—'})()],['in water',inWater(p.x,p.y)?'<span class="warn">yes</span>':'no']])):''}<p class="note">Click a building, street, landmark or crimson site. Search accepts addresses: <span class="mono">120 N Bridge Street</span>.</p>`}
+  else if(p.kind==='datum'){h=`<h2>Carrick Bridge · datum</h2><div class="big">0 Carrick Bridge</div>${kvs([['lat / lon','0.000000, 0.000000'],['deck','62 m wide · +62 m over water · level to |y| 260'],['ramps','constant grade, meets ground at (0, ±1300)'],['towers','4 legs, top = deck +128 m'],['viaduct','the only crossing of the river']])}${profile()}`}
+  else if(p.kind==='building'){const i=p.i,lm=lmByB.get(i),l=lm!=null?LMs[lm]:null,s=ST[Bd.st[i]];
+    h=`<h2>${l?'Landmark':'Building'}</h2><div class="big">${l?esc(l.name):`${Bd.num[i]} ${PRE[Bd.pre[i]]} ${esc(s.name)}`}</div>${l?`<div>${Bd.num[i]} ${PRE[Bd.pre[i]]} ${esc(s.name)}</div>`:''}
+    <div style="margin:4px 0"><span class="tag${Bd.status[i]?' red':''}">${STATUS[Bd.status[i]]}</span><span class="tag">${TYPES[Bd.t[i]]}</span><span class="tag">${WARD_NAME[WN[Bd.ward[i]]]}</span></div>
+    ${kvs(geoRows(Bd.x[i],Bd.y[i]).slice(0,3).concat([['footprint',`${Bd.w[i].toFixed(1)} × ${Bd.d[i].toFixed(1)} m`],['height',`${Bd.lv[i]} levels · ${(Bd.lv[i]*META.level_m).toFixed(0)} m`],['top elev.',(Bd.z[i]+Bd.lv[i]*META.level_m).toFixed(1)+' m'],['units',Bd.units[i]],['people now',fmt(Bd.now[i])],['people peak',fmt(Bd.peak[i])],['side',Bd.num[i]%2===0?'even':'odd'],['built',Bd.yr[i]+(Bd.abn[i]<9999?' · declining from '+Bd.abn[i]:'')],['flood',['above the flood line','low, behind the wall','low, on the flats'][Bd.fl[i]]],['fire (open)',Bd.tf[i]+' s'],['fire (bridges shut)',Bd.tc[i]+' s']]))}
+    ${Bd.tiers[i].length>2?'<p class="note">Stepped: '+tierText(i)+'</p>':''}
+    ${l&&l.note?'<p class="note">'+esc(l.note)+'</p>':''}${sitesFor(i)}`}
+  else if(p.kind==='landmark'){const l=p.o;h=`<h2>Landmark</h2><div class="big">${esc(l.name)}</div>${kvs([['kind',l.kind],['address',esc(l.address)],['lat / lon',`${l.lat.toFixed(7)}, ${l.lon.toFixed(7)}`],['ward',WARD_NAME[l.ward]]])}${l.bi>=0?'<p><button class="b" id="gob">Select building</button></p>':''}${sitesFor(l.bi)}`}
+  else if(p.kind==='site'){const s=p.o;h=`<h2>Situation site</h2><div class="big">${esc(s.name)}</div><div style="margin:4px 0"><span class="tag red">${s.type}</span><span class="tag">vis ${s.visibility}</span><span class="tag">${WARD_NAME[s.ward]}</span></div>${kvs([['archetype',esc(s.archetype)],['address',esc(s.address)],['lat / lon',`${s.lat.toFixed(7)}, ${s.lon.toFixed(7)}`],['host',s.landmark?esc(s.landmark):(s.bi>=0?'building #'+s.bi:'street point')]])}<p class="note">${esc(s.notes)}</p>${s.bi>=0?'<p><button class="b" id="gob">Select host building</button></p>':''}`}
+  else if(p.kind==='street'){const s=p.s;h=`<h2>Street</h2><div class="big">${esc(s.name)}</div><div style="margin:4px 0"><span class="tag">class ${s.cls}</span><span class="tag">${s.kind}</span><span class="tag">${s.axis==='EW'?'east–west · numbered by x':'north–south · numbered by y'}</span></div>${kvs([['ward',s.ward?WARD_NAME[s.ward]:'—'],['laid out',s.era+(s.fill?' (on the 1971 fill)':'')],['carriageway',s.w+' m'],['buildings',streetCnt[s.id]+' ('+(streetCnt[s.id]?Math.round(100*streetVac[s.id]/streetCnt[s.id]):0)+'% vacant now)']])}${matrixFor(s)}`}
+  el.innerHTML=h;const gb=$('gob');if(gb)gb.onclick=()=>{const i=p.kind==='site'?p.o.bi:p.o.bi;setSel({kind:'building',i,x:Bd.x[i],y:Bd.y[i]});flyTo(Bd.x[i],Bd.y[i],Math.max(k,2.4))};
+  const sj=el.querySelectorAll('[data-site]');sj.forEach(n=>n.onclick=()=>{const s=SITES.find(z=>z.id===n.dataset.site);setSel({kind:'site',o:s,x:s.x,y:s.y});flyTo(s.x,s.y,Math.max(k,1.4))});
+  if(fly&&p&&p.x!=null)flyTo(p.x,p.y,fly);draw()}
+function tierText(i){const t=Bd.tiers[i],o=[];for(let j=0;j<t.length;j+=2)o.push(`levels →${t[j+1]} (inset ${t[j]} m)`);return o.join(', ')}
+function sitesFor(b){if(b<0)return'';const ss=SITES.filter(s=>s.bi===b);return ss.length?'<h2>Sites here</h2>'+ss.map(s=>`<div class="row" data-site="${s.id}"><span class="tag red">${s.type}</span>${esc(s.name)}</div>`).join(''):''}
+function matrixFor(s){const rows=D.matrix.filter(m=>m[0]===s.id);if(!rows.length)return'<p class="note">No lots on this street.</p>';
+  return '<h2>Address matrix</h2><table><tr><th>block</th><th class="n">even</th><th class="n">odd</th><th>landmarks</th></tr>'+rows.map(m=>`<tr><td class="mono">${m[2]} ${m[1]}</td><td class="n">${m[3]}</td><td class="n">${m[4]}</td><td>${m[5]?esc(m[5].split(';').map(id=>LMs.find(l=>l.id===id).name).join(', ')):''}</td></tr>`).join('')+'</table>'}
+function profile(){const f=D.bridge.foot,W_=330,Hh=70;let svg=`<svg viewBox="0 0 330 96" width="100%" role="img" aria-label="deck elevation profile"><rect x="0" y="0" width="330" height="96" fill="none"/>`;
+  const sx=y=>10+(y+f)/(2*f)*310,sy=z=>86-(z-200)/(405-200)*80;let g='',d='';for(let y=-f;y<=f;y+=26){const x=sx(y);g+=(g?'L':'M')+x.toFixed(1)+' '+sy(terrain(0,y)).toFixed(1);d+=(d?'L':'M')+x.toFixed(1)+' '+sy(deckZ(y)).toFixed(1)}
+  svg+=`<path d="${g}" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 2" opacity=".7"/><path d="${d}" fill="none" stroke="currentColor" stroke-width="2"/><line x1="${sx(-100)}" y1="${sy(277)}" x2="${sx(-100)}" y2="${sy(405)}" stroke="currentColor" stroke-width="3"/><line x1="${sx(100)}" y1="${sy(277)}" x2="${sx(100)}" y2="${sy(405)}" stroke="currentColor" stroke-width="3"/><line x1="10" y1="${sy(215)}" x2="320" y2="${sy(215)}" stroke="#3d63b2" stroke-width="1"/><text x="12" y="10" font-size="9" fill="currentColor" font-family="IBM Plex Mono">S −1300 m</text><text x="318" y="10" font-size="9" text-anchor="end" fill="currentColor" font-family="IBM Plex Mono">+1300 m N</text><text x="165" y="${sy(405)-2}" font-size="9" text-anchor="middle" fill="currentColor" font-family="IBM Plex Mono">towers 405 m</text></svg>`;
+  return '<h2>Deck profile</h2>'+svg+'<p class="note">Solid = road surface; dashed = ground beneath; blue = river 215 m.</p>'}
+
+/* ---------------------------------------------------------------- tabs: wards, book, checks, edit */
+function showTab(t){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+t))}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+function buildWards(){const rows=WN.map(w=>{let b=0,pk=0,nw=0,der=0,clr=0,u=0;for(let i=0;i<N;i++)if(WN[Bd.ward[i]]===w){b++;pk+=Bd.peak[i];nw+=Bd.now[i];u+=Bd.units[i];if(Bd.status[i]===1)der++;if(Bd.status[i]===2)clr++}return{w,b,pk,nw,der,clr,u}});
+  const tn=rows.reduce((a,r)=>a+r.nw,0),tp=rows.reduce((a,r)=>a+r.pk,0);
+  $('p-wards').innerHTML=`<h2>Population by ward</h2><div class="big mono">${fmt(tn)} <span class="note">now</span> · ${fmt(tp)} <span class="note">peak</span></div>`+rows.map(r=>`<div style="margin:9px 0"><div><span style="display:inline-block;width:11px;height:11px;background:${WARD_COL[r.w]};border:1.2px solid var(--ink);margin-right:6px"></span><b>${WARD_NAME[r.w]}</b> <span class="mono note">${fmt(r.nw)} / ${fmt(r.pk)} · ${Math.round(100*r.nw/r.pk)}%</span></div><div class="bar"><b style="width:100%"></b><i style="width:${100*r.nw/r.pk}%"></i></div><div class="note">${fmt(r.b)} buildings · ${fmt(r.der)} derelict · ${fmt(r.clr)} cleared · ${fmt(r.u)} units</div></div>`).join('')+
+  `<h2>Ghost districts</h2>`+META.ghosts.map(g=>`<div class="row" data-g="${esc(g.name)}"><b>${esc(g.name)}</b> <span class="note">${WARD_NAME[g.ward]} · r ${g.r} m</span></div>`).join('')+
+  `<h2>Rules in force</h2><p class="note">Peak household = 150,000 ÷ ${fmt(Bd.units.reduce((a,b)=>a+b,0))} units. Vacant buildings hold nobody. Cleared lots appear only in Peak. Storey = 3 m = one contour; every 5th storey is an index contour.</p>`;
+  document.querySelectorAll('[data-g]').forEach(n=>n.onclick=()=>{const g=META.ghosts.find(z=>z.name===n.dataset.g);flyTo(g.x,g.y,.5)})}
+function buildBook(){const rows=LMs.map((l,i)=>`<tr class="row" data-l="${i}"><td>${esc(l.name)}</td><td class="mono" style="font-size:11px">${esc(l.address)}</td></tr>`).join('');
+  const sr=SITES.map(s=>`<tr class="row" data-s="${s.id}"><td><span class="tag red">${s.type}</span>${esc(s.name)}</td><td class="mono" style="font-size:11px">${esc(s.address)}</td></tr>`).join('');
+  $('p-book').innerHTML=`<h2>Landmarks · ${LMs.length}</h2><table>${rows}</table><h2>Situation sites · ${SITES.length}</h2><table>${sr}</table><h2>Streets · ${ST.length}</h2><p class="note">${D.matrix.length} hundred-blocks in the address matrix. Click a street on the map for its block table.</p>`;
+  document.querySelectorAll('#p-book [data-l]').forEach(n=>n.onclick=()=>{const l=LMs[+n.dataset.l];if(l.bi>=0)setSel({kind:'building',i:l.bi,x:Bd.x[l.bi],y:Bd.y[l.bi]},2.4);else setSel({kind:'datum',x:0,y:0},.5)});
+  document.querySelectorAll('#p-book [data-s]').forEach(n=>n.onclick=()=>{const s=SITES.find(z=>z.id===n.dataset.s);setSel({kind:'site',o:s,x:s.x,y:s.y},2)})}
+function buildHistory(){const H=D.history,y0=H.year_founded,sx=y=>10+(y-y0)/(NOWY-y0)*310,sy=v=>108-v/150000*98;
+  const pts=H.pop.map(p=>sx(p[0]).toFixed(1)+','+sy(p[1]).toFixed(1)).join(' ');
+  const ticks=H.events.filter(e=>e.kind==='flood'||e.kind==='crossing').map(e=>`<line x1="${sx(e.year)}" x2="${sx(e.year)}" y1="108" y2="${e.kind==='flood'?4:104}" stroke="${e.kind==='flood'?'#b8262a':'currentColor'}" stroke-width="1" stroke-dasharray="${e.kind==='flood'?'2 2':'1 3'}" opacity=".7"/>`).join('');
+  const svg=`<svg viewBox="0 0 330 124" width="100%" role="img" aria-label="population 1794 to 2026">${ticks}<polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2"/><line id="hm" x1="${sx(NOWY)}" x2="${sx(NOWY)}" y1="2" y2="108" stroke="#b8262a" stroke-width="1.6"/><line x1="10" x2="320" y1="108" y2="108" stroke="currentColor" stroke-width="1"/>
+    <text x="10" y="120" font-size="9" font-family="IBM Plex Mono">1794</text><text x="${sx(PEAKY)}" y="${sy(150000)-3}" font-size="9" text-anchor="middle" font-family="IBM Plex Mono">${PEAKY} · 150k</text><text x="320" y="120" font-size="9" text-anchor="end" font-family="IBM Plex Mono">2026 · 100k</text><text x="${sx(D.wall.flood_year)+3}" y="12" font-size="9" font-family="IBM Plex Mono" fill="#b8262a">flood ${D.wall.flood_year}</text></svg>`;
+  const cr=D.crossings.map(c=>`<tr><td>${esc(c.name)}</td><td class="n">${c.year}${c.rebuilt?' / '+c.rebuilt:''}${c.closed?' – '+c.closed:''}</td><td class="n">${c.kind==='rail-lift'?c.tracks+' trk':c.lanes+' ln'}</td><td class="n">${c.river_width.toFixed(0)} m</td></tr>`).join('');
+  const ba=Object.entries(D.water.basins).sort((a,b)=>a[1].year-b[1].year).map(([n,b])=>`<tr><td>${esc(n)}</td><td class="n">${b.year}</td><td class="note">${esc(b.note)}</td></tr>`).join('');
+  $('p-history').innerHTML=`<h2>Population</h2><div class="big mono" id="hy"></div>${svg}<p class="note">Drag the year slider (or press ▶). Streets, buildings, basins, crossings, the floodwall and utilities exist only from the year they were built; decline starts after ${PEAKY}.</p>
+  <h2>Events</h2>${H.events.map(e=>`<div class="ev ${e.kind}" data-y="${e.year}"><b>${e.year}</b><span>${esc(e.text)}</span></div>`).join('')}
+  <h2>Crossings</h2><table><tr><th>span</th><th class="n">built</th><th class="n">carries</th><th class="n">river</th></tr>${cr}</table><p class="note">All four sit at the narrows, in the order a real city accretes them: ferry, swing bridge, rail lift bridge, and last of all the viaduct.</p>
+  <h2>Harbour</h2><table>${ba}</table>`;
+  document.querySelectorAll('#p-history .ev').forEach(n=>n.onclick=()=>{stopPlay();setYear(+n.dataset.y)})}
+function buildSystems(){const U=D.utilities,Sv=D.services;let nowT=0;for(let i=0;i<N;i++)nowT+=Bd.now[i];
+  const cov=(arr,lim)=>{let s=0;for(let i=0;i<N;i++)if(arr[i]<=lim)s+=Bd.now[i];return 100*s/nowT};
+  const med=arr=>{const a=[];for(let i=0;i<N;i++)if(Bd.now[i]>0)a.push(arr[i]);a.sort((x,y)=>x-y);return a[a.length>>1]};
+  const scn=['All crossings open','Viaduct closed','Viaduct + lift bridge closed'],arrs=[Bd.tf,Bd.tv,Bd.tc];
+  const rows=scn.map((s,j)=>`<tr><td>${s}</td><td class="n">${cov(arrs[j],300).toFixed(1)}%</td><td class="n">${cov(arrs[j],480).toFixed(1)}%</td><td class="n">${med(arrs[j])} s</td></tr>`).join('');
+  const fac=Object.fromEntries(U.facilities.map(f=>[f.zone,f]));const hz={};
+  for(let i=0;i<N;i++){const zz=(Bd.y[i]>yc(Bd.x[i])?'N':'S')+(Bd.z[i]>=U.zone_split?'H':'L');const h=fac[zz].twl-Bd.z[i];const a=hz[zz]=hz[zz]||[1e9,-1e9,0];a[0]=Math.min(a[0],h);a[1]=Math.max(a[1],h);a[2]++}
+  const zr=U.facilities.map(f=>`<tr class="row" data-f="${f.id}"><td>${f.zone}</td><td>${esc(LMs.find(l=>l.id===f.id).name)}</td><td class="n">${f.twl}</td><td class="n">${hz[f.zone][0].toFixed(0)}–${hz[f.zone][1].toFixed(0)}</td><td class="n">${fmt(hz[f.zone][2])}</td></tr>`).join('');
+  const fc=[0,0,0],fv=[0,0,0],fr=[0,0,0];for(let i=0;i<N;i++){fc[Bd.fl[i]]++;if(Bd.peak[i]>0){fr[Bd.fl[i]]++;if(Bd.status[i]!==0)fv[Bd.fl[i]]++}}
+  const names=['Above the flood line','Low, behind the wall','Low, on the flats'];
+  const fl=names.map((n,j)=>`<tr><td>${n}</td><td class="n">${fmt(fc[j])}</td><td class="n">${fr[j]?Math.round(100*fv[j]/fr[j]):0}%</td></tr>`).join('');
+  const sv=['fire','police','health'].map(kd=>{const a=LMs.filter(l=>l.kind===kd);return `<tr><td>${kd==='health'?'hospital':kd}</td><td class="n">${a.filter(l=>l.bank==='N').length}</td><td class="n">${a.filter(l=>l.bank==='S').length}</td></tr>`}).join('');
+  const grav=U.laterals.filter(l=>l.fall>=U.sewer_min_fall).length;
+  $('p-systems').innerHTML=`<h2>Crossing scenario</h2><div class="scn">${scn.map((s,j)=>`<label><input type="radio" name="scn" value="${j}" ${j===scen?'checked':''}> ${s}</label>`).join('')}</div><p class="note">Marks the closed spans on the map; with <b>Layers → Fire response</b> on, tints every building by fire-engine travel time under that scenario.</p>
+  <h2>Fire response (residents served)</h2><table><tr><th>scenario</th><th class="n">≤ 5 min</th><th class="n">≤ 8 min</th><th class="n">median</th></tr>${rows}</table>
+  <p class="note">Nothing depends on the bridges: each bank has its own engines, police and hospital. That is why closing a span changes almost nothing for the fire service: the redundancy is paid for in duplicated stations, not in bridges.</p>
+  <h2>Services per bank</h2><table><tr><th></th><th class="n">north</th><th class="n">south</th></tr>${sv}</table>
+  <h2>Water pressure zones</h2><table><tr><th>zone</th><th>storage</th><th class="n">TWL m</th><th class="n">head m</th><th class="n">bldgs</th></tr>${zr}</table><p class="note">Gravity feed from the heights on each bank; every building has ${U.head_min}–${U.head_max} m of head. The intake is upstream (west); both treatment plants are downstream (east).</p>
+  <h2>Flood exposure</h2><table><tr><th>ground</th><th class="n">buildings</th><th class="n">homes vacant</th></tr>${fl}</table><p class="note">The ${D.wall.year} wall protects x = ±${D.wall.x[1]} m. Beyond it, at the far ends of the bays, the ground was never defended and almost nothing was built (${fmt(fc[2])} buildings). ${D.wall.gates.length} gates, ${U.pumps.length} pump stations.</p>
+  <h2>Sewers</h2><p class="note">${U.laterals.length} long north–south trunks: ${grav} fall by gravity (≥ ${(U.sewer_min_fall*100).toFixed(1)}%), ${U.laterals.length-grav} are flat and need a pump (dashed crimson on the map). ${U.outfalls.length} combined-sewer outfalls, including one into each basin.</p>`;
+  document.querySelectorAll('#p-systems input[name=scn]').forEach(r=>r.onchange=()=>{scen=+r.value;legend();draw()});
+  document.querySelectorAll('#p-systems [data-f]').forEach(n=>n.onclick=()=>{const f=U.facilities.find(z=>z.id===n.dataset.f);flyTo(f.x,f.y,.5)})}
+const selfTests=[];
+function buildChecks(){const v=D.validation;const groups={};v.checks.forEach(c=>(groups[c.group]=groups[c.group]||[]).push(c));
+  let h=`<h2>Generator validation</h2><div class="big ${v.failed?'fail':'pass'}">${v.passed} / ${v.total} checks pass</div><p class="note">Run by <span class="mono">validate_city.py</span>, which rebuilds geometry from the JSON and <span class="mono">pc_geo</span> only. ${fmt(v.stats.buildings)} buildings · ${v.stats.street_km} km of street · ${fmt(v.stats.edges)} noded edges.</p>`;
+  for(const g of Object.keys(groups))h+=`<h2>${g}</h2>`+groups[g].map(c=>`<div class="chk"><span class="${c.ok?'pass':'fail'}">${c.ok?'✓':'✗'}</span> <code>${c.id}</code>${esc(c.title)}${c.ok&&c.detail?`<span class="d">${esc(c.detail)}</span>`:(c.ok?'':`<span class="d">${esc(c.detail)}</span>`)}</div>`).join('');
+  h+=`<h2>In-browser cross-checks</h2><div id="st">running…</div>`;$('p-checks').innerHTML=h}
+function runSelfTests(){const out=[];let bad=0;const t0=performance.now();
+  for(let i=0;i<N;i++){const s=ST[Bd.st[i]],r=addrOn(s,Bd.x[i],Bd.y[i]);if(r.n!==Bd.num[i]||PRE.indexOf(r.pre)!==Bd.pre[i])bad++}
+  out.push([bad===0,`JS geocoder reproduces the stored address of all ${fmt(N)} lots`,bad+' mismatches']);
+  let zb=0,zm=0;for(let i=0;i<N;i++){const e=Math.abs(terrain(Bd.x[i],Bd.y[i])-Bd.z[i]);if(e>.06)zb++;zm=Math.max(zm,e)}
+  out.push([zb===0,'JS terrain model equals the generator\'s ground height at every lot',`max diff ${zm.toFixed(3)} m`]);
+  let rb=0;for(const l of LMs){const f=forward(l.address);if(l.id==='carrick-bridge')continue;if(!f||Math.hypot(f.x-l.x,f.y-l.y)>8)rb++}
+  out.push([rb===0,'every landmark address geocodes forward to within 8 m of its door',rb+' misses']);
+  let gb=0;for(const l of LMs){const [x,y]=toXY(l.lat,l.lon);if(Math.hypot(x-l.x,y-l.y)>.001)gb++}
+  out.push([gb===0,'lat/lon ⇄ metres round trip < 1 mm for every landmark',gb+' failures']);
+  let cb=0;for(const [Y,Pp] of D.history.pop)if(popAt(Y)!==Pp)cb++;
+  out.push([cb===0,'population curve rebuilds from every building\'s year',cb+' mismatches in '+D.history.pop.length+' points; '+fmt(popAt(PEAKY))+' at the peak, '+fmt(popAt(NOWY))+' now']);
+  {const fac={};D.utilities.facilities.forEach(f=>fac[f.zone]=f);let hb=0,hmin=1e9,hmax=-1e9;for(let i=0;i<N;i++){const zz=(Bd.y[i]>yc(Bd.x[i])?'N':'S')+(Bd.z[i]>=D.utilities.zone_split?'H':'L');const hd=fac[zz].twl-Bd.z[i];hmin=Math.min(hmin,hd);hmax=Math.max(hmax,hd);if(hd<D.utilities.head_min||hd>D.utilities.head_max)hb++}
+   out.push([hb===0,'every building has 14–100 m of water-supply head',`${hmin.toFixed(0)}–${hmax.toFixed(0)} m`])}
+  let fb=0;for(let i=0;i<N;i++){const f=Bd.z[i]>=D.flood.line?0:(Math.abs(Bd.x[i])<=D.wall.x[1]?1:2);if(f!==Bd.fl[i])fb++}
+  out.push([fb===0,'flood class of every building follows from its ground height and the wall',fb+' mismatches']);
+  let ab=0;for(let i=0;i<N;i++)if(Bd.yr[i]<=ST[Bd.st[i]].era)ab++;
+  out.push([ab===0,'every building post-dates its street',ab+' violations']);
+  $('st').innerHTML=out.map(o=>`<div class="chk"><span class="${o[0]?'pass':'fail'}">${o[0]?'✓':'✗'}</span> ${esc(o[1])}<span class="d">${esc(o[2])}</span></div>`).join('')+`<div class="note">${(performance.now()-t0).toFixed(0)} ms</div>`;window.__selftests=out.map(o=>o[0])}
+
+/* ---------------------------------------------------------------- edit: drag pins, live geocode */
+const edits=new Map();
+function pinsList(){const a=[];SITES.forEach(s=>a.push({k:'site',o:s}));LMs.forEach(l=>{if(l.bi>=0)a.push({k:'landmark',o:l})});return a}
+function pinAt(px,py){for(const s of SITES)if(Math.hypot(X(s.x)-px,Y(s.y)-py)<18)return{k:'site',o:s};for(const l of LMs)if(l.bi>=0&&Math.hypot(X(l.x)-px,Y(l.y)-py)<14)return{k:'landmark',o:l};return null}
+function movePin(p,x,y){const o=p.o;if(!p.orig)p.orig={x:o.x,y:o.y,address:o.address,ward:o.ward};o.x=x;o.y=y;const g=toGeo(x,y);o.lat=g[0];o.lon=g[1];const r=reverse(x,y);if(r)o.address=r.text;const w=wardAt(x,y);if(w)o.ward=w;editInfo(p)}
+function finishPin(p){if(p.orig)edits.set(p.o.id,{id:p.o.id,from:p.orig,to:{x:+p.o.x.toFixed(2),y:+p.o.y.toFixed(2),lat:+p.o.lat.toFixed(9),lon:+p.o.lon.toFixed(9),address:p.o.address,ward:p.o.ward}});editInfo(p);renderEdits()}
+function editInfo(p){const o=p.o;const w=inWater(o.x,o.y),b=buildingAt(o.x,o.y,6);const msgs=[];if(w)msgs.push('<span class="warn">in water — invalid</span>');
+  if(!wardAt(o.x,o.y))msgs.push('<span class="warn">outside every ward</span>');if(p.orig&&o.ward!==p.orig.ward)msgs.push(`ward changes ${WARD_NAME[p.orig.ward]} → ${WARD_NAME[o.ward]}`);
+  if(b<0)msgs.push('<span class="warn">no lot within 6 m — address is street-only</span>');else if(o.bi!==undefined&&b!==o.bi)msgs.push('now on a different lot: '+Bd.num[b]+' '+PRE[Bd.pre[b]]+' '+esc(ST[Bd.st[b]].name));
+  $('liveedit').innerHTML=`<b>${esc(o.name)}</b><br><span class="mono">${o.lat.toFixed(7)}, ${o.lon.toFixed(7)}</span><br>${esc(o.address)}<br>${msgs.join('<br>')||'<span class="pass">valid position</span>'}`}
+function renderEdits(){const a=[...edits.values()];$('editout').value=JSON.stringify(a,null,1);$('ec').textContent=a.length}
+function buildEdit(){$('p-edit').innerHTML=`<h2>Move pins</h2><p class="note">Turn on edit mode, then drag a crimson site or landmark dot. The address, lat/lon and ward re-derive live from the same scheme the generator uses, and the position is checked against water and lots. Nothing is saved to the model — copy the edit list and hand it back.</p>
+  <p><button class="b" id="editT" aria-pressed="false">Edit mode: off</button></p><div id="liveedit" class="note">Drag a pin…</div>
+  <h2>Edits · <span id="ec">0</span></h2><textarea id="editout" readonly></textarea><p><button class="b" id="copyE">Copy edit list</button> <button class="b" id="clrE">Reset pins</button> <span id="cmsg" class="note"></span></p>
+  <h2>Geocoder</h2><p class="note">Forward: type an address in the search box. Reverse: click anywhere. Format: <span class="mono">number · E/W/N/S · street</span>. East–west streets are numbered by easting (E/W), north–south by northing (N/S); even on the north/east side; numbers rise away from the bridge baseline.</p>`;
+  $('editT').onclick=()=>{editOn=!editOn;$('editT').setAttribute('aria-pressed',editOn);$('editT').textContent='Edit mode: '+(editOn?'ON — drag pins':'off');cv.style.cursor=editOn?'crosshair':'grab'};
+  $('copyE').onclick=async()=>{const t=$('editout').value||'[]';try{await navigator.clipboard.writeText(t);$('cmsg').textContent='copied'}catch(e){$('editout').select();$('cmsg').textContent='selected — press copy'}};
+  $('clrE').onclick=()=>{location.reload()}}
+
+/* ---------------------------------------------------------------- search */
+const qEl=$('q'),sg=$('sugg');let sres=[],si=0;
+function search(t){t=t.trim();const out=[];if(!t)return out;
+  const f=forward(t);if(f){out.push({label:`${f.n} ${f.pre} ${f.street.name}`,sub:'address',go:()=>{const b=buildingAt(f.x,f.y,8);setSel(b>=0?{kind:'building',i:b,x:Bd.x[b],y:Bd.y[b]}:{kind:'point',x:f.x,y:f.y},3)}})}
+  const m=/^\s*([+-]?\d+(?:\.\d+)?)\s*[, ]\s*([+-]?\d+(?:\.\d+)?)\s*$/.exec(t);if(m){const [x,y]=toXY(+m[1],+m[2]);out.push({label:`lat ${(+m[1]).toFixed(6)}, lon ${(+m[2]).toFixed(6)}`,sub:'coordinates',go:()=>setSel({kind:'point',x,y},2)})}
+  const q=t.toLowerCase();
+  for(const l of LMs)if(l.name.toLowerCase().includes(q)||l.address.toLowerCase().includes(q))out.push({label:l.name,sub:l.address,go:()=>{l.bi>=0?setSel({kind:'building',i:l.bi,x:Bd.x[l.bi],y:Bd.y[l.bi]},2.6):setSel({kind:'datum',x:0,y:0},.5)}});
+  for(const s of SITES)if(s.name.toLowerCase().includes(q)||s.id.includes(q))out.push({label:s.name,sub:'site · '+s.address,go:()=>setSel({kind:'site',o:s,x:s.x,y:s.y},2)});
+  const seen=new Set();for(const s of ST){if(s.cls==='B')continue;if(s.name.toLowerCase().includes(q)&&!seen.has(s.name)){seen.add(s.name);const mid=s.pts[s.pts.length>>1];out.push({label:s.name,sub:'street',go:()=>{setSel({kind:'street',s,x:mid[0],y:mid[1]});flyTo(mid[0],mid[1],.9)}})}}
+  return out.slice(0,9)}
+function showSugg(){sres=search(qEl.value);si=0;sg.style.display=sres.length?'block':'none';sg.innerHTML=sres.map((r,i)=>`<div class="${i===0?'on':''}" data-i="${i}">${esc(r.label)}<span>${esc(r.sub)}</span></div>`).join('');sg.querySelectorAll('div').forEach(d=>d.onmousedown=e=>{e.preventDefault();sres[+d.dataset.i].go();sg.style.display='none'})}
+qEl.addEventListener('input',showSugg);qEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&sres[si]){sres[si].go();sg.style.display='none';qEl.blur()}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();si=Math.max(0,Math.min(sres.length-1,si+(e.key==='ArrowDown'?1:-1)));[...sg.children].forEach((c,i)=>c.classList.toggle('on',i===si))}else if(e.key==='Escape')sg.style.display='none'});
+qEl.addEventListener('blur',()=>setTimeout(()=>sg.style.display='none',120));
+addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==qEl){e.preventDefault();qEl.focus()}});
+
+/* ---------------------------------------------------------------- time: year slider, modes, layers, legend */
+function setYear(y){year=Math.max(D.history.year_founded,Math.min(NOWY,Math.round(y)));mode=year>=NOWY?'now':(year===PEAKY?'peak':'past');
+  $('yr').value=year;$('mNow').setAttribute('aria-pressed',year===NOWY);$('mPeak').setAttribute('aria-pressed',year===PEAKY);
+  $('yrv').textContent=`${year} · ${fmt(popAt(year))} residents`;
+  const hm=$('hm');if(hm){const x=10+(year-D.history.year_founded)/(NOWY-D.history.year_founded)*310;hm.setAttribute('x1',x);hm.setAttribute('x2',x);const hy=$('hy');if(hy)hy.innerHTML=`${year} <span class="note">· ${fmt(popAt(year))} residents</span>`}
+  let last=null;document.querySelectorAll('.ev').forEach(n=>{n.classList.remove('on');if(+n.dataset.y<=year)last=n});if(last)last.classList.add('on');
+  legend();draw()}
+function setMode(m){setYear(m==='peak'?PEAKY:NOWY)}
+$('mNow').onclick=()=>{stopPlay();setMode('now')};$('mPeak').onclick=()=>{stopPlay();setMode('peak')};
+$('yr').oninput=e=>{stopPlay();setYear(+e.target.value)};
+function stopPlay(){if(playing){clearInterval(playing);playing=0;$('bPlay').textContent='▶'}}
+$('bPlay').onclick=()=>{if(playing){stopPlay();return}if(year>=NOWY)setYear(D.history.year_founded);$('bPlay').textContent='❚❚';playing=setInterval(()=>{setYear(year+2);if(year>=NOWY)stopPlay()},90)};
+$('layers').innerHTML=Object.keys(L).map(k=>`<label><input type="checkbox" data-l="${k}" ${L[k]?'checked':''}> ${LAYER_LABELS[k]}</label>`).join('');
+$('layers').querySelectorAll('input').forEach(c=>c.onchange=()=>{L[c.dataset.l]=c.checked;legend();draw()});
+$('bLayers').onclick=()=>{const l=$('layers');l.style.display=l.style.display==='block'?'none':'block'};
+function legend(){const sw=(c,extra='')=>`<i style="background:${c};${extra}"></i>`;const fl=L.flood?`<br>${sw('rgba(61,99,178,.35)')}below the 222 m flood line`:'';$('legend').innerHTML=(L.resp&&year>=PEAKY)?`fire response, scenario ${['all crossings open','viaduct closed','both bridges closed'][scen]}<br>${sw('rgba(61,99,178,.18)')}&le; 2 min ${sw('rgba(61,99,178,.6)')}&le; 4 min ${sw('rgba(61,99,178,.82)')}&le; 5 min<br>${sw('rgba(184,38,42,.9)')}over 5 min`:year<PEAKY?`${year}: ${fmt(popAt(year))} residents<br>${sw('#e6dfcd')}built by ${year}${fl}<br>${year<WALLY?'no floodwall yet':'floodwall: dashed ink line'}`:mode==='now'
+  ?`${sw('#e6dfcd')}occupied &nbsp;${sw('#7f7b71')}derelict<br>${sw('transparent','border-style:dotted')}cleared (gone)<br><span style="color:#b8262a">○</span> situation site · <span style="color:#b8262a">- -</span> ghost district<br>dotted street = mostly vacant${fl}`
+  :`${sw('#e6dfcd')}every building at peak<br>150,000 residents · cleared lots rebuilt<br>rings inside a footprint = storeys (3 m)${fl}`}
+
+/* ---------------------------------------------------------------- boot */
+function boot(){mkPatterns();mkFlood();buildWards();buildHistory();buildSystems();buildBook();buildChecks();buildEdit();setYear(NOWY);resize();fit();setSel(null);setTimeout(runSelfTests,30);
+  const fl=()=>draw();if(document.fonts&&document.fonts.load){Promise.all([document.fonts.load('15px "Patrick Hand"'),document.fonts.load('12px "IBM Plex Mono"')]).then(fl).catch(()=>{})}
+  window.__ready=true}
+addEventListener('resize',resize);
+if(window.ResizeObserver)new ResizeObserver(resize).observe($('mapwrap'));
+boot();
+window.__api={setYear,get year(){return year},setScen:v=>{scen=v;legend();draw()},setMode,flyTo,setSel,reverse,forward,get k(){return k},set k(v){k=v;draw()},fit,draw,toggle:(n,v)=>{L[n]=v;draw()}};
+</script>

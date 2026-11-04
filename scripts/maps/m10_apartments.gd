@@ -10,7 +10,7 @@ func _init() -> void:
 	id = "m10"
 	map_name = "Apartment Block"
 	title = "THE VIOLENCE  -  10 APARTMENT BLOCK"
-	notes = ["GROUND FLOOR, 8 FLATS, 2 STAIR HALLS, 52 x 22.5 m", "44 m CORRIDOR, COURTYARD, STREET  ·  1 SQUARE = 1 m", "MAP 10  ·  SHEET 11 OF 11"]
+	notes = ["GROUND FLOOR, 8 FLATS, 2 STAIR HALLS, 52 x 22.5 m", "44 m CORRIDOR, COURTYARD, STREET  ·  1 SQUARE = 1 m", "MAP 10  ·  SHEET 11 OF 12"]
 	W = 60.0
 	H = 36.0
 	time_limit = 600.0

@@ -1,0 +1,109 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+department test (map Duplex)
+  ok    founded with 20 officers (v0.7: the inherited roster)
+  ok    some of them experienced (5 with five years or more)
+  ok    stats rolled at hire (Patrol echelon, form +3%)
+  ok    saved
+  ok    loaded
+  ok    load is stable
+  ok    an officer's roll survives a save
+  ok    the operation uses the record's roll, not a new one
+  ok    officer judges, wears a vest, knows their record
+      Sergeant Amit Rao is seriously wounded: out until week 5.
+      Corporal Spencer Westley was killed.
+      Corporal Benjie Dela Cruz's statement in IA-001 does not match the witnesses.
+      Internal affairs: IA-001 opened on Corporal Benjie Dela Cruz (friendly fire).
+      Corporal Eric Chan is seriously wounded: out until week 9.
+      Cost: $780 overtime, $0 to restock. Account: $18,220.
+      Training: 0 on a course, 0 queued; 19 officers could start one now (2 of them a classroom course from a ward bed).
+  ok    all six officers sent have a new file entry (6)
+  ok    experience gained by 5 officer(s)
+      3 officer(s) injured or killed
+  ok    saved after the operation
+  ok    experience, wounds and files survive the save
+  ok    an injured officer is not available
+  ok    healed after 4 week(s)
+  ok    the return to duty is entered in the officer's file
+  ok    an operation from a reloaded save replays exactly (68.4 s, A)
+  ok    and so does its incident record
+  ok    and the department after it
+  -- running the department (v0.8.5)
+  ok    the city's allocation covers the inherited payroll ($30500 > $26264)
+  ok    a week: allocation in, payroll out
+  ok    a course is paid for and takes the officer off the board
+  ok    an officer on a course is not available
+  ok    the refresher taught PF02
+  ok    firearms qualification makes recognition faster
+  ok    new kit is bought ($900)
+  ok    and sold back for half
+  ok    a case opens
+  ok    a suspension: off the board, morale down
+  ok    a suspended officer is unpaid and unavailable
+  ok    back after two weeks
+  ok    a dismissal
+  ok    an undecided case lapses
+  ok    in the red, hiring and training are frozen
+  ok    the budget, courses and cases survive a save
+  -- applicants and statements (Q2, Q3)
+  ok    a weekly pool of two to four applicants (2)
+  ok    Cosimo Gambinesi is a complete record, not yet an officer
+  ok    Steven Wolfby is a complete record, not yet an officer
+  ok    every applicant distinct
+  ok    hiring from the pool costs $7,640
+  ok    a rookie reports after the academy; a lateral hire at once (academy)
+  ok    the rest walked; the chosen one has a badge number id (PC-0021)
+  ok    next week, a fresh pool (4)
+  ok    the pool survives a save
+  ok    the applicant pool and course clocks use department save version 6
+  ok    a version 5 save still loads and rolls its pool on demand
+  ok    in the red the pool still applies, but nobody can be hired
+  ok    integrity 90: the statement matches the body camera
+  ok    integrity 10: the statement can simply not match
+  ok    with nothing to check against, a statement is untested
+  ok    a squadmate's statement follows their integrity
+  -- training queue, classroom, cohort (Q9)
+  ok    judgment from a ward bed: still injured, on the course
+  ok    a range course cannot start from the ward (and not mid-course either)
+  ok    the classroom course finished before the wound (judgment 41 -> 47)
+  ok    and the wound finished on its own clock
+  ok    first course starts
+  ok    the second queues behind it
+  ok    and starts itself the week the first ends
+  ok    both done, in order, hands off
+  ok    coaching can queue twice (two habits, say)
+  ok    both dropped as pointless the week they would have started, unspent
+  ok    three officers free for a cohort
+  ok    the cohort pays three quarters each ($5,400 for three)
+  ok    and comes back bonded (+1, as from an operation together)
+  ok    training_state sees them (3 on a course)
+  -- overtime and the forecast (Q8, Q10)
+  ok    a 40-second raid bills $115 a head (callout plus a minute)
+  ok    three minutes bills $145, against the old flat $160
+  ok    ten quiet minutes of static duty bill $125 at half rate
+  ok    the same ten minutes through doors bill $250, and night static $185 (the premium is never halved)
+  ok    week one of the forecast is this week's end ($29,236)
+  ok    the filed lawsuit lands in its week and stays landed; a story costs trust, not money ($1,944 by week 4)
+  ok    an unspent week ends where the forecast said ($29,236)
+  -- next week's fit, forecast against the week (P1.C2)
+  ok    the forecast matched the week in 12 of 12 (statuses seen: injured, course, academy, suspended, ward course, queued)
+  -- the emergency lateral (P1.C3)
+  ok    the week's candidate is the same every time it is shown (Officer Gwendolyn Lyles)
+  ok    signed: on duty this week (20 -> 21 fit)
+  ok    charged twice a lateral's signing ($17140)
+  ok    and the payroll rises by the pay the button showed ($1219 a week)
+  ok    one a week: one emergency lateral a week, and this week's has signed
+  ok    the department's own stream and this week's pool are untouched
+  ok    next week another may be signed
+  ok    the week's signing survives a save
+  ok    frozen with hiring when the account is in the red
+  -- the standing order (P1.C4)
+  ok    no order: the week is the week it always was
+  ok    short by 3: two recruits this turn (the intake), 20 -> 22 on the books
+  ok    and they are at the academy, not on duty
+  ok    the next turn makes up the last one (23)
+  ok    the order survives a save
+  ok    when the forecast cannot carry one, nobody is enrolled and the report says why
+  ok    recent overtime ($9000 a week) holds back a recruit the bare forecast would allow: the four-week forecast cannot carry another recruit (week 1 would end at $-814, counting $9,000 a week of overtime)
+  ok    cancelled: nobody else is enrolled
+problems: 0

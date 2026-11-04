@@ -1,0 +1,6 @@
+Four records from the intentionally stopped worker were not included in the final screen. The same keys were rerun in an isolated worker:
+('habits', 'good_off:PF01:B', 0, 710001) identical
+('habits', 'good_off:PF01:B', 0, 717920) identical
+('habits', 'good_off:PF01:B', 3, 713001) identical
+('habits', 'good_off:PF01:B', 3, 720920) identical
+PASS

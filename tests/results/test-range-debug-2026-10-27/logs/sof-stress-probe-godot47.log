@@ -1,0 +1,21 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+SOF varied resistance, n=10000 seed=8675309; min 0.558, median 0.802, max 0.950
+id,name,threshold_alone,historical_raw_ceiling_reachable_pct,new_inputs_median,new_inputs_p95,new_anxiety_inputs_median
+BH01,Freeze,0.73,0.00,13,17,11
+BH02,Spray and pray,0.48,0.00,9,12,7
+BH03,Overkill,0.48,0.00,9,12,7
+BH04,Tunnel-vision lock,0.58,0.00,10,14,9
+BH05,Panic reload,0.58,0.00,10,14,9
+BH06,Doorway stall,0.38,2.96,7,9,5
+BH07,Flinch and turtle,0.38,2.96,7,9,5
+BH08,Comms blackout,0.63,0.00,11,15,10
+BH09,Jumpy trigger,0.48,0.00,9,12,7
+BH10,Bee-line to cover,0.53,0.00,9,13,8
+BH21,First sight, first shot,0.43,0.07,8,10,6
+BH24,Door stare,0.58,0.00,10,14,9
+BH26,Fire through the counter,0.48,0.00,9,12,7

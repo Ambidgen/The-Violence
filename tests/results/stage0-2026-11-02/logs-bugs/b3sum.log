@@ -1,0 +1,318 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.43 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.2  A1 on target B1 after 0.38 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.36 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:18.2  A3: beanbag rounds misses B1
+LOG3 00:22.0  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:50.3  A3: Police! Show me your hands! (B1)
+LOG3 00:50.7  B1 calls: contact, 10 o'clock, 2 m
+LOG3 01:02.4  B1 recognizes A1: 3.0 m, 12 deg off eye line
+LOG3 01:02.4  B1 calls: contact, 10 o'clock, 2 m
+LOG3 01:09.5  A1 kills B1 hand to hand (0.40 s against 0.75 s)
+LOG3 01:09.5  B1 KILLED (melee, by A1)
+LOG3 01:09.5    B1 Untrained: 0 shots, 0 hits, 0 down; DEAD
+PROBE3 tool=beanbag on=true sd=700 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:4:rifle:shotgun
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.43 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.2  A1 on target B1 after 0.38 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.36 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:22.1  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:28.8  B1 calls: contact, 11 o'clock, 7 m
+LOG3 00:32.4  B1 recognizes A1: 6.3 m, 0 deg off eye line
+LOG3 00:32.4  B1 calls: contact, 11 o'clock, 6 m
+LOG3 00:50.6  B1 calls: contact, 10 o'clock, 1 m
+LOG3 00:50.7  A3: Police! Show me your hands! (B1)
+LOG3 00:55.8  B1 recognizes A2: 2.4 m, 8 deg off eye line
+LOG3 00:55.8  B1 calls: contact, 11 o'clock, 2 m
+LOG3 01:02.3  B1 calls: contact, 10 o'clock, 2 m
+LOG3 01:09.3  A1 kills B1 hand to hand (0.38 s against 0.60 s)
+LOG3 01:09.3  B1 KILLED (melee, by A1)
+LOG3 01:09.3    B1 Untrained: 0 shots, 0 hits, 0 down; DEAD
+PROBE3 tool=beanbag on=false sd=700 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=701 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:5:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=701 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=702 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=702 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=703 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=703 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:5:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=705 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:3:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=705 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=706 v=240.0 arrested=false alive=false cause=[] gear=A1:5:rifle:shotgun,A2:4:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=706 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=707 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:4:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=707 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=708 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=708 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=709 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:3:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=709 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=710 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:5:rifle:shotgun,A2:4:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=710 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=711 v=240.0 arrested=false alive=false cause=[] gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:5:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=711 v=240.0 arrested=false alive=false cause=[] gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+beanbag           s until an unarmed man who will not give up is cuffed (less) 221.76   221.76   FAIL
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.41 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.1  A1 on target B1 after 0.36 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.35 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:17.9  A3: taser misses B1
+LOG3 00:22.1  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:28.8  B1 calls: contact, 11 o'clock, 7 m
+LOG3 00:32.4  B1 recognizes A1: 6.3 m, 0 deg off eye line
+LOG3 00:32.4  B1 calls: contact, 11 o'clock, 6 m
+LOG3 00:50.6  B1 calls: contact, 10 o'clock, 1 m
+LOG3 00:50.7  A3: Police! Show me your hands! (B1)
+LOG3 00:51.1  A3: taser hits B1
+LOG3 00:51.1  B1 gives up: hands up, weapon down (A3)
+LOG3 00:51.9  A1 moves in to cuff B1
+LOG3 00:56.5  A1 cuffs B1
+LOG3 00:56.5    B1 Untrained: 0 shots, 0 hits, 0 down; ARRESTED
+PROBE3 tool=taser on=true sd=700 v=56.5 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:0:rifle:carbine
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.41 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.1  A1 on target B1 after 0.36 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.35 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:22.1  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:28.8  B1 calls: contact, 11 o'clock, 7 m
+LOG3 00:32.4  B1 recognizes A1: 6.3 m, 0 deg off eye line
+LOG3 00:32.4  B1 calls: contact, 11 o'clock, 6 m
+LOG3 00:50.6  B1 calls: contact, 10 o'clock, 1 m
+LOG3 00:50.7  A3: Police! Show me your hands! (B1)
+LOG3 00:55.8  B1 recognizes A2: 2.4 m, 8 deg off eye line
+LOG3 00:55.8  B1 calls: contact, 11 o'clock, 2 m
+LOG3 01:02.3  B1 calls: contact, 10 o'clock, 2 m
+LOG3 01:09.3  A1 kills B1 hand to hand (0.38 s against 0.60 s)
+LOG3 01:09.3  B1 KILLED (melee, by A1)
+LOG3 01:09.3    B1 Untrained: 0 shots, 0 hits, 0 down; DEAD
+PROBE3 tool=taser on=false sd=700 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=701 v=240.0 arrested=false alive=false cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:2:rifle:carbine
+PROBE3 tool=taser on=false sd=701 v=240.0 arrested=false alive=false cause=[] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=702 v=56.5 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:0:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=702 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=703 v=56.3 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=703 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:2:rifle:carbine
+PROBE3 tool=taser on=false sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=705 v=96.9 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=705 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=706 v=98.7 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:1:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=706 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=707 v=240.0 arrested=false alive=true cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:1:rifle:carbine
+PROBE3 tool=taser on=false sd=707 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=708 v=56.4 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=708 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=709 v=97.6 arrested=true alive=true cause=[] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=709 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=710 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:1:rifle:carbine
+PROBE3 tool=taser on=false sd=710 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=711 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:2:rifle:carbine
+PROBE3 tool=taser on=false sd=711 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+taser             s until an unarmed man who will not give up is cuffed (less) 125.00   221.76   PASS
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.41 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.1  A1 on target B1 after 0.36 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.35 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:21.9  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:23.0  B1 recognizes A1: 6.4 m, 1 deg off eye line
+LOG3 00:23.0  B1 calls: contact, 11 o'clock, 6 m
+LOG3 00:50.6  A3: Police! Show me your hands! (B1)
+LOG3 00:50.9  B1 calls: contact, 10 o'clock, 1 m
+LOG3 00:51.6  A3: expandable baton misses B1
+LOG3 00:56.4  B1 recognizes A2: 2.3 m, 7 deg off eye line
+LOG3 00:56.4  B1 calls: contact, 10 o'clock, 2 m
+LOG3 00:56.5  A2: Police! Show me your hands! (B1)
+LOG3 01:09.7  A1 kills B1 hand to hand (0.38 s against 0.60 s)
+LOG3 01:09.7  B1 KILLED (melee, by A1)
+LOG3 01:09.7    B1 Untrained: 0 shots, 0 hits, 0 down; DEAD
+PROBE3 tool=baton on=true sd=700 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:98:rifle:carbine
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.41 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.1  A1 on target B1 after 0.36 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.35 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:22.1  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:28.8  B1 calls: contact, 11 o'clock, 7 m
+LOG3 00:32.4  B1 recognizes A1: 6.3 m, 0 deg off eye line
+LOG3 00:32.4  B1 calls: contact, 11 o'clock, 6 m
+LOG3 00:50.6  B1 calls: contact, 10 o'clock, 1 m
+LOG3 00:50.7  A3: Police! Show me your hands! (B1)
+LOG3 00:55.8  B1 recognizes A2: 2.4 m, 8 deg off eye line
+LOG3 00:55.8  B1 calls: contact, 11 o'clock, 2 m
+LOG3 01:02.3  B1 calls: contact, 10 o'clock, 2 m
+LOG3 01:09.3  A1 kills B1 hand to hand (0.38 s against 0.60 s)
+LOG3 01:09.3  B1 KILLED (melee, by A1)
+LOG3 01:09.3    B1 Untrained: 0 shots, 0 hits, 0 down; DEAD
+PROBE3 tool=baton on=false sd=700 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=701 v=240.0 arrested=false alive=false cause=[] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:99:rifle:carbine
+PROBE3 tool=baton on=false sd=701 v=240.0 arrested=false alive=false cause=[] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=702 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:96:rifle:carbine
+PROBE3 tool=baton on=false sd=702 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=703 v=57.5 arrested=true alive=true cause=[] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:97:rifle:carbine
+PROBE3 tool=baton on=false sd=703 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:99:rifle:carbine
+PROBE3 tool=baton on=false sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=705 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:99:rifle:carbine
+PROBE3 tool=baton on=false sd=705 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=706 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:97:rifle:carbine
+PROBE3 tool=baton on=false sd=706 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=707 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:95:rifle:carbine
+PROBE3 tool=baton on=false sd=707 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=708 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:96:rifle:carbine
+PROBE3 tool=baton on=false sd=708 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=709 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:97:rifle:carbine
+PROBE3 tool=baton on=false sd=709 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=710 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:95:rifle:carbine
+PROBE3 tool=baton on=false sd=710 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=baton on=true sd=711 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:99:rifle:carbine,A2:99:rifle:carbine,A3:99:rifle:carbine
+PROBE3 tool=baton on=false sd=711 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+baton             s until an unarmed man who will not give up is cuffed (less) 206.55   221.76   PASS
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.41 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.1  A1 on target B1 after 0.36 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.35 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:21.9  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:23.0  B1 recognizes A1: 6.4 m, 1 deg off eye line
+LOG3 00:23.0  B1 calls: contact, 11 o'clock, 6 m
+LOG3 00:50.6  A3: Police! Show me your hands! (B1)
+LOG3 00:51.0  B1 calls: contact, 10 o'clock, 2 m
+LOG3 00:51.1  A3: oc (pepper) spray misses B1
+LOG3 00:51.6  A3: oc (pepper) spray misses B1
+LOG3 00:52.4  A3: oc (pepper) spray misses B1
+LOG3 00:53.0  A3: oc (pepper) spray hits B1
+LOG3 00:53.0  B1 gives up: hands up, weapon down (A3)
+LOG3 00:53.1  A1 moves in to cuff B1
+LOG3 00:57.3  A1 cuffs B1
+LOG3 00:57.3    B1 Untrained: 0 shots, 0 hits, 0 down; ARRESTED
+PROBE3 tool=oc_spray on=true sd=700 v=57.3 arrested=true alive=true cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:2:rifle:carbine
+LOG3 00:14.2  B1 recognizes A3: 4.7 m, 1 deg off eye line
+LOG3 00:14.2  B1 calls: contact, 12 o'clock, 4 m
+LOG3 00:15.0  A3 recognizes B1: 3.5 m, 31 deg off eye line
+LOG3 00:15.0  A3: Police! Show me your hands! (B1)
+LOG3 00:15.2  A3: B1 shows no weapon
+LOG3 00:15.4  A3 on target B1 after 0.41 s (31 deg traverse)
+LOG3 00:15.8  A1 recognizes B1: 3.3 m, 17 deg off eye line
+LOG3 00:15.8  A1: Police! Show me your hands! (B1)
+LOG3 00:16.0  A1: B1 shows no weapon
+LOG3 00:16.1  A1 on target B1 after 0.36 s (18 deg traverse)
+LOG3 00:16.9  A2 recognizes B1: 6.4 m, 9 deg off eye line
+LOG3 00:16.9  A2: Police! Show me your hands! (B1)
+LOG3 00:17.2  A2: B1 shows no weapon
+LOG3 00:17.3  A2 on target B1 after 0.35 s (10 deg traverse)
+LOG3 00:17.5  A3: Police! Show me your hands! (B1)
+LOG3 00:22.1  B1 calls: contact, 10 o'clock, 8 m
+LOG3 00:28.8  B1 calls: contact, 11 o'clock, 7 m
+LOG3 00:32.4  B1 recognizes A1: 6.3 m, 0 deg off eye line
+LOG3 00:32.4  B1 calls: contact, 11 o'clock, 6 m
+LOG3 00:50.6  B1 calls: contact, 10 o'clock, 1 m
+LOG3 00:50.7  A3: Police! Show me your hands! (B1)
+LOG3 00:55.8  B1 recognizes A2: 2.4 m, 8 deg off eye line
+LOG3 00:55.8  B1 calls: contact, 11 o'clock, 2 m
+LOG3 01:02.3  B1 calls: contact, 10 o'clock, 2 m
+LOG3 01:09.3  A1 kills B1 hand to hand (0.38 s against 0.60 s)
+LOG3 01:09.3  B1 KILLED (melee, by A1)
+LOG3 01:09.3    B1 Untrained: 0 shots, 0 hits, 0 down; DEAD
+PROBE3 tool=oc_spray on=false sd=700 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=701 v=240.0 arrested=false alive=false cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:6:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=701 v=240.0 arrested=false alive=false cause=[] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=702 v=55.3 arrested=true alive=true cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:5:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=702 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=703 v=56.2 arrested=true alive=true cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:3:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=703 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:6:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=704 v=21.1 arrested=true alive=true cause=[] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=705 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:6:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=705 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=706 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:5:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=706 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=707 v=56.6 arrested=true alive=true cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:5:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=707 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=708 v=240.0 arrested=false alive=false cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:5:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=708 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=709 v=56.2 arrested=true alive=true cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:5:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=709 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=710 v=57.2 arrested=true alive=true cause=[] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:3:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=710 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=oc_spray on=true sd=711 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:6:rifle:carbine,A2:6:rifle:carbine,A3:6:rifle:carbine
+PROBE3 tool=oc_spray on=false sd=711 v=240.0 arrested=false alive=false cause=["killed"] gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+oc_spray          s until an unarmed man who will not give up is cuffed (less) 129.99   221.76   PASS
+3 of 4 items change the outcome (12 runs each way, 49 s)

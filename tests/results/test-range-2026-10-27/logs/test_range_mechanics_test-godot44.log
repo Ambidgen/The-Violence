@@ -1,0 +1,21 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:977)
+Godot Engine v4.4.stable.official.4c311cbee - https://godotengine.org
+
+ok    all-good/no-bad baseline is applied to both SOF operators
+ok    the actual SOF equipment preset reaches the simulation
+ok    40 active base habits give the expected 0.80 reaction multiplier
+ok    hold habits sleep on assault
+ok    a hold habit can activate while defending
+ok    the hold habit sleeps when the defender stops holding
+ok    SOF baseline resistance keeps BH06 off even at stress 1.0
+ok    with enough effective stress BH06 activates and suspends its good habits
+ok    turning the bad habit off restores the good habits
+ok    trait habit BH11 activates without stress and overrides its good habits
+ok    disabling BH11 restores the overridden habits
+ok    shield loadout correctly replaces the primary weapon
+ok    a shield stops a frontal rifle chest hit
+ok    a front-facing plate stops one chest hit
+ok    SOF helmet stops a head hit and stuns its wearer
+ok    a second head hit is not stopped by a spent SOF helmet
+test range mechanics: PASS

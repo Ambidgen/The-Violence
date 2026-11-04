@@ -1,0 +1,12 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+item              measure                                              with   without   gate
+light             s for police to recognize someone, at night (less)     0.51     0.61   PASS
+medkit            share of the downed who die after the operation (less)   0.15     0.27   PASS
+taser             s until an unarmed man who will not give up is cuffed (less)  42.77    72.93   PASS
+launcher          s until an unarmed man who will not give up is cuffed (less)  59.54    72.93   PASS
+oc_spray          s until an unarmed man who will not give up is cuffed (less)  49.26    72.93   PASS
+baton             s until an unarmed man who will not give up is cuffed (less)  59.73    72.93   PASS
+pepperball        s until an unarmed man who will not give up is cuffed (less)  61.78    72.93   PASS
+beanbag           s until an unarmed man who will not give up is cuffed (less)  60.08    72.93   PASS
+8 of 8 items change the outcome (12 runs each way, 173 s)

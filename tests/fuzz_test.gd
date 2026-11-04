@@ -7,6 +7,7 @@ const Habits = preload("res://scripts/data/habits.gd")
 const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
+const Operation = preload("res://scripts/campaign/operation.gd")
 
 
 func _init() -> void:
@@ -44,7 +45,7 @@ func _init() -> void:
 		for team in 2:
 			for slot in 20:
 				var id := "%s%d" % ["AB"[team], slot + 1]
-				var ech: String = Habits.ECHELON_ORDER[rng.randi_range(0, 4)]
+				var ech: String = Habits.ECHELON_ORDER[rng.randi_range(0, Habits.ECHELON_ORDER.size() - 1)]
 				var good := {}
 				for g in Habits.good_ids():
 					good[g] = rng.randf() < 0.55
@@ -65,9 +66,15 @@ func _init() -> void:
 					"traits": traits, "exp": rng.randi_range(1, 5), "plates": rng.randi_range(0, 4), "pos": p,
 					"face": rng.randf() * TAU, "enabled": slot < sizes[team]})
 		var post: Array = [["assault", "hold", "hunt"][rng.randi_range(0, 2)], ["assault", "hold", "hunt"][rng.randi_range(0, 2)]]
+		# v0.6: about half the matches add civilians; police rules, night and strict rules
+		# of engagement at random
+		var n_civ := rng.randi_range(0, 14) if rng.randf() < 0.5 else 0
+		var opts := {"police_rules": rng.randf() < 0.5, "night": rng.randf() < 0.25, "roe_strict": rng.randf() < 0.15}
+		if n_civ > 0:
+			cfgs = Operation.build(cfgs, lv, nav, {"civilians": n_civ, "seed": 5000 + k})
 		var w = World.new()
 		w.keep_events = rng.randf() < 0.3
-		w.setup(lv, nav, cfgs, post, 5000 + k)
+		w.setup(lv, nav, cfgs, post, 5000 + k, [1, 1], opts)
 		while not w.over:
 			w.step()
 			for o in w.ops:
@@ -85,8 +92,8 @@ func _init() -> void:
 					if o.alive():
 						print("      %s el %d %s room %s dbg %s" % [o.id, o.el, str(o.pos.snapped(Vector2(0.1, 0.1))), o.room, o.dbg])
 		sim_t += w.t
-		print("  %3d map %02d %2dv%-2d %-7s/%-7s -> %s at %5.1f s" % [k, mi, sizes[0], sizes[1], post[0], post[1],
-			["A", "B", "draw"][w.winner], w.t])
+		print("  %3d map %02d %2dv%-2d %-7s/%-7s civ %2d%s -> %s at %5.1f s" % [k, mi, sizes[0], sizes[1], post[0], post[1],
+			n_civ, " police" if opts["police_rules"] else "", ["A", "B", "draw"][w.winner], w.t])
 		w.dispose()
 	print("fuzz matches %d: A %d  B %d  draw %d (time limit %d)   sim %.0f s in %d ms" % [n, ends[0], ends[1], ends[2],
 		timeouts, sim_t, Time.get_ticks_msec() - t0])
@@ -94,5 +101,6 @@ func _init() -> void:
 	for b in Habits.bad_ids():
 		if not bad_seen.has(b):
 			missing.append(b)
-	print("bad habits activated: %d/20  missing: %s" % [bad_seen.size(), str(missing)])
-	quit()
+	print("bad habits activated: %d/%d  missing: %s" % [bad_seen.size(), Habits.bad_ids().size(), str(missing)])
+	# P0.A1: the summary's claim is the gate: every bad habit must fire somewhere
+	quit(1 if not missing.is_empty() else 0)

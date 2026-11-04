@@ -1,0 +1,8 @@
+Six 4.7 screen baselines vs independent 4.4 stable reruns; compared winner, timeout, seconds, a_down, b_down, a_dead, b_dead, a_shots, b_shots, a_hits, b_hits, friendly_hits, stray
+map=0 seed=710001 identical
+map=0 seed=717920 identical
+map=3 seed=713001 identical
+map=3 seed=720920 identical
+map=11 seed=721001 identical
+map=11 seed=728920 identical
+PASS

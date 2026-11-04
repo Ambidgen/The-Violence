@@ -7,7 +7,7 @@ func _init() -> void:
 	id = "m01"
 	map_name = "Lone Cabin"
 	title = "THE VIOLENCE  -  01 LONE CABIN"
-	notes = ["ONE-ROOM CABIN, 7 x 5 m, ONE DOOR, PORCH", "WOODLOT CLEARING  ·  1 SQUARE = 1 m", "MAP 01  ·  SHEET 2 OF 11"]
+	notes = ["ONE-ROOM CABIN, 7 x 5 m, ONE DOOR, PORCH", "WOODLOT CLEARING  ·  1 SQUARE = 1 m", "MAP 01  ·  SHEET 2 OF 12"]
 	W = 30.0
 	H = 20.0
 	time_limit = 240.0
@@ -19,7 +19,6 @@ func _build() -> void:
 	_room("CABIN", "CABIN", [Rect2(12, 7, 7, 5)])
 	_room("PORCH", "PORCH", [Rect2(13.5, 12, 4, 1.6)], {"deck": true})
 	_door(15.5, 12, 0.9, {"id": "FRONT"})
-	_closed_doors = ["FRONT"]   # the one closed door in the game: the whole problem of map 01
 	_window(13.8, 7, 1.2)
 	_window(17.2, 7, 1.2)
 	_window(19, 9.5, 1.0)

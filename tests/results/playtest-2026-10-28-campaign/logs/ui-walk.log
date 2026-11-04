@@ -1,0 +1,27 @@
+shot title 1600x900
+shot after_new_run_click 1600x900
+week 1 drafts=["doctrine:plates,reserve,pie", "procurement:smg,pistols,bangs"] account=25000 fit=20
+shot board_week1 1600x900
+DISABLED 'Brief and plan' tooltip='Choose your inheritance on the desk first.'
+shot inheritance 1600x900
+after inheritance: drafts=["procurement:smg,pistols,bangs"] account=25000
+shot after_inheritance 1600x900
+shot procurement 1600x900
+after procurement: contracts=["plates", "smg"] armory=13 account=20000
+shot board_after_desk 1600x900
+briefing opened; account change=0
+shot briefing 1600x900
+shot tab_force 1600x900
+shot tab_orders 1600x900
+shot run_start 1600x900
+shot run_mid 1600x900
+operation took 30984 ms wall, mode=run
+shot debrief 1600x900
+shot board_after_op 1600x900
+after op1: account=19195 fit=20 week=1
+shot week2_board 1600x900
+week2: week=2 account=23431 fit=20 drafts=["program"] offers=0 events=1
+shot screen_roster 1600x900
+shot screen_budget 1600x900
+shot screen_internal_affairs 1600x900
+shot screen_city_hall 1600x900

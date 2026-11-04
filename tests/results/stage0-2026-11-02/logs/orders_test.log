@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+order         measure                                     with    without   gate
+clear         rooms entered (fewer)                         1.50     4.50   PASS
+arrest        named suspect arrested (share)                0.62     0.31   PASS
+rescue        hostages walked out safe                      1.88     0.00   PASS
+contain       suspects escaped (fewer)                      0.00     0.62   PASS

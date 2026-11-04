@@ -1,0 +1,54 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+habits: 60 good, 27 bad; 84 ids read in res://scripts/sim
+
+pure suspensions (3):
+  BH08 Comms blackout: comms blackout: no callouts (GD04), status (GD08) or re-sectoring (GD09) is the whole habit
+  BH17 Skip the checks: skip the checks: the suspension of WD01/WD02/WD04 is the whole habit
+  BH21 First sight, first shot: first sight, first shot: without HD08-HD10 the ambush opens on the first silhouette
+
+read at one place only (37): check each is not inert outside that branch
+  PF03 Slice the pie (brain.gd:515)
+  PF04 Points of domination (brain.gd:584)
+  PF06 Short rushes (brain.gd:2524)
+  PF08 Re-engage from a new spot (brain.gd:2291)
+  GD02 Sector ownership (brain.gd:735)
+  GD06 Opposite-direction entry (brain.gd:589)
+  GD10 Mutual support distance (brain.gd:2495)
+  ED02 Scan danger points (brain.gd:2940)
+  ED03 Hard corner first (brain.gd:2782)
+  ED06 Resist tunnel vision (world.gd:939)
+  ED07 Sound cueing (world.gd:2699)
+  ED08 Hold the last-known position (brain.gd:2407)
+  WD05 Immediate action (brain.gd:2059)
+  WD06 Close-range transition (brain.gd:1889)
+  WD08 Failure drill vs armour (brain.gd:1966)
+  HD06 Internal routes (brain.gd:2816)
+  HD08 Wait for the funnel (brain.gd:2332)
+  HD09 Drop the point man (brain.gd:1864)
+  HD11 Lift and shift (world.gd:2446)
+  HD12 Counterattack the foothold (brain.gd:4244)
+  HD13 Redistribute to the pressure (brain.gd:3358)
+  HD14 Peel back (brain.gd:2811)
+  HD15 Give up the room (brain.gd:4298)
+  HD18 Call the breach (brain.gd:4115)
+  HD19 Drag the wounded (brain.gd:4276)
+  BH01 Freeze (world.gd:1178)
+  BH05 Panic reload (brain.gd:1739)
+  BH07 Flinch and turtle (brain.gd:1691)
+  BH09 Jumpy trigger (brain.gd:1707)
+  BH10 Bee-line to cover (brain.gd:2023)
+  BH16 Glory shot (brain.gd:2243)
+  BH18 Relaxed carry (brain.gd:2925)
+  BH20 Fixed scan pattern (brain.gd:2775)
+  BH23 Die at the post (brain.gd:4337)
+  BH24 Door stare (brain.gd:2906)
+  BH25 Sally out for a noise (brain.gd:3300)
+  BH26 Fire through the counter (world.gd:2455)
+
+FAIL (0):
+  none

@@ -1,0 +1,58 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+ok    ordinary shooters hold fire through a friend
+ok    non-WD10 shooters do not take the faster WD10 recovery
+ok    ordinary shooters attempt a bounded safe lane recovery
+ok    repositioned shooter progresses without firing through the blocked lane
+ok    lane holds and recovery attempts are recorded as events
+ok    WD10 attempts the wider-lane recovery sooner
+ok    WD10's wider lane remains distinct from the ordinary instinct
+ok    HD11 keeps its half-second lift delay after the lane clears
+ok    HD11 resumes fire after its lift delay
+ok    police lane protection checks beyond the target
+ok    intentional BH26 exception still allows firing through the lane
+ok    no-route fallback holds fire instead of moving or shooting unsafely
+ok    no safe lane route is explicitly diagnosed
+ok    a visible clear alternative is preferred when local movement has no safe route
+ok    reposition routes reject crossing a teammate rather than checking only the destination
+ok    a previously safe reposition is rejected when a teammate moves onto its remaining path
+ok    near-point fixture is exposed although its goal is concealed
+ok    being within 0.3 m of cover does not stop an exposed operator
+ok    cover search completes only at a genuinely concealed position
+ok    after bounded unreachable-cover attempts, a dry operator performs an explicit crouched emergency reload
+ok    unreachable cover, reload blocker, fallback, and exposed reload are attributed
+ok    an optional top-up is deferred rather than reloading exposed with ammunition still available
+ok    two aimed frontal rifle stops are observed by their shooter
+ok    shield-stop telemetry attributes shooter, bearer, zone, weapon class and intent
+ok    repeated visible shield stops can produce a bounded flank without firing while moving
+ok    a clear visible alternative is preferred to a shield flank
+ok    a stop through a wall does not create omniscient shield knowledge
+ok    a frontal pistol round is still stopped by the shield
+ok    an attack from outside the shield's frontal arc is not stopped by it
+ok    heavy rounds retain the existing probabilistic shield penetration
+ok    an ordinary unshielded, unhelmeted head hit retains normal damage behavior
+ok    blocked lane episode starts while aiming
+ok    interrupted aim ends and clears its lane-hold episode
+ok    an expired lane replan is discarded when the encounter resumes
+ok    an expired shield flank is discarded when the encounter resumes
+ok    an interrupted cover search starts a fresh bounded episode
+ok    diagnostic buffer is bounded while totals and overflow remain accurate without drawing RNG
+ok    disabled diagnostics neither record nor count events
+ok    a new world setup clears the diagnostic buffer, totals and overflow
+ok    preset-kit helper is opt-in and preserves legacy habit defaults
+ok    sustained stress reaches BH01 at all tested resistances, more slowly for stronger resistance
+ok    activation is recorded as a transition even after raw stress saturates
+ok    quiet rally decay respects separate raw and resistance-adjusted baseline floors
+ok    direct gas stress updates the separate accumulator without changing raw input
+ok    civilian alarm stress is retained for a concealed attacker who later reveals
+ok    PF04 changes the entry target when an entry opportunity occurs
+ok    entry phase issues movement toward the PF04 target rather than falsely declaring arrival
+ok    PF04 execution is recorded when entry movement starts
+ok    an ongoing entry emits only one execution event
+ok    entry arrival is marked only after reaching the target
+ok    GD02 sector assignment and actual scan opportunities are recorded
+test range regressions: PASS
