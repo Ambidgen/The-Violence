@@ -148,6 +148,7 @@ var roe_tight := false  # order Weapons tight: fire only at someone firing or po
 var less_first := false # order Less-lethal first: a tool, not a round, on a covered man inside 4 m
 var avoid_key := ""     # order Avoid: the navigation overlay this officer's paths use
 var flight := 0.0       # suspect: readiness to run for it when police are close (0-1)
+var yield_out := 0.0    # suspect: readiness to give up when outnumbered by police (crew houses; 0 = never counted)
 var hostage := false    # civilian held by captors (stays put until freed)
 var captor := false     # suspect guarding hostages
 var attacker := false   # event attacker: hidden in the crowd (as a civilian) until the attack
@@ -222,6 +223,7 @@ func configure(cfg: Dictionary) -> void:
 	shield = kit["gear"].has("shield")
 	light = kit["gear"].has("light")
 	flight = float(cfg.get("flight", 0.0))
+	yield_out = float(cfg.get("yield_out", 0.0))
 	hostage = cfg.get("hostage", false)
 	captor = cfg.get("captor", false)
 	attacker = cfg.get("attacker", false)

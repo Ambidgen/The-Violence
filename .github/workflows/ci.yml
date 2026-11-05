@@ -167,9 +167,11 @@ jobs:
     env:
       # A push is the two-seed pilot, the weekly schedule is a drift check (8), and
       # anything else -- a dispatch without a seed count -- is the full baseline.
+      # 2026-11-05: a push to arena/m8-NAME is an 8-seed experiment against the CL3 reference;
+      # its report goes to tests/results/arena/m8-NAME/balance.
       # CL3 (2026-11-04): a push to arena/cl3-* is the 8-seed reference, not a pilot, so the
       # reference can run on a branch without a dispatch (dispatch needs the workflow on main).
-      SEEDS: ${{ github.event.inputs.seeds || (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/arena/cl3-') && '8' || '2') || (github.event_name == 'schedule' && '8' || '20')) }}
+      SEEDS: ${{ github.event.inputs.seeds || (github.event_name == 'push' && ((startsWith(github.ref, 'refs/heads/arena/cl3-') || startsWith(github.ref, 'refs/heads/arena/m8-')) && '8' || '2') || (github.event_name == 'schedule' && '8' || '20')) }}
       PER_SHARD: "4"
     outputs:
       seeds: ${{ steps.plan.outputs.seeds }}
@@ -335,7 +337,7 @@ jobs:
           (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/arena/')))
         env:
           # a later cycle measures itself against the baseline in its own folder (1.B)
-          DEST: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.results || 'tests/results/cycle-1A/baseline') || (startsWith(github.ref, 'refs/heads/arena/cl3-') && 'tests/results/cl3-2026-11-04/balance' || 'tests/results/cycle-1A/pilot') }}
+          DEST: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.results || 'tests/results/cycle-1A/baseline') || (startsWith(github.ref, 'refs/heads/arena/cl3-') && 'tests/results/cl3-2026-11-04/balance' || (startsWith(github.ref, 'refs/heads/arena/m8-') && format('tests/results/{0}/balance', github.ref_name) || 'tests/results/cycle-1A/pilot')) }}
         run: |
           set -euo pipefail
           case "$DEST" in

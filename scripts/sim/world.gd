@@ -88,6 +88,11 @@ const CLEAR_TIME := 10.0       # a person judged harmless is not judged again fo
 const CHALLENGE_EVERY := 2.5   # "Police! Show me your hands!" at most this often per officer
 const CHALLENGE_R := 14.0      # and heard this far
 ## How readily each echelon gives up when cornered by police (1 = most readily).
+## Crew houses: per officer the police outnumber a crew member by (within YIELD_R metres),
+## this much is added to his surrender chance (times his echelon's readiness and his yield_out).
+const YIELD_R := 20.0
+const YIELD_PER_ODD := 0.3
+const YIELD_ODDS_CAP := 4
 const SURRENDER := {"untrained": 1.0, "militia": 0.6, "patrol": 0.4, "regular": 0.3, "police": 0.15, "sof": 0.05}
 ## Walls and rounds (v0.6). Partitions and timber walls let rifle rounds through and
 ## sometimes pistol rounds; [chance a pistol round goes through, energy kept].
@@ -1470,6 +1475,17 @@ func _surrender_roll(e, by, challenged: bool) -> void:
 	for m in mates_near(e, 10.0):
 		if m.fighting():
 			mates += 1
+	# Crew houses (2026-11-04, owner decision): a crew member who sees more police than
+	# friends around him is readier to give up. Only occupants that carry `yield_out`
+	# count it, so every other situation plays exactly as before.
+	if e.yield_out > 0.0:
+		var police_n := 0
+		for x in _near_fast(e.pos, YIELD_R):
+			if x.judges and x.alive() and not x.medic:
+				police_n += 1
+		var odds: int = police_n - (mates + 1)
+		if odds > 0:
+			p += e.yield_out * YIELD_PER_ODD * mini(odds, YIELD_ODDS_CAP) * prop
 	p /= 1.0 + 0.5 * mates
 	if rng.randf() < p:
 		surrender(e, by)

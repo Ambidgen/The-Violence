@@ -78,7 +78,7 @@ func _play(type: String, seed_v: int, force: int, kit := true, trauma := 0.0, mo
 			armed += 1
 	var out := {"seed": seed_v, "type": type, "map": int(s["map"]), "map_name": String(lv.map_name), "armed": armed,
 		"force": int(sm["officers"]), "asked": force, "down": int(sm["officers_down"]), "killed": int(sm["officers_killed"]),
-		"killed_by": by, "suspects_killed": int(sm["suspects_killed"]), "civ_killed": int(sm["civ_killed"]),
+		"killed_by": by, "suspects_killed": int(sm["suspects_killed"]), "surrendered": int(sm.get("surrendered", 0)), "arrested": w.incident.arrests.size(), "civ_killed": int(sm["civ_killed"]),
 		"kind": String(res.get("kind", "")), "kit": kit, "how": how, "sim_s": snappedf(w.t, 0.1), "ended": w.over}
 	w.dispose()
 	return out

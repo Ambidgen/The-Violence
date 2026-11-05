@@ -237,7 +237,7 @@ static func _occupant_cfg(oc: Dictionary, id: String, team: int, slot: int, p: V
 		bad[pers[rng.randi() % pers.size()]] = true
 	var c := {"id": id, "team": team, "slot": slot, "echelon": ech, "good": good, "bad": bad, "plates": 0,
 		"exp": Habits.PRESET_EXP[ech], "traits": {}, "pos": p, "face": face, "enabled": true, "alert": int(oc.get("alert", 0)),
-		"name": oc.get("name", ""), "flight": float(oc.get("flight", 0.0)), "captor": role == "captor",
+		"name": oc.get("name", ""), "flight": float(oc.get("flight", 0.0)), "yield_out": float(oc.get("yield_out", 0.0)), "captor": role == "captor",
 		"sidearm_only": oc.get("arms", "pistol") == "pistol", "kit": occupant_kit(oc)}
 	if role == "attacker":
 		c["attacker"] = true

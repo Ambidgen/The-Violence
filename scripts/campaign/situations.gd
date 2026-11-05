@@ -24,6 +24,19 @@ const WARDS := [
 	{"id": "eastport", "name": "Eastport", "trust": 44, "isolated": 0.5},
 	{"id": "kilbride", "name": "Kilbride", "trust": 30, "isolated": 0.7},
 ]
+## Crew houses (2026-11-04, owner decision: make them less deadly). On the CL3 matrix they
+## killed 0.81 officers a raid, 70% of all officer deaths, with 3-8 armed members of whom
+## half the trained ones carried rifles. Size, rifles and readiness to give up when
+## outnumbered (world.gd YIELD_*) are the levers. Was 3-8 members (two plus the rooms),
+## rifles at 0.5, no yield. raid_probe, 40 raids, six officers in their own kit: 0.42 killed a
+## raid before, 0.23 with these values (0.27 +/- 0.06 over the three smaller-crew variants
+## tried). A lookout in fewer houses (0.25) measured worse (0.57) and is not used.
+const CREW_MIN := 2
+const CREW_MAX := 6
+const CREW_ROOM_BONUS := 1
+const CREW_RIFLE := 0.3
+const CREW_YIELD := 1.0
+const CREW_LOOKOUT := 0.4
 const TYPES := {
 	"warrant": {"name": "Warrant service", "maps": [0, 1, 2, 4, 5, 6], "vis": [1, 3], "pressure": "none",
 		"blurb": "A judge's warrant names a suspect at a residence. You choose the hour; the other occupants and the layout remain uncertain."},
@@ -137,17 +150,17 @@ static func make(type: String, seed_val: int, week := 1, idx := 0, trusts := [],
 			var crew := rng.randi() % 4
 			var crews := ["Kilbride Crew", "Corvino Family", "Los Halcones", "Zarya Bratva"]
 			s["title"] = "%s: %s" % [crews[crew], addr]
-			var n := rng.randi_range(3, mini(8, 2 + rooms.size()))
+			var n := rng.randi_range(CREW_MIN, mini(CREW_MAX, CREW_ROOM_BONUS + rooms.size()))
 			var rifles := 0
 			for k3 in n:
 				var r := rng.randf()
 				var ech2 := "untrained" if r < 0.7 else ("militia" if r < 0.9 else "regular")
-				var arms2 := "rifle" if (ech2 != "untrained" and rng.randf() < 0.5) else "pistol"
+				var arms2 := "rifle" if (ech2 != "untrained" and rng.randf() < CREW_RIFLE) else "pistol"
 				if arms2 == "rifle":
 					rifles += 1
 				s["occupants"].append({"role": "suspect", "name": names.gang_name(crew), "ech": ech2, "room": rooms[rng.randi() % rooms.size()],
-					"arms": arms2, "flight": 0.25, "alert": 1 if rng.randf() < 0.3 else 0})
-			var lookout := rng.randf() < 0.4
+					"arms": arms2, "flight": 0.25, "alert": 1 if rng.randf() < 0.3 else 0, "yield_out": CREW_YIELD})
+			var lookout := rng.randf() < CREW_LOOKOUT
 			if lookout:
 				for oc in s["occupants"]:
 					oc["alert"] = 1
