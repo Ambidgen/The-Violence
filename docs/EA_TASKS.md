@@ -521,7 +521,7 @@ Measured on official Godot 4.7.2 (checksum-verified), headless, 2 cores. Logs: `
 
 After CL2 every quick- and full-tier gate passes again on 4.7.2 (equipment, orders, brains, civ, lethality, hold on 4 maps, stall on 12, fuzz 60 matches with 0 draws, `ui_walk`, balance smoke 0 broken).
 
-**Still open in Stage 0:** CL3's 8-seed × 4-policy balance reference (needs CI: hours of CPU) and CL4 (optional movement tuning). B4 closes once CI stays clean.
+**Still open in Stage 0:** CL4 (optional movement tuning); CL3 is done (below). B4 closes once CI stays clean.
 
 ### Merge of the two 2–3 Nov copies (2026-11-04)
 
@@ -559,7 +559,35 @@ Two copies had split from the same 2 Nov tree: the **Phase 1 copy** (P1.D–P1.I
 
 No case is untagged, so the merge introduced no outcome that neither side had. The 28 pre-split cases cannot be split further without the 2 Nov base tree (neither copy is it); they are the "fixture predates 1.3" set and are rebaselined with the rest at P1.I1.
 
-**CL3.c: the 8-seed × 4-policy reference** runs in CI on branch `arena/cl3-merged-2026-11-04` (the merged tree; GitHub `main` is still the 21 Oct tree and has no workflows, so the matrix cannot be dispatched there). `ci.yml` now makes a push to `arena/cl3-*` run 8 seeds instead of the 2-seed pilot and commit the report to `tests/results/cl3-2026-11-04/balance/`. CI run 41915644631: two shards of four seeds (1001–4004, 5005–8008).
+**CL3.c: the 8-seed × 4-policy reference: done.** Run in CI on branch `arena/cl3-merged-2026-11-04` (the merged tree; GitHub `main` is still the 21 Oct tree and has no workflows, so the matrix cannot be dispatched there). `ci.yml` makes a push to `arena/cl3-*` run 8 seeds instead of the 2-seed pilot. CI run 41915644631, two shards of four seeds (1001–4004, 5005–8008), 32 runs, 9391 s of runner time, 0 broken runs. Report: `tests/results/cl3-2026-11-04/balance/` (report.md, summary.json, weeks.csv, ops.csv). The same run's static and headless jobs failed only because the Windows copy had lost the executable bit on `tools/run_tests.sh`; modes are restored (only `*.sh` executable) in the follow-up commit.
+
+**CL3.d: what moved against `cycle-1C/balance`.** This is the first measurement of P1.D–P1.H, which had never run before the merge (`ops_ui.gd` did not load). Means over the same 8 seeds, 1C → CL3:
+
+| metric | cautious | minimal | military | accept-all |
+|---|---|---|---|---|
+| lowest fit officers | 5.0 → 5.75 | 9.0 → 9.1 | 5.25 → 4.75 | 5.9 → 4.75 |
+| weeks under 12 fit | 16.8 → 20.4 | 7.6 → 6.9 | 25.3 → 26.3 | 20.5 → 16.3 |
+| week-ends with ≥ 12 fit | 58% → 49% | 81% → 83% | 37% → 34% | 49% → 59% |
+| weeks below $0 | 27.0 → 32.9 | 0 → 0 | 5.9 → 4.6 | 32.6 → 35.6 |
+| lowest account | −26.5k → −36.7k | +39.8k → +38.4k | **−27.2k → −10.1k** | −28.4k → −29.8k |
+| account at week 40 | −2.6k → −12.3k | +347k → +215k | +14.3k → +8.0k | −6.9k → −9.9k |
+| officers killed | 23.9 → 22.4 | 9.4 → 8.3 | 15.5 → 17.4 | 21.6 → 21.4 |
+| killed per operation | 0.34 → 0.32 | 0.24 → 0.21 | 0.24 → 0.27 | 0.26 → 0.25 |
+| civilians killed | 4.5 → 5.0 | 2.6 → 2.4 | 4.4 → 4.9 | 4.4 → 3.75 |
+| allies lost at the end | 3.0 → 2.75 | 2.0 → 1.4 | 3.4 → 3.0 | 3.5 → 3.0 |
+| allies won back | 0 → 0 | 0.12 → 0 | 0 → 0 | 0 → 0 |
+| chief kept | 5/8 → 8/8 | 8/8 → 8/8 | 8/8 → 8/8 | 6/8 → 8/8 |
+| run score | −799 → −795 | −426 → −404 | −490 → −575 | −648 → −616 |
+
+**Bands: 36 of 52 miss (1C: 39 of 52).** Three flipped to ok: money-debt for military and for accept-all, and allies-held for minimal. None flipped the other way. The worst-seed bands (`min`/`max` aggregates) are read over 8 seeds here against 20 in 1C, so a flip there is weaker evidence than a mean moving.
+
+**Reading.** P1.D–P1.H move the numbers in the intended direction, but by far less than Gate 1 asks:
+- **Election is no longer a threat**: every policy keeps the chief on all 8 seeds (1C on the same seeds: 5/8 cautious, 6/8 accept-all). The election band passes with nothing to spare, which may mean the contest is now too soft.
+- **Money**: military-first's debt trough is cut by about 60%; the other deficit-running policies are unchanged or worse (cautious ends about 10k lower). Minimal still banks over $200k, so the economy still pays for doing nothing.
+- **Roster, deaths, lethality are untouched**: the worst week still fields 2–4 fit officers (band ≥ 10), officers killed per run is 8–22 (band ≤ 8), killed per operation 0.21–0.32 (band ≤ 0.15). These are the tactical layer's numbers, not the run layer's, and no Phase 1 task targets them.
+- **Ally recovery never happens** (0 on all 32 runs; 1C had one seed of minimal win one back); either the mechanism is unreachable for these policies or the band is.
+
+`tests/balance_bands.json` now names this run as its reference. The band values are not changed: per roadmap 8.4 they are the owner's decision, and this is the matrix where they are to be read as a verdict.
 
 ## Order and overlap
 

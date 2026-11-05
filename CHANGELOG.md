@@ -3,6 +3,15 @@
 Newest first. The README covers the game as it stands; this file keeps the history.
 
 
+## Unreleased — CL3: a balance reference for the merged tree (2026-11-04)
+
+- **New reference matrix**: 8 seeds × 4 policies on the merged tree, run in CI, in
+  `tests/results/cl3-2026-11-04/balance/`; `balance_bands.json` points at it. It is the first
+  measurement of P1.D–P1.H: the chief now survives the election on every run, military-first's
+  worst debt is cut by about 60%, and 36 of 52 Gate 1 bands still miss (39 before). Roster,
+  deaths and lethality have not moved. Every changed determinism case is tagged to a cause.
+- **CI can run the shell scripts again**: the Windows copy had lost their executable bit.
+
 ## Unreleased — Week Closed: a recap when the week ends (2026-11-04)
 
 - **Week Closed (S15)**: ending a week now plays a five-second crayon sheet before the new

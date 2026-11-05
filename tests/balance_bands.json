@@ -4,6 +4,8 @@
   "status": "asserting",
   "enforce": true,
   "note": "Gate 1 bands for the run layer (EA_TASKS P1.A3), asserting since P1.I2: a full matrix run by rogue_balance_test.gd now exits 1 on a miss. The two-week smoke in the quick tier is never judged by them, and --report-only reproduces an experiment without failing. The values are provisional: the roadmap's 8.4 says the Gate 1 numbers are the owner's decision, because they encode how hard the game should be, and the 1.C matrix (2026-11-02) still missed roster, money, deaths and ally bands before 1.D-1.F landed; the first matrix run after P1.I is where they are read as a verdict and, if a band is genuinely unreachable, re-set with a reason recorded beside it.",
+  "reference": "tests/results/cl3-2026-11-04/balance",
+  "reference_note": "CL3 (2026-11-04): 8 seeds x 4 policies on the merged tree, CI run 41915644631; 36 of 52 bands miss (cycle-1C: 39). Supersedes tests/results/cycle-1C/balance as the comparison point. Diff and reading: docs/EA_TASKS.md, Stage 0: CL3.",
   "bands": [
     {
       "id": "roster-floor",
