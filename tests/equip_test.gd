@@ -37,8 +37,8 @@ func _init() -> void:
 	print("item              measure                                              with   without   gate")
 	for tn in tests:
 		var spec: Dictionary = GATES[tn]
-		if tn == "sof_helmet":
-			var res: Array = _helmet_unit()
+		if tn == "sof_helmet" or tn == "armour":
+			var res: Array = _helmet_unit() if tn == "sof_helmet" else _armour_unit()
 			var ok0: bool = res[0]
 			passed += 1 if ok0 else 0
 			print("%-17s %-52s %6s  %7s   %s" % [tn, spec["measure"], res[1], res[2], "PASS" if ok0 else "FAIL"])
@@ -107,6 +107,8 @@ const GATES := {
 	"gas": {"measure": "barricaded suspects who end alive in cuffs (more)", "dir": 1, "margin": 0.3},
 	"gas_mask": {"measure": "officer-seconds gassed taking a gassed room (less)", "dir": -1, "margin": 3.0},
 	"sof_helmet": {"measure": "head hits survived: first, second", "dir": 1, "margin": 0},
+	# 2026-11-05 (owner): calibre against the vest every officer wears and the plates over it
+	"armour": {"measure": "rule breaks: 9 mm torso / 7.62 two plates / one plate", "dir": 1, "margin": 0},
 	"ballistic_helmet": {"measure": "handgun rounds to the head survived, any side (more)", "dir": 1, "margin": 0.5},
 }
 
@@ -551,6 +553,55 @@ func t_smg(on: bool, sd: int):
 				met += 1
 	w.dispose()
 	return [through, met]
+
+
+# ------------------------------------------------------------------ body armour
+## The calibre rules (2026-11-05), on a police officer (who always wears a soft vest):
+## a 9 mm round to the chest or abdomen staggers and never wounds; a battle-rifle round to
+## the front of the chest is stopped by two plates (both spent) and kills with one plate or
+## none; a 9 mm round to an unhelmeted head still downs or kills. Twenty seeds each.
+func _armour_hit(plates: int, gun: String, zone: String, sd: int) -> Dictionary:
+	var lv = Maps.get_level(11)
+	var lane := _lane(8.0)
+	var kit_a := _kit("carbine", "service_pistol", {}, {"armour": "plates" if plates > 0 else "none", "plates": plates})
+	var kit_b := _kit(gun if Equipment.WEAPONS[gun]["slot"] == "primary" else "", gun if Equipment.WEAPONS[gun]["slot"] == "secondary" else "service_pistol")
+	var cfgs: Array = [_cfg("A1", 0, 0, "police", kit_a, lane[0], 0.0, true), _cfg("B1", 1, 0, "regular", kit_b, lane[1][1], PI)]
+	var w = World.new()
+	w.keep_events = false
+	w.setup(lv, _nav(11), cfgs, ["hold", "hold"], 980 + sd, [1, 1], {"a_posted": true, "b_stay": true, "b_posted": true, "police_rules": true})
+	var a = w.by_id["A1"]
+	var b = w.by_id["B1"]
+	var u: Vector2 = (a.pos - b.pos).normalized()
+	a.body_dir = (-u).angle()
+	if Equipment.WEAPONS[gun]["slot"] == "secondary":
+		b.active = "pistol"
+	w._hit(a, [zone, 0.0, 0.0, 1.0], 0.0, u, b, 1.0, 0)
+	var out := {"vest": a.vest, "state": a.state, "wounds": a.wounds, "plates": a.plates}
+	w.dispose()
+	return out
+
+
+func _armour_unit() -> Array:
+	var breaks := [0, 0, 0]
+	for sd in 20:
+		for z in ["chest", "abd"]:
+			var r := _armour_hit(0, "service_pistol", z, sd)
+			if not r["vest"] or r["state"] != "ok" or int(r["wounds"]) > 0:
+				breaks[0] += 1
+		var h := _armour_hit(0, "service_pistol", "head", sd)
+		if h["state"] == "ok":
+			breaks[0] += 1
+		var two := _armour_hit(2, "battle_rifle", "chest", sd)
+		if two["state"] != "ok" or int(two["plates"]) != 0:
+			breaks[1] += 1
+		var one := _armour_hit(1, "battle_rifle", "chest", sd)
+		if one["state"] != "dead":
+			breaks[2] += 1
+		var none := _armour_hit(0, "battle_rifle", "abd", sd)
+		if none["state"] != "dead":
+			breaks[2] += 1
+	var ok: bool = breaks[0] == 0 and breaks[1] == 0 and breaks[2] == 0
+	return [ok, "%d/%d" % [breaks[0], breaks[1]], "%d" % breaks[2]]
 
 
 # ------------------------------------------------------------------ the helmet

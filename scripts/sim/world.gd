@@ -108,8 +108,17 @@ const PEN := {
 ## Sounds that are gunfire (alarm civilians, call the city's police).
 const GUN_SOUNDS := {"rifle": true, "pistol": true, "smg": true, "rifle_loud": true, "rifle_heavy": true,
 	"shotgun": true, "pistol_heavy": true, "breach_shot": true}
-## Rounds a soft vest stops.
+## Rounds a handgun-rated helmet stops.
 const VEST_STOPS := {"pistol": true, "pistol_heavy": true, "buck": true}
+## Calibre classes against body armour (2026-11-05, owner), from the weapon's "cal" or,
+## for a record without one, its wall class: see Equipment.WEAPONS and _hit().
+const CAL_OF_PEN := {"pistol": "low", "pistol_heavy": "low", "buck": "medium", "rifle": "medium", "heavy": "high"}
+## A medium round through a soft vest: the weapon's lethality to the torso is scaled by this.
+const VEST_MEDIUM := 0.4
+## Seconds staggered when the vest stops a handgun round, and when two plates stop a
+## full-power rifle round.
+const VEST_LOW_STAGGER := 0.35
+const PLATE_HIGH_STAGGER := 0.6
 ## Doors (v0.7.5): seconds to open, unlock, and per attempt to ram, kick or shoot a
 ## lock, with the chance an attempt works.
 const DOOR_OPEN_T := 0.6
@@ -307,6 +316,9 @@ func _attach(o) -> void:
 		o.police = factions[o.faction].get("police", false)
 	if o.faction < factions.size():
 		o.judges = factions[o.faction].get("judges", false)
+	# body armour (2026-11-05, owner): every police officer wears a soft vest, plates or not
+	if o.judges and not o.civ:
+		o.vest = true
 	if not o.ech.has("form") and (not o.civ or o.attacker):
 		o.ech = Habits.vary(o.ech, rng)
 		# reset() ran before the varied resistance was known; initialize the
@@ -3149,11 +3161,28 @@ func _hit(a, zn: Array, lat: float, u: Vector2, shooter, energy := 1.0, walls :=
 	if intended == a and shooter.ticker.get("shield_observed_target", "") == a.id:
 		shooter.ticker.erase("shield_observed_target")
 		shooter.ticker.erase("shield_observed_count")
-	# soft armour stops a pistol round or buckshot to the chest from any side (v0.6)
-	if zone == "chest" and a.vest and VEST_STOPS.has(sw["pen"]) and a.plates <= 0:
-		a.ticker["flinch_until"] = maxf(a.ticker.get("flinch_until", -1.0), t + 0.25)
-		emit({"type": "plate", "p": a.pos, "id": a.id, "dir": u})
-		say("%s: vest stops %s's pistol round" % [a.id, shooter.id], "hit")
+	# Body armour by calibre (2026-11-05, owner). The soft vest covers the torso (chest
+	# and abdomen) from any side; plates cover the front of the chest over it.
+	var cal := _cal(sw)
+	var torso := zone == "chest" or zone == "abd"
+	if torso and a.vest and cal == "low":
+		# a handgun round never gets through the vest: a stagger, no wound
+		_armour_stop(a, shooter, u, VEST_LOW_STAGGER, "vest stops %s's handgun round" % shooter.id)
+		return
+	if cal == "high" and torso:
+		if zone == "chest" and front and a.plates >= 2:
+			a.plates -= 2
+			_armour_stop(a, shooter, u, PLATE_HIGH_STAGGER, "plates stop %s's rifle round (%d left)" % [shooter.id, a.plates])
+			if shooter.aim.get("tid", "") == a.id:
+				shooter.aim["plate_seen"] = true
+			return
+		# one plate or none: the round goes through and kills
+		if zone == "chest" and front:
+			a.plates = 0
+		shooter.hits += 1
+		stat["hits"] += 1
+		_down(a, shooter, true, "chest" if zone == "chest" else "abdomen")
+		emit({"type": "blood", "p": a.pos, "dir": u, "power": 1.4, "zone": zone, "id": a.id, "side": side})
 		return
 	if zone == "chest" and a.plates > 0 and front:
 		a.plates -= 1
@@ -3173,6 +3202,9 @@ func _hit(a, zn: Array, lat: float, u: Vector2, shooter, energy := 1.0, walls :=
 	var L: float = float(sw.get("lethal", 1.0))
 	if sw.has("lethal_far"):
 		L = lerpf(L, float(sw["lethal_far"]), clampf((a.pos.distance_to(shooter.pos) - 10.0) / 15.0, 0.0, 1.0))
+	# a medium round through a soft vest does reduced harm to the torso
+	if torso and a.vest and cal == "medium":
+		L *= VEST_MEDIUM
 	match zone:
 		"head":
 			# the special operations helmet stops the first head hit, with a heavy stun
@@ -3219,6 +3251,25 @@ func _hit(a, zn: Array, lat: float, u: Vector2, shooter, energy := 1.0, walls :=
 	if not a.aim.is_empty():
 		a.aim["settle"] = 0.0
 	emit({"type": "blood", "p": a.pos, "dir": u, "power": power, "zone": zone, "id": a.id, "side": side})
+
+
+## The calibre class of a weapon record: "low", "medium" or "high".
+static func _cal(sw: Dictionary) -> String:
+	return String(sw.get("cal", CAL_OF_PEN.get(String(sw.get("pen", "rifle")), "medium")))
+
+
+## A round stopped by body armour: staggered for dur seconds (no aim, no shot), aim
+## unsettled, a little stress. Not a hit.
+func _armour_stop(a, shooter, u: Vector2, dur: float, what: String) -> void:
+	a.ticker["flinch_until"] = maxf(a.ticker.get("flinch_until", -1.0), t + dur)
+	a.ticker["stagger_until"] = maxf(a.ticker.get("stagger_until", -1.0), t + dur)
+	a.muzzle_dir += deg_to_rad(5.0) * (1.0 if rng.randf() < 0.5 else -1.0)
+	if not a.aim.is_empty():
+		a.aim["settle"] = 0.0
+	add_stress(a, 0.05, "armour hit")
+	stat["armour"] = stat.get("armour", 0) + 1
+	emit({"type": "plate", "p": a.pos, "id": a.id, "dir": u})
+	say("%s: %s" % [a.id, what], "hit")
 
 
 ## A handgun round stopped by a police helmet (v0.9.1): a quarter-second's flinch, aim

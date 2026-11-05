@@ -78,22 +78,22 @@
       "metric": "officers_killed",
       "agg": "mean",
       "test": "<=",
-      "value": 22,
+      "value": 8,
       "policies": [
         "all"
       ],
-      "why": "re-set 2026-11-05 (owner: accept roughly the current lethality). Was <= 8 ('a run is meant to cost some officers, not most'); the crew-house matrix (arena/m8-crew-2026-11-05) gives 7.4-19.3 per run by policy, so 22 keeps a seed's worth of headroom over cautious and still catches a regression to the CL3 level (21-22)"
+      "why": "13-16 of 20 died across three runs; a run is meant to cost some officers, not most. (Re-set to 22 on 2026-11-05 and restored the same day: the owner chose body armour by calibre instead of accepting the death rate.)"
     },
     {
       "id": "lethality",
       "metric": "officers_killed_per_op",
       "agg": "max",
       "test": "<=",
-      "value": 0.45,
+      "value": 0.15,
       "policies": [
         "all"
       ],
-      "why": "re-set 2026-11-05 (owner: accept roughly the current lethality). Was <= 0.15; the crew-house matrix's worst run per policy is 0.23-0.40, and 0.45 still fails a return to six officers lost on a 13-op run"
+      "why": "0.21-0.25 per operation on 28 Oct; a fifth of a squad per call is what broke the roster. (Re-set to 0.45 on 2026-11-05 and restored the same day, as for deaths.)"
     },
     {
       "id": "civilians",

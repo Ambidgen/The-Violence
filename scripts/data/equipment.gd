@@ -19,57 +19,60 @@ const WHO_NAMES := {"any": "anyone", "tactical": "tactical training", "sof": "sp
 ## scale the Fitts time on target, s_w is the weapon's own dispersion (mrad), kappa its
 ## recoil per shot, cadence and snap the fastest and the usual split, switch the time to
 ## swing onto a target already acquired. pen is the round's class against walls and
-## armour (see World.PEN); lethal scales the chance that a hit no armour stopped kills or
+## armour (see World.PEN); cal is the calibre class against body armour (World._hit):
+## "low" (handgun rounds) never gets through a soft vest to the torso, it staggers;
+## "medium" (buckshot, 5.56, 7.62 short) does reduced harm through a vest; "high" (7.62
+## full power) kills outright through the torso unless two plates take it. lethal scales the chance that a hit no armour stopped kills or
 ## downs; sound is the loudness class (Habits.SOUND). draw scales the holster draw.
 const WEAPONS := {
 	"service_pistol": {"name": "Service pistol (9 mm)", "short": "Pistol", "slot": "secondary", "cls": "pistol",
 		"a_w": 0.00, "b_w": 1.00, "s_w": 2.5, "kappa": 9.0, "mag": 15, "spare": 2, "reload": 2.0, "stop": 0.003,
-		"cadence": 0.15, "snap": 0.22, "switch": 0.06, "sound": "pistol", "pen": "pistol", "lethal": 1.0,
+		"cadence": 0.15, "snap": 0.22, "switch": 0.06, "sound": "pistol", "cal": "low", "pen": "pistol", "lethal": 1.0,
 		"draw": 1.0, "kg": 0.9, "cost": 500, "who": "any",
 		"desc": "The standard sidearm. Fifteen rounds."},
 	"compact_pistol": {"name": "Compact pistol (9 mm)", "short": "Compact", "slot": "secondary", "cls": "pistol",
 		"a_w": 0.00, "b_w": 1.00, "s_w": 3.2, "kappa": 10.0, "mag": 10, "spare": 2, "reload": 1.9, "stop": 0.003,
-		"cadence": 0.16, "snap": 0.24, "switch": 0.06, "sound": "pistol", "pen": "pistol", "lethal": 0.95,
+		"cadence": 0.16, "snap": 0.24, "switch": 0.06, "sound": "pistol", "cal": "low", "pen": "pistol", "lethal": 0.95,
 		"draw": 0.8, "kg": 0.6, "cost": 450, "who": "any",
 		"desc": "Quicker out of the holster, ten rounds, less precise."},
 	"heavy_pistol": {"name": "Heavy pistol (.45)", "short": ".45", "slot": "secondary", "cls": "pistol",
 		"a_w": 0.01, "b_w": 1.02, "s_w": 2.6, "kappa": 13.0, "mag": 8, "spare": 3, "reload": 2.1, "stop": 0.003,
-		"cadence": 0.20, "snap": 0.28, "switch": 0.07, "sound": "pistol_heavy", "pen": "pistol_heavy",
+		"cadence": 0.20, "snap": 0.28, "switch": 0.07, "sound": "pistol_heavy", "cal": "low", "pen": "pistol_heavy",
 		"lethal": 1.2, "draw": 1.05, "kg": 1.1, "cost": 700, "who": "any",
 		"desc": "Eight heavy rounds: more of them put a man down, slower to fire well."},
 	"smg": {"name": "Submachine gun (9 mm)", "short": "SMG", "slot": "primary", "cls": "smg",
 		"a_w": 0.03, "b_w": 0.85, "s_w": 1.6, "kappa": 3.0, "mag": 30, "spare": 3, "reload": 2.3, "stop": 0.004,
-		"cadence": 0.08, "snap": 0.14, "switch": 0.07, "sound": "smg", "pen": "pistol", "lethal": 1.0,
+		"cadence": 0.08, "snap": 0.14, "switch": 0.07, "sound": "smg", "cal": "low", "pen": "pistol", "lethal": 1.0,
 		"draw": 0.85, "kg": 2.8, "cost": 1500, "who": "any",
 		"desc": "Fast handling and fast follow-ups with pistol rounds: fewer go through walls."},
 	"carbine": {"name": "Patrol carbine (5.56)", "short": "Carbine", "slot": "primary", "cls": "rifle",
 		"a_w": 0.06, "b_w": 0.80, "s_w": 1.0, "kappa": 4.0, "mag": 30, "spare": 3, "reload": 2.6, "stop": 0.004,
-		"cadence": 0.10, "snap": 0.18, "switch": 0.08, "sound": "rifle", "pen": "rifle", "lethal": 1.0,
+		"cadence": 0.10, "snap": 0.18, "switch": 0.08, "sound": "rifle", "cal": "medium", "pen": "rifle", "lethal": 1.0,
 		"draw": 1.0, "kg": 3.2, "cost": 1200, "who": "any",
 		"desc": "The standard long gun (the v0.7 rifle). Thirty rounds."},
 	"sbr": {"name": "Short-barrel rifle (5.56)", "short": "SBR", "slot": "primary", "cls": "rifle",
 		"a_w": 0.045, "b_w": 0.78, "s_w": 1.15, "kappa": 4.6, "mag": 30, "spare": 3, "reload": 2.6, "stop": 0.004,
-		"cadence": 0.10, "snap": 0.17, "switch": 0.075, "sound": "rifle_loud", "pen": "rifle", "lethal": 0.95,
+		"cadence": 0.10, "snap": 0.17, "switch": 0.075, "sound": "rifle_loud", "cal": "medium", "pen": "rifle", "lethal": 0.95,
 		"draw": 0.9, "kg": 2.9, "cost": 1800, "who": "tactical",
 		"desc": "Handier than the carbine in a hallway; louder, a little less precise."},
 	"assault_rifle": {"name": "Assault rifle (7.62 short)", "short": "Rifle", "slot": "primary", "cls": "rifle",
 		"a_w": 0.07, "b_w": 0.83, "s_w": 1.5, "kappa": 6.0, "mag": 30, "spare": 3, "reload": 2.8, "stop": 0.005,
-		"cadence": 0.11, "snap": 0.20, "switch": 0.09, "sound": "rifle_loud", "pen": "rifle", "lethal": 1.15,
+		"cadence": 0.11, "snap": 0.20, "switch": 0.09, "sound": "rifle_loud", "cal": "medium", "pen": "rifle", "lethal": 1.15,
 		"draw": 1.0, "kg": 3.6, "cost": 900, "who": "any",
 		"desc": "The street's rifle: heavier rounds that put a man down more often, heavier recoil, slower on target."},
 	"battle_rifle": {"name": "Battle rifle (7.62)", "short": "7.62", "slot": "primary", "cls": "rifle",
 		"a_w": 0.10, "b_w": 0.86, "s_w": 0.9, "kappa": 7.5, "mag": 20, "spare": 3, "reload": 2.9, "stop": 0.004,
-		"cadence": 0.14, "snap": 0.25, "switch": 0.10, "sound": "rifle_heavy", "pen": "heavy", "lethal": 1.3,
+		"cadence": 0.14, "snap": 0.25, "switch": 0.10, "sound": "rifle_heavy", "cal": "high", "pen": "heavy", "lethal": 1.3,
 		"draw": 1.15, "kg": 4.6, "cost": 2600, "who": "tactical",
 		"desc": "Goes through walls, cars and people. Slow to swing, twenty rounds."},
 	"shotgun": {"name": "Pump shotgun (12 ga)", "short": "Shotgun", "slot": "primary", "cls": "shotgun",
 		"a_w": 0.07, "b_w": 0.84, "s_w": 2.0, "kappa": 14.0, "mag": 6, "spare": 4, "reload": 3.6, "stop": 0.002,
-		"cadence": 0.65, "snap": 0.70, "switch": 0.09, "sound": "shotgun", "pen": "buck", "lethal": 1.4,
+		"cadence": 0.65, "snap": 0.70, "switch": 0.09, "sound": "shotgun", "cal": "medium", "pen": "buck", "lethal": 1.4,
 		"spread": 0.03, "lethal_far": 0.7, "draw": 1.0, "kg": 3.6, "cost": 600, "who": "any",
 		"desc": "Buckshot: the pattern spreads 3 cm a metre and hits hard up close, poorly past 20 m. Six shells. Takes breaching rounds."},
 	"marksman": {"name": "Marksman rifle (7.62, magnified)", "short": "DMR", "slot": "primary", "cls": "rifle",
 		"a_w": 0.12, "b_w": 0.90, "s_w": 0.45, "kappa": 7.0, "mag": 10, "spare": 3, "reload": 2.8, "stop": 0.003,
-		"cadence": 0.45, "snap": 0.50, "switch": 0.11, "sound": "rifle_heavy", "pen": "heavy", "lethal": 1.3,
+		"cadence": 0.45, "snap": 0.50, "switch": 0.11, "sound": "rifle_heavy", "cal": "high", "pen": "heavy", "lethal": 1.3,
 		"optic_fixed": "magnified", "draw": 1.2, "kg": 5.0, "cost": 3200, "who": "tactical",
 		"desc": "Precise far out, slow up close. Ten rounds."},
 }
@@ -88,9 +91,9 @@ const OPTICS := {
 const ARMOUR := {
 	"none": {"name": "No armour", "kg": 0.0, "cost": 0},
 	"vest": {"name": "Soft vest", "kg": 2.5, "cost": 700,
-		"desc": "Stops pistol rounds and buckshot to the chest, from any side; not rifle rounds."},
+		"desc": "Every officer wears one under whatever else. Handgun rounds to the torso only stagger; buckshot and most rifle rounds do reduced harm; full-power rifle rounds go through."},
 	"plates": {"name": "Plate carrier", "kg": 3.0, "kg_plate": 2.5, "cost": 900, "cost_plate": 350,
-		"desc": "Plates stop any round to the front of the chest, one plate segment a hit."},
+		"desc": "Worn over the soft vest. Plates stop a round to the front of the chest, one plate a hit; a full-power rifle round takes two plates, and kills a wearer with fewer than two left."},
 }
 
 const HEAD := {
