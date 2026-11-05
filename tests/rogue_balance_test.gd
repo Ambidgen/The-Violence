@@ -106,6 +106,7 @@ func play_run(seed_v: int, policy: String, weeks_wanted: int) -> Dictionary:
 	while not c.over() and c.dept.week <= weeks_wanted:
 		var op_lines: Array = []   # ally lines from this week's operations (before end_week)
 		var wk: int = int(c.dept.week)
+		var ledger_mark = c.dept.ledger.back() if not c.dept.ledger.is_empty() else null
 		# 1. the desk, before the first operation (P1.A1: the interface's order)
 		desk_lines.append_array(Policies.settle_desk(c, policy))
 		# 2. the department's standing orders: findings, courses, hiring
@@ -184,6 +185,8 @@ func play_run(seed_v: int, policy: String, weeks_wanted: int) -> Dictionary:
 				"okonjo": snappedf(float(c.politics.share("okonjo")), 0.1),
 				"pell": snappedf(float(c.politics.share("pell")), 0.1)},
 			"lines": wk_lines,
+			"allocation": int(c.dept.allocation),
+			"money": _money_since(c.dept.ledger, ledger_mark),
 		})
 	var out := {
 		"version": 1, "seed": seed_v, "policy": policy, "policy_label": Policies.label(policy),
@@ -224,6 +227,51 @@ func _ops_csv(runs: Array) -> String:
 				kb["suspect"], kb["friendly"], kb["bled_out"], o["suspects"], o["suspects_killed"], o["civ_killed"],
 				o["kind"], o["score"], o["sim_s"], 1 if o["ended"] else 0]
 			out.append(",".join(row.map(func(x): return str(int(x)) if (x is float and x == floorf(x)) else str(x))))
+	return "\n".join(out) + "\n"
+
+
+## EA_TASKS P1.D (2026-11-04): the week's ledger summed by kind of item, so a deficit
+## can be traced to payroll, settlements, courses, kit or interest. `mark` is the last
+## entry before the week began (the ledger is capped at 400, so it is found from the end).
+static func _money_since(ledger: Array, mark) -> Dictionary:
+	var start := 0
+	if mark != null:
+		start = ledger.rfind(mark) + 1
+	var out := {}
+	for i in range(start, ledger.size()):
+		var e: Dictionary = ledger[i]
+		var k := money_kind(String(e["item"]))
+		out[k] = int(out.get(k, 0)) + int(e["amount"])
+	return out
+
+
+## A ledger item's kind: the text before the first ':', ',' or ' (' ("Payroll, week 3" ->
+## "Payroll", "Kit: plates" -> "Kit", "Settlement of $4,000 (instalment 1 of 4 ..." ->
+## "Settlement").
+static func money_kind(item: String) -> String:
+	var cut := item.length()
+	for sep in [":", ",", " (", " of $"]:
+		var i := item.find(sep)
+		if i >= 0 and i < cut:
+			cut = i
+	return item.substr(0, cut).strip_edges()
+
+
+const MONEY_COLS := ["seed", "policy", "week", "kind", "amount"]
+
+
+func _money_csv(runs: Array) -> String:
+	var out: PackedStringArray = [",".join(MONEY_COLS)]
+	var sorted_runs := runs.duplicate()
+	sorted_runs.sort_custom(func(a, b): return [int(a["seed"]), String(a["policy"])] < [int(b["seed"]), String(b["policy"])])
+	for r in sorted_runs:
+		for wk in r.get("weeks", []):
+			var m: Dictionary = wk.get("money", {})
+			var ks := m.keys()
+			ks.sort()
+			for k in ks:
+				out.append(",".join([str(int(r["seed"])), String(r["policy"]), str(int(wk["week"])),
+					"\"%s\"" % String(k).replace("\"", "'"), str(int(m[k]))]))
 	return "\n".join(out) + "\n"
 
 
@@ -456,6 +504,7 @@ func _finish(runs: Array, broken: Array, policy_list: Array, weeks: int, n_seeds
 	_write_text("%s/ops.csv" % out_dir, _ops_csv(runs))
 	_write_text("%s/weeks.csv" % out_dir, _weeks_csv(runs))
 	_write_text("%s/allies.csv" % out_dir, _allies_csv(runs))
+	_write_text("%s/money.csv" % out_dir, _money_csv(runs))
 	print(report)
 	print("rogue_balance: %d run(s) in %d s, %d broken, %d band miss(es) -> %s" % [
 		runs.size(), int(wall / 1000), broken.size(), misses, out_dir])
