@@ -1,0 +1,33 @@
+import=0
+the violence: tier 'quick', 25 suites, engine: 4.4.1.stable.official.49a5bc7b6
+logs: /home/claude/t441/build/test-logs
+
+  PASS    _check                          6s
+  PASS    godot472_test                   1s
+  PASS    crayon_shorts_test              2s
+  PASS    week_recap_test                 1s
+  PASS    city_integration_test           2s
+  PASS    character_assets_test           2s
+  PASS    group_movement_test             6s
+  PASS    clearance_model_test            2s
+  PASS    test_range_mechanics_test       2s
+  PASS    test_range_regression_test      3s
+  PASS    test_range_replays_test         7s
+  PASS    test_range_determinism_test    17s
+  PASS    improvements_test               1s
+  PASS    ops_ui_test                     3s
+  PASS    dept_test                      12s
+  PASS    orders_test                   593s
+  PASS    save_test                       2s
+  PASS    story_test                      4s
+  PASS    politics_test                   3s
+  PASS    rogue_test                      3s
+  PASS    pacing_test                     2s
+  PASS    policies_test                   2s
+  PASS    kit_proposal_test               2s
+  PASS    rogue_balance_test            571s
+  PASS    ui_walk                        34s
+
+----------------------------------------------------------------
+suites: 25   pass: 25   fail: 0   timeout: 0   known failures: 0
+all selected suites passed
