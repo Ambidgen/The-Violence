@@ -652,6 +652,62 @@ weeks 1–12 alone cautious loses 13 officers and spends $103K on it. Money (1.D
 The economy itself needs only small changes once deaths are settled: minimal still banks
 over $200K after the quarterly sweeps (the 1.D exit wants ≤ $100K).
 
+### Stage 1, option 1 applied: crew houses less deadly (2026-11-05)
+
+**Owner decision 2026-11-04: option 1.** Changed in `situations.gd` (crew-house generation)
+and `world.gd` (surrender):
+- **Crews**: 2–6 members instead of 3–8, at most one more than the rooms (two
+  more before). The rifle chance is 0.3
+  instead of 0.5. The lookout chance stays at 0.4; a lower one (0.25)
+  measured worse in the probe.
+- **New: members give up when outnumbered.** Each crew member has `yield_out` = 1.0. In
+  `_surrender_roll`, every armed officer within 20 m beyond the member's own side (the
+  member plus nearby mates) adds 0.3 × `yield_out` to the surrender chance, counting at
+  most 4 extra officers. Other situation types have `yield_out` 0 and are unchanged.
+- **Raid probe** (40 gang raids, 6 officers, own kit): officers killed per raid fell from
+  0.42 to 0.23, armed members from 5.1 to 3.5, and suspects killed from 0.90 to 0.45.
+  1.2 members per raid now surrender. Successes rose from 7 to 16 of 40.
+
+**Measured on the campaign matrix.** CI run 41964333236 ran 8 seeds × 4 policies, the same
+seeds as CL3, on branch `arena/m8-crew-2026-11-05`. Results are in
+`tests/results/arena/m8-crew-2026-11-05/balance/`.
+
+| situation | CL3 killed per op | crew change |
+|---|---|---|
+| crew house (`gang`) | 0.81 | **0.49** |
+| hostage | 0.24 | 0.27 |
+| barricade | 0.15 | 0.15 |
+| warrant | 0.07 | 0.10 |
+
+| exit | CL3 | crew change |
+|---|---|---|
+| 1.C cautious ≥ 12 fit, share of week-ends | 49% | 76% (needs 90%) |
+| 1.D cautious weeks below $0: weeks 1–12 / all (means) | 6 / 33 | 4.5 / 26 (needs 0 / ≤ 4) |
+| 1.D minimal week-40 balance | $215K | $182K (needs ≤ $100K) |
+| 1.F run score: cautious / minimal / military | −795 / −404 / −575 | −410 / −285 / −408 |
+| officers killed per run: cautious / accept-all / military / minimal | 22 / 21 / 17 / 8.3 | 19 / 17 / 14 / 7.4 |
+
+- Band misses: 37 of 52 (36 on CL3). The minimal deaths band now passes. Two bands that
+  were near the edge now miss: accept-all civilians (6.4 against ≤ 6) and accept-all worst
+  debt. No runs broke.
+- Every policy moved the right way on roster, score and officer deaths. The money and
+  deaths misses are smaller but not closed: deaths are still about twice the ≤ 8 band, and
+  lethality is 0.23–0.40 against ≤ 0.15.
+- Crew houses fell from 0.81 to 0.49 per raid, not to the probe's 0.23. In the campaign,
+  the officers sent are hurt, traumatised or short-handed, not a fresh six. Crew houses
+  are still the deadliest type, now with about 45% of officer deaths.
+- 1.E: this run used the old allies counter, so it shows 0 won back. The fixed counter
+  (commit 7631121) is in the next matrix.
+- The determinism cases need rebaselining for this change (P1.I1).
+
+**Next.** Option 1 alone does not close Gate 1. The levers that are left:
+- tune crew houses further (this run tested the probe's middle variant);
+- option 3: the armoured rescue vehicle and the six-officer floor;
+- hostage operations, now 0.27 per op and the second-largest share of deaths;
+- option 4: re-set the deaths and lethality bands.
+
+The roster and money exits follow deaths, so they need no separate work.
+
 ## Order and overlap
 
 ```

@@ -3,6 +3,19 @@
 Newest first. The README covers the game as it stands; this file keeps the history.
 
 
+## Unreleased — Crew houses less deadly (2026-11-05)
+
+- **Crew houses (owner decision)**: crews have 2–6 members instead of 3–8, and fewer carry
+  rifles. Members now give up more often when officers outnumber them nearby.
+- **Measured on 8 seeds × 4 policies**: officers killed per crew-house raid fell from 0.81
+  to 0.49. Every policy loses fewer officers, keeps more of its roster fit and scores
+  better; cautious went from −795 to −410. Gate 1 still misses 37 of 52 bands. Deaths and
+  lethality are still about twice their bands. Details in `docs/EA_TASKS.md`, "option 1
+  applied".
+- **Balance harness**: allies won back are now counted from week-end ally states. Before,
+  allies regained through a desk reconciliation were never counted, so every matrix
+  showed 0.
+
 ## Unreleased — Phase 1 diagnosis: the money miss is a death bill (2026-11-04)
 
 - **The balance harness writes `money.csv`**: each week's ledger summed by kind of item
