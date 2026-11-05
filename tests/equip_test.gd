@@ -72,6 +72,8 @@ const GATES := {
 	# the heavy pistol, 23% for the battle rifle), about 0.02-0.03 across all hits: pooled
 	# over twelve times the seeds, against a margin the design can actually reach
 	"heavy_pistol": {"measure": "targets killed outright per hit, 6 m (more)", "dir": 1, "margin": 0.02, "range": true, "pooled": true, "seeds": 12},
+	# 2026-11-05: the .22, the least lethal handgun
+	"light_pistol": {"measure": "targets killed outright per hit, 6 m (less)", "dir": -1, "margin": 0.02, "range": true, "pooled": true, "seeds": 12},
 	"smg": {"measure": "police rounds that met a wall and went through (less)", "dir": -1, "margin": 0.05, "pooled": true},
 	"sbr": {"measure": "s on target per acquisition, 6 m (less)", "dir": -1, "margin": 0.01, "range": true},
 	"assault_rifle": {"measure": "targets killed outright per hit, 15 m (more)", "dir": 1, "margin": 0.02, "range": true},
@@ -242,6 +244,11 @@ func t_compact_pistol(on: bool, sd: int):
 
 func t_heavy_pistol(on: bool, sd: int):
 	var r := _range(_kit("", "heavy_pistol" if on else "service_pistol"), 6.0, sd)
+	return [r["dead"], r["hits"]]
+
+
+func t_light_pistol(on: bool, sd: int):
+	var r := _range(_kit("", "light_pistol" if on else "service_pistol"), 6.0, sd)
 	return [r["dead"], r["hits"]]
 
 
@@ -583,11 +590,17 @@ func _armour_hit(plates: int, gun: String, zone: String, sd: int) -> Dictionary:
 
 func _armour_unit() -> Array:
 	var breaks := [0, 0, 0]
+	var harmed_45 := 0
 	for sd in 20:
 		for z in ["chest", "abd"]:
-			var r := _armour_hit(0, "service_pistol", z, sd)
-			if not r["vest"] or r["state"] != "ok" or int(r["wounds"]) > 0:
-				breaks[0] += 1
+			for g in ["service_pistol", "light_pistol"]:
+				var r := _armour_hit(0, g, z, sd)
+				if not r["vest"] or r["state"] != "ok" or int(r["wounds"]) > 0:
+					breaks[0] += 1
+			# 2026-11-05: the .45 is medium calibre, so a vest only reduces its harm
+			var r45 := _armour_hit(0, "heavy_pistol", z, sd)
+			if r45["state"] != "ok" or int(r45["wounds"]) > 0:
+				harmed_45 += 1
 		var h := _armour_hit(0, "service_pistol", "head", sd)
 		if h["state"] == "ok":
 			breaks[0] += 1
@@ -600,6 +613,8 @@ func _armour_unit() -> Array:
 		var none := _armour_hit(0, "battle_rifle", "abd", sd)
 		if none["state"] != "dead":
 			breaks[2] += 1
+	if harmed_45 == 0:
+		breaks[0] += 1
 	var ok: bool = breaks[0] == 0 and breaks[1] == 0 and breaks[2] == 0
 	return [ok, "%d/%d" % [breaks[0], breaks[1]], "%d" % breaks[2]]
 

@@ -100,7 +100,7 @@ func start(seed_v: int) -> void:
 	result = {}
 	record = {"civ_hit": 0, "civ_killed": 0, "excessive": 0, "officers_killed": 0, "suspects_killed": 0, "arrests": 0,
 		"successes": 0, "failures": 0, "unattended": 0, "stories": 0, "settled": 0, "leaks": 0, "charged": 0,
-		"dismissed": 0, "cleared": 0, "crowd_killed": 0, "grants": 0}
+		"dismissed": 0, "cleared": 0, "crowd_killed": 0, "grants": 0, "patrols": 0, "patrols_late": 0}
 	_headline(1, "NEW CHIEF INHERITS BRIDGE STREET FILE", "The deputy chief signed the eviction order that cleared Bridge Street. The outgoing chief gave the briefing. The election is forty weeks away.", "city")
 
 
@@ -509,6 +509,38 @@ func on_decision(week: int, c: Dictionary, decision: String, dept) -> Array:
 # ================================================================== the week ends
 ## Unattended situations, the budget, consequences coming due, the polls drifting, the
 ## council's quarterly review, and this week's front page. Returns readable lines.
+## A patrol encounter resolved on the desk (Patrol, 2026-11-05): the ward's trust, and
+## what a killed officer or a civilian hurt while police waited does to the race. An armed
+## one that went to the sim is scored by on_operation instead.
+func on_patrol(week: int, e: Dictionary, res: Dictionary, dept) -> Array:
+	var lines: Array = []
+	cur_week = week
+	var wi: int = int(e.get("ward_i", -1))
+	var where: String = String(e.get("ward", "the city"))
+	record["patrols"] = int(record.get("patrols", 0)) + 1
+	record["arrests"] += int(res.get("arrests", 0))
+	_trust(wi, int(res.get("trust", 0)))
+	if bool(res.get("late", false)):
+		record["patrols_late"] = int(record.get("patrols_late", 0)) + 1
+	var off_killed: int = int(res.get("officers_killed", 0))
+	if off_killed > 0:
+		record["officers_killed"] += off_killed
+		_ally("union", -4 * off_killed, dept, lines, "an officer killed on patrol in %s" % where)
+		_ally("council", -2 * off_killed, dept, lines, "an officer killed on patrol in %s" % where)
+		_poll("kettering", 2.0 * off_killed, "an officer killed on patrol in %s" % where)
+		_headline(week, "OFFICER KILLED ON PATROL IN %s" % where.to_upper(),
+			"A routine call, the radio says. Rourke (union): 'There is no such thing.'", "op")
+	var hurt_c: int = int(res.get("civ_hurt", 0)) + int(res.get("civ_killed", 0))
+	if hurt_c > 0 and bool(res.get("late", false)):
+		var why := "police waited at a %s in %s" % [String(e.get("kind", "call")).replace("_", " "), where]
+		_ally("coalition", -1, dept, lines, why)
+		_poll("kettering", 0.4, why)
+		if int(res.get("civ_killed", 0)) > 0:
+			_headline(week, "POLICE WAITED; A RESIDENT OF %s DIED" % where.to_upper(),
+				"The car was on the corner, the family says. The department says it was waiting for backup.", "op")
+	return lines
+
+
 func week_end(week: int, board: Array, dept) -> Array:
 	var lines: Array = []
 	cur_week = week

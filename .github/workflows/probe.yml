@@ -37,7 +37,7 @@ jobs:
           mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot || true
           chmod +x ~/godot/godot
       - name: import the project
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
       - name: bisect
         # The log of a job is not reachable from the sandbox this was written in, so the
         # answer is committed like the balance results are: one file the branch can read.

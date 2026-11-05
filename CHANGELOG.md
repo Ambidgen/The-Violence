@@ -3,6 +3,33 @@
 Newest first. The README covers the game as it stands; this file keeps the history.
 
 
+## Unreleased — Patrol encounters, the .22 and warrant helmets (2026-11-05)
+
+- **Patrol encounters (owner request)**: one a day, seven a week, on a new Patrol radio card
+  on the board. A pair of officers radios in what they are responding to, and the chief
+  picks one of three: **Proceed** (no backup), **Proceed, backup en route** ($150 overtime) or
+  **Wait for backup** ($200, safest for officers, but slow on urgent calls). Sixteen kinds:
+  ten routine ones (traffic stops, noise, welfare checks, lost children...), three quarters
+  of the draw, where proceeding alone is the right call; and six dangerous ones (bar fights,
+  domestics, robberies, shots fired, a man in crisis with a knife, a man seen with a gun),
+  where backup is. Officers can be hurt or killed, civilians hurt while police waited, a
+  complaint can open an internal-affairs case, and the ward's trust moves. Unanswered calls
+  are handled by the pair alone at the week's end. Patrols take nobody off the week's
+  operations.
+- **Armed encounters play out in the sim**: about 0.6 a week the suspect has a gun, and the
+  encounter becomes a small hands-off operation: the pair; the backup arriving 75 s later on
+  a phase line (en route) or alongside them (waited).
+- **The .45 is medium calibre**: a soft vest reduces its harm instead of stopping it.
+- **New: the .22 light pistol**, the least lethal handgun, low calibre, $300. Street
+  suspects now carry it (two in ten), and it is in the pistols contract.
+- **Helmets on every warrant**: officers serving a warrant wear a ballistic helmet,
+  issued from the station whatever the armoury stocks.
+- **Tests**: `patrol_test` (quick tier); `equip_test` gains the .22 gate and the .45 vest
+  rule.
+- **CI**: the Godot import step runs a second time if the importer crashes (it did on 4.7.2,
+  failing a docs-only run).
+
+
 ## Unreleased — Crew houses less deadly (2026-11-05)
 
 - **Crew houses (owner decision)**: crews have 2–6 members instead of 3–8, and fewer carry

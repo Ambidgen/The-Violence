@@ -17,6 +17,7 @@ extends RefCounted
 
 const Rogue = preload("res://scripts/campaign/rogue.gd")
 const Department = preload("res://scripts/campaign/department.gd")
+const Patrol = preload("res://scripts/campaign/patrol.gd")
 
 ## The order the plan and the playtest report use.
 const ORDER := ["cautious", "minimal", "military", "accept_all"]
@@ -468,6 +469,32 @@ static func call_plan(c, policy: String) -> Array:
 		return int(a["visibility"]) > int(b["visibility"]))
 	var max_calls: int = int(rule["max"])
 	return out.slice(0, max_calls)
+
+
+# ================================================================== patrol encounters (2026-11-05)
+## How a policy answers the radio: 0 proceed, 1 proceed with backup en route, 2 wait for
+## backup. Read from the dispatch only (Patrol.read: urgency and danger as the chief sees
+## them), never from the encounter's hidden dice.
+##   cautious     backup for anything that could turn; waits unless it is urgent
+##   military     backup en route for anything that could turn
+##   accept_all   backup en route only when it reads dangerous
+##   minimal      never answers: the pair goes in alone (the default at the week's end)
+static func patrol_choice(e: Dictionary, policy: String) -> int:
+	var rd: Dictionary = Patrol.read(e)
+	var danger: String = String(rd["danger"])
+	var urgent: bool = String(rd["urgency"]) == "urgent"
+	match policy:
+		"cautious":
+			if danger == "dangerous":
+				return 1 if urgent else 2
+			if danger == "could turn":
+				return 1
+			return 0
+		"military":
+			return 1 if danger != "routine" else 0
+		"accept_all":
+			return 1 if danger == "dangerous" else 0
+	return 0
 
 
 ## True when at least one officer free for this situation is under the trauma floor.

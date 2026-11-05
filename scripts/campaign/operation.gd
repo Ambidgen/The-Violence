@@ -73,7 +73,7 @@ static func build(base_cfgs: Array, level, nav, spec: Dictionary, dept = null) -
 const Habits = preload("res://scripts/data/habits.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const Geom = preload("res://scripts/sim/geom.gd")
-const TIME_LIMIT := {"warrant": 600.0, "gang": 720.0, "barricade": 900.0, "hostage": 900.0, "event": 900.0}
+const TIME_LIMIT := {"warrant": 600.0, "gang": 720.0, "barricade": 900.0, "hostage": 900.0, "event": 900.0, "patrol": 420.0}
 
 
 ## The stage areas of a map, named by the side they face from: where squads form up and
@@ -340,6 +340,11 @@ static func build_planned(sit: Dictionary, plan: Dictionary, dept, level, nav) -
 			c["pistols"] = od.get("pistols", false)
 			c["avoid_key"] = ak
 			c["bodycam"] = bool(plan.get("bodycams", dept.bodycams))
+			# 2026-11-05 (owner): every officer serving a warrant wears a helmet. Department
+			# policy: issued from the station for the call, whatever the armoury stocks.
+			if sit["type"] == "warrant" and String(c["kit"].get("head", "none")) == "none":
+				c["kit"] = (c["kit"] as Dictionary).duplicate(true)
+				c["kit"]["head"] = "ballistic_helmet"
 			cfgs.append(c)
 			slot += 1
 	var casualty: Vector2 = vehicles[0] + Vector2(1.5, 0) if not vehicles.is_empty() else nav.snap(Vector2(2, 2))

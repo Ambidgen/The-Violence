@@ -20,8 +20,8 @@ const WHO_NAMES := {"any": "anyone", "tactical": "tactical training", "sof": "sp
 ## recoil per shot, cadence and snap the fastest and the usual split, switch the time to
 ## swing onto a target already acquired. pen is the round's class against walls and
 ## armour (see World.PEN); cal is the calibre class against body armour (World._hit):
-## "low" (handgun rounds) never gets through a soft vest to the torso, it staggers;
-## "medium" (buckshot, 5.56, 7.62 short) does reduced harm through a vest; "high" (7.62
+## "low" (9 mm and .22 handgun rounds) never gets through a soft vest to the torso, it
+## staggers; "medium" (.45, buckshot, 5.56, 7.62 short) does reduced harm through a vest; "high" (7.62
 ## full power) kills outright through the torso unless two plates take it. lethal scales the chance that a hit no armour stopped kills or
 ## downs; sound is the loudness class (Habits.SOUND). draw scales the holster draw.
 const WEAPONS := {
@@ -37,9 +37,15 @@ const WEAPONS := {
 		"desc": "Quicker out of the holster, ten rounds, less precise."},
 	"heavy_pistol": {"name": "Heavy pistol (.45)", "short": ".45", "slot": "secondary", "cls": "pistol",
 		"a_w": 0.01, "b_w": 1.02, "s_w": 2.6, "kappa": 13.0, "mag": 8, "spare": 3, "reload": 2.1, "stop": 0.003,
-		"cadence": 0.20, "snap": 0.28, "switch": 0.07, "sound": "pistol_heavy", "cal": "low", "pen": "pistol_heavy",
+		"cadence": 0.20, "snap": 0.28, "switch": 0.07, "sound": "pistol_heavy", "cal": "medium", "pen": "pistol_heavy",
 		"lethal": 1.2, "draw": 1.05, "kg": 1.1, "cost": 700, "who": "any",
-		"desc": "Eight heavy rounds: more of them put a man down, slower to fire well."},
+		"desc": "Eight heavy rounds: more of them put a man down, slower to fire well. The .45 does reduced harm through a soft vest instead of only staggering."},
+	# 2026-11-05 (owner): the light pistol. Cheap and common on the street; low calibre.
+	"light_pistol": {"name": "Light pistol (.22)", "short": ".22", "slot": "secondary", "cls": "pistol",
+		"a_w": 0.00, "b_w": 0.98, "s_w": 2.8, "kappa": 7.0, "mag": 10, "spare": 2, "reload": 1.8, "stop": 0.003,
+		"cadence": 0.13, "snap": 0.21, "switch": 0.06, "sound": "pistol", "cal": "low", "pen": "pistol", "lethal": 0.7,
+		"draw": 0.8, "kg": 0.5, "cost": 300, "who": "any",
+		"desc": "A small .22: light recoil, ten rounds, the least likely of any gun to put someone down. Cheap, and common on the street."},
 	"smg": {"name": "Submachine gun (9 mm)", "short": "SMG", "slot": "primary", "cls": "smg",
 		"a_w": 0.03, "b_w": 0.85, "s_w": 1.6, "kappa": 3.0, "mag": 30, "spare": 3, "reload": 2.3, "stop": 0.004,
 		"cadence": 0.08, "snap": 0.14, "switch": 0.07, "sound": "smg", "cal": "low", "pen": "pistol", "lethal": 1.0,
@@ -168,7 +174,7 @@ const CAPITAL := {
 const GEAR_ORDER := ["flashbang", "stingball", "gas", "ram", "breach", "shield", "light", "medkit", "gas_mask",
 	"oc_spray", "baton", "taser", "pepperball", "launcher", "beanbag"]
 const PRIMARY_ORDER := ["carbine", "sbr", "smg", "shotgun", "battle_rifle", "marksman", "assault_rifle"]
-const SECONDARY_ORDER := ["service_pistol", "compact_pistol", "heavy_pistol"]
+const SECONDARY_ORDER := ["service_pistol", "compact_pistol", "light_pistol", "heavy_pistol"]
 
 ## Kits by echelon for the test range. Every echelon but the untrained keeps the v0.7
 ## carbine and service pistol, so the matchups of earlier versions still stand.

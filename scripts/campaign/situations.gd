@@ -47,7 +47,10 @@ const TYPES := {
 	"hostage": {"name": "Hostage", "maps": [0, 3, 4, 5, 6], "vis": [3, 4], "pressure": "high",
 		"blurb": "The caller reports captors and a deadline. The count, location and number of hostages remain uncertain."},
 	"event": {"name": "Public event", "maps": [11], "vis": [5, 5], "pressure": "set by the event",
-		"blurb": "A candidate's rally. Assign officers to posts and patrol routes. Most pass without incident; the threat estimate is not a promise."}
+		"blurb": "A candidate's rally. Assign officers to posts and patrol routes. Most pass without incident; the threat estimate is not a promise."},
+	# 2026-11-05: an armed patrol encounter, played out (Patrol). Never on the weekly board draw.
+	"patrol": {"name": "Patrol encounter", "maps": [0, 1, 2, 4, 5, 6], "vis": [2, 3], "pressure": "set by the call",
+		"blurb": "A patrol pair answered a call and found an armed suspect. The plan is the radio's: the pair, and the backup if you sent it."}
 }
 const PRESSURE_NAMES := {"none": "None: you pick the hour", "low": "Low", "high": "High: a deadline", "extreme": "Extreme",
 	"set by the event": "Set by the event"}
@@ -249,7 +252,8 @@ static func _kit_occupants(s: Dictionary, rng: RandomNumberGenerator) -> void:
 		if oc.get("arms", "pistol") == "rifle":
 			oc["long_gun"] = "assault_rifle" if rng.randf() < 0.65 else "carbine"
 		var r := rng.randf()
-		oc["handgun"] = "service_pistol" if r < 0.6 else ("compact_pistol" if r < 0.85 else "heavy_pistol")
+		# 2026-11-05: the .22 light pistol takes a share of what was the 9 mm
+		oc["handgun"] = "service_pistol" if r < 0.4 else ("light_pistol" if r < 0.6 else ("compact_pistol" if r < 0.85 else "heavy_pistol"))
 		if oc.get("ech", "untrained") != "untrained" and rng.randf() < 0.25:
 			oc["vest"] = true
 

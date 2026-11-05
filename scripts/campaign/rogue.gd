@@ -51,7 +51,7 @@ const CONTRACTS := {
 		"desc": "Two seconds of nobody thinking clearly in the room. Tactically trained officers only."},
 	"smg": {"name": "Submachine guns", "items": ["smg"], "cost": 5000, "tier": 1, "tag": "neutral",
 		"desc": "Fast handling indoors with pistol rounds: fewer of them go through the wall into the flat next door."},
-	"pistols": {"name": "Compact and heavy pistols", "items": ["compact_pistol", "heavy_pistol"], "cost": 2500, "tier": 1, "tag": "neutral",
+	"pistols": {"name": "Compact, light and heavy pistols", "items": ["compact_pistol", "light_pistol", "heavy_pistol"], "cost": 2500, "tier": 1, "tag": "neutral",
 		"desc": "A quicker draw, or a heavier round. Choice for the sidearm."},
 	"pepper": {"name": "Pepperball launchers", "items": ["pepperball"], "cost": 4500, "tier": 2, "tag": "restraint",
 		"desc": "Irritant rounds at a distance. Tactically trained officers only."},

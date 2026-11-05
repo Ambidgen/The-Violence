@@ -119,6 +119,7 @@ rogue_test.gd|quick|600|exit|
 pacing_test.gd|quick|120|exit|
 policies_test.gd|quick|300|exit|
 kit_proposal_test.gd|quick|300|exit|
+patrol_test.gd|quick|900|exit|
 rogue_balance_test.gd|quick|1200|exit|-- --smoke
 ui_walk.gd|quick|900|exit|--verbose
 determinism_test.gd|full|1800|xfail|-- --verbose

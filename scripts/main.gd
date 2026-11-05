@@ -790,6 +790,19 @@ func ops_end_week() -> Array:
 	return lines
 
 
+## The chief answers the patrol radio (2026-11-05). An armed encounter becomes a small
+## operation with its plan already made by the choice, and plays out at once, hands-off.
+func ops_patrol(pid: String, choice: int) -> void:
+	var out: Dictionary = campaign.decide_patrol(pid, choice)
+	_save()
+	if String(out["run"]) != "":
+		ops_ui.flash = "\n".join(out["lines"])
+		ops_select(String(out["run"]))
+		ops_run()
+		return
+	ops_ui.show_board(out["lines"])
+
+
 func ops_new_campaign() -> void:
 	campaign = Campaign.new()
 	campaign.start(randi_range(1, 999999), true)

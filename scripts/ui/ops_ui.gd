@@ -20,6 +20,7 @@ const StoryArchive = preload("res://scripts/campaign/story_archive.gd")
 const Settings = preload("res://scripts/ui/settings.gd")
 const Risk = preload("res://scripts/campaign/risk.gd")
 const Rogue = preload("res://scripts/campaign/rogue.gd")
+const Patrol = preload("res://scripts/campaign/patrol.gd")
 const CityMap = preload("res://scripts/ui/city_map.gd")
 const PANEL_W := 460.0
 const INK := Color("#141313")
@@ -220,6 +221,7 @@ func show_board(lines := []) -> void:
 	_dept_strip(box)
 	if c.run != null:
 		_desk_card(box)
+	_patrol_card(box)
 	_story_card(box, Story.current(c))
 	if bool(Settings.get_v("tips")) and c.week() <= 2:
 		_first_weeks(box)
@@ -350,6 +352,42 @@ func _desk_card(parent: Control) -> void:
 		var k3: int = ei
 		_btn(h3, "Open  >", func(): _desk_event(k3))
 	_text(v, _program_line(), GREY, 10)
+
+
+## The patrol radio (2026-11-05): one encounter a day. The next day's call is answered
+## here; the rest of the week waits its turn. Anything left at the end of the week, the
+## pair handles alone.
+func _patrol_card(parent: Control) -> void:
+	var c = main.campaign
+	if c.patrols.is_empty():
+		return
+	var v := _card(parent)
+	var nxt: Dictionary = Patrol.next_pending(c.patrols)
+	_text(v, "PATROL RADIO  ·  one call a day", Ink.accent(1.0) if not nxt.is_empty() else INK, 13)
+	for e in c.patrols:
+		var day: String = Patrol.DAYS[int(e["day"])]
+		var st: String = String(e["status"])
+		if st == "done":
+			_text(v, "%s  ·  %s" % [day, Patrol.summary_line(e)], GREY, 11)
+			continue
+		if st == "running":
+			_text(v, "%s  ·  %s: armed, on the board as an operation." % [day, Patrol.spec(e)["name"]], INK, 11)
+			continue
+		if String(e["id"]) != String(nxt.get("id", "")):
+			_text(v, "%s  ·  —" % day, GREY, 10)
+			continue
+		var rd: Dictionary = Patrol.read(e)
+		_text(v, "%s  ·  %s" % [day.to_upper(), String(Patrol.spec(e)["name"]).to_upper()], INK, 12)
+		_text(v, Patrol.radio_line(e, c.dept), INK, 12)
+		_text(v, "Dispatch reads it as %s; %s." % [rd["danger"], rd["urgency"]], GREY, 10)
+		var h := _h(v)
+		var pid: String = String(e["id"])
+		for k in Patrol.CHOICES.size():
+			var ch: Dictionary = Patrol.CHOICES[k]
+			var kk: int = k
+			var b := _btn(h, String(ch["name"]), func(): main.ops_patrol(pid, kk))
+			b.tooltip_text = String(ch["desc"]) + ((" Overtime $%d." % Patrol.OVERTIME[k]) if Patrol.OVERTIME[k] > 0 else "")
+	_text(v, "Calls you leave unanswered, the pair goes in alone.", GREY, 10)
 
 
 func _program_line() -> String:

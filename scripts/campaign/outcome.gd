@@ -36,7 +36,7 @@ static func evaluate(sit: Dictionary, w) -> Dictionary:
 		elif o3.arrested or not o3.alive():
 			resolved += 1
 	match sit["type"]:
-		"warrant", "barricade":
+		"warrant", "barricade", "patrol":
 			if named == null:
 				goal = "the named suspect was never found"
 			elif named.arrested:

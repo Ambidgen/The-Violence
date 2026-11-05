@@ -95,12 +95,8 @@ func play_run(seed_v: int, policy: String, weeks_wanted: int) -> Dictionary:
 	var c = Campaign.new()
 	c.start(seed_v, true, "user://legacy_balance.json")
 	var weeks: Array = []
-	var hung := 0
-	var ops_ran := 0
-	var tot_killed := 0
-	var tot_down := 0
-	var tot_score := 0
-	var tot_findings := 0
+	# counters the operations add to (_run_op)
+	var acc := {"hung": 0, "ops": 0, "killed": 0, "down": 0, "score": 0, "findings": 0, "patrols": 0, "patrol_sims": 0}
 	var desk_lines: Array = []
 	var op_log: Array = []      # one row per operation (EA_TASKS P1.C1)
 	while not c.over() and c.dept.week <= weeks_wanted:
@@ -113,7 +109,24 @@ func play_run(seed_v: int, policy: String, weeks_wanted: int) -> Dictionary:
 		Policies.ia(c, policy)
 		Policies.training(c, policy)
 		Policies.hiring(c, policy)
-		# 3. the week's calls
+		# 3. the week's patrol encounters, one a day in order (2026-11-05): the policy answers
+		# from the dispatch; an armed one is played out like any operation
+		for e in c.patrols.duplicate():
+			if String(e["status"]) != "pending":
+				continue
+			var out: Dictionary = c.decide_patrol(String(e["id"]), Policies.patrol_choice(e, policy))
+			acc["patrols"] += 1
+			for ln0 in out["lines"]:
+				if _ally_line(ln0):
+					op_lines.append(String(ln0))
+			if String(out["run"]) != "":
+				var ps: Dictionary = c.get_sit(String(out["run"]))
+				var plv = Maps.get_level(int(ps["map"]))
+				var pnav = Nav.new()
+				pnav.build(plv)
+				acc["patrol_sims"] += 1
+				_run_op(c, ps, ps["plan"], plv, pnav, wk, acc, op_lines, op_log)
+		# 4. the week's calls
 		for s in Policies.call_plan(c, policy):
 			if String(s["status"]) != "open":
 				continue
@@ -136,34 +149,8 @@ func play_run(seed_v: int, policy: String, weeks_wanted: int) -> Dictionary:
 			if Campaign.plan_members(s).is_empty():
 				s["plan"] = {}
 				continue
-			var b: Dictionary = Operation.build_planned(s, plan, c.dept, lv, nav)
-			var w = World.new()
-			w.setup(lv, nav, b["cfgs"], b["postures"], b["seed"], b["alerts"], b["opts"])
-			w.recorder = Recorder.new(w)
-			var guard := 0
-			while not w.over and guard < GUARD_STEPS:
-				w.step()
-				w.events.clear()
-				guard += 1
-			if not w.over:
-				hung += 1
-			var res: Dictionary = Outcome.evaluate(s, w)
-			var summary: Dictionary = w.incident.summary()
-			tot_score += int(res.get("score", 0))
-			tot_findings += int(res.get("findings", 0))
-			tot_killed += int(summary["officers_killed"])
-			tot_down += int(summary["officers_down"])
-			ops_ran += 1
-			for ln in c.dept.apply_result(w, lv.map_name):
-				if _ally_line(ln):
-					op_lines.append(String(ln))
-			for ln2 in c.after_operation(s["id"], res, w):
-				if _ally_line(ln2):
-					op_lines.append(String(ln2))
-			c.record(s["id"], res)
-			op_log.append(_op_row(wk, s, lv, w, res, summary))
-			w.dispose()
-		# 4. the week closes: payroll, allocation, consequences, the next board
+			_run_op(c, s, plan, lv, nav, wk, acc, op_lines, op_log)
+		# 5. the week closes: payroll, allocation, consequences, the next board
 		var end_lines: Array = c.end_week()
 		var wk_lines: Array = op_lines.duplicate()
 		for ln in end_lines:
@@ -192,10 +179,11 @@ func play_run(seed_v: int, policy: String, weeks_wanted: int) -> Dictionary:
 		"version": 1, "seed": seed_v, "policy": policy, "policy_label": Policies.label(policy),
 		"engine": Engine.get_version_info()["string"], "weeks_asked": weeks_wanted,
 		"weeks_played": weeks.size(), "wall_ms": Time.get_ticks_msec() - t0,
-		"ops": ops_ran, "hung": hung, "findings": tot_findings,
-		"officers_killed_per_op": snappedf(float(tot_killed) / maxf(1.0, float(ops_ran)), 0.01),
-		"officers_down_per_op": snappedf(float(tot_down) / maxf(1.0, float(ops_ran)), 0.01),
-		"mean_op_score": tot_score / maxi(1, ops_ran),
+		"ops": int(acc["ops"]), "hung": int(acc["hung"]), "findings": int(acc["findings"]),
+		"patrols": int(acc["patrols"]), "patrol_sims": int(acc["patrol_sims"]),
+		"officers_killed_per_op": snappedf(float(acc["killed"]) / maxf(1.0, float(acc["ops"])), 0.01),
+		"officers_down_per_op": snappedf(float(acc["down"]) / maxf(1.0, float(acc["ops"])), 0.01),
+		"mean_op_score": int(acc["score"]) / maxi(1, int(acc["ops"])),
 		"record": c.politics.record.duplicate(), "election": {}, "run_score": {},
 		"desk": desk_lines.size(), "weeks": weeks, "op_log": op_log,
 	}
@@ -205,6 +193,49 @@ func play_run(seed_v: int, policy: String, weeks_wanted: int) -> Dictionary:
 			"votes": c.politics.result["votes"], "head": String(e["head"])}
 		out["run_score"] = Rogue.run_score(c)
 	return out
+
+
+## One operation, played to the end and written into the campaign (a call from the board,
+## or an armed patrol encounter). acc: the run's counters.
+func _run_op(c, s: Dictionary, plan: Dictionary, lv, nav, wk: int, acc: Dictionary, op_lines: Array, op_log: Array) -> void:
+	var b: Dictionary = Operation.build_planned(s, plan, c.dept, lv, nav)
+	var w = World.new()
+	w.setup(lv, nav, b["cfgs"], b["postures"], b["seed"], b["alerts"], b["opts"])
+	w.recorder = Recorder.new(w)
+	var guard := 0
+	while not w.over and guard < GUARD_STEPS:
+		w.step()
+		w.events.clear()
+		guard += 1
+	if not w.over:
+		acc["hung"] += 1
+	var res: Dictionary = Outcome.evaluate(s, w)
+	var summary: Dictionary = w.incident.summary()
+	# what the interface keeps on the record (main._op_finished): arrests, officers hurt
+	var arrests := 0
+	var hurt := 0
+	for o in w.ops:
+		if o.judges and o.officer_id != "" and o.state != "dead" and (o.wounds > 0 or o.arm_hit or o.leg_hit or o.state == "down"):
+			hurt += 1
+		elif not o.judges and not o.civ and o.arrested:
+			arrests += 1
+	res["arrests"] = arrests
+	res["officers_hurt"] = hurt
+	res["officers_killed"] = int(summary["officers_killed"])
+	acc["score"] += int(res.get("score", 0))
+	acc["findings"] += int(res.get("findings", 0))
+	acc["killed"] += int(summary["officers_killed"])
+	acc["down"] += int(summary["officers_down"])
+	acc["ops"] += 1
+	for ln in c.dept.apply_result(w, lv.map_name):
+		if _ally_line(ln):
+			op_lines.append(String(ln))
+	for ln2 in c.after_operation(s["id"], res, w):
+		if _ally_line(ln2):
+			op_lines.append(String(ln2))
+	c.record(s["id"], res)
+	op_log.append(_op_row(wk, s, lv, w, res, summary))
+	w.dispose()
 
 
 ## Every operation of every run, one line each (EA_TASKS P1.C1), small enough to commit

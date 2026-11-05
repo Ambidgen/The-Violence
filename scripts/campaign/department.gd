@@ -1049,6 +1049,42 @@ func to_cfg(r: Dictionary, slot: int, level, alert := 1) -> Dictionary:
 		"integrity": int(r["integrity"])}
 
 
+# ================================================================== hurt on patrol
+## A patrol encounter resolved on the desk (Patrol, 2026-11-05) hurt an officer:
+## "hurt" (one to three weeks), "down" (four to eight) or "dead", by the same rules,
+## costs and morale as an operation. Returns the line for the report.
+func patrol_casualty(r: Dictionary, harm: String, what: String) -> String:
+	if r.is_empty() or r["status"] == "dead" or harm == "":
+		return ""
+	var who := "%s %s" % [r["rank"], r["name"]]
+	match harm:
+		"dead":
+			r["status"] = "dead"
+			r["file"].append({"week": week, "text": "Killed on patrol: %s." % what})
+			note("%s killed on patrol (%s)." % [who, what])
+			spend("Line-of-duty death benefit: %s" % r["name"], Courses.DEATH_BENEFIT)
+			shift_morale(-3)
+			return "%s was killed." % who
+		"down":
+			r["status"] = "injured"
+			r["out_until"] = week + 4 + rng.randi_range(0, 4)
+			r["wounded"] += 1
+			r["trauma"] = float(r["trauma"]) + 2.0
+			r["file"].append({"week": week, "text": "Seriously hurt on patrol (%s); out until week %d." % [what, r["out_until"]]})
+			spend("Medical: %s" % r["name"], Courses.MEDICAL_SERIOUS)
+			shift_morale(-2)
+			return "%s is seriously hurt: out until week %d." % [who, r["out_until"]]
+		_:
+			r["status"] = "injured"
+			r["out_until"] = week + 1 + rng.randi_range(0, 2)
+			r["wounded"] += 1
+			r["trauma"] = float(r["trauma"]) + 0.5
+			r["file"].append({"week": week, "text": "Hurt on patrol (%s); out until week %d." % [what, r["out_until"]]})
+			spend("Medical: %s" % r["name"], Courses.MEDICAL)
+			shift_morale(-1)
+			return "%s is hurt: out until week %d." % [who, r["out_until"]]
+
+
 # ================================================================== back from an operation
 ## Write what happened to each department officer back into their record, file the
 ## incident summary, and save. Returns readable lines for the debrief.

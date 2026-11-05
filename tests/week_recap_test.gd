@@ -33,6 +33,9 @@ func _init() -> void:
 	for s in c.board:
 		if s["status"] == "open":
 			open_n += 1
+	# patrol encounters settle at the week's end and add to the recap (tests/patrol_test.gd);
+	# this test counts the board alone
+	c.patrols = []
 	var bal0: int = c.dept.balance
 	c.end_week()
 	var r: Dictionary = c.last_recap

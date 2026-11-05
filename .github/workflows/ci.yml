@@ -123,7 +123,7 @@ jobs:
       - name: import the project
         # The first headless run builds .godot/ (the import cache); doing it
         # explicitly keeps its output out of the test logs.
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
 
       - name: headless suites
         # $HOME, not ~: a ~ inside an env value is not expanded, and the runner
@@ -219,7 +219,7 @@ jobs:
           mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
           chmod +x ~/godot/godot
       - name: import the project
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
       - name: balance shard
         # One process per seed x policy, each with its own XDG_DATA_HOME (the harness
         # does that itself). Its exit code is only "these runs finished"; the merge
@@ -301,7 +301,7 @@ jobs:
           mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
           chmod +x ~/godot/godot
       - name: import the project
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
       - name: download the shards
         uses: actions/download-artifact@v4
         with:
@@ -402,7 +402,7 @@ jobs:
           mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
           chmod +x ~/godot/godot
       - name: import the project
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
       - name: crowd probe
         run: |
           set -o pipefail
@@ -485,7 +485,7 @@ jobs:
           mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
           chmod +x ~/godot/godot
       - name: import the project
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
       - name: what the briefing is worth
         env:
           DEST: ${{ github.event.inputs.results || 'tests/results/cycle-1H' }}
@@ -548,7 +548,7 @@ jobs:
           mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
           chmod +x ~/godot/godot
       - name: import the project
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
       - name: what changed, before the write
         run: |
           set -o pipefail
@@ -611,7 +611,7 @@ jobs:
           mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
           chmod +x ~/godot/godot
       - name: import the project
-        run: ~/godot/godot --headless --path . --import || true
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
       - name: full suites
         # $HOME, not ~: a ~ inside an env value is not expanded, and the runner
         # used to stop with "no Godot binary" before running anything.

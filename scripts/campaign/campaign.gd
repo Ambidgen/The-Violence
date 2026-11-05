@@ -14,6 +14,7 @@ const Politics = preload("res://scripts/campaign/politics.gd")
 const Rogue = preload("res://scripts/campaign/rogue.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const Autoplan = preload("res://scripts/campaign/autoplan.gd")
+const Patrol = preload("res://scripts/campaign/patrol.gd")
 
 const VERSION := 4        # 2: v0.9, the city's politics; 3: the endless-battle link (removed); 4: the run layer (roguelike)
 const SAVE_PATH := "user://campaign.json"
@@ -24,6 +25,8 @@ var seed_val := 1001
 var dept
 var board: Array = []          # this week's situations
 var past: Array = []           # every situation of earlier weeks, with its outcome
+var patrols: Array = []        # this week's patrol encounters, one a day (Patrol, 2026-11-05)
+var patrol_past: Array = []    # earlier weeks' encounters, briefly
 var rng := RandomNumberGenerator.new()
 var politics                   # v0.9: wards, allies, candidates, the press, the election
 var run                        # 1.3: the run layer (Rogue) for a roguelike story; null for the classic campaign
@@ -51,6 +54,8 @@ func start(seed_v: int, rogue := false, legacy_path_v: String = Rogue.LEGACY_PAT
 	politics = Politics.new()
 	politics.start(seed_v)
 	board = _new_board()
+	patrol_past = []
+	patrols = _new_patrols()
 	run = null
 	opening = []
 	legacy_path = legacy_path_v
@@ -77,6 +82,61 @@ func _new_board() -> Array:
 		return []
 	return Situations.board(seed_val, dept.week, politics.trust if politics != null else [],
 		politics == null or not politics.lost("coalition"))
+
+
+func _new_patrols() -> Array:
+	if politics != null and politics.ended:
+		return []
+	return Patrol.week_encounters(seed_val, dept.week, dept)
+
+
+func get_patrol(pid: String) -> Dictionary:
+	for e in patrols:
+		if String(e["id"]) == pid:
+			return e
+	return {}
+
+
+## The chief answers a patrol encounter (Patrol, 2026-11-05): 0 proceed, 1 proceed with
+## backup en route, 2 wait for backup. Returns {"lines": [...], "run": sid}: "run" names
+## the situation the interface (or the harness) must now play when the encounter turned
+## out to be armed; it is on the board with its plan made.
+func decide_patrol(pid: String, choice: int, allow_sim := true) -> Dictionary:
+	var e := get_patrol(pid)
+	if e.is_empty() or String(e["status"]) != "pending":
+		return {"lines": [], "run": ""}
+	choice = clampi(choice, 0, 2)
+	e["choice"] = choice
+	Patrol.refresh_pair(e, dept)
+	e["backup"] = Patrol.pick_officers(e, dept, 2, e["pair"]) if choice >= 1 else []
+	if e["pair"].is_empty():
+		# nobody fit to send: the call goes unanswered, and the ward notices
+		e["status"] = "done"
+		e["result"] = {"kind": "failure", "late": true, "text": "No car was free.", "trust": -1}
+		politics._trust(int(e["ward_i"]), -1)
+		return {"lines": ["%s: no car was free." % Patrol.spec(e)["name"]], "run": ""}
+	var armed: bool = bool(e.get("armed", false))
+	# the wait itself can cost an armed call too: gone (or worse) before the cars arrive
+	if armed and allow_sim and not Patrol.is_late(e, choice):
+		var used: Array = []
+		for s0 in board:
+			if s0.get("site_id", "") != "":
+				used.append(s0["site_id"])
+		var s: Dictionary = Patrol.to_situation(e, choice, dept, politics.trust, not politics.lost("coalition"), used)
+		if not s.is_empty():
+			e["status"] = "running"
+			e["sim"] = true
+			board.append(s)
+			if Patrol.OVERTIME[choice] > 0:
+				dept.spend("Overtime, patrol backup (%s, %s)" % [String(Patrol.spec(e)["name"]).to_lower(), Patrol.DAYS[int(e["day"])]], Patrol.OVERTIME[choice])
+			return {"lines": ["%s: the suspect is armed. It is now an operation." % Patrol.spec(e)["name"]], "run": String(s["id"])}
+	var res: Dictionary = Patrol.resolve_desk(e, choice, dept)
+	var lines: Array = Patrol.apply(e, choice, res, dept)
+	lines.append_array(politics.on_patrol(dept.week, e, res, dept))
+	e["result"] = res
+	e["status"] = "done"
+	lines.push_front(Patrol.summary_line(e))
+	return {"lines": lines, "run": ""}
 
 
 func over() -> bool:
@@ -202,6 +262,9 @@ func committed(except_sid := "") -> Dictionary:
 		# A plan may be edited without treating its existing members as busy.
 		if s["id"] == except_sid and s["status"] == "open":
 			continue
+		# a patrol encounter takes nobody off the week's operations (owner, 2026-11-05)
+		if String(s.get("patrol_id", "")) != "":
+			continue
 		for oid2 in plan_members(s):
 			out[oid2] = s["id"]
 	return out
@@ -252,6 +315,12 @@ func record(sid: String, result: Dictionary) -> void:
 		return
 	s["status"] = "done"
 	s["result"] = result
+	if String(s.get("patrol_id", "")) != "":
+		var e := get_patrol(String(s["patrol_id"]))
+		if not e.is_empty():
+			e["result"] = Patrol.from_operation(e, result)
+			e["status"] = "done"
+			politics.record["patrols"] = int(politics.record.get("patrols", 0)) + 1
 
 
 ## The week ends: situations nobody went to are written down, wounds heal, and a new
@@ -260,6 +329,22 @@ func end_week() -> Array:
 	if over():
 		return []
 	var lines: Array = []
+	# patrol encounters nobody answered: the pair went in on their own
+	# (an armed one is settled on the desk: there is no one to watch it play out), and an
+	# armed one answered but never run is settled the same way, with the chief's choice
+	for e0 in patrols:
+		if String(e0["status"]) != "running":
+			continue
+		var s_run := get_sit(String(e0["id"]))
+		if not s_run.is_empty() and String(s_run["status"]) == "done":
+			continue
+		board.erase(s_run)
+		e0["status"] = "pending"
+		e0["sim"] = false
+		e0["overtime_paid"] = true
+		lines.append_array(decide_patrol(String(e0["id"]), int(e0["choice"]), false)["lines"])
+	for e in Patrol.pending(patrols):
+		lines.append_array(decide_patrol(String(e["id"]), 0, false)["lines"])
 	# S15 Week Closed: the week as it stood when the chief ended it
 	var recap := _recap_start()
 	if run != null:
@@ -290,7 +375,13 @@ func end_week() -> Array:
 	var triage := Department.triage_line(dept.cases, dept.week)
 	if triage != "":
 		lines.append(triage)
+	for e2 in patrols:
+		patrol_past.append({"id": e2["id"], "week": e2["week"], "kind": e2["kind"], "ward": e2["ward"], "choice": e2["choice"],
+			"status": e2["status"], "result": (e2.get("result", {}) as Dictionary).duplicate(true)})
+	if patrol_past.size() > 300:
+		patrol_past = patrol_past.slice(patrol_past.size() - 300)
 	board = _new_board()
+	patrols = _new_patrols()
 	if not over():
 		dept.note("Week %d: %d situations on the board." % [dept.week, board.size()])
 		if run != null:
@@ -315,6 +406,19 @@ func _recap_start() -> Dictionary:
 			r["wounded"] += int(res.get("officers_hurt", 0))
 		elif s["status"] == "open":
 			r["unattended"] += 1
+	# patrol encounters settled on the desk (the armed ones are on the board above)
+	r["patrols"] = 0
+	for e in patrols:
+		if String(e["status"]) != "done":
+			continue
+		r["patrols"] += 1
+		if bool(e.get("sim", false)):
+			continue
+		var pr: Dictionary = e.get("result", {})
+		r["arrests"] += int(pr.get("arrests", 0))
+		r["civilians"] += int(pr.get("civ_killed", 0))
+		r["officers"] += int(pr.get("officers_killed", 0))
+		r["wounded"] += int(pr.get("officers_hurt", 0))
 	if r["officers"] > 0 or r["civilians"] > 0:
 		r["verdict"] = "ON THE RECORD"
 	return r
@@ -335,6 +439,7 @@ static func _brief_record(s: Dictionary) -> Dictionary:
 func to_data() -> Dictionary:
 	return {"version": VERSION, "seed": seed_val, "rng_state": str(rng.state), "department": dept.to_data(),
 		"board": board.duplicate(true), "past": past.duplicate(true), "politics": politics.to_data(),
+		"patrols": patrols.duplicate(true), "patrol_past": patrol_past.duplicate(true),
 		"short_history": short_history.duplicate(true), "short_last_week": short_last_week,
 		"run": run.to_data() if run != null else null}
 
@@ -363,6 +468,17 @@ func from_data(d: Dictionary) -> bool:
 		if p0 is Dictionary:
 			past.append(p0)
 			_ints(p0)
+	patrols = []
+	for e0 in (d.get("patrols", []) if d.get("patrols", []) is Array else []):
+		if e0 is Dictionary:
+			for k in ["week", "day", "seed", "ward_i", "choice"]:
+				if e0.has(k):
+					e0[k] = int(e0[k])
+			patrols.append(e0)
+	patrol_past = []
+	for p1 in (d.get("patrol_past", []) if d.get("patrol_past", []) is Array else []):
+		if p1 is Dictionary:
+			patrol_past.append(p1)
 	short_history = {}
 	if d.get("short_history", {}) is Dictionary:
 		short_history = d["short_history"].duplicate(true)
