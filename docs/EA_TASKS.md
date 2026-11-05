@@ -784,6 +784,37 @@ Hostage and warrant operations improved slightly.
 Open: head protection (helmets for all, or the aim rule from WD08 that shifts aim to the
 head once a plate is seen), and whether the .45 heavy pistol should be medium calibre.
 
+### Patrol encounters, the .22 and warrant helmets (2026-11-05)
+
+**Owner request 2026-11-05**, on top of body armour:
+- **.45 is medium calibre.** It now does reduced harm through a soft vest instead of only staggering.
+- **New .22 light pistol** (`light_pistol`): low calibre, lethality 0.7, $300. Street suspects carry it (two in ten). It is also in the pistols contract.
+- **Warrants:** every officer serving one wears a ballistic helmet (`Operation.build_planned`), whatever the armoury stocks.
+- **Patrol encounters** (`scripts/campaign/patrol.gd`): one a day, seven a week, on the board's Patrol radio card.
+  - A named pair responds. The chief picks one of three: proceed (no backup); proceed, backup en route ($150); or wait for backup ($200).
+  - Each encounter's dice are rolled once, when it is made, so a choice changes the thresholds, never the roll. The choice sets three things:
+
+    | | proceed | en route | wait |
+    |---|---|---|---|
+    | share of the danger that turns violent | 1.0 | 0.45 | 0.12 |
+    | harm when it does | ×1 | ×0.7 | ×0.5 |
+    | share of the urgency that arrives late | 0 | 0.05 | 0.7 |
+
+  - There are 16 kinds. The 10 routine ones are 75% of the draw; proceeding alone is best for them. For bar fights, domestics, robberies and shots fired, en route is best. For a man in crisis with a knife, or a man seen with a gun, waiting is best. `patrol_test` checks this by expected cost over 4,000 rolls a kind.
+  - **Outcomes:** officers hurt (1–3 weeks), seriously hurt (4–8) or killed (rare), each with the same costs and morale as an operation. A civilian can be hurt or killed when police were late. A complaint of force opens an IA case. Ward trust moves (`Politics.on_patrol`).
+  - **Armed encounters** (about 0.6 a week) become a small operation of type `patrol` played out in the sim. The suspect has a street handgun; backup en route arrives 75 s later on a phase line, and "wait" sends all four together. They are resolved on the desk only if no one ran them before the week ended.
+  - Patrols take nobody off the week's operations. Calls left unanswered are handled by the pair alone at the end of the week.
+  - **Harness policies** (`Policies.patrol_choice`), read from the dispatch:
+
+    | policy | answers |
+    |---|---|
+    | cautious | as above |
+    | military-first | backup en route for anything that could turn |
+    | accept-all | backup en route only when it reads dangerous |
+    | minimal | never answers |
+
+- **What this does to the bands:** patrol deaths and injuries add to `officers_killed` and the roster, and armed patrols add operations to `ops`. Lethality per operation is not comparable with earlier matrices. The next matrix (branch `arena/m8-patrol-2026-11-05`) measures it all together with the armour stagger limit.
+
 ## Order and overlap
 
 ```

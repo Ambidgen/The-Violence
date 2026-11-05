@@ -139,6 +139,9 @@ func _init() -> void:
 		"statement": "matches",
 		"witness": "",
 	}
+	# patrol encounters can open complaints of their own over 40 weeks (2026-11-05): the
+	# cabinet is checked against this one case
+	c.dept.cases.clear()
 	c.dept.cases.append(case_file)
 	var case_docs: Array = StoryArchive.documents(c, "cases")
 	_check(
