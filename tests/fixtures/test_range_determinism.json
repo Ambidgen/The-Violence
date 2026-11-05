@@ -9,10 +9,10 @@
       "winner": 1
     },
     "lane_repro": {
-      "digest": "5c2d6a42960f92f2",
-      "hits": 16,
-      "shots": 66,
-      "time": 24.133,
+      "digest": "b7dd8bf211ee1e3f",
+      "hits": 19,
+      "shots": 74,
+      "time": 53.133,
       "timeout": false,
       "winner": 0
     },
