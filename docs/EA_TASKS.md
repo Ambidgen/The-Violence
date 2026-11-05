@@ -781,8 +781,14 @@ stopped round, pinning officers (probe 0.42 killed per raid). The stagger limit 
 0.30, against 0.23 for the crew change alone; the difference is within the probe's noise.
 Hostage and warrant operations improved slightly.
 
+**With the stagger limit** (CI run 42078313143, same branch): crew houses 0.65 → **0.39**
+killed per raid, hostage 0.18, barricade 0.12, warrant 0.08. Score: accept-all −365,
+cautious −247, military-first −303, minimal −321. The cautious policy never drops below 12
+fit officers. Gate 1 misses 31 of 52. (The 4.7.2 headless job failed on an importer crash,
+not the code.)
+
 Open: head protection (helmets for all, or the aim rule from WD08 that shifts aim to the
-head once a plate is seen), and whether the .45 heavy pistol should be medium calibre.
+head once a plate is seen). The .45 is now medium calibre (below).
 
 ### Patrol encounters, the .22 and warrant helmets (2026-11-05)
 
@@ -813,7 +819,33 @@ head once a plate is seen), and whether the .45 heavy pistol should be medium ca
     | accept-all | backup en route only when it reads dangerous |
     | minimal | never answers |
 
-- **What this does to the bands:** patrol deaths and injuries add to `officers_killed` and the roster, and armed patrols add operations to `ops`. Lethality per operation is not comparable with earlier matrices. The next matrix (branch `arena/m8-patrol-2026-11-05`) measures it all together with the armour stagger limit.
+- **Measured** (CI run 42092129942, 8 seeds × 4 policies, branch `arena/m8-patrol-2026-11-05`,
+  against the stagger-limit matrix):
+  - **Armed patrols in the sim:** 838 across the 32 runs (about 26 a campaign, 0.65 a week),
+    0.08 officers killed each.
+  - **Other operations, killed per op:** crew house 0.39 → 0.44, hostage 0.18 → 0.13,
+    barricade 0.12 → 0.10, warrant 0.08 → 0.06 (the helmets). There are 10–15% fewer of them,
+    because patrol injuries thin the roster.
+  - **Gate 1 misses:** 30 of 52, from 31.
+
+    | policy | killed per run | weeks under 12 fit | lowest balance | score |
+    |---|---|---|---|---|
+    | accept-all | 16 → 16 | 6 → 16 | −53k → −64k | −365 → +9 |
+    | cautious | 15 → 16 | 1 → 16 | −21k → −55k | −247 → −122 |
+    | military-first | 12 → 12 | 9 → 17 | −18k → −34k | −303 → +24 |
+    | minimal | 5.9 → 7.3 | 3 → 6 | +35k → +38k | −321 → +5 |
+
+  - **Findings:**
+    1. **Run score is inflated by patrol arrests.** One campaign of desk patrols, all
+       proceeding, makes 88 arrests at 3 points each, about +260. Every policy's score rose by
+       124–374 for that reason, not because play got better. A patrol arrest probably
+       should not score the same as a raid arrest (1 point, or none).
+    2. **Patrols thin the roster.** Weeks under 12 fit officers rose by 3 to 16 a run, and
+       the roster-floor and roster-weeks bands all miss.
+    3. **Waiting is expensive.** The cautious policy's lowest balance fell by $34k: its
+       overtime pays for backup on every call that could turn.
+    4. **Deaths overall barely moved.** Patrol deaths replaced deaths in the operations the
+       roster could no longer field.
 
 ## Order and overlap
 

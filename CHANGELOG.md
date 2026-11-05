@@ -28,6 +28,10 @@ Newest first. The README covers the game as it stands; this file keeps the histo
   rule.
 - **CI**: the Godot import step runs a second time if the importer crashes (it did on 4.7.2,
   failing a docs-only run).
+- **Measured** on the 8-seed matrix: about 26 armed patrols a campaign go to the sim,
+  0.08 officers killed each. Warrants fell to 0.06 killed per op, with the helmets. Gate 1
+  misses 30 of 52. Patrol arrests inflate the run score by about 260, and patrol injuries add
+  3–10 weeks a run under 12 fit officers. See EA_TASKS.
 
 
 ## Unreleased — Crew houses less deadly (2026-11-05)
