@@ -349,7 +349,8 @@ jobs:
           cp build/balance/report.md "$DEST/report.md"
           cp build/balance/summary.json "$DEST/summary.json"
           # every operation, one line each (EA_TASKS P1.C1); absent from runs before 1.C
-          for f in ops.csv weeks.csv; do
+          # allies.csv and money.csv (2026-11-05): every week's ally standings and ledger by kind
+          for f in ops.csv weeks.csv allies.csv money.csv; do
             if [ -f "build/balance/$f" ]; then cp "build/balance/$f" "$DEST/$f"; fi
           done
           git config user.name "github-actions[bot]"

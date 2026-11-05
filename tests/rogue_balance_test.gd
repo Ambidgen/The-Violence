@@ -594,6 +594,7 @@ func derive(run: Dictionary) -> Dictionary:
 	var first_lost := {}
 	var lost_end := 0
 	var regained := 0
+	var was_lost := {}   # ally -> lost at the previous week-end
 	var below0 := 0
 	var below0_early := 0
 	var out: Dictionary = {}
@@ -609,11 +610,17 @@ func derive(run: Dictionary) -> Dictionary:
 				for nm in _LOST_NAMES:
 					if String(ln).find(nm) >= 0 and not first_lost.has(_LOST_NAMES[nm]):
 						first_lost[_LOST_NAMES[nm]] = int(x["week"])
-			elif String(ln).begins_with("Won back"):
-				regained += 1
+		# 2026-11-05: an ally won back is counted from the week-end states (lost one week,
+		# not lost the next). Counting "Won back" lines missed every ally won back at the
+		# desk -- a reconciliation offer, an event -- because only the lines of operations
+		# and of the week's end are kept, so every matrix so far reported 0.
 		for a in x.get("allies", {}):
-			if bool(x["allies"][a].get("lost", false)) and not first_lost.has(a):
+			var now_lost := bool(x["allies"][a].get("lost", false))
+			if now_lost and not first_lost.has(a):
 				first_lost[a] = int(x["week"])
+			if bool(was_lost.get(a, false)) and not now_lost:
+				regained += 1
+			was_lost[a] = now_lost
 	if not w.is_empty():
 		var last: Dictionary = w[w.size() - 1]
 		for a2 in last.get("allies", {}):
