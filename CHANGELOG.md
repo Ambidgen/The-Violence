@@ -3,6 +3,16 @@
 Newest first. The README covers the game as it stands; this file keeps the history.
 
 
+## Unreleased — Phase 1 diagnosis: the money miss is a death bill (2026-11-04)
+
+- **The balance harness writes `money.csv`**: each week's ledger summed by kind of item
+  (payroll, academy places, death benefits, courses, settlements, sweeps).
+- **Finding**: on the CL3 matrix, crew-house raids kill 0.81 officers per raid, 70% of all
+  officer deaths. Replacing the dead costs cautious about $306K a run, which is the whole of
+  its deficit. Options for the owner in `docs/EA_TASKS.md`, "Stage 1: what the CL3
+  reference says".
+- **Gate R0**: the quick tier passes 25/25 on official Godot 4.4.1 too.
+
 ## Unreleased — CL3: a balance reference for the merged tree (2026-11-04)
 
 - **New reference matrix**: 8 seeds × 4 policies on the merged tree, run in CI, in

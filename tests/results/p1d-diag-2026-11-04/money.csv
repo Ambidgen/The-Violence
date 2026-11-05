@@ -1,0 +1,991 @@
+seed,policy,week,kind,amount
+1001,accept_all,1,"Behaviour coaching",-26600
+1001,accept_all,1,"City allocation",32000
+1001,accept_all,1,"Contract",-3500
+1001,accept_all,1,"Kit returned",1355
+1001,accept_all,1,"Overtime",-1600
+1001,accept_all,1,"Payroll",-27484
+1001,accept_all,1,"The outgoing chief's reserve",10000
+1001,accept_all,2,"Behaviour coaching",-3800
+1001,accept_all,2,"City allocation",32000
+1001,accept_all,2,"Kit returned",3005
+1001,accept_all,2,"Line-of-duty death benefit",-3000
+1001,accept_all,2,"Medical",-3000
+1001,accept_all,2,"Overtime",-2125
+1001,accept_all,2,"Payroll",-26230
+1001,accept_all,2,"Program",-4600
+1001,accept_all,3,"Academy place",-7640
+1001,accept_all,3,"City allocation",32000
+1001,accept_all,3,"Kit",-800
+1001,accept_all,3,"Kit returned",4740
+1001,accept_all,3,"Medical",-1000
+1001,accept_all,3,"Overtime",-2210
+1001,accept_all,3,"Payroll",-26230
+1001,accept_all,4,"City allocation",32000
+1001,accept_all,4,"Interest on the overdraft",-124
+1001,accept_all,4,"Line-of-duty death benefit",-15000
+1001,accept_all,4,"Overtime",-2125
+1001,accept_all,4,"Payroll",-21340
+1001,accept_all,5,"Academy place",-7640
+1001,accept_all,5,"City allocation",32000
+1001,accept_all,5,"Desk",4000
+1001,accept_all,5,"Kit",-400
+1001,accept_all,5,"Line-of-duty death benefit",-3000
+1001,accept_all,5,"Medical",-1500
+1001,accept_all,5,"Overtime",-2240
+1001,accept_all,5,"Payroll",-19929
+1001,accept_all,5,"Restock",-1000
+1001,accept_all,5,"Surplus sold",2000
+1001,accept_all,6,"Academy place",-7640
+1001,accept_all,6,"City allocation",32000
+1001,accept_all,6,"Kit",-250
+1001,accept_all,6,"Kit returned",230
+1001,accept_all,6,"Line-of-duty death benefit",-3000
+1001,accept_all,6,"Overtime",-1240
+1001,accept_all,6,"Payroll",-19637
+1001,accept_all,7,"Academy place",-7640
+1001,accept_all,7,"City allocation",32000
+1001,accept_all,7,"Kit",-400
+1001,accept_all,7,"Overtime",-1600
+1001,accept_all,7,"Payroll",-20837
+1001,accept_all,8,"Academy place",-7640
+1001,accept_all,8,"City allocation",31000
+1001,accept_all,8,"Kit returned",1745
+1001,accept_all,8,"Medical",-500
+1001,accept_all,8,"Overtime",-1615
+1001,accept_all,8,"Payroll",-22037
+1001,accept_all,9,"City allocation",31000
+1001,accept_all,9,"Desk",-1500
+1001,accept_all,9,"Kit",-800
+1001,accept_all,9,"Kit returned",400
+1001,accept_all,9,"Line-of-duty death benefit",-3000
+1001,accept_all,9,"Medical",-3000
+1001,accept_all,9,"Overtime",-1640
+1001,accept_all,9,"Payroll",-22037
+1001,accept_all,9,"Surplus sold",2000
+1001,accept_all,10,"Academy place",-7640
+1001,accept_all,10,"City allocation",31000
+1001,accept_all,10,"Desk",-3500
+1001,accept_all,10,"Kit",-800
+1001,accept_all,10,"Kit returned",750
+1001,accept_all,10,"Overtime",-1700
+1001,accept_all,10,"Payroll",-22037
+1001,accept_all,11,"City allocation",31000
+1001,accept_all,11,"Overtime",-1030
+1001,accept_all,11,"Payroll",-25637
+1001,accept_all,12,"City allocation",31000
+1001,accept_all,12,"Desk",-9000
+1001,accept_all,12,"Interest on the overdraft",-133
+1001,accept_all,12,"Kit",-1290
+1001,accept_all,12,"Kit returned",950
+1001,accept_all,12,"Line-of-duty death benefit",-3000
+1001,accept_all,12,"Overtime",-1850
+1001,accept_all,12,"Payroll",-24206
+1001,accept_all,13,"City allocation",31000
+1001,accept_all,13,"Interest on the overdraft",-17
+1001,accept_all,13,"Kit",-950
+1001,accept_all,13,"Kit returned",2370
+1001,accept_all,13,"Line-of-duty death benefit",-3000
+1001,accept_all,13,"Overtime",-2445
+1001,accept_all,13,"Payroll",-23006
+1001,accept_all,13,"Surplus sold",2000
+1001,accept_all,14,"City allocation",31000
+1001,accept_all,14,"Kit",-1440
+1001,accept_all,14,"Kit returned",75
+1001,accept_all,14,"Overtime",-1660
+1001,accept_all,14,"Payroll",-23006
+1001,accept_all,14,"Settlement",-2500
+1001,accept_all,15,"City allocation",31000
+1001,accept_all,15,"Interest on the overdraft",-37
+1001,accept_all,15,"Kit",-3760
+1001,accept_all,15,"Kit returned",1345
+1001,accept_all,15,"Line-of-duty death benefit",-9000
+1001,accept_all,15,"Overtime",-2060
+1001,accept_all,15,"Payroll",-18503
+1001,accept_all,15,"Settlement",-2500
+1001,accept_all,16,"City allocation",28500
+1001,accept_all,16,"Desk",-15000
+1001,accept_all,16,"Interest on the overdraft",-239
+1001,accept_all,16,"Kit",-2230
+1001,accept_all,16,"Kit returned",1270
+1001,accept_all,16,"Overtime",-1610
+1001,accept_all,16,"Payroll",-18503
+1001,accept_all,16,"Settlement",-2500
+1001,accept_all,17,"City allocation",28500
+1001,accept_all,17,"Interest on the overdraft",-155
+1001,accept_all,17,"Kit",-400
+1001,accept_all,17,"Kit returned",520
+1001,accept_all,17,"Line-of-duty death benefit",-6000
+1001,accept_all,17,"Overtime",-1570
+1001,accept_all,17,"Payroll",-16103
+1001,accept_all,17,"Settlement",-2500
+1001,accept_all,17,"Surplus sold",2000
+1001,accept_all,18,"Academy place",-7640
+1001,accept_all,18,"City allocation",28500
+1001,accept_all,18,"Interest on the overdraft",-54
+1001,accept_all,18,"Kit returned",1040
+1001,accept_all,18,"Line-of-duty death benefit",-9000
+1001,accept_all,18,"Medical",-1500
+1001,accept_all,18,"Overtime",-1300
+1001,accept_all,18,"Payroll",-12503
+1001,accept_all,19,"Academy place",-7640
+1001,accept_all,19,"City allocation",28500
+1001,accept_all,19,"Kit",-250
+1001,accept_all,19,"Overtime",-800
+1001,accept_all,19,"Payroll",-13703
+1001,accept_all,20,"Academy place",-7640
+1001,accept_all,20,"City allocation",31000
+1001,accept_all,20,"Desk",-15000
+1001,accept_all,20,"Interest on the overdraft",-33
+1001,accept_all,20,"Kit returned",75
+1001,accept_all,20,"Overtime",-800
+1001,accept_all,20,"Payroll",-12664
+1001,accept_all,21,"Academy place",-15280
+1001,accept_all,21,"City allocation",31000
+1001,accept_all,21,"Kit",-400
+1001,accept_all,21,"Kit returned",1090
+1001,accept_all,21,"Medical",-500
+1001,accept_all,21,"Overtime",-690
+1001,accept_all,21,"Payroll",-12664
+1001,accept_all,21,"Surplus sold",2000
+1001,accept_all,22,"Academy place",-15280
+1001,accept_all,22,"City allocation",31000
+1001,accept_all,22,"Overtime",-1050
+1001,accept_all,22,"Payroll",-13864
+1001,accept_all,23,"Academy place",-15280
+1001,accept_all,23,"City allocation",31000
+1001,accept_all,23,"Kit",-1440
+1001,accept_all,23,"Kit returned",625
+1001,accept_all,23,"Overtime",-1220
+1001,accept_all,23,"Payroll",-16264
+1001,accept_all,24,"City allocation",30100
+1001,accept_all,24,"Desk",-15000
+1001,accept_all,24,"Interest on the overdraft",-205
+1001,accept_all,24,"Kit",-150
+1001,accept_all,24,"Kit returned",720
+1001,accept_all,24,"Overtime",-690
+1001,accept_all,24,"Payroll",-18664
+1001,accept_all,25,"City allocation",30100
+1001,accept_all,25,"Desk",-6500
+1001,accept_all,25,"Interest on the overdraft",-92
+1001,accept_all,25,"Kit",-400
+1001,accept_all,25,"Kit returned",1100
+1001,accept_all,25,"Overtime",-1800
+1001,accept_all,25,"Payroll",-18664
+1001,accept_all,25,"Surplus sold",2000
+1001,accept_all,26,"Academy place",-15280
+1001,accept_all,26,"City allocation",30100
+1001,accept_all,26,"Desk",3000
+1001,accept_all,26,"Kit",-650
+1001,accept_all,26,"Kit returned",780
+1001,accept_all,26,"Medical",-1500
+1001,accept_all,26,"Overtime",-1930
+1001,accept_all,26,"Payroll",-17464
+1001,accept_all,27,"City allocation",30100
+1001,accept_all,27,"Desk",5000
+1001,accept_all,27,"Interest on the overdraft",-177
+1001,accept_all,27,"Kit",-400
+1001,accept_all,27,"Kit returned",1195
+1001,accept_all,27,"Line-of-duty death benefit",-3000
+1001,accept_all,27,"Medical",-1500
+1001,accept_all,27,"Overtime",-1460
+1001,accept_all,27,"Payroll",-18664
+1001,accept_all,27,"Settlement",-12500
+1001,accept_all,28,"City allocation",30100
+1001,accept_all,28,"Interest on the overdraft",-251
+1001,accept_all,28,"Kit",-1140
+1001,accept_all,28,"Kit returned",30
+1001,accept_all,28,"Overtime",-1320
+1001,accept_all,28,"Payroll",-18664
+1001,accept_all,28,"Settlement",-12500
+1001,accept_all,29,"City allocation",27700
+1001,accept_all,29,"Interest on the overdraft",-292
+1001,accept_all,29,"Kit returned",720
+1001,accept_all,29,"Overtime",-1076
+1001,accept_all,29,"Payroll",-18664
+1001,accept_all,29,"Settlement",-12500
+1001,accept_all,29,"Surplus sold",2000
+1001,accept_all,30,"City allocation",27700
+1001,accept_all,30,"Interest on the overdraft",-386
+1001,accept_all,30,"Kit returned",200
+1001,accept_all,30,"Overtime",-1120
+1001,accept_all,30,"Payroll",-18664
+1001,accept_all,30,"Settlement",-12500
+1001,accept_all,31,"City allocation",27700
+1001,accept_all,31,"Interest on the overdraft",-240
+1001,accept_all,31,"Overtime",-1380
+1001,accept_all,31,"Payroll",-18664
+1001,accept_all,32,"City allocation",27700
+1001,accept_all,32,"Desk",-2000
+1001,accept_all,32,"Interest on the overdraft",-202
+1001,accept_all,32,"Kit",-800
+1001,accept_all,32,"Kit returned",1195
+1001,accept_all,32,"Medical",-3000
+1001,accept_all,32,"Overtime",-2280
+1001,accept_all,32,"Payroll",-18664
+1001,accept_all,33,"City allocation",27700
+1001,accept_all,33,"Interest on the overdraft",-9
+1001,accept_all,33,"Kit",-400
+1001,accept_all,33,"Kit returned",550
+1001,accept_all,33,"Overtime",-1312
+1001,accept_all,33,"Payroll",-18664
+1001,accept_all,33,"Surplus sold",2000
+1001,accept_all,34,"Academy place",-7640
+1001,accept_all,34,"City allocation",27700
+1001,accept_all,34,"Kit",-400
+1001,accept_all,34,"Kit returned",750
+1001,accept_all,34,"Line-of-duty death benefit",-3000
+1001,accept_all,34,"Overtime",-1905
+1001,accept_all,34,"Payroll",-17464
+1001,accept_all,35,"Academy place",-7640
+1001,accept_all,35,"City allocation",27700
+1001,accept_all,35,"Kit returned",200
+1001,accept_all,35,"Line-of-duty death benefit",-9000
+1001,accept_all,35,"Overtime",-1460
+1001,accept_all,35,"Payroll",-15064
+1001,accept_all,36,"Academy place",-7640
+1001,accept_all,36,"City allocation",27700
+1001,accept_all,36,"Medical",-1000
+1001,accept_all,36,"Overtime",-1120
+1001,accept_all,36,"Payroll",-15064
+1001,accept_all,37,"Academy place",-7640
+1001,accept_all,37,"City allocation",27700
+1001,accept_all,37,"Kit",-1290
+1001,accept_all,37,"Overtime",-800
+1001,accept_all,37,"Payroll",-16264
+1001,accept_all,37,"Surplus sold",2000
+1001,accept_all,38,"Academy place",-7640
+1001,accept_all,38,"City allocation",27700
+1001,accept_all,38,"Kit returned",675
+1001,accept_all,38,"Overtime",-1300
+1001,accept_all,38,"Payroll",-16264
+1001,accept_all,38,"Settlement",-2500
+1001,accept_all,39,"Academy place",-7640
+1001,accept_all,39,"City allocation",27700
+1001,accept_all,39,"Kit",-1440
+1001,accept_all,39,"Kit returned",625
+1001,accept_all,39,"Line-of-duty death benefit",-3000
+1001,accept_all,39,"Overtime",-1355
+1001,accept_all,39,"Payroll",-16264
+1001,accept_all,39,"Settlement",-2500
+1001,accept_all,40,"City allocation",27700
+1001,accept_all,40,"Kit",-550
+1001,accept_all,40,"Kit returned",720
+1001,accept_all,40,"Medical",-1500
+1001,accept_all,40,"Overtime",-1690
+1001,accept_all,40,"Payroll",-17464
+1001,accept_all,40,"Settlement",-2500
+1001,cautious,1,"Behaviour coaching",-7600
+1001,cautious,1,"City allocation",32000
+1001,cautious,1,"Contract",-3500
+1001,cautious,1,"De-escalation and judgment",-9000
+1001,cautious,1,"Overtime",-1370
+1001,cautious,1,"Payroll",-27484
+1001,cautious,2,"City allocation",32000
+1001,cautious,2,"Interest on the overdraft",-9
+1001,cautious,2,"Kit returned",3450
+1001,cautious,2,"Line-of-duty death benefit",-9000
+1001,cautious,2,"Medical",-5000
+1001,cautious,2,"Overtime",-1695
+1001,cautious,2,"Payroll",-23619
+1001,cautious,2,"Program",-4600
+1001,cautious,3,"Academy place",-7640
+1001,cautious,3,"City allocation",32000
+1001,cautious,3,"Kit returned",5800
+1001,cautious,3,"Overtime",-1740
+1001,cautious,3,"Payroll",-23619
+1001,cautious,3,"Use-of-force review",-2500
+1001,cautious,4,"City allocation",32000
+1001,cautious,4,"Interest on the overdraft",-51
+1001,cautious,4,"Kit",-800
+1001,cautious,4,"Kit returned",200
+1001,cautious,4,"Line-of-duty death benefit",-9000
+1001,cautious,4,"Medical",-2000
+1001,cautious,4,"Overtime",-1380
+1001,cautious,4,"Payroll",-20927
+1001,cautious,4,"Use-of-force review",-2500
+1001,cautious,5,"Academy place",-7640
+1001,cautious,5,"City allocation",32000
+1001,cautious,5,"Desk",-2500
+1001,cautious,5,"Kit returned",200
+1001,cautious,5,"Overtime",-1230
+1001,cautious,5,"Payroll",-20927
+1001,cautious,5,"Surplus sold",2000
+1001,cautious,5,"Use-of-force review",-2500
+1001,cautious,6,"Academy place",-7640
+1001,cautious,6,"City allocation",32000
+1001,cautious,6,"Kit returned",400
+1001,cautious,6,"Line-of-duty death benefit",-9000
+1001,cautious,6,"Overtime",-1480
+1001,cautious,6,"Payroll",-17578
+1001,cautious,7,"Academy place",-15280
+1001,cautious,7,"City allocation",32000
+1001,cautious,7,"Overtime",-970
+1001,cautious,7,"Payroll",-18778
+1001,cautious,8,"City allocation",31000
+1001,cautious,8,"Interest on the overdraft",-45
+1001,cautious,8,"Kit",-400
+1001,cautious,8,"Line-of-duty death benefit",-3000
+1001,cautious,8,"Medical",-500
+1001,cautious,8,"Overtime",-870
+1001,cautious,8,"Payroll",-18939
+1001,cautious,9,"City allocation",31000
+1001,cautious,9,"Desk",-15000
+1001,cautious,9,"Interest on the overdraft",-314
+1001,cautious,9,"Kit",-800
+1001,cautious,9,"Kit returned",2200
+1001,cautious,9,"Line-of-duty death benefit",-6000
+1001,cautious,9,"Medical",-1500
+1001,cautious,9,"Overtime",-1380
+1001,cautious,9,"Payroll",-18939
+1001,cautious,9,"Surplus sold",2000
+1001,cautious,9,"Use-of-force review",-5000
+1001,cautious,10,"City allocation",31000
+1001,cautious,10,"Interest on the overdraft",-95
+1001,cautious,10,"Kit",-400
+1001,cautious,10,"Overtime",-1600
+1001,cautious,10,"Payroll",-17739
+1001,cautious,11,"Academy place",-15280
+1001,cautious,11,"City allocation",31000
+1001,cautious,11,"Medical",-1500
+1001,cautious,11,"Overtime",-1030
+1001,cautious,11,"Payroll",-17739
+1001,cautious,12,"City allocation",28500
+1001,cautious,12,"Interest on the overdraft",-114
+1001,cautious,12,"Kit",-400
+1001,cautious,12,"Line-of-duty death benefit",-3000
+1001,cautious,12,"Medical",-500
+1001,cautious,12,"Overtime",-1960
+1001,cautious,12,"Payroll",-18939
+1001,cautious,13,"City allocation",28500
+1001,cautious,13,"Desk",-8000
+1001,cautious,13,"Interest on the overdraft",-61
+1001,cautious,13,"Kit",-800
+1001,cautious,13,"Kit returned",1100
+1001,cautious,13,"Overtime",-1120
+1001,cautious,13,"Payroll",-18939
+1001,cautious,13,"Surplus sold",2000
+1001,cautious,14,"Academy place",-7640
+1001,cautious,14,"City allocation",28500
+1001,cautious,14,"Overtime",-970
+1001,cautious,14,"Payroll",-17721
+1001,cautious,15,"Academy place",-7640
+1001,cautious,15,"City allocation",28500
+1001,cautious,15,"Desk",-3000
+1001,cautious,15,"Kit returned",200
+1001,cautious,15,"Medical",-3500
+1001,cautious,15,"Overtime",-1270
+1001,cautious,15,"Payroll",-18921
+1001,cautious,16,"City allocation",28500
+1001,cautious,16,"Overtime",-1095
+1001,cautious,16,"Payroll",-20121
+1001,cautious,17,"Academy place",-7640
+1001,cautious,17,"City allocation",28500
+1001,cautious,17,"Line-of-duty death benefit",-3000
+1001,cautious,17,"Medical",-500
+1001,cautious,17,"Overtime",-920
+1001,cautious,17,"Payroll",-20139
+1001,cautious,17,"Surplus sold",2000
+1001,cautious,18,"Academy place",-7640
+1001,cautious,18,"City allocation",28500
+1001,cautious,18,"Kit",-800
+1001,cautious,18,"Kit returned",1650
+1001,cautious,18,"Medical",-500
+1001,cautious,18,"Overtime",-1820
+1001,cautious,18,"Payroll",-21339
+1001,cautious,19,"City allocation",28500
+1001,cautious,19,"Interest on the overdraft",-66
+1001,cautious,19,"Kit",-400
+1001,cautious,19,"Kit returned",400
+1001,cautious,19,"Overtime",-1290
+1001,cautious,19,"Payroll",-22539
+1001,cautious,19,"Use-of-force review",-5000
+1001,cautious,20,"City allocation",28500
+1001,cautious,20,"Interest on the overdraft",-1
+1001,cautious,20,"Kit",-800
+1001,cautious,20,"Kit returned",200
+1001,cautious,20,"Line-of-duty death benefit",-3000
+1001,cautious,20,"Overtime",-1460
+1001,cautious,20,"Payroll",-20139
+1001,cautious,21,"Academy place",-7640
+1001,cautious,21,"City allocation",28500
+1001,cautious,21,"Kit",-800
+1001,cautious,21,"Kit returned",2250
+1001,cautious,21,"Line-of-duty death benefit",-6000
+1001,cautious,21,"Overtime",-2080
+1001,cautious,21,"Payroll",-17739
+1001,cautious,21,"Surplus sold",2000
+1001,cautious,22,"City allocation",28500
+1001,cautious,22,"Interest on the overdraft",-82
+1001,cautious,22,"Kit",-800
+1001,cautious,22,"Kit returned",400
+1001,cautious,22,"Line-of-duty death benefit",-6000
+1001,cautious,22,"Medical",-6000
+1001,cautious,22,"Overtime",-2100
+1001,cautious,22,"Payroll",-16521
+1001,cautious,23,"Academy place",-7640
+1001,cautious,23,"City allocation",28500
+1001,cautious,23,"Overtime",-920
+1001,cautious,23,"Payroll",-16521
+1001,cautious,24,"Academy place",-7640
+1001,cautious,24,"City allocation",28500
+1001,cautious,24,"Desk",-3500
+1001,cautious,24,"Medical",-500
+1001,cautious,24,"Overtime",-690
+1001,cautious,24,"Payroll",-17721
+1001,cautious,25,"Academy place",-7640
+1001,cautious,25,"City allocation",28500
+1001,cautious,25,"Desk",-1000
+1001,cautious,25,"Overtime",-340
+1001,cautious,25,"Payroll",-17721
+1001,cautious,25,"Settlement",-2500
+1001,cautious,25,"Surplus sold",2000
+1001,cautious,25,"Use-of-force review",-2500
+1001,cautious,26,"Academy place",-7640
+1001,cautious,26,"City allocation",28500
+1001,cautious,26,"Interest on the overdraft",-2
+1001,cautious,26,"Kit",-800
+1001,cautious,26,"Kit returned",550
+1001,cautious,26,"Line-of-duty death benefit",-3000
+1001,cautious,26,"Medical",-500
+1001,cautious,26,"Overtime",-1120
+1001,cautious,26,"Payroll",-17721
+1001,cautious,26,"Settlement",-2500
+1001,cautious,27,"City allocation",28500
+1001,cautious,27,"Interest on the overdraft",-13
+1001,cautious,27,"Kit returned",1100
+1001,cautious,27,"Overtime",-1120
+1001,cautious,27,"Payroll",-18921
+1001,cautious,27,"Settlement",-2500
+1001,cautious,28,"Academy place",-7640
+1001,cautious,28,"City allocation",28500
+1001,cautious,28,"Desk",-800
+1001,cautious,28,"Overtime",-860
+1001,cautious,28,"Payroll",-17470
+1001,cautious,28,"Settlement",-2500
+1001,cautious,29,"Academy place",-7640
+1001,cautious,29,"City allocation",28500
+1001,cautious,29,"Medical",-1500
+1001,cautious,29,"Overtime",-896
+1001,cautious,29,"Payroll",-18670
+1001,cautious,29,"Surplus sold",2000
+1001,cautious,30,"Academy place",-7640
+1001,cautious,30,"City allocation",28500
+1001,cautious,30,"Overtime",-1120
+1001,cautious,30,"Payroll",-19870
+1001,cautious,31,"Academy place",-7640
+1001,cautious,31,"City allocation",28500
+1001,cautious,31,"Desk",-2000
+1001,cautious,31,"Overtime",-1380
+1001,cautious,31,"Payroll",-21070
+1001,cautious,32,"City allocation",28500
+1001,cautious,32,"Kit",-800
+1001,cautious,32,"Overtime",-1370
+1001,cautious,32,"Payroll",-22270
+1001,cautious,33,"City allocation",28500
+1001,cautious,33,"Kit",-400
+1001,cautious,33,"Overtime",-1445
+1001,cautious,33,"Payroll",-22270
+1001,cautious,33,"Surplus sold",2000
+1001,cautious,34,"City allocation",28500
+1001,cautious,34,"Desk",-15000
+1001,cautious,34,"Interest on the overdraft",-352
+1001,cautious,34,"Line-of-duty death benefit",-9000
+1001,cautious,34,"Overtime",-3590
+1001,cautious,34,"Payroll",-18054
+1001,cautious,34,"Use-of-force review",-7500
+1001,cautious,35,"City allocation",28500
+1001,cautious,35,"Interest on the overdraft",-193
+1001,cautious,35,"Kit",-400
+1001,cautious,35,"Kit returned",1650
+1001,cautious,35,"Line-of-duty death benefit",-3000
+1001,cautious,35,"Overtime",-1630
+1001,cautious,35,"Payroll",-16854
+1001,cautious,36,"Academy place",-7640
+1001,cautious,36,"City allocation",28500
+1001,cautious,36,"Overtime",-1380
+1001,cautious,36,"Payroll",-16854
+1001,cautious,37,"Academy place",-7640
+1001,cautious,37,"City allocation",28500
+1001,cautious,37,"Interest on the overdraft",-36
+1001,cautious,37,"Line-of-duty death benefit",-6000
+1001,cautious,37,"Medical",-1500
+1001,cautious,37,"Overtime",-1900
+1001,cautious,37,"Payroll",-15654
+1001,cautious,37,"Surplus sold",2000
+1001,cautious,38,"Academy place",-7640
+1001,cautious,38,"City allocation",28500
+1001,cautious,38,"Overtime",-780
+1001,cautious,38,"Payroll",-15654
+1001,cautious,39,"Academy place",-7640
+1001,cautious,39,"City allocation",28500
+1001,cautious,39,"Kit returned",600
+1001,cautious,39,"Line-of-duty death benefit",-3000
+1001,cautious,39,"Overtime",-1520
+1001,cautious,39,"Payroll",-15618
+1001,cautious,40,"Academy place",-7640
+1001,cautious,40,"City allocation",28500
+1001,cautious,40,"Interest on the overdraft",-22
+1001,cautious,40,"Kit",-400
+1001,cautious,40,"Line-of-duty death benefit",-6000
+1001,cautious,40,"Medical",-3000
+1001,cautious,40,"Overtime",-2050
+1001,cautious,40,"Payroll",-14418
+1001,military,1,"Behaviour coaching",-7600
+1001,military,1,"City allocation",32000
+1001,military,1,"Contract",-3000
+1001,military,1,"Firearms qualification",-10800
+1001,military,1,"Kit",-1590
+1001,military,1,"Kit returned",100
+1001,military,1,"Medical",-1500
+1001,military,1,"Overtime",-1660
+1001,military,1,"Payroll",-27484
+1001,military,2,"City allocation",32000
+1001,military,2,"Interest on the overdraft",-7
+1001,military,2,"Kit",-3080
+1001,military,2,"Kit returned",550
+1001,military,2,"Line-of-duty death benefit",-3000
+1001,military,2,"Medical",-2000
+1001,military,2,"Overtime",-2035
+1001,military,2,"Payroll",-26248
+1001,military,3,"City allocation",32000
+1001,military,3,"Kit",-1400
+1001,military,3,"Kit returned",1000
+1001,military,3,"Medical",-500
+1001,military,3,"Overtime",-2410
+1001,military,3,"Payroll",-26248
+1001,military,4,"City allocation",32000
+1001,military,4,"Interest on the overdraft",-61
+1001,military,4,"Kit",-800
+1001,military,4,"Kit returned",300
+1001,military,4,"Line-of-duty death benefit",-6000
+1001,military,4,"Medical",-4500
+1001,military,4,"Overtime",-2305
+1001,military,4,"Payroll",-23812
+1001,military,5,"City allocation",32000
+1001,military,5,"Desk",4000
+1001,military,5,"Kit returned",545
+1001,military,5,"Line-of-duty death benefit",-3000
+1001,military,5,"Overtime",-2410
+1001,military,5,"Payroll",-22381
+1001,military,5,"Surplus sold",2000
+1001,military,6,"Behaviour coaching",-3800
+1001,military,6,"City allocation",32000
+1001,military,6,"Firearms qualification",-3600
+1001,military,6,"Interest on the overdraft",-7
+1001,military,6,"Kit",-2090
+1001,military,6,"Kit returned",1240
+1001,military,6,"Line-of-duty death benefit",-3000
+1001,military,6,"Medical",-6500
+1001,military,6,"Overtime",-1330
+1001,military,6,"Payroll",-20930
+1001,military,7,"City allocation",32000
+1001,military,7,"Kit",-1380
+1001,military,7,"Overtime",-800
+1001,military,7,"Payroll",-20930
+1001,military,7,"Restock",-45
+1001,military,8,"City allocation",31000
+1001,military,8,"Firearms qualification",-1800
+1001,military,8,"Kit returned",1585
+1001,military,8,"Line-of-duty death benefit",-3000
+1001,military,8,"Overtime",-780
+1001,military,8,"Payroll",-19114
+1001,military,8,"Program",-3900
+1001,military,9,"City allocation",31000
+1001,military,9,"Contract",-7000
+1001,military,9,"Firearms qualification",-1800
+1001,military,9,"Overtime",-340
+1001,military,9,"Payroll",-19114
+1001,military,9,"Settlement",-2500
+1001,military,10,"Behaviour coaching",-7600
+1001,military,10,"City allocation",31000
+1001,military,10,"Desk",8000
+1001,military,10,"Firearms qualification",-14400
+1001,military,10,"Payroll",-19114
+1001,military,10,"Settlement",-2500
+1001,military,11,"Behaviour coaching",-3800
+1001,military,11,"City allocation",31000
+1001,military,11,"Firearms qualification",-5400
+1001,military,11,"Overtime",-690
+1001,military,11,"Payroll",-19114
+1001,military,11,"Settlement",-2500
+1001,military,12,"City allocation",31000
+1001,military,12,"Desk",-500
+1001,military,12,"Firearms qualification",-3600
+1001,military,12,"Kit",-1790
+1001,military,12,"Line-of-duty death benefit",-3000
+1001,military,12,"Medical",-3000
+1001,military,12,"Overtime",-1900
+1001,military,12,"Payroll",-17914
+1001,military,12,"Settlement",-2500
+1001,military,13,"City allocation",31000
+1001,military,13,"Contract",-2500
+1001,military,13,"Firearms qualification",-1800
+1001,military,13,"Kit",-400
+1001,military,13,"Kit returned",200
+1001,military,13,"Medical",-2000
+1001,military,13,"Overtime",-1290
+1001,military,13,"Payroll",-17914
+1001,military,14,"City allocation",31000
+1001,military,14,"Desk",-1000
+1001,military,14,"Firearms qualification",-1800
+1001,military,14,"Kit",-1570
+1001,military,14,"Overtime",-800
+1001,military,14,"Payroll",-17914
+1001,military,14,"Program",-3620
+1001,military,14,"Restock",-45
+1001,military,15,"Behaviour coaching",-3800
+1001,military,15,"City allocation",31000
+1001,military,15,"Firearms qualification",-10800
+1001,military,15,"Kit",-980
+1001,military,15,"Overtime",-520
+1001,military,15,"Payroll",-17914
+1001,military,15,"Restock",-135
+1001,military,16,"Behaviour coaching",-3800
+1001,military,16,"City allocation",30100
+1001,military,16,"Firearms qualification",-9000
+1001,military,16,"Overtime",-460
+1001,military,16,"Payroll",-17914
+1001,military,16,"Restock",-45
+1001,military,17,"City allocation",30100
+1001,military,17,"Contract",-7000
+1001,military,17,"Kit returned",660
+1001,military,17,"Line-of-duty death benefit",-6000
+1001,military,17,"Overtime",-980
+1001,military,17,"Payroll",-14457
+1001,military,17,"Restock",-105
+1001,military,18,"Behaviour coaching",-3800
+1001,military,18,"City allocation",30100
+1001,military,18,"Firearms qualification",-5400
+1001,military,18,"Overtime",-510
+1001,military,18,"Payroll",-14457
+1001,military,19,"City allocation",30100
+1001,military,19,"Desk",-800
+1001,military,19,"Firearms qualification",-7200
+1001,military,19,"Kit",-1480
+1001,military,19,"Lateral hire",-10640
+1001,military,19,"Overtime",-800
+1001,military,19,"Payroll",-15711
+1001,military,20,"City allocation",30100
+1001,military,20,"Firearms qualification",-7200
+1001,military,20,"Overtime",-800
+1001,military,20,"Payroll",-15711
+1001,military,20,"Program",-3480
+1001,military,20,"Restock",-90
+1001,military,21,"City allocation",30100
+1001,military,21,"Contract",-4500
+1001,military,21,"Firearms qualification",-7200
+1001,military,21,"Kit returned",1570
+1001,military,21,"Line-of-duty death benefit",-3000
+1001,military,21,"Overtime",-870
+1001,military,21,"Payroll",-14300
+1001,military,21,"Restock",-180
+1001,military,22,"Academy place",-7640
+1001,military,22,"City allocation",30100
+1001,military,22,"Firearms qualification",-5400
+1001,military,22,"Kit returned",170
+1001,military,22,"Overtime",-1050
+1001,military,22,"Payroll",-15500
+1001,military,22,"Restock",-120
+1001,military,23,"City allocation",30100
+1001,military,23,"Firearms qualification",-3600
+1001,military,23,"Kit",-1710
+1001,military,23,"Lateral hire",-10640
+1001,military,23,"Overtime",-980
+1001,military,23,"Payroll",-16972
+1001,military,23,"Restock",-45
+1001,military,24,"Academy place",-7640
+1001,military,24,"City allocation",29200
+1001,military,24,"Firearms qualification",-3600
+1001,military,24,"Kit",-400
+1001,military,24,"Kit returned",195
+1001,military,24,"Overtime",-1300
+1001,military,24,"Payroll",-18172
+1001,military,24,"Restock",-60
+1001,military,25,"City allocation",29200
+1001,military,25,"Contract",-6500
+1001,military,25,"Firearms qualification",-1800
+1001,military,25,"Kit",-340
+1001,military,25,"Kit returned",200
+1001,military,25,"Overtime",-1460
+1001,military,25,"Payroll",-16972
+1001,military,26,"Behaviour coaching",-3800
+1001,military,26,"City allocation",29200
+1001,military,26,"Desk",9000
+1001,military,26,"Firearms qualification",-3600
+1001,military,26,"Kit",-400
+1001,military,26,"Kit returned",170
+1001,military,26,"Lateral hire",-10640
+1001,military,26,"Overtime",-1200
+1001,military,26,"Payroll",-18423
+1001,military,26,"Program",-3760
+1001,military,26,"Restock",-60
+1001,military,27,"City allocation",29200
+1001,military,27,"Desk",-5000
+1001,military,27,"Firearms qualification",-1800
+1001,military,27,"Kit",-60
+1001,military,27,"Medical",-1500
+1001,military,27,"Overtime",-1370
+1001,military,27,"Payroll",-18423
+1001,military,27,"Restock",-60
+1001,military,28,"City allocation",29200
+1001,military,28,"Desk",6000
+1001,military,28,"Firearms qualification",-5400
+1001,military,28,"Kit",-3440
+1001,military,28,"Lateral hire",-10640
+1001,military,28,"Overtime",-1430
+1001,military,28,"Payroll",-20895
+1001,military,28,"Restock",-90
+1001,military,29,"City allocation",26900
+1001,military,29,"Contract",-2500
+1001,military,29,"Kit",-340
+1001,military,29,"Kit returned",1035
+1001,military,29,"Line-of-duty death benefit",-9000
+1001,military,29,"Overtime",-1856
+1001,military,29,"Payroll",-16613
+1001,military,29,"Restock",-120
+1001,military,30,"City allocation",26900
+1001,military,30,"Kit returned",265
+1001,military,30,"Overtime",-1120
+1001,military,30,"Payroll",-16613
+1001,military,31,"City allocation",26900
+1001,military,31,"Firearms qualification",-7200
+1001,military,31,"Kit returned",170
+1001,military,31,"Overtime",-870
+1001,military,31,"Payroll",-16613
+1001,military,31,"Restock",-60
+1001,military,32,"City allocation",26900
+1001,military,32,"Desk",3000
+1001,military,32,"Firearms qualification",-5400
+1001,military,32,"Kit",-740
+1001,military,32,"Kit returned",660
+1001,military,32,"Line-of-duty death benefit",-3000
+1001,military,32,"Medical",-1500
+1001,military,32,"Overtime",-1290
+1001,military,32,"Payroll",-15395
+1001,military,32,"Program",-3620
+1001,military,32,"Restock",-120
+1001,military,33,"City allocation",26900
+1001,military,33,"Contract",-4000
+1001,military,33,"Firearms qualification",-5400
+1001,military,33,"Kit",-2470
+1001,military,33,"Overtime",-740
+1001,military,33,"Payroll",-15395
+1001,military,34,"Academy place",-7640
+1001,military,34,"City allocation",26900
+1001,military,34,"Firearms qualification",-1800
+1001,military,34,"Kit",-3250
+1001,military,34,"Line-of-duty death benefit",-3000
+1001,military,34,"Overtime",-1480
+1001,military,34,"Payroll",-15341
+1001,military,34,"Restock",-60
+1001,military,35,"City allocation",26900
+1001,military,35,"Kit",-1810
+1001,military,35,"Kit returned",490
+1001,military,35,"Overtime",-1460
+1001,military,35,"Payroll",-15341
+1001,military,35,"Restock",-60
+1001,military,35,"Settlement",-2500
+1001,military,36,"Academy place",-7640
+1001,military,36,"Behaviour coaching",-3800
+1001,military,36,"City allocation",26900
+1001,military,36,"Kit returned",170
+1001,military,36,"Overtime",-1120
+1001,military,36,"Payroll",-16541
+1001,military,36,"Restock",-60
+1001,military,36,"Settlement",-2500
+1001,military,37,"City allocation",26900
+1001,military,37,"Contract",-5000
+1001,military,37,"Kit",-1510
+1001,military,37,"Medical",-3000
+1001,military,37,"Overtime",-1610
+1001,military,37,"Payroll",-16541
+1001,military,37,"Restock",-90
+1001,military,37,"Settlement",-2500
+1001,military,38,"City allocation",26900
+1001,military,38,"Kit",-850
+1001,military,38,"Medical",-1500
+1001,military,38,"Overtime",-1330
+1001,military,38,"Payroll",-16541
+1001,military,38,"Program",-3620
+1001,military,38,"Restock",-120
+1001,military,38,"Settlement",-2500
+1001,military,39,"Behaviour coaching",-3800
+1001,military,39,"City allocation",26900
+1001,military,39,"Kit",-990
+1001,military,39,"Kit returned",600
+1001,military,39,"Overtime",-870
+1001,military,39,"Payroll",-16541
+1001,military,39,"Restock",-180
+1001,military,40,"Behaviour coaching",-7600
+1001,military,40,"City allocation",26900
+1001,military,40,"Kit",-340
+1001,military,40,"Kit returned",170
+1001,military,40,"Overtime",-780
+1001,military,40,"Payroll",-16541
+1001,military,40,"Restock",-180
+1001,minimal,1,"City allocation",32000
+1001,minimal,1,"Overtime",-1020
+1001,minimal,1,"Payroll",-27484
+1001,minimal,1,"Surplus sold",2000
+1001,minimal,1,"The outgoing chief's reserve",10000
+1001,minimal,2,"City allocation",32000
+1001,minimal,2,"Overtime",-680
+1001,minimal,2,"Payroll",-27484
+1001,minimal,3,"City allocation",32000
+1001,minimal,3,"Overtime",-1120
+1001,minimal,3,"Payroll",-27484
+1001,minimal,4,"City allocation",32000
+1001,minimal,4,"Council sweeps",-10900
+1001,minimal,4,"Overtime",-850
+1001,minimal,4,"Payroll",-27484
+1001,minimal,5,"City allocation",32000
+1001,minimal,5,"Overtime",-1450
+1001,minimal,5,"Payroll",-27484
+1001,minimal,5,"Restock",-500
+1001,minimal,5,"Surplus sold",2000
+1001,minimal,6,"City allocation",32000
+1001,minimal,6,"Medical",-1000
+1001,minimal,6,"Overtime",-1040
+1001,minimal,6,"Payroll",-27484
+1001,minimal,7,"City allocation",32000
+1001,minimal,7,"Overtime",-1020
+1001,minimal,7,"Payroll",-27484
+1001,minimal,8,"City allocation",33300
+1001,minimal,8,"Council sweeps",-12400
+1001,minimal,8,"Overtime",-1150
+1001,minimal,8,"Payroll",-27484
+1001,minimal,9,"City allocation",33300
+1001,minimal,9,"Desk",-1000
+1001,minimal,9,"Overtime",-1190
+1001,minimal,9,"Payroll",-27484
+1001,minimal,9,"Surplus sold",2000
+1001,minimal,10,"City allocation",33300
+1001,minimal,10,"Overtime",-1750
+1001,minimal,10,"Payroll",-27484
+1001,minimal,11,"City allocation",33300
+1001,minimal,11,"Overtime",-780
+1001,minimal,11,"Payroll",-27484
+1001,minimal,12,"City allocation",33300
+1001,minimal,12,"Council sweeps",-14600
+1001,minimal,12,"Line-of-duty death benefit",-3000
+1001,minimal,12,"Overtime",-910
+1001,minimal,12,"Payroll",-25245
+1001,minimal,13,"City allocation",33300
+1001,minimal,13,"Overtime",-1700
+1001,minimal,13,"Payroll",-25245
+1001,minimal,13,"Surplus sold",2000
+1001,minimal,14,"City allocation",33300
+1001,minimal,14,"Overtime",-680
+1001,minimal,14,"Payroll",-25245
+1001,minimal,15,"City allocation",33300
+1001,minimal,15,"Medical",-500
+1001,minimal,15,"Overtime",-1040
+1001,minimal,15,"Payroll",-25245
+1001,minimal,15,"Restock",-7
+1001,minimal,16,"City allocation",34600
+1001,minimal,16,"Council sweeps",-20300
+1001,minimal,16,"Desk",-3500
+1001,minimal,16,"Overtime",-805
+1001,minimal,16,"Payroll",-25245
+1001,minimal,17,"City allocation",34600
+1001,minimal,17,"Overtime",-690
+1001,minimal,17,"Payroll",-25245
+1001,minimal,17,"Surplus sold",2000
+1001,minimal,18,"City allocation",34600
+1001,minimal,18,"Overtime",-1190
+1001,minimal,18,"Payroll",-24045
+1001,minimal,19,"City allocation",34600
+1001,minimal,19,"Desk",-4000
+1001,minimal,19,"Overtime",-680
+1001,minimal,19,"Payroll",-24045
+1001,minimal,20,"City allocation",34600
+1001,minimal,20,"Council sweeps",-25800
+1001,minimal,20,"Desk",-3000
+1001,minimal,20,"Overtime",-850
+1001,minimal,20,"Payroll",-24045
+1001,minimal,21,"City allocation",34600
+1001,minimal,21,"Medical",-3000
+1001,minimal,21,"Overtime",-1575
+1001,minimal,21,"Payroll",-25245
+1001,minimal,21,"Surplus sold",2000
+1001,minimal,22,"City allocation",34600
+1001,minimal,22,"Overtime",-960
+1001,minimal,22,"Payroll",-25245
+1001,minimal,23,"City allocation",34600
+1001,minimal,23,"Overtime",-690
+1001,minimal,23,"Payroll",-25245
+1001,minimal,24,"City allocation",36000
+1001,minimal,24,"Council sweeps",-29600
+1001,minimal,24,"Overtime",-910
+1001,minimal,24,"Payroll",-25245
+1001,minimal,25,"City allocation",36000
+1001,minimal,25,"Overtime",-1020
+1001,minimal,25,"Payroll",-25245
+1001,minimal,25,"Settlement",-2500
+1001,minimal,25,"Surplus sold",2000
+1001,minimal,26,"City allocation",36000
+1001,minimal,26,"Desk",-3000
+1001,minimal,26,"Overtime",-850
+1001,minimal,26,"Payroll",-25245
+1001,minimal,26,"Settlement",-2500
+1001,minimal,27,"City allocation",36000
+1001,minimal,27,"Overtime",-850
+1001,minimal,27,"Payroll",-25245
+1001,minimal,27,"Settlement",-2500
+1001,minimal,28,"City allocation",36000
+1001,minimal,28,"Council sweeps",-29200
+1001,minimal,28,"Overtime",-680
+1001,minimal,28,"Payroll",-25245
+1001,minimal,28,"Settlement",-2500
+1001,minimal,29,"City allocation",36000
+1001,minimal,29,"Medical",-1500
+1001,minimal,29,"Overtime",-870
+1001,minimal,29,"Payroll",-25245
+1001,minimal,29,"Surplus sold",2000
+1001,minimal,30,"City allocation",36000
+1001,minimal,30,"Overtime",-870
+1001,minimal,30,"Payroll",-25245
+1001,minimal,31,"City allocation",36000
+1001,minimal,31,"Overtime",-870
+1001,minimal,31,"Payroll",-25245
+1001,minimal,32,"City allocation",37400
+1001,minimal,32,"Council sweeps",-30000
+1001,minimal,32,"Overtime",-850
+1001,minimal,32,"Payroll",-25245
+1001,minimal,33,"City allocation",37400
+1001,minimal,33,"Overtime",-665
+1001,minimal,33,"Payroll",-25245
+1001,minimal,33,"Settlement",-2500
+1001,minimal,33,"Surplus sold",2000
+1001,minimal,34,"City allocation",37400
+1001,minimal,34,"Line-of-duty death benefit",-9000
+1001,minimal,34,"Overtime",-1710
+1001,minimal,34,"Payroll",-21555
+1001,minimal,34,"Settlement",-2500
+1001,minimal,35,"City allocation",37400
+1001,minimal,35,"Desk",-2000
+1001,minimal,35,"Overtime",-1020
+1001,minimal,35,"Payroll",-21555
+1001,minimal,35,"Settlement",-2500
+1001,minimal,36,"City allocation",37400
+1001,minimal,36,"Council sweeps",-30000
+1001,minimal,36,"Overtime",-870
+1001,minimal,36,"Payroll",-21555
+1001,minimal,36,"Settlement",-2500
+1001,minimal,37,"City allocation",37400
+1001,minimal,37,"Overtime",-1190
+1001,minimal,37,"Payroll",-21555
+1001,minimal,37,"Surplus sold",2000
+1001,minimal,38,"City allocation",37400
+1001,minimal,38,"Overtime",-780
+1001,minimal,38,"Payroll",-21555
+1001,minimal,39,"City allocation",37400
+1001,minimal,39,"Line-of-duty death benefit",-3000
+1001,minimal,39,"Medical",-1500
+1001,minimal,39,"Overtime",-1440
+1001,minimal,39,"Payroll",-20301
+1001,minimal,40,"City allocation",38900
+1001,minimal,40,"Council sweeps",-30000
+1001,minimal,40,"Overtime",-780
+1001,minimal,40,"Payroll",-20301

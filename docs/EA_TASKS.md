@@ -589,6 +589,69 @@ No case is untagged, so the merge introduced no outcome that neither side had. T
 
 `tests/balance_bands.json` now names this run as its reference. The band values are not changed: per roadmap 8.4 they are the owner's decision, and this is the matrix where they are to be read as a verdict.
 
+### Stage 1: what the CL3 reference says about the Phase 1 exits (2026-11-04)
+
+Every Phase 1 exit misses on the CL3 matrix (8 seeds, merged tree):
+
+| cycle | exit | CL3 |
+|---|---|---|
+| 1.C roster | cautious ≥ 12 fit in ≥ 90% of week-ends | 49% |
+| 1.D money | cautious: no week below $0 in weeks 1–12, ≤ 4 overall | 6 and 33 (means) |
+| 1.D money | minimal: week-40 balance ≤ $100K or visibly spent | $215K mean (after $230K of council sweeps) |
+| 1.E allies | lost and won back in ≥ 5 of 20 runs | 0 of 32 |
+| 1.F score | cautious mean run score above minimal and military-first | lowest of the four (−795 vs −404, −575) |
+
+**Diagnosis: the money miss is a death bill.** The balance harness now writes `money.csv`
+(each week's ledger summed by kind of item). One seed (1001) × 4 policies × 40 weeks, run
+locally on 4.7.2, in `tests/results/p1d-diag-2026-11-04/`:
+
+| 40 weeks, seed 1001 | cautious | accept-all | military | minimal |
+|---|---|---|---|---|
+| net change of the account | −$33.7K | −$24.5K | −$13.8K | +$88.5K |
+| academy places (replacements) | −$191.0K | −$175.7K | −$30.6K | 0 |
+| line-of-duty death benefits | −$87.0K | −$75.0K | −$45.0K | −$15.0K |
+| medical | −$28.5K | −$19.5K | −$27.5K | −$7.5K |
+| lateral hires | 0 | 0 | −$42.6K | 0 |
+| **cost of deaths and wounds** | **−$306.5K** | **−$270.2K** | **−$145.6K** | **−$22.5K** |
+
+Without the cost of deaths and wounds, cautious would end about $270K in the black. The
+allocation covers payroll and training; it cannot cover replacing 25–29 officers a run. In
+weeks 1–12 alone cautious loses 13 officers and spends $103K on it. Money (1.D), roster
+(1.C) and the deaths and lethality bands are one problem.
+
+**Where the deaths are: crew-house raids.** From CL3's `ops.csv` (2,128 operations):
+
+| situation | operations | officers killed | per operation |
+|---|---|---|---|
+| crew house (`gang`) | 484 | 391 | **0.81** |
+| hostage | 413 | 98 | 0.24 |
+| barricade | 287 | 44 | 0.15 |
+| warrant | 242 | 17 | 0.07 |
+| public event | 702 | 5 | 0.01 |
+
+- Crew houses are **70% of all officer deaths**. Every other type together is 0.10 per
+  operation, inside the 0.15 lethality band.
+- They were as deadly in 1C (0.79 over 1,169 raids), so this is not a merge or clearance
+  regression.
+- Most raids send six officers (1,297 of 1,653 in CL3 + 1C): the plan's floor, because the
+  roster is short. Six against 5.5 armed members (3–8, up to a third with rifles) kills 0.98
+  officers per raid. More officers help, but not enough: at 2:1 it is 0.56, at 3:1 still 0.5.
+  Most deaths are outright kills by suspects (326 of 391), so better medical care would not
+  change much.
+
+**This is a design decision (owner).** Ways to close it, none applied yet:
+1. Make crew houses less deadly in the simulation: fewer members, fewer rifles, more
+   surrenders when outnumbered. Changes how the game feels; needs P1.I1 rebaselining.
+2. Make them avoidable: fewer crew-house calls, or a plan option (surveillance, wait them
+   out, a warrant at a better hour) that trades a slower result for fewer deaths.
+3. Make the existing counters matter: the armoured rescue vehicle (P1.D4, crew houses
+   only) and the plan's six-officer floor; cautious buys neither today.
+4. Accept the lethality and re-set the deaths, lethality and roster bands (P1.I2.a), then
+   rebalance the money against the death bill instead.
+
+The economy itself needs only small changes once deaths are settled: minimal still banks
+over $200K after the quarterly sweeps (the 1.D exit wants ≤ $100K).
+
 ## Order and overlap
 
 ```

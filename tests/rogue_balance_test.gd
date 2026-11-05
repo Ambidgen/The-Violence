@@ -247,10 +247,10 @@ static func _money_since(ledger: Array, mark) -> Dictionary:
 
 ## A ledger item's kind: the text before the first ':', ',' or ' (' ("Payroll, week 3" ->
 ## "Payroll", "Kit: plates" -> "Kit", "Settlement of $4,000 (instalment 1 of 4 ..." ->
-## "Settlement").
+## "Settlement", "Council sweeps $30,000 of unspent ..." -> "Council sweeps").
 static func money_kind(item: String) -> String:
 	var cut := item.length()
-	for sep in [":", ",", " (", " of $"]:
+	for sep in [":", ",", " (", " of $", " $"]:
 		var i := item.find(sep)
 		if i >= 0 and i < cut:
 			cut = i
