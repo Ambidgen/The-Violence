@@ -119,6 +119,8 @@ const VEST_MEDIUM := 0.4
 ## full-power rifle round.
 const VEST_LOW_STAGGER := 0.35
 const PLATE_HIGH_STAGGER := 0.6
+## At most one armour stagger in this many seconds (see _armour_stop).
+const ARMOUR_STAGGER_GAP := 1.0
 ## Doors (v0.7.5): seconds to open, unlock, and per attempt to ram, kick or shoot a
 ## lock, with the chance an attempt works.
 const DOOR_OPEN_T := 0.6
@@ -3261,11 +3263,15 @@ static func _cal(sw: Dictionary) -> String:
 ## A round stopped by body armour: staggered for dur seconds (no aim, no shot), aim
 ## unsettled, a little stress. Not a hit.
 func _armour_stop(a, shooter, u: Vector2, dur: float, what: String) -> void:
-	a.ticker["flinch_until"] = maxf(a.ticker.get("flinch_until", -1.0), t + dur)
-	a.ticker["stagger_until"] = maxf(a.ticker.get("stagger_until", -1.0), t + dur)
-	a.muzzle_dir += deg_to_rad(5.0) * (1.0 if rng.randf() < 0.5 else -1.0)
-	if not a.aim.is_empty():
-		a.aim["settle"] = 0.0
+	# As with the shield (B2): a stagger on every stopped round let a fast handgun pin the
+	# wearer, unable to fire back, until a head shot landed. One stagger per ARMOUR_STAGGER_GAP.
+	if t - float(a.ticker.get("armour_stagger_t", -99.0)) >= ARMOUR_STAGGER_GAP:
+		a.ticker["armour_stagger_t"] = t
+		a.ticker["flinch_until"] = maxf(a.ticker.get("flinch_until", -1.0), t + dur)
+		a.ticker["stagger_until"] = maxf(a.ticker.get("stagger_until", -1.0), t + dur)
+		a.muzzle_dir += deg_to_rad(5.0) * (1.0 if rng.randf() < 0.5 else -1.0)
+		if not a.aim.is_empty():
+			a.aim["settle"] = 0.0
 	add_stress(a, 0.05, "armour hit")
 	stat["armour"] = stat.get("armour", 0) + 1
 	emit({"type": "plate", "p": a.pos, "id": a.id, "dir": u})
