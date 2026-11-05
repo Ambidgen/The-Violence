@@ -708,7 +708,11 @@ seeds as CL3, on branch `arena/m8-crew-2026-11-05`. Results are in
 
 The roster and money exits follow deaths, so they need no separate work.
 
-### Stage 1, option 4: deaths and lethality bands re-set (2026-11-05)
+### Stage 1, option 4: deaths and lethality bands re-set (2026-11-05, withdrawn)
+
+**Withdrawn the same day.** The owner replaced this with body armour by calibre (next
+section), and the bands went back to deaths ≤ 8 and lethality ≤ 0.15. The crew-house matrix
+stays the reference. The record below is kept for the reasoning.
 
 **Owner decision 2026-11-05: accept roughly the current lethality.** In
 `balance_bands.json`, the reference is now the crew-house matrix
@@ -734,6 +738,51 @@ option 4, and the next Stage 1 work:
   counter), the score band (≥ 0; every policy is about −290 to −420, mostly from deaths at
   −25 each, so this band or the death weight needs the same decision), and the accept-all
   civilians band (6.4 against ≤ 6).
+
+### Stage 1: body armour by calibre (2026-11-05)
+
+**Owner decision 2026-11-05**, in place of option 4. Every officer wears a soft vest
+under any plates. Each weapon has a calibre (`cal` in `equipment.gd`):
+
+| calibre | weapons | torso, soft vest | plates |
+|---|---|---|---|
+| low | service, compact and heavy pistols, SMG | stopped; stagger only (at most one a second) | — |
+| medium | carbine, SBR, assault rifle, shotgun | lethality × 0.4 | one plate stops one round (front chest), as before |
+| high | battle rifle, marksman | no effect | two plates stop the round and are both destroyed; with fewer than two, the hit kills |
+
+Head and limb hits are unchanged. Criminals can wear vests through the existing `vest`
+flag. Unit gate `armour` in `equip_test` (20 seeds, 0 breaks); `lane_repro` in the range
+fixture re-recorded.
+
+**Measured:** CI run 42061626578, 8 seeds × 4 policies, branch `arena/m8-armour-2026-11-05`,
+against the crew-house matrix. This run predates the one-a-second stagger limit.
+
+| officers killed per op | crew change | armour |
+|---|---|---|
+| crew house | 0.49 | **0.65** |
+| hostage | 0.27 | 0.23 |
+| barricade | 0.15 | 0.15 |
+| warrant | 0.10 | 0.08 |
+
+| policy | killed per run | score |
+|---|---|---|
+| accept-all | 17 → 21 | −416 → −603 |
+| cautious | 19 → 24 | −410 → −589 |
+| military-first | 14 → 14 | −408 → −286 |
+| minimal | 7.4 → 9.1 | −285 → −390 |
+
+Gate 1 misses 35 of 52 (37 before).
+
+**Why crew houses got worse:** almost all crew-house deaths are head shots. The local raid
+probe (`tests/raid_probe.gd`, 40 raids, six officers) gave 6 of 9 deaths to the head before
+armour and 11 of 12 after. The vest keeps officers up after torso hits, so they stay
+exposed long enough to take a head shot. The first version also re-staggered on every
+stopped round, pinning officers (probe 0.42 killed per raid). The stagger limit brought it to
+0.30, against 0.23 for the crew change alone; the difference is within the probe's noise.
+Hostage and warrant operations improved slightly.
+
+Open: head protection (helmets for all, or the aim rule from WD08 that shifts aim to the
+head once a plate is seen), and whether the .45 heavy pistol should be medium calibre.
 
 ## Order and overlap
 

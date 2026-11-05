@@ -12,10 +12,15 @@ Newest first. The README covers the game as it stands; this file keeps the histo
   better; cautious went from −795 to −410. Gate 1 still misses 37 of 52 bands. Deaths and
   lethality are still about twice their bands. Details in `docs/EA_TASKS.md`, "option 1
   applied".
-- **Deaths and lethality bands re-set (owner decision)**: Gate 1 now accepts up to 22
-  officers killed per run (was 8) and 0.45 per operation in the worst run (was 0.15). The
-  crew-house matrix is the new reference. 30 of 52 bands miss; the roster and money bands
-  are next, re-balanced to absorb that death rate.
+- **Body armour by calibre (owner decision)**: every officer wears a soft vest under any
+  plates. Handgun and SMG rounds to the torso only stagger; most rifles and shotguns do 40%
+  of their usual harm to a vested torso; battle and marksman rifles kill through the torso
+  unless two plates take the round, and destroy both. Head and limb hits are unchanged.
+  Measured: hostage and warrant operations lose slightly fewer officers, but crew houses
+  lose more (0.49 → 0.65 per raid), because nearly all crew-house deaths are head shots and
+  vested officers stay up long enough to take one. Gate 1 misses 35 of 52.
+- **Deaths and lethality bands**: briefly re-set to 22 and 0.45, then restored to 8 and
+  0.15 when the owner chose body armour instead.
 - **Balance harness**: allies won back are now counted from week-end ally states. Before,
   allies regained through a desk reconciliation were never counted, so every matrix
   showed 0.
