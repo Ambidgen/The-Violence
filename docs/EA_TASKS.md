@@ -708,6 +708,33 @@ seeds as CL3, on branch `arena/m8-crew-2026-11-05`. Results are in
 
 The roster and money exits follow deaths, so they need no separate work.
 
+### Stage 1, option 4: deaths and lethality bands re-set (2026-11-05)
+
+**Owner decision 2026-11-05: accept roughly the current lethality.** In
+`balance_bands.json`, the reference is now the crew-house matrix
+(`tests/results/arena/m8-crew-2026-11-05/balance`):
+
+| band | was | now | crew-house matrix |
+|---|---|---|---|
+| `deaths` (mean officers killed per run) | ≤ 8 | ≤ 22 | 7.4–19.3 by policy |
+| `lethality` (worst run, killed per op) | ≤ 0.15 | ≤ 0.45 | 0.23–0.40 by policy |
+
+Both still fail a return to the CL3 level. Re-checked against the same results,
+**30 of 52 bands miss** (37 before). Roster and money do not move, because they now have
+to absorb about 15–20 deaths a run instead of expecting fewer. That is the second half of
+option 4, and the next Stage 1 work:
+- **Roster** (`roster-floor` 2–3 against ≥ 10; `roster-weeks` 24–33 against ≤ 8; coverage):
+  replacements must arrive faster than about one death every two weeks. The levers are
+  academy throughput and lead time, laterals, and return-to-duty time.
+- **Money** (`money-deficit`, `money-debt`, `money-end` for cautious and accept-all): the
+  death bill (academy places plus death benefits, about $270–300K a run) must fit in the
+  allocation, either through a larger allocation or council money tied to line-of-duty
+  deaths, or through cheaper replacements.
+- **Not tied to deaths:** the allies bands (`ally-recovery` needs a matrix with the fixed
+  counter), the score band (≥ 0; every policy is about −290 to −420, mostly from deaths at
+  −25 each, so this band or the death weight needs the same decision), and the accept-all
+  civilians band (6.4 against ≤ 6).
+
 ## Order and overlap
 
 ```

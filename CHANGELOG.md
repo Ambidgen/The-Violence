@@ -12,6 +12,10 @@ Newest first. The README covers the game as it stands; this file keeps the histo
   better; cautious went from −795 to −410. Gate 1 still misses 37 of 52 bands. Deaths and
   lethality are still about twice their bands. Details in `docs/EA_TASKS.md`, "option 1
   applied".
+- **Deaths and lethality bands re-set (owner decision)**: Gate 1 now accepts up to 22
+  officers killed per run (was 8) and 0.45 per operation in the worst run (was 0.15). The
+  crew-house matrix is the new reference. 30 of 52 bands miss; the roster and money bands
+  are next, re-balanced to absorb that death rate.
 - **Balance harness**: allies won back are now counted from week-end ally states. Before,
   allies regained through a desk reconciliation were never counted, so every matrix
   showed 0.

@@ -4,8 +4,8 @@
   "status": "asserting",
   "enforce": true,
   "note": "Gate 1 bands for the run layer (EA_TASKS P1.A3), asserting since P1.I2: a full matrix run by rogue_balance_test.gd now exits 1 on a miss. The two-week smoke in the quick tier is never judged by them, and --report-only reproduces an experiment without failing. The values are provisional: the roadmap's 8.4 says the Gate 1 numbers are the owner's decision, because they encode how hard the game should be, and the 1.C matrix (2026-11-02) still missed roster, money, deaths and ally bands before 1.D-1.F landed; the first matrix run after P1.I is where they are read as a verdict and, if a band is genuinely unreachable, re-set with a reason recorded beside it.",
-  "reference": "tests/results/cl3-2026-11-04/balance",
-  "reference_note": "CL3 (2026-11-04): 8 seeds x 4 policies on the merged tree, CI run 41915644631; 36 of 52 bands miss (cycle-1C: 39). Supersedes tests/results/cycle-1C/balance as the comparison point. Diff and reading: docs/EA_TASKS.md, Stage 0: CL3.",
+  "reference": "tests/results/arena/m8-crew-2026-11-05/balance",
+  "reference_note": "Crew-house change (2026-11-05): 8 seeds x 4 policies, CI run 41964333236, same seeds as CL3; 37 of 52 bands missed before the deaths and lethality bands were re-set. CL3 (tests/results/cl3-2026-11-04/balance) is the previous reference. Reading: docs/EA_TASKS.md, Stage 1, option 1 applied and option 4.",
   "bands": [
     {
       "id": "roster-floor",
@@ -78,22 +78,22 @@
       "metric": "officers_killed",
       "agg": "mean",
       "test": "<=",
-      "value": 8,
+      "value": 22,
       "policies": [
         "all"
       ],
-      "why": "13-16 of 20 died across three runs; a run is meant to cost some officers, not most"
+      "why": "re-set 2026-11-05 (owner: accept roughly the current lethality). Was <= 8 ('a run is meant to cost some officers, not most'); the crew-house matrix (arena/m8-crew-2026-11-05) gives 7.4-19.3 per run by policy, so 22 keeps a seed's worth of headroom over cautious and still catches a regression to the CL3 level (21-22)"
     },
     {
       "id": "lethality",
       "metric": "officers_killed_per_op",
       "agg": "max",
       "test": "<=",
-      "value": 0.15,
+      "value": 0.45,
       "policies": [
         "all"
       ],
-      "why": "0.21-0.25 per operation on 28 Oct; a fifth of a squad per call is what broke the roster"
+      "why": "re-set 2026-11-05 (owner: accept roughly the current lethality). Was <= 0.15; the crew-house matrix's worst run per policy is 0.23-0.40, and 0.45 still fails a return to six officers lost on a 13-op run"
     },
     {
       "id": "civilians",
