@@ -63,13 +63,13 @@ const LINES4 := [
 	["I HAVE THINGS TO DO WITH MY LIFE I CAN'T LET HIM TAKE AWAY FROM ME.", "N", 0.2, -1.0, 10],
 	["I'LL SURVIVE THIS. WE'LL SURVIVE THIS. TOGETHER.", "N", 0.7, 5.2, 10],
 	["END NOTE", "STAMP", 0.3, 2.8, 10],
-	["JULY 27TH, 2000:", "HEAD", 1.4, 1.8, 11],
+	["NOVEMBER 8TH, 2001:", "HEAD", 1.4, 1.8, 11],
 	["FIRST TV APPEARANCE OF MAYOR ELECT", "N", 0.2, -1.0, 11],
 	["(MOST WATCHED TV MOMENT IN CITY HISTORY)", "N", 0.4, 4.4, 11],
-	["JULY 30TH, 2000 - INAUGURATION DAY.", "HEAD", 1.4, 2.4, 12],
+	["JANUARY 7TH, 2002 - INAUGURATION DAY.", "HEAD", 1.4, 2.4, 12],
 	["I'M GONNA DO IT.", "SCRAWL", 0.2, 16.6, 12],
 	["CASE REPORT:", "REP", 0.8, 1.2, 13],
-	["THOMAS GRENDEL (ACTING CHIEF)", "REP", 0.1, 1.8, 13],
+	["THOMAS GRENDEL, CHIEF OF POLICE", "REP", 0.1, 1.8, 13],
 	["SUBJECT A (FULL NAME: DOUGLAS FETTICK)", "REP", 0.3, 2.4, 13],
 	["A'S DIARY ENTRIES BECOME INCREASINGLY DERANGED UNTIL THE POINT OF INCOHERENCE.", "REP", 0.7, -1.0, 13],
 	["A'S MOST COGENT MOMENT PAST THE SEVENTH PAGE IS SPENT PLANNING THE LOGISTICS OF THE ASSASSINATION.", "REP", 0.5, 7.4, 13],
@@ -812,7 +812,7 @@ func fk_p0() -> void:
 			ln(Vector2(-210, -126 + k2 * 66), Vector2(210, -126 + k2 * 66), LINE_BLUE, 2.0, 20003 + k2, 1.0, 0.3)
 	txt_c("THIS MACHINE", 0.0, -134.0, 46, INK, 20010, 3, rv(1.3, 1.2))
 	txt_c("KILLS TYRANTS", 0.0, -68.0, 46, RED, 20011, 3, rv(2.4, 1.2))
-	txt_c("JULY 20TH, 2000", 0.0, 0.0, 30, INK, 20012, 2, rv(3.6, 0.9))
+	txt_c("NOVEMBER 2ND, 2001", 0.0, 0.0, 30, INK, 20012, 2, rv(3.6, 0.9))
 	fk_pop()
 	# the evidence tag on its string
 	var rt := rv(4.4, 0.6)
@@ -1458,7 +1458,7 @@ func fk_p11() -> void:
 			solid(wnd, Color(0.45, 0.85, 1.0, gl))
 			edge(wnd, INK, 1.6, 24720 + q2, 1.0, 0.3)
 			draw_circle(Vector2(hx + 75, 526), 42.0, Color(0.45, 0.85, 1.0, 0.12 * gl))
-	txt("JULY 27TH, 2000:", Vector2(50, 88), 46, SUN, 24730, 3, rv(t0, 1.0))
+	txt("NOVEMBER 8TH, 2001:", Vector2(50, 88), 46, SUN, 24730, 3, rv(t0, 1.0))
 	var rtv := rv(cs(44) - 0.4, 0.8)
 	var scr := jb_tv(Rect2(420, 120, 760, 460), 24740, rtv)
 	if rtv >= 1.0:
@@ -1579,7 +1579,7 @@ func fk_p12() -> void:
 		return
 	fk_sheet()
 	if cur == 0:
-		txt("JULY 30TH, 2000 - INAUGURATION DAY.", Vector2(350, 156), 38, INK, 35300, 2, rv(cs(46) + 0.2, 1.6))
+		txt("JANUARY 7TH, 2002 - INAUGURATION DAY.", Vector2(350, 156), 38, INK, 35300, 2, rv(cs(46) + 0.2, 1.6))
 	if tau < 0.0:
 		return
 	# how many phrases on the sheets before this one, and in all

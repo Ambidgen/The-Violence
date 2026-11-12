@@ -2,7 +2,7 @@ extends "res://scripts/view/proto/presser_view.gd"
 ## Cutscene 3 — Jeremy Berry (prototype, 2026-10-30). Thomas's narration of how the man
 ## behind the Valentine's Day shooting got there: the silly name, the serious man, the
 ## Eastside tower, who he would and would not rent to, the internet, the empty rooms,
-## the loans, the rebrand, Christmas 1998, the things he stopped doing, and the door.
+## the loans, the rebrand, Christmas 2000, the things he stopped doing, and the door.
 ## It ends on the date and leads straight into the tutorial mission (the top-floor
 ## clear of Paisley Tower).
 ##
@@ -52,7 +52,7 @@ const LINES3 := [
 	["A *BETTER* PAISLEY TOWER.", "N", 0.2, -1.0, 8],
 	["A MORE MODERN PAISLEY TOWER.", "N", 0.2, -1.0, 8],
 	["...UNTIL HE REALIZED THAT FATEFUL DAY.", "N", 0.8, -1.0, 9],
-	["CHRISTMAS 1998.", "N", 0.3, 3.0, 9],
+	["CHRISTMAS 2000.", "N", 0.3, 3.0, 9],
 	["THAT PEOPLE DIDN'T FORGET AS EASILY AS THEY USED TO.", "N", 0.4, -1.0, 9],
 	["AND SO JEREMY STOPPED RUNNING THE COMMERCIALS.", "N", 0.8, -1.0, 10],
 	["STOPPED PUTTING OUT FLYERS.", "N", 0.2, -1.0, 10],
@@ -62,7 +62,7 @@ const LINES3 := [
 	["STOPPED LEAVING THE TOWER ALTOGETHER, PEOPLE IN THAT NEIGHBORHOOD SAY.", "N", 0.2, -1.0, 10],
 	["", "BEAT", 0.4, 3.8, 11],
 	["...UNTIL ONE DAY HE DID.", "N", 0.2, 3.8, 11],
-	["FEBRUARY 14TH, 1999", "END", 0.6, 4.6, 11],
+	["FEBRUARY 14TH, 2001", "END", 0.6, 4.6, 11],
 ]
 
 const PAGES := 12
@@ -515,7 +515,7 @@ func jb_footprint(c: Vector2, ang: float, sz: float, s: int, a := 1.0) -> void:
 # ================================================================== page 0: the name
 func jb_p0() -> void:
 	txt_c("THE VALENTINE'S DAY MASS SHOOTING", 800.0, 104.0, 54, RED, 9001, 3, rv(0.15, 1.6))
-	txt_c("FEBRUARY 14TH, 1999", 800.0, 162.0, 32, INK, 9002, 2, rv(1.7, 0.9))
+	txt_c("FEBRUARY 14TH, 2001", 800.0, 162.0, 32, INK, 9002, 2, rv(1.7, 0.9))
 	var hp: Array = [Vector2(90, 90), Vector2(1510, 90), Vector2(110, 300), Vector2(1490, 300)]
 	for k in hp.size():
 		heart(hp[k], 24.0, PINK if k % 2 == 0 else PURPLE, 9003 + k * 3, rv(2.4 + k * 0.1, 0.3))
@@ -920,7 +920,7 @@ func jb_p8() -> void:
 		txt_c("MODERN!", mc.x, mc.y + 14.0, 32, PURPLE, 11695, 3, rmd)
 
 
-# ================================================================== page 9: Christmas 1998
+# ================================================================== page 9: Christmas 2000
 func jb_p9() -> void:
 	var T := cs(35)
 	sky_strip(170.0, SKY, 11700, rv(T - 0.3, 0.6))
