@@ -3,6 +3,34 @@
 Newest first. The README covers the game as it stands; this file keeps the history.
 
 
+## Unreleased — one trunk: the map UI, field orders and the cutscenes join the balance line (2026-11-11)
+
+Stage A of the roadmap to release (v4). Three lines of work in three repositories are one
+tree again; nothing from any of them was dropped.
+
+- **Merged by content.** The balance line (crew houses, body armour by calibre, the patrol
+  radio, Week Closed, 4–5 Nov) is the base. The map-UI line (`campaign-map-ui-2026-11-03`:
+  no side menu, popups on the city map, 67 crayon icons, orders in the field, the
+  bright-crayon pass) is merged three ways against the Stage 0 branch: 671 files taken as
+  they were, 15 merged, four conflicts resolved by keeping both sides. The cutscene line
+  brings **Hero** and **The Mayor**, and Jeremy and Fettick re-dated to 2001.
+- **The patrol radio has its own card.** A radio on the HUD shows how many calls are still
+  to come this week and opens it; so does a row on the week's card. An answer comes straight
+  back to the radio with the next day's call. The week's report folds the calls nobody
+  answered and nothing came of into one line; a call where someone was hurt keeps its own.
+- **The operation camera.** The wheel, a middle- or right-drag and Home always moved the
+  plan; nothing on screen said so. The run bar now has zoom out, zoom in, fit and *follow
+  the action*, each squad's row has an eye that keeps the view on that squad (it closes in
+  to twice the fitted view), W A S D move the view, and moving it yourself lets go.
+  `scripts/view/op_camera.gd` holds the arithmetic; `tests/op_camera_test.gd` checks it.
+- **Names**: George Carrick, **Julia Noussan** and **Bob Stevens**, as the story canon has
+  them. Display text only; the ids and the election are unchanged until the Stage B recast.
+- **Week Closed** is drawn in the bright crayon like the other shorts (it came with the
+  merge), and the rendered walk now waits for it instead of clicking through it.
+- **Tests**: `op_camera_test` joins the quick tier; `ops_ui_test` covers the radio card, the
+  folded report and election night in the map UI; `ui_walk` follows a squad, zooms, fits,
+  and opens the radio.
+
 ## Unreleased — Patrol encounters, the .22 and warrant helmets (2026-11-05)
 
 - **Patrol encounters (owner request)**: one a day, seven a week, on a new Patrol radio card

@@ -111,6 +111,8 @@ static func _body(id: String) -> String:
 			return '<path d="M12 3.5l9.5 16.5h-19z" fill="%s"/><path d="M12 9.5v5M12 17.4v.1" stroke-width="2.4"/>' % Y
 		"offer":
 			return '<rect x="3" y="6" width="18" height="12.5" rx="1.5" fill="%s"/><path d="M3.3 6.5L12 13l8.7-6.5"/>' % W
+		"radio":      # 2026-11-11: the patrol radio (a handset, its aerial, a lit dial)
+			return '<path d="M9.5 8V2.8"/><rect x="6.5" y="8" width="11" height="13" rx="2" fill="%s"/><path d="M9.5 12h5" stroke="%s"/><path d="M9.5 14.6h5" stroke="%s"/><circle cx="12" cy="18" r="1.4" fill="%s" stroke-width="1.4"/>' % [B, W, W, Y]
 		"help":
 			return '<circle cx="12" cy="12" r="9" fill="%s"/><path d="M9.3 9.4a2.8 2.8 0 1 1 3.8 2.6c-.8.3-1.1.9-1.1 1.7v.6M12 17.4v.1" stroke-width="2.2"/>' % Y
 		"fold":

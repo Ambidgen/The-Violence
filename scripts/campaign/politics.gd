@@ -60,9 +60,9 @@ const ALLY_ORDER := ["council", "union", "coalition", "da"]
 const CANDIDATES := {
 	"kettering": {"name": "George Carrick", "ticket": "Safe Streets", "start": 34,
 		"blurb": "The head of Port Carrick Enterprises, with an answer for every problem: more police, more money, fewer questions. His son Kevin builds armoured vehicles; the contracts remain a family matter."},
-	"okonjo": {"name": "Alicia Beddrow", "ticket": "Port Carrick Together", "start": 31,
+	"okonjo": {"name": "Julia Noussan", "ticket": "Port Carrick Together", "start": 31,
 		"blurb": "A democratic socialist who intends to repair the city. She wants your signature on the Bridge Street order read aloud—and your name off the door."},
-	"pell": {"name": "Gordon Pell", "ticket": "Independent", "start": 35,
+	"pell": {"name": "Bob Stevens", "ticket": "Independent", "start": 35,
 		"blurb": "Competent, tireless and difficult to hurry. His answer to a failed review is another review, with a clearer filing system."},
 }
 const CAND_ORDER := ["kettering", "okonjo", "pell"]
@@ -393,7 +393,7 @@ func on_operation(week: int, sit: Dictionary, res: Dictionary, w, dept) -> Array
 		_poll("pell", -3.0, "%d killed at %s" % [crowd_killed, sit.get("site_name", "a public event")])
 		_trust(wi, -8)
 		var place := String(sit.get("site_name", "public event")).to_upper()
-		_headline(week, "%s KILLED AT %s" % [_num(crowd_killed).to_upper(), place], "The rally was over before the ambulances left. Pell calls for a review; Beddrow asks who signed the plan.", "op")
+		_headline(week, "%s KILLED AT %s" % [_num(crowd_killed).to_upper(), place], "The rally was over before the ambulances left. Stevens calls for a review; Noussan asks who signed the plan.", "op")
 	# what was done to civilians by police: the story is coming, sooner or later
 	if civ_hit + civ_killed + excessive > 0:
 		var p_never := 0.0
@@ -628,7 +628,7 @@ func week_end(week: int, board: Array, dept) -> Array:
 			dept.spend("Council sweeps $%s of unspent surplus into the city reserve" % dept.money(sweep), sweep)
 			_ally("council", 2, dept, lines, "a balanced book ($%s swept)" % dept.money(sweep))
 			lines.append("The budget committee sweeps $%s of unspent surplus into the city reserve." % dept.money(sweep))
-	# a balanced book is Pell's whole platform
+	# a balanced book is Stevens's whole platform
 	if dept.balance >= 0:
 		_poll("pell", 0.3, "a balanced book")
 	# EA_TASKS P1.E3: an ally nobody has had word against this week holds its standing —
@@ -680,7 +680,7 @@ func _land(week: int, p: Dictionary, dept) -> Array:
 				_:
 					source = "The department's log records the finding at %s. " % String(p["address"])
 			var age := ("The operation was %d weeks ago. " % late) if late >= 3 else ""
-			var body := "%s%sBeddrow: 'A report is not the same thing as an answer.'" % [source, age]
+			var body := "%s%sNoussan: 'A report is not the same thing as an answer.'" % [source, age]
 			_headline(week, head, body, "story")
 			lines.append("In the papers: %s." % head.capitalize())
 		"lawsuit":
@@ -725,8 +725,8 @@ func _front_page(week: int) -> void:
 		var sh := share(ld)
 		var lines_c := {
 			"kettering": ["CARRICK: 'I WILL GIVE THE POLICE WHATEVER THEY ASK FOR'", "%s%% back Carrick's Safe Streets ticket. His son Kevin's armoured vehicle firm did not return the Ledger's call." % int(sh)],
-			"okonjo": ["BEDDROW LEADS: 'THE CHIEF WILL BE MY FIRST APPOINTMENT TO LEAVE'", "%s%% back Port Carrick Together. Asked about Bridge Street, she held up the signed order. 'He knows.'" % int(sh)],
-			"pell": ["PELL UNVEILS 212-PAGE PLAN TO STREAMLINE CITY PAPERWORK", "%s%% back the independent. The plan includes a form for requesting a review of the plan." % int(sh)],
+			"okonjo": ["NOUSSAN LEADS: 'THE CHIEF WILL BE MY FIRST APPOINTMENT TO LEAVE'", "%s%% back Port Carrick Together. Asked about Bridge Street, she held up the signed order. 'He knows.'" % int(sh)],
+			"pell": ["STEVENS UNVEILS 212-PAGE PLAN TO STREAMLINE CITY PAPERWORK", "%s%% back the independent. The plan includes a form for requesting a review of the plan." % int(sh)],
 		}
 		_headline(week, lines_c[ld][0], lines_c[ld][1], "politics")
 		have += 1
@@ -734,7 +734,7 @@ func _front_page(week: int) -> void:
 		["UNIONTOWN AVENUE REPAIR CREW RETURNS TO THE SAME POTHOLE", "One lane is closed. The city says a steel plate will arrive Thursday."],
 		["IRONWORKS PLANT CLOSURE: 300 SHIFTS CUT", "Workers left through the east gate with their lockers in boxes."],
 		["FERRY STREET LIFT BRIDGE INSPECTION DELAYED AGAIN", "The weight limit remains in force. The detour adds twenty minutes."],
-		["CITY HALL ELEVATOR STUCK; PELL TAKES THE STAIRS", "His office logged the climb as a facilities issue."],
+		["CITY HALL ELEVATOR STUCK; STEVENS TAKES THE STAIRS", "His office logged the climb as a facilities issue."],
 		["CARRICK LEDGER CUTS FOUR REPORTERS", "The city desk will cover council and courts with one fewer person."],
 		["NORTHGATE BAKERY WINS REGIONAL PRIZE FOR RYE", "The owner says the ovens are older than the lease."],
 		["WATER MAIN BURSTS UNDER FOUNDRY ROAD", "Crews have closed the block. Repairs may run into next week."],
@@ -791,20 +791,20 @@ func ending(dept) -> Dictionary:
 		"okonjo":
 			keep = t >= 60.0 and not lost("coalition") and force <= 2
 			if keep:
-				head = "Beddrow keeps you—for ninety days, in writing."
+				head = "Noussan keeps you—for ninety days, in writing."
 				lines.append("At the swearing-in, she places the Bridge Street order beside your appointment letter. 'Your signature is here,' she says. 'The next one has to mean something.'")
 				lines.append("The coalition calls the appointment a test. Rourke calls it probation. The oversight board receives its first file before the office opens.")
 			else:
-				head = "Beddrow fires you on her first morning."
+				head = "Noussan fires you on her first morning."
 				lines.append("She reads the Bridge Street order into the record, then your force record: %d civilians hit by police, %d killed. The old signature and the new numbers share a page." % [int(record["civ_hit"]), int(record["civ_killed"])])
 				lines.append("The department goes under civilian oversight. Its first request is every file you ever closed.")
 		"pell":
 			keep = dept.balance >= 0 and dept.deficit_weeks <= 4
 			if keep:
-				head = "Pell keeps you, subject to review."
+				head = "Stevens keeps you, subject to review."
 				lines.append("His first order is a review of the Bridge Street file. Yours is scheduled for the third quarter of the year after next. The account balances; for now, so does your desk.")
 			else:
-				head = "Pell reviews your position out of existence."
+				head = "Stevens reviews your position out of existence."
 				lines.append("After %d weeks in deficit, the chief's office is folded into Municipal Services, Sub-Division C. Your desk is reassigned to parking enforcement; the line item is already approved." % int(dept.deficit_weeks))
 	# `_n()` already carries the noun ("7 stories"), so the sentence must not add it
 	# again — the first engine run of a 40-week campaign printed "7 stories stories".
@@ -818,7 +818,7 @@ func ending(dept) -> Dictionary:
 	# what the ending says in words is the count itself. This used to be a string + int
 	# concatenation ("SCORE BREAKDOWN: Carrick=" + int(...)), which does not parse: it was
 	# the last of the faults that kept the campaign from compiling (CI 2026-11-02).
-	lines.append("The count: Carrick %d%%, Beddrow %d%%, Pell %d%%." % [
+	lines.append("The count: Carrick %d%%, Noussan %d%%, Stevens %d%%." % [
 		int(result["votes"]["kettering"]), int(result["votes"]["okonjo"]), int(result["votes"]["pell"])])
 	return {"winner": win, "keep": keep, "head": head, "lines": lines}
 

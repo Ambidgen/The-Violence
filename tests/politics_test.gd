@@ -353,7 +353,7 @@ func _causes_e1_f1() -> void:
 	var cl: Array = p.week_causes(1)
 	_check(cl.any(func(l): return String(l).contains(p.ally_name("union")) and String(l).contains("+5") and String(l).contains("test decision")),
 		"an ally gain is logged with its cause: %s" % str(cl))
-	_check(cl.any(func(l): return String(l).contains("Pell") and String(l).contains("+2.0")), "and so is a poll gain")
+	_check(cl.any(func(l): return String(l).contains("Stevens") and String(l).contains("+2.0")), "and so is a poll gain")
 	p.week_end(1, [], dept)
 	_check(p.week_causes(1).size() >= 2, "the causes survive the week_end into the log")
 	# E3: a quiet week (nothing moved an ally) holds every non-lost ally's standing

@@ -27,6 +27,8 @@ var board: Array = []          # this week's situations
 var past: Array = []           # every situation of earlier weeks, with its outcome
 var patrols: Array = []        # this week's patrol encounters, one a day (Patrol, 2026-11-05)
 var patrol_past: Array = []    # earlier weeks' encounters, briefly
+var last_patrol_quiet: Array = []   # end_week()'s lines for unanswered calls where nothing happened (not saved; the UI folds them)
+var last_patrol_quiet_n := 0        # and how many calls those were
 var rng := RandomNumberGenerator.new()
 var politics                   # v0.9: wards, allies, candidates, the press, the election
 var run                        # 1.3: the run layer (Rogue) for a roguelike story; null for the classic campaign
@@ -343,8 +345,17 @@ func end_week() -> Array:
 		e0["sim"] = false
 		e0["overtime_paid"] = true
 		lines.append_array(decide_patrol(String(e0["id"]), int(e0["choice"]), false)["lines"])
+	# 2026-11-11: the lines stay in the report as they were (the harnesses read them); the
+	# ones for calls where nothing happened are also noted, so the week's card can say
+	# "five routine calls" in one line and keep the room for what matters.
+	last_patrol_quiet = []
+	last_patrol_quiet_n = 0
 	for e in Patrol.pending(patrols):
-		lines.append_array(decide_patrol(String(e["id"]), 0, false)["lines"])
+		var plines: Array = decide_patrol(String(e["id"]), 0, false)["lines"]
+		lines.append_array(plines)
+		if Patrol.uneventful(e):
+			last_patrol_quiet.append_array(plines)
+			last_patrol_quiet_n += 1
 	# S15 Week Closed: the week as it stood when the chief ended it
 	var recap := _recap_start()
 	if run != null:

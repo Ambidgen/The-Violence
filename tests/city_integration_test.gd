@@ -75,7 +75,7 @@ func _init() -> void:
 			matches = matches and float(s["city_x"]) == float(src["x"]) and float(s["city_y"]) == float(src["y"])
 			matches = matches and int(s["map"]) == int(City.SITE_LAYOUTS[id]["map"])
 			if kind == "event":
-				matches = matches and id == "civic-plaza-rally" and s["candidate"] in ["George Carrick", "Alicia Beddrow", "Gordon Pell"]
+				matches = matches and id == "civic-plaza-rally" and s["candidate"] in ["George Carrick", "Julia Noussan", "Bob Stevens"]
 	check(matches, "generated calls inherit the exact site, address, ward, trust, visibility and coordinates")
 	check(seen.size() == City.SITE_LAYOUTS.size(), "seeded calls can reach all %d supported sites" % City.SITE_LAYOUTS.size())
 

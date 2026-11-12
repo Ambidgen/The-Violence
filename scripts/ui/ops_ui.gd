@@ -38,6 +38,7 @@ var hud_money: Label
 var hud_fit: Label
 var hud_cases: Label
 var hud_end: Button
+var hud_radio: Button         # the patrol radio (2026-11-11): lit while a call is waiting
 var run_bar: PanelContainer
 var run_row: HBoxContainer
 var _titled := false
@@ -232,6 +233,9 @@ func _build_hud() -> void:
 	hud_money = _chip(h, "money", "", "The department account", 18)
 	hud_fit = _chip(h, "force", "", "Officers fit for duty", 18)
 	hud_cases = _chip(h, "ia", "", "Internal affairs cases open", 18)
+	hud_radio = _cam_btn(h, "radio", "Patrol radio", func(): open_radio())
+	hud_radio.focus_mode = Control.FOCUS_NONE
+	hud_radio.add_theme_font_size_override("font_size", 16)
 	h.add_child(VSeparator.new())
 	hud_end = _btn(h, "End week", func(): _end_week())
 	hud_end.focus_mode = Control.FOCUS_NONE
@@ -293,6 +297,14 @@ func _refresh_hud() -> void:
 	var nc: int = d.open_cases().size()
 	hud_cases.text = str(nc)
 	hud_cases.add_theme_color_override("font_color", Ink.accent(0.9) if nc > 0 else INK)
+	# the patrol radio: how many of the week's calls are still to come, red while one waits
+	var waiting: int = Patrol.pending(c.patrols).size()
+	var nxt: Dictionary = Patrol.next_pending(c.patrols)
+	hud_radio.visible = not c.patrols.is_empty() and not c.over()
+	hud_radio.text = str(waiting) if waiting > 0 else ""
+	hud_radio.add_theme_color_override("font_color", Ink.accent(0.9))
+	hud_radio.tooltip_text = ("Patrol radio: %s, %s. %d call%s left this week." % [Patrol.DAYS[int(nxt["day"])], String(Patrol.spec(nxt)["name"]).to_lower(), waiting, "" if waiting == 1 else "s"]) if not nxt.is_empty() else "Patrol radio: every call this week is answered"
+	hud_radio.set_meta("label", "Patrol radio")
 	var block: Array = c.run.blocking() if c.run != null else []
 	hud_end.text = "End week"
 	hud_end.visible = not c.over()
@@ -430,6 +442,23 @@ func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Butto
 	return b
 
 
+## A picture-only button for the operation camera: the wording lives in the tooltip and
+## in meta "label", where the tests and the walk find it.
+func _cam_btn(parent: Control, icon_id: String, label: String, cb: Callable, toggle := false) -> Button:
+	var b := Button.new()
+	b.icon = Icons.tex(icon_id, 22)
+	b.tooltip_text = label
+	b.set_meta("label", label)
+	b.custom_minimum_size = Vector2(36, 32)
+	b.toggle_mode = toggle
+	if toggle:
+		b.toggled.connect(func(on): cb.call(on))
+	else:
+		b.pressed.connect(cb)
+	parent.add_child(b)
+	return b
+
+
 func _card(parent: Control) -> VBoxContainer:
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", UI._sb(Color("#fbf7ec"), Color("#8e8a95"), 1, 8.0))
@@ -528,7 +557,7 @@ func open_week() -> void:
 	if c.run != null:
 		_desk_card(box)
 	_calls_list(box)
-	_patrol_card(box)
+	_radio_row(box)
 	_story_card(box, Story.current(c))
 	if bool(Settings.get_v("tips")) and c.week() <= 2:
 		_first_weeks(box)
@@ -773,40 +802,82 @@ func _desk_row(v: Control, row: Array, cb: Callable) -> void:
 	_btn(h, "Open  >", cb).tooltip_text = String(row[2])
 
 
-## The patrol radio (2026-11-05): one encounter a day. The next day's call is answered
-## here; the rest of the week waits its turn. Anything left at the end of the week, the
-## pair handles alone.
-func _patrol_card(parent: Control) -> void:
+## The patrol radio on the week's card (2026-11-11): one row, like a desk item. The radio
+## itself is its own card (open_radio), from here or from the radio on the HUD.
+func _radio_row(parent: Control) -> void:
 	var c = main.campaign
 	if c.patrols.is_empty():
 		return
 	var v := _card(parent)
 	var nxt: Dictionary = Patrol.next_pending(c.patrols)
-	_text(v, "PATROL RADIO  ·  one call a day", Ink.accent(1.0) if not nxt.is_empty() else INK, 13)
+	var left: int = Patrol.pending(c.patrols).size()
+	var what: String = ("%s: %s" % [Patrol.DAYS[int(nxt["day"])], String(Patrol.spec(nxt)["name"]).to_lower()]) if not nxt.is_empty() else "every call answered"
+	_desk_row(v, ["radio", "Patrol radio  ·  %s" % what, ("%d call%s left this week; unanswered ones the pair handles alone" % [left, "" if left == 1 else "s"]) if left > 0 else "Nothing waiting"], func(): open_radio())
+
+
+## The patrol radio (2026-11-05; its own card since the trunk merge, 2026-11-11): one
+## encounter a day. The next day's call is answered here; the rest of the week waits its
+## turn, and an answer comes straight back here with the next call. Anything left at the
+## end of the week, the pair handles alone.
+func open_radio(lines := []) -> void:
+	var c = main.campaign
+	if c == null or c.over():
+		show_board(lines)
+		return
+	mode = "board"
+	root.visible = true
+	_clear()
+	_city_backdrop()
+	_refresh_hud()
+	_title("PATROL RADIO  ·  week %d" % c.week())
+	var nxt: Dictionary = Patrol.next_pending(c.patrols)
+	_chips(box, [
+		["radio", str(Patrol.pending(c.patrols).size()), "Calls still to come this week"],
+		["force", str(c.dept.available().size()), "Officers fit for duty"],
+		["money", "$" + Department.money(c.dept.balance), "The account: backup is overtime"],
+	])
+	for ln in lines:
+		_text(box, String(ln), INK, 12)
+	if c.patrols.is_empty():
+		_text(box, "No calls this week.", GREY, 11)
+	# the call that is waiting, first and large
+	if not nxt.is_empty():
+		var v := _card(box)
+		var rd: Dictionary = Patrol.read(nxt)
+		_text(v, "%s  ·  %s" % [Patrol.DAYS[int(nxt["day"])].to_upper(), String(Patrol.spec(nxt)["name"]).to_upper()], Ink.accent(1.0), 14)
+		_text(v, Patrol.radio_line(nxt, c.dept), INK, 13)
+		_chips(v, [
+			["event", String(rd["danger"]), "How dispatch reads the danger: routine, could turn, or dangerous"],
+			["clock", String(rd["urgency"]), "How dispatch reads the hurry: no rush, time matters, or urgent"],
+		])
+		var h := _h(v)
+		var pid: String = String(nxt["id"])
+		for k in Patrol.CHOICES.size():
+			var ch: Dictionary = Patrol.CHOICES[k]
+			var kk: int = k
+			var b := _btn(h, String(ch["name"]) + (("  $%d" % Patrol.OVERTIME[k]) if Patrol.OVERTIME[k] > 0 else ""), func(): main.ops_patrol(pid, kk))
+			b.set_meta("label", String(ch["name"]))
+			# its own picture: "backup" would otherwise read as "back" and draw an arrow
+			b.icon = Icons.tex(["next", "busy", "clock"][k], 22)
+			b.add_theme_constant_override("h_separation", 6)
+			b.tooltip_text = String(ch["desc"]) + ((" Overtime $%d." % Patrol.OVERTIME[k]) if Patrol.OVERTIME[k] > 0 else "")
+		_text(v, "Routine calls are best handled by the pair. Backup costs overtime; waiting for it is safest for the officers and slowest for whoever called.", GREY, 10)
+	# the week, day by day
+	var wv := _card(box)
+	_text(wv, "THE WEEK", INK, 12)
 	for e in c.patrols:
 		var day: String = Patrol.DAYS[int(e["day"])]
 		var st: String = String(e["status"])
 		if st == "done":
-			_text(v, "%s  ·  %s" % [day, Patrol.summary_line(e)], GREY, 11)
-			continue
-		if st == "running":
-			_text(v, "%s  ·  %s: armed, on the board as an operation." % [day, Patrol.spec(e)["name"]], INK, 11)
-			continue
-		if String(e["id"]) != String(nxt.get("id", "")):
-			_text(v, "%s  ·  —" % day, GREY, 10)
-			continue
-		var rd: Dictionary = Patrol.read(e)
-		_text(v, "%s  ·  %s" % [day.to_upper(), String(Patrol.spec(e)["name"]).to_upper()], INK, 12)
-		_text(v, Patrol.radio_line(e, c.dept), INK, 12)
-		_text(v, "Dispatch reads it as %s; %s." % [rd["danger"], rd["urgency"]], GREY, 10)
-		var h := _h(v)
-		var pid: String = String(e["id"])
-		for k in Patrol.CHOICES.size():
-			var ch: Dictionary = Patrol.CHOICES[k]
-			var kk: int = k
-			var b := _btn(h, String(ch["name"]), func(): main.ops_patrol(pid, kk))
-			b.tooltip_text = String(ch["desc"]) + ((" Overtime $%d." % Patrol.OVERTIME[k]) if Patrol.OVERTIME[k] > 0 else "")
-	_text(v, "Calls you leave unanswered, the pair goes in alone.", GREY, 10)
+			_text(wv, "%s  ·  %s" % [day, Patrol.summary_line(e)], INK if not Patrol.uneventful(e) else GREY, 11)
+		elif st == "running":
+			_text(wv, "%s  ·  %s: armed, on the map as an operation." % [day, Patrol.spec(e)["name"]], INK, 11)
+		elif String(e["id"]) == String(nxt.get("id", "")):
+			_text(wv, "%s  ·  waiting for your answer" % day, Ink.accent(0.9), 11)
+		else:
+			_text(wv, "%s  ·  not yet" % day, GREY, 11)
+	_text(box, "Calls you leave unanswered, the pair goes in alone at the end of the week.", GREY, 10)
+	_btn(box, "<  Board", func(): show_map())
 
 
 func _program_line() -> String:
@@ -985,8 +1056,31 @@ func _armory() -> void:
 	_btn(box, "<  Board", func(): show_board())
 
 
+## The week's report with the routine patrol calls in one line (2026-11-11). A call where
+## someone was hurt or a complaint was made keeps its own line; so does everything else.
+func _fold_patrol(lines: Array) -> Array:
+	var c = main.campaign
+	var quiet: Array = c.last_patrol_quiet.duplicate()
+	if quiet.is_empty():
+		return lines
+	var out: Array = []
+	var at := -1
+	for ln in lines:
+		var k: int = quiet.find(ln)
+		if k >= 0:
+			quiet.remove_at(k)
+			if at < 0:
+				at = out.size()
+			continue
+		out.append(ln)
+	var n: int = c.last_patrol_quiet_n
+	out.insert(maxi(at, 0), "Patrol radio: %d call%s nobody answered; the pair%s handled %s alone, and nothing came of %s." % [
+		n, "" if n == 1 else "s", "" if n == 1 else "s", "it" if n == 1 else "them", "it" if n == 1 else "them"])
+	return out
+
+
 func _end_week() -> void:
-	var lines: Array = main.ops_end_week()
+	var lines: Array = _fold_patrol(main.ops_end_week())
 	if main.campaign.over():
 		main.play_consequence_short("s11_election", {}, func(): show_board(lines), true)
 	else:
@@ -1289,7 +1383,7 @@ func _open_document(
 	_documents(filter, document_id, return_person, return_topic)
 
 
-## Poll bars, told apart by pattern: Carrick solid ink, Beddrow hatched, Pell outline.
+## Poll bars, told apart by pattern: Carrick solid ink, Noussan hatched, Stevens outline.
 class PollBars:
 	extends Control
 	var p
@@ -3542,6 +3636,13 @@ func show_run() -> void:
 	_run_refs["slider"] = sl
 	_btn(h, "Live", func(): _go_live())
 	h.add_child(VSeparator.new())
+	# The operation camera (2026-11-11): the wheel and a right-drag always worked; now
+	# the bar says so, and the view can stay on the action or on a squad (its row).
+	_cam_btn(h, "minus", "Camera: zoom out", func(): main.cam_zoom(-1))
+	_cam_btn(h, "plus", "Camera: zoom in", func(): main.cam_zoom(1))
+	_cam_btn(h, "map", "Camera: fit the whole plan (Home)", func(): main.cam_fit())
+	_run_refs["cam_action"] = _cam_btn(h, "bodycam", "Camera: follow the action", func(on): main.cam_action(on), true)
+	h.add_child(VSeparator.new())
 	# EA_TASKS P1.G2: offered once the operation has been quiet for a minute of its own
 	# clock. The simulation still runs to the end; only the watching is skipped.
 	if main.has_method("can_skip_report"):
@@ -3571,6 +3672,7 @@ func show_run() -> void:
 	note.visible = false
 	_run_refs["order_note"] = note
 	_text(box, "Pick a squad, then click a room on the plan: it moves there by the usual paths, consolidates and holds until you press Resume or pick another room. Squads only, not single officers.", GREY, 10)
+	_text(box, "The view: the wheel zooms, a right-drag or W A S D moves it, Home fits the plan. The eye on a squad's row keeps the view on that squad; the camera on the bar keeps it on the action. Moving the view yourself lets go.", GREY, 10)
 	_text(box, "RADIO", INK, 12)
 	var lg := RichTextLabel.new()
 	lg.bbcode_enabled = true
@@ -3696,7 +3798,8 @@ func _squad_rows(w) -> void:
 			var res := _btn(h, "Resume", func(): _resume_squad(i))
 			res.icon = Icons.tex("play", 20)
 			res.tooltip_text = "Squad %d goes back to its own orders from where it stands" % (i + 1)
-			rows[i] = {"b": b, "lab": lab, "res": res}
+			var fol := _cam_btn(h, "eye", "Camera: follow Squad %d" % (i + 1), func(_on): main.cam_follow(i), true)
+			rows[i] = {"b": b, "lab": lab, "res": res, "fol": fol}
 		var r: Dictionary = rows[i]
 		var alive := 0
 		for m in el["members"]:
@@ -3719,6 +3822,13 @@ func _squad_rows(w) -> void:
 			_pick_squad(i, false)
 		(r["res"] as Button).visible = oroom != ""
 		(r["res"] as Button).disabled = not live
+		# the eye is down while the view is on this squad; a squad that is gone cannot be followed
+		(r["fol"] as Button).set_pressed_no_signal(main.cam_track == "sq:%d" % i)
+		(r["fol"] as Button).disabled = alive == 0
+		if alive == 0 and main.cam_track == "sq:%d" % i:
+			main.cam_release()
+	if _run_refs.has("cam_action"):
+		(_run_refs["cam_action"] as Button).set_pressed_no_signal(main.cam_track == "action")
 
 
 func _pick_squad(i: int, on: bool) -> void:

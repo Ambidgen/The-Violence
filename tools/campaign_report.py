@@ -23,7 +23,7 @@ ALLIES = ["council", "union", "coalition", "da"]
 ALLY_CODES = {"CL": "council", "UN": "union", "CC": "coalition", "DA": "da"}
 ALLY_NAMES = {"council": "Duff", "union": "Rourke", "coalition": "Mbeki-Shaw", "da": "Varga"}
 LOST_NAMES = {"Marguerite Duff": "council", "Tommy Rourke": "union", "Rev. Alma Mbeki-Shaw": "coalition", "Paul Varga": "da"}
-CANDIDATES = {"kettering": "Kettering", "okonjo": "Okonjo-Vale", "pell": "Pell"}
+CANDIDATES = {"kettering": "Carrick", "okonjo": "Noussan", "pell": "Stevens"}   # ids are the code's; names are canon since 2026-11-11
 MARK_WEEKS = [1, 5, 10, 20, 30, 40]
 
 WEEK_RE = re.compile(r"^  week (\d+): account \$(-?\d+), morale (\d+), (\d+) open cases, (\d+) fit\s+\|\s+trust (\d+)\s+allies (.*?)\s+polls K (\d+) O (\d+) P (\d+)")
@@ -81,7 +81,8 @@ def from_log(path: Path) -> dict:
             r["hung"] += 1
         m = ELECTION_RE.match(line)
         if m:
-            r["winner"] = {"Royce Kettering": "Kettering", "Dana Okonjo-Vale": "Okonjo-Vale", "Gordon Pell": "Pell"}.get(m.group(1), m.group(1))
+            r["winner"] = {"George Carrick": "Carrick", "Julia Noussan": "Noussan", "Bob Stevens": "Stevens",
+                           "Royce Kettering": "Carrick", "Dana Okonjo-Vale": "Noussan", "Gordon Pell": "Stevens", "Alicia Beddrow": "Noussan"}.get(m.group(1), m.group(1))
             r["kept"] = m.group(5) == "true"
             r["votes"] = {"kettering": int(m.group(2)), "okonjo": int(m.group(3)), "pell": int(m.group(4))}
         m = FORTY_RE.search(line)

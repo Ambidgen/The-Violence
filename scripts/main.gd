@@ -37,6 +37,7 @@ const Recorder = preload("res://scripts/sim/recorder.gd")
 const Fog = preload("res://scripts/view/fog.gd")
 const ReplayView = preload("res://scripts/view/replay_view.gd")
 const PlanMarks = preload("res://scripts/view/plan_marks.gd")
+const OpCamera = preload("res://scripts/view/op_camera.gd")
 const OpsUI = preload("res://scripts/ui/ops_ui.gd")
 const Pacing = preload("res://scripts/sim/pacing.gd")
 const PX := 40.0
@@ -78,6 +79,10 @@ var ledger
 var views := {}
 var preview_ops := {}
 var _panning := false
+# The operation camera (2026-11-11): what the view is following while an operation runs.
+# "" nothing (the chief moves it), "sq:<i>" a squad, "action" where the shooting is.
+var cam_track := ""
+var _fit_z := 1.0                 # the zoom _fit_camera last chose: "fitted" for follow_zoom
 
 # v0.6 operations: civilians, police rules, night, and team A from the department
 var n_civ := 0
@@ -450,6 +455,7 @@ func _load_map(i: int) -> void:
 	for ch2 in canopy_layer.get_children():
 		ch2.queue_free()
 	_build_props()
+	cam_track = ""
 	_fit_camera()
 
 
@@ -800,7 +806,8 @@ func ops_patrol(pid: String, choice: int) -> void:
 		ops_select(String(out["run"]))
 		ops_run()
 		return
-	ops_ui.show_board(out["lines"])
+	# 2026-11-11: back to the radio, where the next day's call is, not to the week's card
+	ops_ui.open_radio(out["lines"])
 
 
 func ops_new_campaign() -> void:
@@ -1479,7 +1486,80 @@ func _process(delta: float) -> void:
 				_save()
 			ui.show_debrief(world, dept_lines, use_dept)
 	_test_hooks()
+	_cam_tick(delta)
 	_director(delta)
+
+
+# ------------------------------------------------------------------ the operation camera
+## 2026-11-11. The wheel, a middle- or right-drag and Home already moved the plan; these
+## are the parts the run card's buttons and the squad rows call: zoom in steps, fit, and
+## follow a squad or the action. Moving the view by hand lets go of whatever it follows.
+
+## Follow squad i (0-based), or stop if the view is already on it.
+func cam_follow(i: int) -> void:
+	var key := "sq:%d" % i
+	if cam_track == key:
+		cam_track = ""
+		return
+	cam_track = key
+	var z := OpCamera.follow_zoom(cam.zoom.x, _fit_z)
+	cam.zoom = Vector2(z, z)
+
+
+## Follow the action: whoever is shooting, and the police on the move.
+func cam_action(on: bool) -> void:
+	cam_track = "action" if on else ("" if cam_track == "action" else cam_track)
+	if on:
+		var z := OpCamera.follow_zoom(cam.zoom.x, _fit_z)
+		cam.zoom = Vector2(z, z)
+
+
+func cam_release() -> void:
+	cam_track = ""
+
+
+## A step in (dir > 0) or out about the middle of the view.
+func cam_zoom(dir: int) -> void:
+	var z := OpCamera.zoom_step(cam.zoom.x, dir)
+	cam.zoom = Vector2(z, z)
+
+
+## The whole plan again, following nothing.
+func cam_fit() -> void:
+	cam_track = ""
+	_fit_camera()
+
+
+## The point (pixels) the view is being taken to, or Vector2.INF when it follows nothing
+## it can see: the squad is gone, or the chief is looking at the past.
+func cam_goal() -> Vector2:
+	if cam_track == "" or world == null or mode != "run" or view_t >= 0.0:
+		return Vector2.INF
+	var pts: Array = OpCamera.action_points(world) if cam_track == "action" else OpCamera.squad_points(world, int(cam_track.trim_prefix("sq:")))
+	var c := OpCamera.centre(pts)
+	if not c.is_finite():
+		return Vector2.INF
+	# the bar along the bottom covers that much of the view: keep them above it
+	return c * PX + Vector2(0, OPS_BAR_H / 2.0 / maxf(cam.zoom.x, 0.01) if _side_w() == 0.0 else 0.0)
+
+
+func _cam_tick(delta: float) -> void:
+	if _args.has("cam") or front == null or front.is_open():
+		return     # the director's camera owns recordings; nothing moves under a menu
+	# W A S D, not the arrows: the arrows already belong to whatever control has the
+	# focus (they would scrub the rewind slider while they moved the view).
+	var typing: Control = get_viewport().gui_get_focus_owner()
+	if mode in ["plan", "run", "debrief"] and (shorts == null or not shorts.busy) and not (typing is LineEdit or typing is TextEdit):
+		var d := Vector2(
+			float(Input.is_key_pressed(KEY_D)) - float(Input.is_key_pressed(KEY_A)),
+			float(Input.is_key_pressed(KEY_S)) - float(Input.is_key_pressed(KEY_W)))
+		if d != Vector2.ZERO:
+			cam_track = ""
+			cam.position += d * OpCamera.KEY_PAN * delta / maxf(cam.zoom.x, 0.01)
+	if cam_track != "" and mode != "run":
+		cam_track = ""
+	# at 10x and 20x the people move that much faster: so does the view, or it trails them
+	cam.position = OpCamera.approach(cam.position, cam_goal(), delta * clampf(speed, 1.0, 8.0))
 
 
 ## A director's camera for recordings (1.1): --cam=action follows where the fighting is,
@@ -1733,6 +1813,7 @@ func _fit_camera() -> void:
 	if not is_finite(z) or z < 0.005 or z > 100.0:
 		return
 	cam.zoom = Vector2(z, z)
+	_fit_z = z
 	var centre := Vector2(level.W * PX / 2.0, (level.H * PX + 156.0) / 2.0)
 	cam.position = centre + Vector2(_side_w() / 2.0 / z, OPS_BAR_H / 2.0 / z if _side_w() == 0.0 else 0.0)
 
@@ -1758,7 +1839,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				var f := 1.12 if mb.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.12
 				var before := get_global_mouse_position()
 				cam.zoom = (cam.zoom * f).clamp(Vector2(0.3, 0.3), Vector2(4, 4))
-				cam.position += (before - cam.position) * (1.0 - 1.0 / f)
+				if cam_track == "":     # following: zoom about what is followed, not the cursor
+					cam.position += (before - cam.position) * (1.0 - 1.0 / f)
 			return
 		if mb.button_index == MOUSE_BUTTON_MIDDLE or (mb.button_index == MOUSE_BUTTON_RIGHT and mode == "run"):
 			_panning = mb.pressed
@@ -1783,6 +1865,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_rebuild_previews()
 				_refresh()
 	elif event is InputEventMouseMotion and _panning:
+		cam_track = ""     # moving the view by hand lets go of what it was following
 		cam.position -= (event as InputEventMouseMotion).relative / cam.zoom.x
 	elif event is InputEventKey and event.pressed and not event.echo:
 		var k := (event as InputEventKey).keycode
@@ -1806,7 +1889,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				set_speed(UI.SPEEDS[i])
 				ui.speed_buttons[i].set_pressed_no_signal(true)
 		if k == KEY_HOME:
-			_fit_camera()
+			cam_fit()
 		elif k == KEY_F2:
 			set_red_ink(not Ink.red_ink_enabled)
 		elif k == KEY_F3:

@@ -346,7 +346,7 @@ func show_credits(from: String) -> void:
 
 # ------------------------------------------------------------------ the manual
 const MANUAL := [
-	["The job", """You are Port Carrick's new police chief. Before the appointment, you were deputy chief. You signed the Bridge Street eviction order; the outgoing chief gave the briefing. Alicia Beddrow remembers who signed and who briefed it.
+	["The job", """You are Port Carrick's new police chief. Before the appointment, you were deputy chief. You signed the Bridge Street eviction order; the outgoing chief gave the briefing. Julia Noussan remembers who signed and who briefed it.
 
 For forty weeks, the board gives you more calls than you can answer. Choose which to take, who to send and what orders they carry. Once an operation starts, your officers act on their own. You watch the plan meet the room.
 
@@ -395,8 +395,9 @@ The budget covers pay, overtime, kit, training, medical bills and settlements. O
 Deaths, wounds, dismissals and deficits lower morale. Low morale adds stress to every operation. Very low morale costs you officers."""],
 	["The city", """City Hall shows the polls, four allies and trust in each ward. Each ally holds something the department needs: the budget chair controls the allocation; the union affects morale; the coalition shares community tips; the district attorney decides whether a cleared case stays closed. Lose an ally below 25 and that support goes with them. Win them back above 40.
 
-George Carrick promises the police more money and fewer limits. Alicia Beddrow wants the Bridge Street order read in public. Gordon Pell wants the books balanced before the next promise is made. At the end of week 40, the city votes. The winner decides whether you keep the office."""],
-	["Controls", """Mouse wheel zooms. Middle- or right-drag pans. Home fits the view.
+George Carrick promises the police more money and fewer limits. Julia Noussan wants the Bridge Street order read in public. Bob Stevens wants the books balanced before the next promise is made. At the end of week 40, the city votes. The winner decides whether you keep the office."""],
+	["Controls", """Mouse wheel zooms. Middle- or right-drag pans, and so do W A S D. Home fits the view.
+In an operation, the eye on a squad's row keeps the view on that squad, and the camera on the bar keeps it on the action. Moving the view yourself lets go.
 Space pauses an operation; keys 1–7 set its speed.
 F2 switches off red ink. F3 switches off gore. Neither changes the simulation.
 Esc opens the menu.

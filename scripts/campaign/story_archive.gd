@@ -15,7 +15,7 @@ const CONTACTS := [
 	},
 	{
 		"id": "dana",
-		"name": "Alicia Beddrow",
+		"name": "Julia Noussan",
 		"role": "Mayoral candidate · Port Carrick Together",
 		"intro": "She wants the Bridge Street order read aloud, with your name on it."
 	},
@@ -51,7 +51,7 @@ const CONTACTS := [
 	},
 	{
 		"id": "pell",
-		"name": "Gordon Pell",
+		"name": "Bob Stevens",
 		"role": "Mayoral candidate · Independent",
 		"intro": "He believes every problem can be made legible in a form."
 	},
@@ -202,9 +202,9 @@ static func _winner_name(winner: String) -> String:
 		"kettering":
 			return "George Carrick"
 		"okonjo":
-			return "Alicia Beddrow"
+			return "Julia Noussan"
 		"pell":
-			return "Gordon Pell"
+			return "Bob Stevens"
 	return "The new mayor"
 
 
@@ -229,8 +229,8 @@ static func contact_status(campaign, contact_id: String) -> String:
 	if campaign == null:
 		return "No campaign file."
 	var politics = campaign.politics
-	# The archive's contact ids are not the politics layer's candidate ids: Dana
-	# Beddrow is "dana" in the story and "okonjo" in the polls. Passing the
+	# The archive's contact ids are not the politics layer's candidate ids: Julia
+	# Noussan is "dana" in the story and "okonjo" in the polls. Passing the
 	# contact id straight to politics.share() read a key that is not there, which
 	# logged an engine error and printed a 0.0% share for her.
 	var cand_ids := {"kettering": "kettering", "dana": "okonjo", "pell": "pell"}
@@ -608,7 +608,7 @@ static func documents(campaign, filter := "all") -> Array:
 			"Incoming chief",
 			(
 				"I gave the Bridge Street briefing. You signed the eviction order as deputy chief. "
-				+ "Alicia Beddrow remembers who signed and who briefed it. "
+				+ "Julia Noussan remembers who signed and who briefed it. "
 				+ "This memo records that sequence; it does not decide whether the order was lawful."
 			)
 		)

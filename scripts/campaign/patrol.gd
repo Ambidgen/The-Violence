@@ -387,6 +387,15 @@ static func _label(res: Dictionary) -> String:
 	return "handled"
 
 
+## Nothing the chief has to read about: nobody hurt, no complaint (2026-11-11). The
+## week's report folds these into one line; the radio's own list keeps every call.
+static func uneventful(e: Dictionary) -> bool:
+	var res: Dictionary = e.get("result", {})
+	return (int(res.get("officers_killed", 0)) == 0 and int(res.get("officers_hurt", 0)) == 0
+		and int(res.get("civ_killed", 0)) == 0 and int(res.get("civ_hurt", 0)) == 0
+		and not bool(res.get("complaint", false)))
+
+
 ## One line for the board and the week's report.
 static func summary_line(e: Dictionary) -> String:
 	var res: Dictionary = e.get("result", {})

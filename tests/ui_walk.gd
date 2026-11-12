@@ -17,6 +17,7 @@ extends SceneTree
 ## reported as KNOWN and do not fail the walk (today: the first call's disabled button
 ## explains itself only in a tooltip, EA_TASKS P3.B1).
 
+const OpCamera = preload("res://scripts/view/op_camera.gd")
 const ALL_STEPS := ["title", "desk", "brief", "run", "endweek", "screens"]
 const SCREENS := ["Roster", "Budget", "Internal affairs", "City Hall", "Armoury and programs", "Campaign file"]
 const OP_WALL_LIMIT_MS := 900000      # an operation that has not ended after 15 min of wall time has hung
@@ -346,6 +347,23 @@ func _walk(seed_v: int) -> void:
 				check(press("Resume"), "Resume is offered for the squad holding on an order")
 				await frames(4)
 				check(not el0.has("ordered_room"), "Resume returns Squad 1 to its orders")
+			# the operation camera (2026-11-11): the eye on a squad's row keeps the view on it,
+			# and the bar zooms and fits. Timed, not counted in frames: the view eases by the clock.
+			var z_fit: float = main.cam.zoom.x
+			if check(press("Camera: follow Squad 1"), "a squad's row offers to follow it"):
+				var tc := Time.get_ticks_msec()
+				while Time.get_ticks_msec() - tc < 1500:
+					await frames(2)
+				var goal: Vector2 = main.cam_goal()
+				check(main.cam_track == "sq:0", "the view is on Squad 1")
+				check(main.cam.zoom.x >= minf(z_fit * 1.9, OpCamera.ZOOM_MAX), "following closes in (zoom %.2f from %.2f fitted)" % [main.cam.zoom.x, z_fit])
+				check(goal.is_finite() and main.cam.position.distance_to(goal) < 80.0, "and the view has caught up with the squad (%.0f px off)" % (main.cam.position.distance_to(goal) if goal.is_finite() else -1.0))
+				await snap("run_follow")
+				var z_near: float = main.cam.zoom.x
+				check(press("Camera: zoom out") and main.cam.zoom.x < z_near, "the bar zooms out (%.2f to %.2f)" % [z_near, main.cam.zoom.x])
+				check(press("Camera: fit"), "the bar fits the whole plan")
+				await frames(3)
+				check(main.cam_track == "" and is_equal_approx(main.cam.zoom.x, z_fit), "Fit lets go of the squad and shows the whole plan (zoom %.2f)" % main.cam.zoom.x)
 			press("20x", false)
 			var shot_mid := false
 			while not main._op_done and Time.get_ticks_msec() - t0 < OP_WALL_LIMIT_MS:
@@ -380,9 +398,29 @@ func _walk(seed_v: int) -> void:
 				press("Board", false)
 			await frames(6)
 		await frames(10)
+		# S15 Week Closed (trunk merge 2026-11-11): when rendering, the recap plays over the
+		# map and its callback opens the week. A player cannot click through it (it takes
+		# the mouse); the walk presses buttons directly, so it has to wait for it or skip
+		# it, or that callback reopens the week over whatever screen the walk is on by then.
+		if main.shorts != null and main.shorts.busy:
+			await frames(40)
+			if main.shorts.busy:
+				await snap("week_closed")
+				main.shorts.stop()   # what a click does
+			await frames(6)
+			check(not main.shorts.busy, "Week Closed ends on a skip and hands back to the board")
 		check(c.week() == wk + 1, "End week advances to week %d (now %d)" % [wk + 1, c.week()])
 		facts["week2_desk"] = c.run.drafts.map(func(d): return d["kind"]) + c.run.offers.map(func(o): return "offer") + c.run.events.map(func(e): return "event")
 		await snap("board_week2")
+		# the patrol radio (trunk merge 2026-11-11): its own card, from the radio on the HUD
+		var rb := find_btn(main.ops_ui.hud, "Patrol radio")
+		if check(rb != null and not rb.disabled, "the HUD has the patrol radio"):
+			rb.pressed.emit()
+			await frames(6)
+			check(find_btn(main.ops_ui.root, "Wait for backup") != null, "the radio opens with the day's call and its three answers")
+			await snap("patrol_radio")
+			check(press("Board"), "the radio returns to the map")
+			await frames(4)
 
 	# ---- the management screens open and close
 	if want("screens"):
