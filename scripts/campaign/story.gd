@@ -8,7 +8,7 @@ const WEEKS := 40
 const PROLOGUE := (
 	"Before this appointment, you were deputy chief. You signed the Bridge Street eviction order; "
 	+ "the outgoing chief gave the briefing. "
-	+ "Dana Okonjo-Vale remembers who signed and who briefed it. "
+	+ "Alicia Beddrow remembers who signed and who briefed it. "
 	+ "The campaign does not "
 	+ "ask whether the order was legal. It asks what you do with the authority that came from it."
 )
@@ -88,7 +88,7 @@ const BEATS := {
 			"The city has had ten weeks to watch you work. It still wants to know whether "
 			+ "Bridge Street was a mistake—or only a bad week in the papers."
 		),
-		"speaker": "Dana Okonjo-Vale",
+		"speaker": "Alicia Beddrow",
 		"quote":
 		(
 			"Don't call Bridge Street an operation. "
@@ -121,7 +121,7 @@ const BEATS := {
 	{
 		"title": "Last week",
 		"text": "A week remains. The public story is shorter now. It has not become more accurate.",
-		"speaker": "Royce Kettering",
+		"speaker": "George Carrick",
 		"quote": "People vote on the result, Chief. Not the folder.",
 	},
 }
@@ -268,9 +268,9 @@ static func acts() -> Array:
 static func _winner_name(winner: String) -> String:
 	match winner:
 		"kettering":
-			return "Royce Kettering"
+			return "George Carrick"
 		"okonjo":
-			return "Dana Okonjo-Vale"
+			return "Alicia Beddrow"
 		"pell":
 			return "Gordon Pell"
 	return "The new mayor"

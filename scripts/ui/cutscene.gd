@@ -11,7 +11,7 @@ const SCENES := [
 	["c3_the_plan", "Jeremy Berry", "res://scripts/view/proto/jeremy_view.gd"],
 	["c4_forty_weeks", "This Machine Kills Tyrants", "res://scripts/view/proto/fettick_view.gd"],
 ]
-const PAPER := Color("#e6dfcd")
+const PAPER := Color("#fbf7ec")
 const MID := Color("#45413b")
 const HAND_FONT := preload("res://fonts/PatrickHand.woff2")
 

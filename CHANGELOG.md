@@ -130,6 +130,92 @@ Every gate in the quick and full tiers passes on Godot 4.7.2. Details and number
 - Side effect in gang raids: officers killed per operation 0.45 → 0.30.
 - Test-range determinism: the shield case refreshed (same winner).
 
+## Unreleased — orders in the field (2026-11-03)
+
+A new live order while an operation runs: **move a squad to a room.**
+
+- On the run card each squad has a row (state, and Resume when it holds on an order).
+  Pick a squad, click a room on the plan.
+- The squad (never a single officer) breaks off, goes there by the ordinary paths (doors,
+  locked doors and whoever it meets on the way are handled as they always are),
+  **consolidates** (posts on the room's doors and windows) and **holds**. It does not
+  give the room up (HD15 fall-back is off while it holds on an order).
+- It holds until you press **Resume** (it goes back to its own objective from where it
+  stands, clearing from the nearest room still to clear) or pick **another room**.
+- A held room counts as cleared. The room is ringed in red on the plan (dashed on the
+  way, solid once held, tagged SQ1). Every order goes on the radio and the debrief
+  timeline ("Chief: Squad 1 to the kitchen, consolidate and hold").
+- Orders also override a phase line, are refused for rooms outside, and are given live
+  only (an order from the rewind view goes live first).
+- `tests/field_orders_test.gd` (quick tier): reach, hold, move again, resume, refusals,
+  timeline, and the same orders at the same tick replay the same operation. `ui_walk`
+  gives an order through the run card and a click on the plan.
+
+## Unreleased — fewer words, more pictures (2026-11-03)
+
+- **Crayon icons** (`scripts/ui/icons.gd`): 67 small hand-drawn SVGs in the opening's
+  palette, rasterised at runtime. Every campaign button gets one from its wording, and
+  shows one or two words (or none: Map, Open, Live, Pause, Menu); the full wording is the
+  tooltip.
+- **Chips instead of sentences**: the HUD (week, account, fit officers, IA cases), the
+  week (fit, injured, committed, account), a call (type, ward trust, visibility, time
+  pressure, status), the briefing, the station's account line (account, allocation,
+  payroll, morale, cases) and next week's roster outlook are icon-and-number chips with
+  the explanation in the tooltip.
+- **The ? on every card** shows or hides the explanation lines (tips, notes, the outgoing
+  chief's advice). They start hidden.
+- **Police HQ** is five picture doors. The desk and the call list are one row per item:
+  a picture, a few words, an arrow.
+- Hire and Sign read `Hire  $7,640  ·  +$1,200/wk`; the run's Skip reads `Skip 27/60 s`.
+
+## Unreleased — the map is the campaign (2026-11-03)
+
+The right-hand side menu is gone. The campaign is played on the city map, and every choice
+comes up as a card on top of it.
+
+- **Calls open from their pins.** Click a red pin for that call's card (site, ward, threat,
+  who is free) and *Brief and plan* from there; the card steps to the next call.
+- **Landmarks are the department's doors**, drawn on the map at their canonical buildings:
+  **Police HQ** (Carrick Street Station) opens roster, budget, internal affairs, armoury
+  and programs, and the campaign file; **City Hall** opens the politics; **the Ledger**
+  opens the week.
+- **The week** (desk, results, story, front page, a list of the calls) opens by itself
+  when a week starts or something comes back, and again from the Ledger or the HUD.
+- **A crayon HUD** (top right): week, account (red when frozen), End week (disabled with
+  its reason while the desk is unsettled), The week, Menu.
+- **Operations have no side panel either.** The floor plan fills the screen. A bar along
+  the bottom carries *Map*, the three steps (Briefing, Force, Orders), *Suggest* and *RUN*;
+  each step opens as a popup above the bar, at most about half the window, and pressing
+  the step again folds it away. The live run's controls (pause, speed, rewind, skip,
+  abort) are the same bar, the radio and squads a popup; the debrief is a popup with
+  *Back to the map* in the bar.
+- **Every card** can be dragged by its title bar, folded to the bar (– or double-click)
+  and closed (×, a step back). It sizes to its content and remembers where you put it.
+- `ui_walk` now clicks pins and landmarks through the map's own hit test.
+
+## Unreleased — one look, all the way through (2026-11-03)
+
+The game had three visual languages: the bright child's crayon of the opening scenes, the
+grey technical stock of the campaign shorts, and a muted mix in the game itself. Everything
+now follows the opening, as your 29 Oct direction asked (brighter, more childish).
+
+- **Shorts**: cream paper, sky and sun, notebook-paper panels, the opening's palette. Two
+  shorts (officer down, the allocation) had never drawn: `String(int)` aborted every frame.
+- **Title**: Port Carrick at night in a child's colours (the opening's last frame) instead
+  of grey-and-orange smog; the footer has its own paper scrap so it can be read.
+- **Board**: the city map is crayon (each ward its own wax, a scribbled river, red pins).
+- **Management screens sit over the city**, not the last operation's map (P3.A1; now a
+  failing check in `ui_walk` and `ops_ui_test` if it regresses).
+- **Operations**: indigo crayon fog and a lilac night page instead of near-black and grey;
+  plans in pastel rooms on green by day, saturated rooms by night.
+- **People and props**: police in the opening's royal blue, suspects in bright earth
+  colours, peach skin; brick, umber and moss brightened; sprites regenerated and re-baked.
+- **UI and the ledger of the dead**: cream and white notebook paper, sun-yellow selection,
+  crayon-lettered header.
+- **Names**: George Carrick and Alicia Beddrow (Port Carrick Together), as the story canon
+  and the opening's posters have them; Gordon Pell unchanged. Display text only.
+- Before/after screenshots: `tests/results/visual-2026-11-03/`.
+
 ## Unreleased — EA_TASKS Phase 1 close-out: the three known bugs, the pace, the chief, the bands (2026-11-02)
 
 - **Wolf brain holds cover (B1)**: a lone fighter now dwells in the cover it has

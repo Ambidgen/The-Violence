@@ -1746,6 +1746,20 @@ func abort() -> void:
 	brain.withdraw(teams[0])
 
 
+## Orders in the field (2026-11-03): the chief moves a squad to a room, or sends it back
+## to its own orders. Squads only, never single officers. Returns "" or why not.
+func order_squad_move(si: int, room: String) -> String:
+	if over or aborted or teams.is_empty():
+		return "the operation is over" if over else "the squads are withdrawing"
+	return brain.order_move(teams[0], si, room)
+
+
+func order_squad_resume(si: int) -> String:
+	if over or aborted or teams.is_empty():
+		return "the operation is over" if over else "the squads are withdrawing"
+	return brain.order_resume(teams[0], si)
+
+
 ## The attack at a public event begins: the hidden attackers draw and open fire.
 func _begin_attack() -> void:
 	attack_on = true

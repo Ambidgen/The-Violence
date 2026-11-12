@@ -24,19 +24,19 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 INK = "#201d1a"
-SKIN = "#d6a27f"
+SKIN = "#ffc39a"  # the opening's peach (was #d6a27f, visual overhaul 2026-11-03)
 BOOT = "#171717"
 GOLD = "#e5b853"
 # key: (body, dark shade, highlight, head/hair, decoration)
 LOOKS = {
-    "patrol": ("#304d84", "#1a294a", "#7895b7", "#202f56", "badge"),
-    "swat": ("#343e4b", "#1b222b", "#8a9daa", "#262e36", "webbing"),
-    "riot": ("#2b4265", "#19283d", "#aac1ce", "#1f3049", "stripe"),
-    "hood": ("#866047", "#4d392e", "#bf9672", "#372b25", "hood"),
-    "leather": ("#694b42", "#392b29", "#b78065", "#211e1d", "zip"),
-    "workcoat": ("#6d704e", "#393f2c", "#a7aa7b", "#514232", "pockets"),
-    "track": ("#526963", "#30433f", "#c4b899", "#302823", "track"),
-    "vestlook": ("#796f5d", "#393b37", "#b7a48c", "#272521", "vest"),
+    "patrol": ("#2f52e0", "#1d3399", "#8fa8ff", "#1b2580", "badge"),
+    "swat": ("#3d4f7d", "#212c4d", "#9aaad0", "#1a2238", "webbing"),
+    "riot": ("#2f5ad6", "#1d3a8a", "#a8c0ff", "#1b2580", "stripe"),
+    "hood": ("#c8763a", "#8a4a22", "#f0b07a", "#4a2a18", "hood"),
+    "leather": ("#9a4a3a", "#5c2a20", "#d88a72", "#2a1810", "zip"),
+    "workcoat": ("#7a9a3a", "#4a6020", "#b8d07a", "#5a4028", "pockets"),
+    "track": ("#2fa08a", "#1d6656", "#8adcc8", "#3a2820", "track"),
+    "vestlook": ("#b08a4a", "#6a5228", "#e0c08a", "#2a2018", "vest"),
 }
 CUSTOM_KIT = ("riot_head",)
 

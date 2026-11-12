@@ -15,8 +15,8 @@ const CONTACTS := [
 	},
 	{
 		"id": "dana",
-		"name": "Dana Okonjo-Vale",
-		"role": "Mayoral candidate · Carrick Together",
+		"name": "Alicia Beddrow",
+		"role": "Mayoral candidate · Port Carrick Together",
 		"intro": "She wants the Bridge Street order read aloud, with your name on it."
 	},
 	{
@@ -45,7 +45,7 @@ const CONTACTS := [
 	},
 	{
 		"id": "kettering",
-		"name": "Royce Kettering",
+		"name": "George Carrick",
 		"role": "Mayoral candidate · Safe Streets",
 		"intro": "He promises more money, more police and fewer questions."
 	},
@@ -127,7 +127,7 @@ const QUESTIONS := {
 		{
 			"id": "contracts",
 			"label": "Ask about contracts",
-			"question": "Does Kettering's family business concern you?"
+			"question": "Does Carrick's family business concern you?"
 		},
 	],
 	"rourke":
@@ -171,7 +171,7 @@ const QUESTIONS := {
 		},
 		{
 			"id": "family",
-			"label": "Ask about his brother-in-law",
+			"label": "Ask about his son's company",
 			"question": "Would your family bid on a city contract?"
 		},
 		{
@@ -200,9 +200,9 @@ const QUESTIONS := {
 static func _winner_name(winner: String) -> String:
 	match winner:
 		"kettering":
-			return "Royce Kettering"
+			return "George Carrick"
 		"okonjo":
-			return "Dana Okonjo-Vale"
+			return "Alicia Beddrow"
 		"pell":
 			return "Gordon Pell"
 	return "The new mayor"
@@ -230,7 +230,7 @@ static func contact_status(campaign, contact_id: String) -> String:
 		return "No campaign file."
 	var politics = campaign.politics
 	# The archive's contact ids are not the politics layer's candidate ids: Dana
-	# Okonjo-Vale is "dana" in the story and "okonjo" in the polls. Passing the
+	# Beddrow is "dana" in the story and "okonjo" in the polls. Passing the
 	# contact id straight to politics.share() read a key that is not there, which
 	# logged an engine error and printed a 0.0% share for her.
 	var cand_ids := {"kettering": "kettering", "dana": "okonjo", "pell": "pell"}
@@ -409,7 +409,7 @@ static func dialogue(campaign, contact_id: String, topic_id: String) -> Dictiona
 					reference = "candidate-tally"
 					reply = (
 						"My committee examines the bid and records the relationship. "
-						+ "Kettering's brother-in-law building vehicles is not a footnote we can remove."
+						+ "Carrick's son building vehicles is not a footnote we can remove."
 					)
 		"rourke":
 			reference = "force-ledger"
@@ -515,7 +515,7 @@ static func dialogue(campaign, contact_id: String, topic_id: String) -> Dictiona
 						reply += "I want voters to see what the money buys."
 				"family":
 					reference = "candidate-tally"
-					reply = "My brother-in-law builds armoured vehicles. If the city buys from his firm, "
+					reply = "My son Kevin builds armoured vehicles. If the city buys from his firm, "
 					reply += "put the relationship in the contract file and let people read it. "
 					reply += "I'm not afraid of the price."
 				"chief":
@@ -608,7 +608,7 @@ static func documents(campaign, filter := "all") -> Array:
 			"Incoming chief",
 			(
 				"I gave the Bridge Street briefing. You signed the eviction order as deputy chief. "
-				+ "Dana Okonjo-Vale remembers who signed and who briefed it. "
+				+ "Alicia Beddrow remembers who signed and who briefed it. "
 				+ "This memo records that sequence; it does not decide whether the order was lawful."
 			)
 		)

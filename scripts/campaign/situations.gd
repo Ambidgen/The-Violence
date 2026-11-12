@@ -211,14 +211,14 @@ static func make(type: String, seed_val: int, week := 1, idx := 0, trusts := [],
 			s["intel"].append({"key": "deadline", "label": "Deadline", "truth": "they say they start killing at %d minutes" % (s["deadline"] / 60),
 				"est": "", "known": true, "conf": 1.0})
 		"event":
-			var who: Array = ["Royce Kettering", "Dana Okonjo-Vale", "Gordon Pell"]
+			var who: Array = ["George Carrick", "Alicia Beddrow", "Gordon Pell"]
 			var cand: String = who[rng.randi() % who.size()]
 			s["title"] = "Rally: %s, %s" % [cand, String(site.get("name", "location unavailable"))]
 			s["candidate"] = cand
 			s["duration"] = 15 * 60
 			s["crowd"] = rng.randi_range(36, 54)
 			# whether anything will happen is rolled now and never shown
-			var p: float = 0.08 + (0.05 if cand == "Dana Okonjo-Vale" else 0.0) + (0.04 if cand == "Gordon Pell" else 0.0)
+			var p: float = 0.08 + (0.05 if cand == "Alicia Beddrow" else 0.0) + (0.04 if cand == "Gordon Pell" else 0.0)
 			s["attack"] = rng.randf() < p
 			s["attack_p"] = p
 			if s["attack"]:

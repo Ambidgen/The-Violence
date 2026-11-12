@@ -8,7 +8,7 @@ const Ink = preload("res://scripts/view/ink.gd")
 const Equipment = preload("res://scripts/data/equipment.gd")
 const Maps = preload("res://scripts/maps/registry.gd")
 const PANEL_W := 460.0
-const INK := Color("#141313")
+const INK := Color("#1e1b1c")
 const SPEEDS := [0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0]
 const SHORT := {"untrained": "Untrained", "militia": "Militia", "patrol": "Patrol", "regular": "Regular", "police": "Police tac", "sof": "Spec ops"}
 
@@ -89,11 +89,11 @@ func build(m) -> void:
 	var ver := Label.new()
 	ver.text = "v" + str(ProjectSettings.get_setting("application/config/version", ""))
 	ver.add_theme_font_size_override("font_size", 12)
-	ver.add_theme_color_override("font_color", Color("#6e675c"))
+	ver.add_theme_color_override("font_color", Color("#5b5866"))
 	ver.size_flags_vertical = Control.SIZE_SHRINK_END
 	head_row.add_child(ver)
 	sub = Label.new()
-	sub.add_theme_color_override("font_color", Color("#6e675c"))
+	sub.add_theme_color_override("font_color", Color("#5b5866"))
 	v.add_child(sub)
 	set_map_title(main.level)
 	v.add_child(HSeparator.new())
@@ -192,19 +192,21 @@ static func hand_font() -> Font:
 ## drawn round a word, a pressed or selected one is coloured in; one hand for all text.
 static func make_theme() -> Theme:
 	const CB = preload("res://scripts/ui/crayon_box.gd")
-	var paper := Color("#e6dfcd")
-	var paper_dk := Color("#d3c9b1")
-	var pencil := Color("#2f2e2d")
-	var faint := Color("#a39a86")
+	# Visual overhaul 2026-11-03: the opening's cream drawing paper and white notebook
+	# paper, its sun yellow for a pressed button and its police blue for bars.
+	var paper := Color("#fbf7ec")
+	var paper_dk := Color("#e9e2d2")
+	var pencil := Color("#1e1b1c")
+	var faint := Color("#8e8a95")
 	var th := Theme.new()
 	th.default_font = hand_font()
 	th.default_font_size = 15
 	var panel = CB.make(paper, pencil, 12.0, 1.8, 0.18)
 	th.set_stylebox("panel", "PanelContainer", panel)
-	var normal = CB.make(Color("#ece5d4"), faint, 5.0, 1.5, 0.14)
-	var hover = CB.make(Color("#f2ecdc"), pencil, 5.0, 2.0, 0.14)
-	var pressed = CB.make(Color("#ecd49a"), pencil, 5.0, 1.8, 0.25)
-	var disabled = CB.make(Color("#e6dfcd", 0.6), Color(faint, 0.6), 5.0, 1.2, 0.0)
+	var normal = CB.make(Color("#ffffff"), faint, 5.0, 1.5, 0.14)
+	var hover = CB.make(Color("#fffaf0"), pencil, 5.0, 2.0, 0.14)
+	var pressed = CB.make(Color("#ffd166"), pencil, 5.0, 1.8, 0.25)
+	var disabled = CB.make(Color("#fbf7ec", 0.6), Color(faint, 0.6), 5.0, 1.2, 0.0)
 	var focus := StyleBoxEmpty.new()
 	for t in ["Button", "OptionButton"]:
 		th.set_stylebox("normal", t, normal)
@@ -220,32 +222,32 @@ static func make_theme() -> Theme:
 		th.set_color("font_focus_color", t, INK)
 		th.set_color("font_disabled_color", t, faint)
 	th.set_color("font_color", "Label", INK)
-	th.set_stylebox("normal", "LineEdit", CB.make(Color("#f2ecdc"), faint, 4.0, 1.4, 0.0))
-	th.set_stylebox("focus", "LineEdit", CB.make(Color("#f2ecdc"), pencil, 4.0, 1.8, 0.0))
+	th.set_stylebox("normal", "LineEdit", CB.make(Color("#fffaf0"), faint, 4.0, 1.4, 0.0))
+	th.set_stylebox("focus", "LineEdit", CB.make(Color("#fffaf0"), pencil, 4.0, 1.8, 0.0))
 	th.set_color("font_color", "LineEdit", INK)
 	th.set_color("default_color", "RichTextLabel", INK)
-	th.set_stylebox("normal", "RichTextLabel", CB.make(Color("#ece5d4"), faint, 6.0, 1.3, 0.08))
+	th.set_stylebox("normal", "RichTextLabel", CB.make(Color("#ffffff"), faint, 6.0, 1.3, 0.08))
 	th.set_stylebox("background", "ProgressBar", CB.make(paper_dk, faint, 0.0, 1.2, 0.0))
-	th.set_stylebox("fill", "ProgressBar", CB.make(Color("#2f4a86"), Color(0, 0, 0, 0), 0.0, 0.0, 0.35))
+	th.set_stylebox("fill", "ProgressBar", CB.make(Color("#2747e6"), Color(0, 0, 0, 0), 0.0, 0.0, 0.35))
 	th.set_stylebox("panel", "PopupMenu", CB.make(paper, pencil, 4.0, 1.6, 0.1))
-	th.set_stylebox("hover", "PopupMenu", CB.make(Color("#f0c56a"), Color(0, 0, 0, 0), 2.0, 0.0, 0.2))
+	th.set_stylebox("hover", "PopupMenu", CB.make(Color("#ffd166"), Color(0, 0, 0, 0), 2.0, 0.0, 0.2))
 	th.set_color("font_color", "PopupMenu", INK)
 	th.set_color("font_hover_color", "PopupMenu", Color(0.07, 0.07, 0.07))
-	th.set_stylebox("panel", "TooltipPanel", CB.make(Color("#f2ecdc"), pencil, 6.0, 1.6, 0.0))
+	th.set_stylebox("panel", "TooltipPanel", CB.make(Color("#fffaf0"), pencil, 6.0, 1.6, 0.0))
 	th.set_color("font_color", "TooltipLabel", INK)
 	th.set_stylebox("panel", "TabContainer", CB.make(paper, faint, 6.0, 1.3, 0.1))
-	th.set_stylebox("tab_selected", "TabContainer", CB.make(Color("#2f2e2d"), pencil, 6.0, 1.6, 0.25))
-	th.set_stylebox("tab_unselected", "TabContainer", CB.make(Color("#ece5d4"), faint, 6.0, 1.3, 0.1))
-	th.set_stylebox("tab_hovered", "TabContainer", CB.make(Color("#f2ecdc"), pencil, 6.0, 1.6, 0.1))
-	th.set_color("font_selected_color", "TabContainer", Color("#ece4d0"))
+	th.set_stylebox("tab_selected", "TabContainer", CB.make(Color("#1e1b1c"), pencil, 6.0, 1.6, 0.25))
+	th.set_stylebox("tab_unselected", "TabContainer", CB.make(Color("#ffffff"), faint, 6.0, 1.3, 0.1))
+	th.set_stylebox("tab_hovered", "TabContainer", CB.make(Color("#fffaf0"), pencil, 6.0, 1.6, 0.1))
+	th.set_color("font_selected_color", "TabContainer", Color("#fffaf0"))
 	th.set_color("font_unselected_color", "TabContainer", INK)
 	th.set_color("font_hovered_color", "TabContainer", Color(0.07, 0.07, 0.07))
 	for sc in ["VScrollBar", "HScrollBar"]:
 		# a visible track and a grabber you can find and hit: a scrolling panel has to look like one
-		th.set_stylebox("scroll", sc, CB.make(Color("#d3c9b1", 0.55), Color(0, 0, 0, 0), 5.0, 0.0, 0.0))
-		th.set_stylebox("grabber", sc, CB.make(Color("#6e675c"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
-		th.set_stylebox("grabber_highlight", sc, CB.make(Color("#2f2e2d"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
-		th.set_stylebox("grabber_pressed", sc, CB.make(Color("#2f2e2d"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
+		th.set_stylebox("scroll", sc, CB.make(Color("#9cc3ff", 0.45), Color(0, 0, 0, 0), 5.0, 0.0, 0.0))
+		th.set_stylebox("grabber", sc, CB.make(Color("#5b5866"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
+		th.set_stylebox("grabber_highlight", sc, CB.make(Color("#1e1b1c"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
+		th.set_stylebox("grabber_pressed", sc, CB.make(Color("#1e1b1c"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
 	return th
 
 
@@ -273,7 +275,7 @@ func _heading(parent: Control, text: String) -> Label:
 	var l := Label.new()
 	l.text = Ink.bb(text)
 	l.add_theme_font_size_override("font_size", 12)
-	l.add_theme_color_override("font_color", Color("#6e675c"))
+	l.add_theme_color_override("font_color", Color("#5b5866"))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	parent.add_child(l)
 	return l
@@ -437,7 +439,7 @@ func _build_setup() -> void:
 	exp_spin.value_changed.connect(func(v): _exp(v))
 	hx.add_child(exp_spin)
 	exp_label = Label.new()
-	exp_label.add_theme_color_override("font_color", Color("#6e675c"))
+	exp_label.add_theme_color_override("font_color", Color("#5b5866"))
 	hx.add_child(exp_label)
 	_heading(colt, "Hearing: every operator hears the same (shots, footsteps, reloads; walls halve it) unless a trait changes it.")
 	for tr in Habits.TRAITS:
@@ -747,7 +749,7 @@ func _build_run() -> void:
 		b.custom_minimum_size = Vector2(44, 0)
 		speed_buttons.append(b)
 	speed_note = Label.new()
-	speed_note.add_theme_color_override("font_color", Color("#6e675c"))
+	speed_note.add_theme_color_override("font_color", Color("#5b5866"))
 	speed_note.add_theme_font_size_override("font_size", 11)
 	r.add_child(speed_note)
 	var ho := _h(r)

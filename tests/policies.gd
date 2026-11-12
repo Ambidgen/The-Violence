@@ -77,7 +77,7 @@ const POLICIES := {
 	},
 	"military": {
 		"label": "military-first",
-		"desc": "Military contracts and kit, Kettering's offers, cases cleared, hire to 16 (an emergency lateral below 12 fit), three calls a week including crowd events.",
+		"desc": "Military contracts and kit, Carrick's offers, cases cleared, hire to 16 (an emergency lateral below 12 fit), three calls a week including crowd events.",
 		"doctrine": ["plates", "tactical", "reserve", "union", "cams", "lines", "pie", "liaison"],
 		"contracts": ["military", "neutral"],
 		"max_contract": 8000,
@@ -255,7 +255,7 @@ static func want_offer(o: Dictionary, pol: Dictionary) -> bool:
 		return true
 	var eff: Dictionary = o.get("accept", {})
 	if mode == "military":
-		# the Safe Streets chief: hardware, cash, and Kettering's favour
+		# the Safe Streets chief: hardware, cash, and Carrick's favour
 		if eff.has("contract"):
 			return true
 		if int(eff.get("money", 0)) > 0:
@@ -273,7 +273,7 @@ static func want_offer(o: Dictionary, pol: Dictionary) -> bool:
 		return true
 	if eff.has("contract"):
 		# "military" is the tag an offer uses to grant *some* military contract; check
-		# both forms, or cautious would take Kettering's truck for the cash.
+		# both forms, or cautious would take Carrick's truck for the cash.
 		var cc := String(eff["contract"])
 		if cc == "military" or String(Rogue.CONTRACTS.get(cc, {}).get("tag", "")) == "military":
 			return false

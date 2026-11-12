@@ -14,8 +14,8 @@ extends SceneTree
 ## briefing spends money, the operation does not end, the week does not advance, a
 ## management screen does not open or close, or a visible control leaves the viewport
 ## horizontally (the overflow check). Known problems that belong to a later cycle are
-## reported as KNOWN and do not fail the walk (today: the stale tactical map behind
-## management screens, EA_TASKS P3.A1).
+## reported as KNOWN and do not fail the walk (today: the first call's disabled button
+## explains itself only in a tooltip, EA_TASKS P3.B1).
 
 const ALL_STEPS := ["title", "desk", "brief", "run", "endweek", "screens"]
 const SCREENS := ["Roster", "Budget", "Internal affairs", "City Hall", "Armoury and programs", "Campaign file"]
@@ -121,7 +121,9 @@ func _overflow_walk(node: Node, vw: float, bad: Array) -> void:
 
 
 func find_btn(node: Node, sub: String) -> Button:
-	if node is Button and (node as Button).is_visible_in_tree() and sub.to_lower() in (node as Button).text.to_lower():
+	# 2026-11-03: buttons show an icon and a short word; the full wording is meta "label"
+	if node is Button and (node as Button).is_visible_in_tree() and (sub.to_lower() in (node as Button).text.to_lower()
+			or sub.to_lower() in String(node.get_meta("label", "")).to_lower()):
 		return node
 	for c in node.get_children():
 		var r := find_btn(c, sub)
@@ -146,16 +148,52 @@ func press(sub: String, need := true, ui_root: Node = null) -> bool:
 		else:
 			say("disabled '%s': %s" % [sub, b.tooltip_text])
 		return false
-	b.pressed.emit()
+	# a toggle button (a squad, a step, a speed) answers `toggled`, not `pressed`
+	if b.toggle_mode:
+		b.set_pressed_no_signal(true)
+		b.toggled.emit(true)
+	else:
+		b.pressed.emit()
 	return true
+
+
+## Campaign UI 2026-11-03: the board is the map. Click a pin or a landmark the way a
+## player does, through the map's own hit test, and report what opened.
+func _click_map(at: Vector2, what: String) -> bool:
+	var m = main.ops_ui.city_map
+	if not m.visible or at.x < 0.0:
+		fail("the map has no %s to click" % what)
+		return false
+	var ev := InputEventMouseButton.new()
+	ev.button_index = MOUSE_BUTTON_LEFT
+	ev.pressed = true
+	ev.position = at
+	m._gui_input(ev)
+	return true
+
+
+func click_pin(i: int) -> bool:
+	return _click_map(main.ops_ui.city_map.pin_pos(i), "pin %d" % (i + 1))
+
+
+func click_landmark(id: String) -> bool:
+	return _click_map(main.ops_ui.city_map.landmark_pos(id), "landmark %s" % id)
+
+
+func first_open_call() -> int:
+	var b: Array = main.campaign.board
+	for i in b.size():
+		if b[i]["status"] == "open":
+			return i
+	return -1
 
 
 ## Management screens should not sit over a tactical map (EA_TASKS P3.A1).
 func backdrop(tag: String) -> void:
 	var stale: bool = main.floorplan != null and main.floorplan.is_visible_in_tree() and not main.ops_ui.city_map.visible
 	facts["backdrop_" + tag] = "tactical map" if stale else "city map"
-	if stale:
-		note_known("management screens sit over the last tactical map, not the city (EA_TASKS P3.A1)")
+	# fixed 2026-11-03 (ops_ui._city_backdrop): no longer KNOWN, a regression fails the walk
+	check(not stale, "%s sits over the city map, not the last tactical map (EA_TASKS P3.A1)" % tag)
 
 
 func want(step: String) -> bool:
@@ -225,11 +263,18 @@ func _walk(seed_v: int) -> void:
 
 	# ---- the desk: inheritance first, then procurement
 	if want("desk") or want("brief") or want("run"):
+		check(click_pin(first_open_call()), "a call opens from its pin on the map")
+		await frames(4)
+		check(main.ops_ui.card.visible and main.ops_ui.city_map.selected == first_open_call(), "the pin opens that call's card over the map")
+		if want("title"):
+			await snap("call_popup")
 		var bp := find_btn(main.ops_ui.root, "Brief and plan")
 		check(bp != null and bp.disabled, "Brief and plan waits for the inheritance")
 		if bp != null and bp.disabled:
 			facts["first_action_reason_visible"] = false   # the reason is a tooltip only (EA_TASKS P3.B1)
 			note_known("the first call's Brief and plan is disabled with its reason in a tooltip only (EA_TASKS P3.B1)")
+		check(click_landmark("ledger"), "the Ledger opens the week")
+		await frames(4)
 		check(press("Open"), "the desk opens the inheritance")
 		await frames(6)
 		if want("desk"):
@@ -243,6 +288,8 @@ func _walk(seed_v: int) -> void:
 		if c.run.drafts.any(func(d): return d["kind"] == "procurement"):
 			var stock0: int = c.run.armory.size()
 			var a1: int = c.dept.balance
+			main.ops_ui.open_week()
+			await frames(2)
 			check(press("Open"), "the desk opens procurement")
 			await frames(6)
 			if want("desk"):
@@ -258,6 +305,10 @@ func _walk(seed_v: int) -> void:
 	# ---- brief, force, orders
 	if want("brief") or want("run"):
 		var a2: int = c.dept.balance
+		main.ops_ui.show_map()
+		await frames(2)
+		click_pin(first_open_call())
+		await frames(2)
 		check(press("Brief and plan"), "the first call can be briefed after the desk")
 		await frames(10)
 		check(c.dept.balance == a2, "opening a briefing spends nothing (account change $%d)" % (c.dept.balance - a2))
@@ -278,6 +329,23 @@ func _walk(seed_v: int) -> void:
 			await frames(20)
 			if want("run"):
 				await snap("run_start")
+			# orders in the field (2026-11-03): pick Squad 1, click a room on the plan
+			var w0 = main.world
+			var target := ""
+			for rn in w0.level.rooms:
+				if not w0.level.is_exterior(rn) and not w0.level.rooms[rn].get("hall", false):
+					target = rn
+					break
+			if check(press("Squad 1"), "the run card lists the squads to order"):
+				check(main.ops_ui.cmd_sq == 0, "Squad 1 is picked for an order")
+				check(main.ops_ui.run_click(w0.level.rooms[target]["label"]), "a click on the plan gives the picked squad its order")
+				var el0: Dictionary = w0.teams[0]["elements"][0]
+				check(el0.get("ordered_room", "") == target, "Squad 1 moves to the %s and holds (%s)" % [target, el0.get("ordered_room", "none")])
+				await frames(30)
+				await snap("run_order")
+				check(press("Resume"), "Resume is offered for the squad holding on an order")
+				await frames(4)
+				check(not el0.has("ordered_room"), "Resume returns Squad 1 to its orders")
 			press("20x", false)
 			var shot_mid := false
 			while not main._op_done and Time.get_ticks_msec() - t0 < OP_WALL_LIMIT_MS:
@@ -299,10 +367,12 @@ func _walk(seed_v: int) -> void:
 		var guard := 0
 		while guard < 8:
 			guard += 1
-			var ew := find_btn(main.ops_ui.root, "End week")
+			var ew := find_btn(main.ops_ui.hud, "End week")
 			if ew != null and not ew.disabled:
 				ew.pressed.emit()
 				break
+			main.ops_ui.open_week()
+			await frames(2)
 			if not press("Open", false):
 				break
 			await frames(6)
@@ -317,7 +387,16 @@ func _walk(seed_v: int) -> void:
 	# ---- the management screens open and close
 	if want("screens"):
 		for scr in SCREENS:
-			if not check(press(scr), "the board opens %s" % scr):
+			main.ops_ui.show_map()
+			await frames(2)
+			var lm: String = "city-hall" if scr == "City Hall" else "police-hq"
+			check(click_landmark(lm), "the %s landmark opens" % lm)
+			await frames(4)
+			if lm == "police-hq" and scr == SCREENS[0]:
+				await snap("hq_popup")
+			if scr != "City Hall" and not check(press(scr), "Police HQ opens %s" % scr):
+				continue
+			if scr == "City Hall" and not check(main.ops_ui.card.visible and main.ops_ui.mode == "city_hall" and main.ops_ui.city_map.visible, "City Hall opens over the map"):
 				continue
 			await frames(8)
 			var tag: String = "screen_" + scr.to_lower().replace(" ", "_")

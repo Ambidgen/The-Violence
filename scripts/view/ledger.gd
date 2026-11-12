@@ -5,7 +5,11 @@ extends Control
 ## running count by side heads the column. Used in normal matches and the endless battle.
 
 const Ink = preload("res://scripts/view/ink.gd")
-const INK := Color("#141313")
+const C = preload("res://scripts/view/crayon.gd")
+# Visual overhaul 2026-11-03: notebook paper and crayon edges, like the opening captions.
+const INK := Color("#1e1b1c")
+const PAGE := Color("#ffffff")
+const RULE := Color("#9cc3ff")
 const W := 384.0
 const ROW_H := 47.0
 const HEAD_H := 46.0
@@ -95,9 +99,10 @@ func _draw() -> void:
 	var total := 0
 	for k in totals:
 		total += totals[k]
-	draw_rect(Rect2(0, 0, W, HEAD_H - 6.0), Color(0.93, 0.93, 0.91, 0.92))
-	draw_rect(Rect2(0, 0, W, HEAD_H - 6.0), INK, false, 1.0)
-	draw_string(bold, Vector2(10, 18), "T H E   D E A D   %d" % total, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ink.accent(0.9) if total > 0 else INK)
+	var head := Rect2(0, 0, W, HEAD_H - 6.0)
+	draw_rect(head, Color(PAGE, 0.95))
+	C.outline(self, C.rect_poly(head), INK, 2.4, 11, 1.0)
+	C.letters(self, "THE DEAD  %d" % total, Vector2(10, 22), 19, Ink.accent(0.95) if total > 0 else INK, 12, 2, 0.95)
 	var parts: Array = []
 	var keys: Array = totals.keys()
 	keys.sort()
@@ -105,7 +110,7 @@ func _draw() -> void:
 		parts.append("%s %d" % [world.factions[k2].get("tag", "?") if k2 < world.factions.size() else "?", totals[k2]])
 	if bled > 0:
 		parts.append("of wounds %d" % bled)
-	draw_string(font, Vector2(10, 34), "   ".join(parts), HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 11, Color("#2f2e2d"))
+	draw_string(font, Vector2(10, 36), "   ".join(parts), HORIZONTAL_ALIGNMENT_LEFT, W - 20.0, 11, Color("#2f2e2d"))
 	for i in entries.size():
 		var e: Dictionary = entries[i]
 		var rec: Dictionary = e["rec"]
@@ -116,11 +121,12 @@ func _draw() -> void:
 		var a := clampf(1.0 - maxf(0.0, i - (max_rows - 4)) * 0.22, 0.15, 1.0)
 		var y: float = e["y"]
 		var box := Rect2(x, y, W, ROW_H - 4.0)
-		draw_rect(box, Color(0.93, 0.93, 0.91, 0.9 * a))
+		draw_rect(box, Color(PAGE, 0.93 * a))
 		if age < 1.4:
-			draw_rect(box, Ink.accent(0.22 * (1.0 - age / 1.4)))
-		draw_rect(Rect2(x, y, 4.0, ROW_H - 4.0), Ink.accent(a))
-		draw_rect(box, Color(0.07, 0.07, 0.07, 0.35 * a), false, 1.0)
+			draw_rect(box, Ink.accent(0.18 * (1.0 - age / 1.4)))
+		var seed := int(rec["t"] * 10.0) % 997
+		C.line(self, Vector2(x + 5, y + 3), Vector2(x + 5, y + ROW_H - 7), Ink.accent(a), 3.0, seed, 0.6, 1)
+		C.outline(self, C.rect_poly(box), Color(INK, 0.75 * a), 1.8, seed + 1, 0.8)
 		var t: String = world.clock(rec["t"])
 		var who: String = rec["name"] if rec["name"] != "" else rec["id"]
 		draw_string(font, Vector2(x + 10, y + 15), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.45, 0.45, 0.44, a))

@@ -136,7 +136,25 @@ static func adapt(doc: Dictionary) -> Dictionary:
 	usable.sort_custom(func(a, b): return String(a["id"]) < String(b["id"]))
 	return {"version": String(meta.get("version", "unknown")), "sites": usable,
 		"wards": wards, "water": doc.get("water", {}), "streets": doc.get("streets", []),
-		"extent": extent}
+		"extent": extent, "landmarks": _landmarks(doc.get("landmarks", []))}
+
+
+## Campaign UI 2026-11-03: only the landmarks the board draws (the station, City Hall,
+## the Ledger), as id -> {x, y}, so the map can pin its doors to the right buildings.
+const BOARD_LANDMARKS := ["police-hq", "city-hall", "ledger"]
+
+
+static func _landmarks(raw) -> Array:
+	var out: Array = []
+	if not (raw is Array):
+		return out
+	for lm in raw:
+		if lm is Dictionary and BOARD_LANDMARKS.has(String(lm.get("id", ""))):
+			var x = lm.get("x")
+			var y = lm.get("y")
+			if (x is int or x is float) and (y is int or y is float) and is_finite(float(x)) and is_finite(float(y)):
+				out.append({"id": String(lm["id"]), "name": String(lm.get("name", "")), "x": float(x), "y": float(y)})
+	return out
 
 
 ## A separate RNG means site selection never consumes the operation's random stream.

@@ -107,7 +107,9 @@ func _draw() -> void:
 	var W: float = level.W * PX
 	var H: float = level.H * PX
 	var sheet := Rect2(-60, -60, W + 120, H + 236)
-	var tint := Color.WHITE if not night() else Color(0.62, 0.6, 0.57)
+	# 2026-11-03: night lilac, not grey-brown, so the page around the plan stays the
+	# opening's bright paper while the indigo fog carries the night
+	var tint := Color.WHITE if not night() else Color(0.88, 0.86, 0.98)
 	draw_texture_rect(paper(), sheet, true, tint)
 	var sk: Array = sketches()["ground"]
 	sk[maxi(_bi, 0) % sk.size()].replay(self)

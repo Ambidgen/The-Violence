@@ -40,6 +40,14 @@ with orange light cones) are **darker, denser and more detailed** than the first
   stroke by stroke.
 
 
+## Status (2026-11-03): one look
+
+The opening scenes' bright child's crayon (cream paper, saturated wax, notebook-paper
+captions) is now the reference for the whole game; it supersedes the darker grey-paper
+"prototype 2" plates below wherever they disagree. Shorts, title, board map, plans, fog,
+figures, props and UI chrome were moved to it on 3 November (see the changelog, and the
+before/after renders in `tests/results/visual-2026-11-03/`).
+
 ## Status (2026-11-02): gameplay, menus, and the opening are converted
 
 The four opening scenes and fourteen campaign shorts now run as native crayon drawings in Godot. Opening timelines live in `scripts/view/proto/`; the short-form set is data-driven by `assets/cutscenes/shorts/shorts.json` and drawn by `scripts/view/crayon_short.gd`. Their legacy Remotion renders remain archived as references.

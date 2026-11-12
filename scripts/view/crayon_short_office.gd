@@ -33,7 +33,7 @@ func _week() -> void:
 	_txt(big, Vector2(126, 510), 230, DARK, 111, 385, _reveal(0.55, 0.65))
 	_txt("/ %d WEEKS" % total, Vector2(128, 588), 24, MID, 112, 370, _reveal(0.9, 0.5))
 	_txt(
-		_slot("week-title", String(props.get("ward", "PORT CARRICK"))),
+		_slot("week-title", _ps(props.get("ward", "PORT CARRICK"))),
 		Vector2(105, 714),
 		30,
 		DARK,
@@ -75,7 +75,7 @@ func _week() -> void:
 		if j == week - 1:
 			C.scribble_ring(self, r2.get_center(), 19, 28, RED, 210, _reveal(1.5, 0.4), 3.2)
 	_txt(
-		_slot("note", String(props.get("note", "SITUATIONS ON THE BOARD"))),
+		_slot("note", _ps(props.get("note", "SITUATIONS ON THE BOARD"))),
 		Vector2(715, 713),
 		21,
 		DARK,
@@ -88,8 +88,8 @@ func _week() -> void:
 
 func _situation() -> void:
 	_heading(
-		"SITUATION FILE · WEEK %s" % str(props.get("week", 12)),
-		String(props.get("kind", "THE FILE")),
+		"SITUATION FILE · WEEK %s" % _ps(props.get("week", 12)),
+		_ps(props.get("kind", "THE FILE")),
 		220
 	)
 	var folder := Rect2(92, 222, 965, 594)
@@ -97,7 +97,7 @@ func _situation() -> void:
 	var title_text := _slot("title", _prop_text("title", "SITUATION TITLE"))
 	_txt(title_text, Vector2(128, 326), 39, DARK, 224, 860, _reveal(0.65, 0.7))
 	_txt(
-		_slot("ward", String(props.get("ward", "WARD"))),
+		_slot("ward", _ps(props.get("ward", "WARD"))),
 		Vector2(128, 408),
 		25,
 		UMBER,
@@ -120,17 +120,17 @@ func _situation() -> void:
 		)
 		_box(r, 240 + i, _reveal(1.25 + i * 0.18, 0.22))
 	_txt(
-		String(props.get("pressure", "PRESSURE UNKNOWN")),
+		_ps(props.get("pressure", "PRESSURE UNKNOWN")),
 		Vector2(128, 576),
 		23,
-		RED if String(props.get("pressure", "")).contains("HIGH") else DARK,
+		RED if _ps(props.get("pressure", "")).contains("HIGH") else DARK,
 		250,
 		760,
 		_reveal(2.0, 0.55)
 	)
 	C.line(self, Vector2(128, 603), Vector2(1000, 603), DARK, 1.7, 251)
 	_txt(
-		String(props.get("room", "ROOM ESTIMATE")),
+		_ps(props.get("room", "ROOM ESTIMATE")),
 		Vector2(132, 666),
 		19,
 		MID,
@@ -203,7 +203,7 @@ func _plan() -> void:
 	_panel(Rect2(1080, 246, 412, 524), 370, STOCK, _reveal(1.0, 0.6))
 	_txt("ENTRY", Vector2(1120, 330), 18, MID, 371, 280)
 	_txt(
-		_slot("entry", String(props.get("entry", "FRONT DOOR"))),
+		_slot("entry", _ps(props.get("entry", "FRONT DOOR"))),
 		Vector2(1120, 390),
 		26,
 		DARK,
@@ -221,7 +221,7 @@ func _plan() -> void:
 		_reveal(2.5, 0.55)
 	)
 	_txt(
-		_slot("objective", String(props.get("objective", "CLEAR THE HOUSE"))),
+		_slot("objective", _ps(props.get("objective", "CLEAR THE HOUSE"))),
 		Vector2(1120, 624),
 		22,
 		RED,
@@ -233,11 +233,11 @@ func _plan() -> void:
 
 
 func _staging() -> void:
-	_heading("CALL SIGN · " + String(props.get("callsign", "A-2")), "STAGING", 400)
+	_heading("CALL SIGN · " + _ps(props.get("callsign", "A-2")), "STAGING", 400)
 	var road := PackedVector2Array(
 		[Vector2(80, 390), Vector2(1510, 334), Vector2(1510, 643), Vector2(80, 700)]
 	)
-	C.hatch(self, road, _alpha(C.SLATE, _reveal(0.35, 0.8)), 5.2, 0.5, 401, 2.0)
+	C.hatch(self, road, _alpha(NIGHT, _reveal(0.35, 0.8)), 5.2, 0.5, 401, 2.0)
 	C.outline(self, road, DARK, 3.0, 402, 1.2, _reveal(0.35, 0.8))
 	for i in 12:
 		var x := 148.0 + i * 112.0
@@ -264,7 +264,7 @@ func _staging() -> void:
 		_person(Vector2(688 + (i % 6) * 49, 622 + int(i / 6) * 27), 0.76, NAVY, 480 + i, i % 4 == 0)
 	_panel(Rect2(1090, 704, 404, 104), 500, STOCK, _reveal(2.2, 0.45))
 	_txt(
-		_slot("callsign", String(props.get("callsign", "A-2"))),
+		_slot("callsign", _ps(props.get("callsign", "A-2"))),
 		Vector2(1122, 770),
 		29,
 		NAVY,
@@ -274,9 +274,9 @@ func _staging() -> void:
 	)
 	_txt(
 		(
-			_slot("street", String(props.get("street", "FOUNDRY ST")))
+			_slot("street", _ps(props.get("street", "FOUNDRY ST")))
 			+ " · "
-			+ String(props.get("time", "02:14"))
+			+ _ps(props.get("time", "02:14"))
 		),
 		Vector2(96, 834),
 		21,
@@ -314,12 +314,12 @@ func _threshold() -> void:
 	C.line(self, Vector2(410, 418), Vector2(410, 545), UMBER, 5, 551, 1.1, 2, _reveal(1.2, 0.55))
 	C.cone(self, Vector2(374, 548), -0.55, 650, 0.52, AMBER, 560, 0.62, 5.0)
 	C.pool(self, Vector2(892, 511), 270, 148, _alpha(AMBER, 0.7), 561, 0.42)
-	var contact := String(props.get("variant", "clear")) == "contact"
+	var contact := _ps(props.get("variant", "clear")) == "contact"
 	if contact:
 		_person(Vector2(934, 592), 1.45, UMBER, 570)
 		C.scribble_ring(self, Vector2(934, 515), 48, 58, RED, 571, _reveal(3.3, 0.45), 3.0)
 	else:
-		C.line(self, Vector2(780, 601), Vector2(1010, 601), C.MOSS, 5.0, 572, 1.2)
+		C.line(self, Vector2(780, 601), Vector2(1010, 601), SAP, 5.0, 572, 1.2)
 	# Recognition bar fills then holds; contact and clear resolve to different word marks.
 	var bar := Rect2(420, 750, 760, 28)
 	_box(bar, 580, _reveal(1.0, 0.35))
@@ -336,7 +336,7 @@ func _threshold() -> void:
 		2.0
 	)
 	_txt(
-		_slot("room", String(props.get("room", "ROOM UNKNOWN"))),
+		_slot("room", _ps(props.get("room", "ROOM UNKNOWN"))),
 		Vector2(414, 840),
 		26,
 		DARK,
@@ -348,10 +348,10 @@ func _threshold() -> void:
 
 
 func _officer_down() -> void:
-	var killed := String(props.get("variant", "down")) == "killed"
-	_heading("INCIDENT RECORD · WEEK %s" % String(props.get("week", 1)), "OFFICER DOWN", 600)
+	var killed := _ps(props.get("variant", "down")) == "killed"
+	_heading("INCIDENT RECORD · WEEK %s" % _ps(props.get("week", 1)), "OFFICER DOWN", 600)
 	C.hatch_rect(
-		self, Rect2(78, 224, 1440, 572), _alpha(C.SLATE, _reveal(0.2, 0.6)), 5.0, -0.5, 601, 2.4
+		self, Rect2(78, 224, 1440, 572), _alpha(NIGHT, _reveal(0.2, 0.6)), 5.0, -0.5, 601, 2.4
 	)
 	# Radio rings and one small figure on the wet plan.
 	for i in 4:
@@ -369,7 +369,7 @@ func _officer_down() -> void:
 	# Case note and badge are deliberately kept as paper-coloured spaces.
 	_panel(Rect2(176, 624, 790, 126), 640, STOCK, _reveal(2.0, 0.55))
 	_txt(
-		_slot("name", String(props.get("name", "OFFICER"))),
+		_slot("name", _ps(props.get("name", "OFFICER"))),
 		Vector2(212, 694),
 		34,
 		DARK,
@@ -380,9 +380,9 @@ func _officer_down() -> void:
 	_txt(
 		(
 			"BADGE "
-			+ _slot("badge", String(props.get("badge", "0000")))
+			+ _slot("badge", _ps(props.get("badge", "0000")))
 			+ " · WEEK "
-			+ String(props.get("week", 1))
+			+ _ps(props.get("week", 1))
 		),
 		Vector2(214, 730),
 		18,
@@ -451,7 +451,7 @@ func _debrief() -> void:
 		C.evidence(self, Vector2(280 + i * 135, 376 + (i % 2) * 275), i + 1, 750 + i, 1.7)
 	_panel(Rect2(1054, 238, 438, 524), 760, STOCK, _reveal(1.0, 0.55))
 	_txt(
-		"ROUNDS     %s" % String(props.get("rounds", 0)),
+		"ROUNDS     %s" % _ps(props.get("rounds", 0)),
 		Vector2(1100, 352),
 		22,
 		DARK,
@@ -460,7 +460,7 @@ func _debrief() -> void:
 		_reveal(2.0, 0.4)
 	)
 	_txt(
-		"FINDINGS   %s" % String(props.get("findings", 0)),
+		"FINDINGS   %s" % _ps(props.get("findings", 0)),
 		Vector2(1100, 432),
 		22,
 		DARK,
@@ -469,7 +469,7 @@ func _debrief() -> void:
 		_reveal(2.5, 0.4)
 	)
 	_txt(
-		"TIME       %s MIN" % String(props.get("minutes", 0)),
+		"TIME       %s MIN" % _ps(props.get("minutes", 0)),
 		Vector2(1100, 512),
 		22,
 		DARK,
@@ -478,7 +478,7 @@ func _debrief() -> void:
 		_reveal(3.0, 0.4)
 	)
 	_txt(
-		"CIVILIANS  %s" % String(props.get("civilians", 0)),
+		"CIVILIANS  %s" % _ps(props.get("civilians", 0)),
 		Vector2(1100, 592),
 		22,
 		DARK,

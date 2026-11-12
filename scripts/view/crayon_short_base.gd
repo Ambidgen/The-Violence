@@ -6,16 +6,26 @@ extends Node2D
 const C = preload("res://scripts/view/crayon.gd")
 const W := 1600.0
 const H := 900.0
-const PAPER := Color("#8d8a83")
-const STOCK := Color("#e6dfcd")
-const DARK := Color("#1d1b19")
-const MID := Color("#3a3632")
-const RED := Color("#b8262a")
-const AMBER := Color("#e8b43c")
-const BLUE := Color("#3b6fd6")
-const NAVY := Color("#24304f")
-const UMBER := Color("#5b3c27")
-const SAP := Color("#4f6a3a")
+# The bright child's-drawing palette of the opening scenes (scripts/view/proto/
+# opening_view.gd). Visual overhaul 2026-11-03: the shorts were drawn on the darker grey
+# stock of the second prototype plates and read as a different game from the opening.
+const PAPER := Color("#fbf7ec")    # cream drawing paper
+const STOCK := Color("#ffffff")    # notebook paper for panels and cards
+const DARK := Color("#1e1b1c")     # wax-crayon black
+const MID := Color("#5b5866")      # pencil grey
+const RED := Color("#ff2b30")
+const AMBER := Color("#ffc400")
+const BLUE := Color("#2747e6")     # police blue, as the opening draws the uniforms
+const NAVY := Color("#2747e6")
+const UMBER := Color("#a5592a")
+const SAP := Color("#2fcf3f")      # grass green
+const SKY := Color("#33a6ff")
+const NIGHT := Color("#251a7a")    # the opening's night sky; stands in for wet slate
+const SUN := Color("#ffd60a")
+const SUN_EDGE := Color("#ff9500")
+const RULE := Color("#9cc3ff")     # notebook rules
+const MARGIN := Color("#ff6f7d")   # notebook margin
+const SOFT_GREY := Color("#9aa1ad")
 
 static var _paper_cache: ImageTexture
 
@@ -43,7 +53,7 @@ func configure(
 func _ready() -> void:
 	vp = get_viewport_rect().size
 	if _paper_cache == null:
-		_paper_cache = C.paper_texture(Vector2i(800, 450), PAPER, 91, 1.4)
+		_paper_cache = C.paper_texture(Vector2i(800, 450), PAPER, 29, 0.0)
 	paper = _paper_cache
 	set_process(true)
 
@@ -70,40 +80,33 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(vp.x / W, vp.y / H))
 	C.boil = 1.0
 	draw_texture_rect(paper, Rect2(0, 0, W, H), false)
-	# The stock is a darkened page with a softly worked centre and dirty corners.
-	C.hatch_rect(self, Rect2(26, 24, W - 52, H - 48), _alpha(STOCK, 0.18), 6.5, -0.7, 1, 1.2, 1.0)
-	for k in 4:
-		var x := 34.0 if k % 2 == 0 else W - 34.0
-		var y := 32.0 if k < 2 else H - 32.0
-		C.smudge(self, Vector2(x, y), 46.0, _alpha(DARK, 0.38))
-	# Registration ticks, hand ruled, not clean vector chrome.
-	for i in 4:
-		var x0 := 38.0 if i % 2 == 0 else W - 38.0
-		var y0 := 38.0 if i < 2 else H - 38.0
-		var dx := 1.0 if i % 2 == 0 else -1.0
-		var dy := 1.0 if i < 2 else -1.0
-		C.line(self, Vector2(x0, y0), Vector2(x0 + dx * 25.0, y0), DARK, 2.0, 20 + i, 0.8, 2)
-		C.line(self, Vector2(x0, y0), Vector2(x0, y0 + dy * 25.0), DARK, 2.0, 30 + i, 0.8, 2)
+	# A child's page: a strip of scribbled sky along the top and a sun in the corner,
+	# as in the opening scenes; the rest of the page is left to the drawing.
+	C.hatch_rect(self, Rect2(0, -4, W, 52), SKY, 6.0, -0.35, 9, 3.6, 1.0)
+	C.hatch_rect(self, Rect2(0, 0, W, 34), SKY, 9.0, 0.5, 11, 2.6, 1.0)
+	var sun_c := Vector2(W - 70.0, 54.0)
+	for i in 10:
+		var ang := TAU * float(i) / 10.0 + 0.2
+		C.line(self, sun_c + Vector2.from_angle(ang) * 40.0, sun_c + Vector2.from_angle(ang) * 58.0, SUN_EDGE, 3.0, 40 + i, 1.0, 1)
+	C.hatch(self, C.ellipse_poly(sun_c, 32.0, 32.0, 18, 51, 0.05), SUN, 3.4, 0.4, 52, 3.4)
+	C.outline(self, C.ellipse_poly(sun_c, 32.0, 32.0, 18, 51, 0.05), SUN_EDGE, 2.6, 53, 1.0)
 	draw_short()
 	_footer()
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 func _panel(rect: Rect2, seed: int, tint: Color = STOCK, reveal := 1.0) -> void:
-	var fill := _alpha(tint, 0.84)
-	C.hatch_rect(self, rect, fill, 4.7, -0.7, seed, 1.8, reveal)
+	# Notebook paper, like the opening's captions: white (or the tint, washed out), blue
+	# rules, a red margin, and a crayon edge pressed hard.
+	var fill := tint.lerp(STOCK, 0.55) if tint != STOCK else STOCK
+	C.hatch_rect(self, rect, _alpha(fill, 0.95), 3.2, -0.7, seed, 2.6, reveal)
+	var y := rect.position.y + 30.0
+	while y < rect.end.y - 8.0:
+		C.line(self, Vector2(rect.position.x + 6, y), Vector2(rect.end.x - 6, y), _alpha(RULE, 0.55), 1.2, seed + int(y), 0.4, 1, reveal)
+		y += 30.0
+	if rect.size.x > 160.0:
+		C.line(self, Vector2(rect.position.x + 34, rect.position.y + 4), Vector2(rect.position.x + 34, rect.end.y - 4), _alpha(MARGIN, 0.7), 1.6, seed + 3, 0.5, 1, reveal)
 	C.outline(self, C.rect_poly(rect), DARK, 3.1, seed + 1, 1.0, reveal)
-	C.line(
-		self,
-		rect.position + Vector2(8, 7),
-		Vector2(rect.end.x - 8, rect.position.y + 7),
-		_alpha(STOCK, 0.6),
-		1.0,
-		seed + 2,
-		0.7,
-		1,
-		reveal
-	)
 
 
 func _box(rect: Rect2, seed: int, reveal := 1.0, color: Color = DARK) -> void:
@@ -173,7 +176,7 @@ func _wrap_lines(text: String, size: int, max_width: float) -> Array[String]:
 ## could not compile, 2026-11-02: the function was only on the office sheet).
 func _draw_van(c: Vector2, sc: float, seed: int) -> void:
 	var r := Rect2(c - Vector2(89, 39) * sc, Vector2(178, 78) * sc)
-	C.hatch_rect(self, r, _alpha(C.SLATE_LIGHT, _reveal(1.0, 0.5)), 3.7, -0.6, seed, 2.4)
+	C.hatch_rect(self, r, _alpha(SOFT_GREY, _reveal(1.0, 0.5)), 3.7, -0.6, seed, 2.4)
 	C.outline(self, C.rect_poly(r), DARK, 3.0, seed + 1)
 	for side in [-1.0, 1.0]:
 		C.hatch(
@@ -213,8 +216,15 @@ func _slot(id: String, fallback: String) -> String:
 	return fallback
 
 
+## A prop as text. The manifest is JSON, so whole numbers arrive as floats ("WEEK 23.0").
+static func _ps(v) -> String:
+	if v is float and is_equal_approx(v, round(v)):
+		return str(int(round(v)))
+	return str(v)
+
+
 func _prop_text(id: String, fallback: String) -> String:
-	return String(props.get(id, fallback))
+	return _ps(props.get(id, fallback))
 
 
 func _heading(kicker: String, title: String, seed: int, title_size := 40) -> void:

@@ -40,7 +40,7 @@ func build(m) -> void:
 	v.add_child(title)
 	var sub := Label.new()
 	sub.text = "Endless battle  ·  Port Carrick  ·  seed %d" % main.seed_val
-	sub.add_theme_color_override("font_color", Color("#6e675c"))
+	sub.add_theme_color_override("font_color", Color("#5b5866"))
 	v.add_child(sub)
 	v.add_child(HSeparator.new())
 	var h := _h(v)
@@ -60,7 +60,7 @@ func build(m) -> void:
 		b.custom_minimum_size = Vector2(44, 0)
 		speed_buttons.append(b)
 	speed_note = Label.new()
-	speed_note.add_theme_color_override("font_color", Color("#6e675c"))
+	speed_note.add_theme_color_override("font_color", Color("#5b5866"))
 	speed_note.add_theme_font_size_override("font_size", 11)
 	v.add_child(speed_note)
 	var ho := _h(v)

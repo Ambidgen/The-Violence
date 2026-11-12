@@ -17,13 +17,15 @@ const Ink = preload("res://scripts/view/ink.gd")
 const PX := 40.0
 
 ## Room crayons: [day, night], picked per room so neighbours differ.
+# Visual overhaul 2026-11-03: the opening's colours. Day rooms are bright pastel crayon;
+# night rooms are saturated indigo, teal and plum rather than grey-greens.
 const ROOM_TINTS := [
-	[Color("#dccfb4"), Color("#59606c")],
-	[Color("#cfd6c6"), Color("#56635a")],
-	[Color("#e0c9b3"), Color("#695a55")],
-	[Color("#c9d0dc"), Color("#4f5b6d")],
-	[Color("#e3d6a8"), Color("#66604a")],
-	[Color("#d8c3c9"), Color("#62555e")],
+	[Color("#ffe08a"), Color("#3b3fa0")],
+	[Color("#b8f0a0"), Color("#2e6b6a")],
+	[Color("#ffc2a8"), Color("#7a3f6c")],
+	[Color("#b9d8ff"), Color("#2f56a8")],
+	[Color("#ffe6a8"), Color("#6b5a2a")],
+	[Color("#f5c0e0"), Color("#6a3a8a")],
 ]
 const WET_ROOMS := ["BATH", "KITCHEN", "LAUNDRY", "WC", "WASHROOM", "ENSUITE", "SHOWER", "PANTRY", "MESS"]
 
@@ -47,12 +49,12 @@ static func paint_ground(ci, lv, night: bool) -> void:
 	var site := C.rect_poly(Rect2(0, 0, W, H))
 	# the ground: green scribble by day, near-black charcoal by night
 	if night:
-		ci.draw_colored_polygon(site, Color("#2c312c"))
-		C.hatch(ci, site, _a(C.GRAPHITE, 0.9), 3.4, -0.7, 11, 2.6)
-		C.hatch(ci, site, _a(C.MOSS.darkened(0.45), 0.8), 5.0, 0.9, 12, 2.4)
+		ci.draw_colored_polygon(site, Color("#1f2a5a"))
+		C.hatch(ci, site, _a(Color("#251a7a"), 0.9), 3.4, -0.7, 11, 2.8)
+		C.hatch(ci, site, _a(Color("#14a52c").darkened(0.35), 0.75), 5.0, 0.9, 12, 2.6)
 	else:
-		C.hatch(ci, site, _a(C.MOSS.lightened(0.15), 0.55), 4.2, -0.7, 11, 2.4)
-		C.hatch(ci, site, _a(C.GRAPHITE, 0.16), 7.0, 0.8, 12, 1.6)
+		C.hatch(ci, site, _a(Color("#2fcf3f"), 0.55), 4.2, -0.7, 11, 2.8)
+		C.hatch(ci, site, _a(Color("#14a52c"), 0.3), 7.0, 0.8, 12, 2.0)
 	for d in lv.decor:
 		_decor(ci, d, night)
 	var k := 0
@@ -107,8 +109,8 @@ static func _decor(ci, d: Dictionary, night: bool) -> void:
 		"road":
 			var rr: Rect2 = _r(d["r"])
 			var poly := C.rect_poly(rr)
-			ci.draw_colored_polygon(poly, C.SLATE if night else Color("#9a9a96"))
-			C.hatch(ci, poly, _a(C.SLATE.darkened(0.3) if night else C.GRAPHITE, 0.6 if night else 0.35), 3.6, -0.15, s, 2.6)
+			ci.draw_colored_polygon(poly, Color("#3a3f7a") if night else Color("#8a909b"))
+			C.hatch(ci, poly, _a(Color("#251a7a") if night else C.GRAPHITE, 0.6 if night else 0.3), 3.6, -0.15, s, 2.6)
 			var mark := _a(C.TAPE if not night else C.CHALK.darkened(0.3), 0.85)
 			if d.get("axis", "h") == "h":
 				var cy := rr.get_center().y

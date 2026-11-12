@@ -27,19 +27,19 @@ func _press() -> void:
 	_panel(Rect2(92, 218, 1410, 580), 801, STOCK, _reveal(0.25, 0.7))
 	_txt("THE PORT CARRICK LEDGER", Vector2(130, 286), 31, DARK, 802, 1280, _reveal(0.55, 0.55))
 	C.line(self, Vector2(130, 309), Vector2(1460, 309), DARK, 2.8, 803)
-	_txt("WEEK %s" % String(props.get("week", 1)), Vector2(130, 347), 17, MID, 804, 250)
-	var headline := _slot("headline", String(props.get("headline", "A CITY WAITS FOR ANSWERS")))
+	_txt("WEEK %s" % _ps(props.get("week", 1)), Vector2(130, 347), 17, MID, 804, 250)
+	var headline := _slot("headline", _ps(props.get("headline", "A CITY WAITS FOR ANSWERS")))
 	_txt(headline, Vector2(132, 448), 42, DARK, 805, 1260, _reveal(0.85, 0.7))
 	C.line(self, Vector2(132, 476), Vector2(1458, 476), DARK, 2.0, 806)
 	var deck := _slot(
-		"deck", String(props.get("deck", "The paper puts the week's events into words."))
+		"deck", _ps(props.get("deck", "The paper puts the week's events into words."))
 	)
 	_txt(deck, Vector2(140, 540), 23, MID, 807, 830, _reveal(1.5, 0.8))
 	# A crude press photograph: a van under a lamp, built from hatching instead of a bitmap.
 	C.hatch_rect(
 		self,
 		Rect2(1040, 525, 382, 196),
-		_alpha(C.SLATE, 0.48),
+		_alpha(NIGHT, 0.48),
 		4.0,
 		-0.6,
 		810,
@@ -56,20 +56,20 @@ func _press() -> void:
 		821,
 		2.0
 	)
-	var tone := String(props.get("tone", "neutral"))
+	var tone := _ps(props.get("tone", "neutral"))
 	if tone == "bad":
 		C.line(self, Vector2(136, 731), Vector2(1438, 731), RED, 7.0, 822, 1.8)
 		_stamp("BAD WEEK", Vector2(1270, 844), 823, RED)
 	else:
-		_stamp(String(props.get("price", "50 CENTS")), Vector2(1270, 844), 824, DARK)
+		_stamp(_ps(props.get("price", "50 CENTS")), Vector2(1270, 844), 824, DARK)
 
 
 func _case() -> void:
 	_heading("INTERNAL AFFAIRS · EXHIBIT", "THE CASE", 840)
 	_panel(Rect2(114, 238, 928, 548), 841, STOCK, _reveal(0.28, 0.7))
-	_txt(String(props.get("caseNo", "IA 00-000")), Vector2(158, 304), 20, MID, 842, 520)
+	_txt(_ps(props.get("caseNo", "IA 00-000")), Vector2(158, 304), 20, MID, 842, 520)
 	_txt(
-		_slot("officer", String(props.get("officer", "OFFICER"))),
+		_slot("officer", _ps(props.get("officer", "OFFICER"))),
 		Vector2(158, 366),
 		25,
 		DARK,
@@ -78,7 +78,7 @@ func _case() -> void:
 		_reveal(0.65, 0.55)
 	)
 	C.line(self, Vector2(158, 389), Vector2(998, 389), DARK, 2.0, 844)
-	var summary := _slot("summary", String(props.get("summary", "THE FINDING IS RECORDED.")))
+	var summary := _slot("summary", _ps(props.get("summary", "THE FINDING IS RECORDED.")))
 	_txt(summary, Vector2(162, 476), 25, DARK, 845, 780, _reveal(1.0, 0.85))
 	# Redactions obscure what the file cannot publish.
 	for i in 5:
@@ -96,7 +96,7 @@ func _case() -> void:
 	_panel(exhibit, 860, _alpha(PAPER, 0.5), _reveal(0.8, 0.55))
 	C.evidence(self, Vector2(1274, 442), 3, 861, 3.5)
 	C.scribble_ring(self, Vector2(1274, 444), 94, 88, DARK, 862, _reveal(1.5, 0.6), 2.4)
-	var verdict := String(props.get("finding", "CLEARED")).to_upper()
+	var verdict := _ps(props.get("finding", "CLEARED")).to_upper()
 	_stamp(verdict, Vector2(1124, 832), 863, RED if verdict == "SUSTAINED" else DARK)
 
 
@@ -134,7 +134,7 @@ func _ally() -> void:
 		3.2
 	)
 	_txt(
-		_slot("name", String(props.get("name", "ALLY"))),
+		_slot("name", _ps(props.get("name", "ALLY"))),
 		Vector2(170, 330),
 		31,
 		DARK,
@@ -143,7 +143,7 @@ func _ally() -> void:
 		_reveal(0.8, 0.6)
 	)
 	_txt(
-		_slot("title", String(props.get("title", "A COALITION PARTNER"))),
+		_slot("title", _ps(props.get("title", "A COALITION PARTNER"))),
 		Vector2(170, 384),
 		19,
 		MID,
@@ -152,7 +152,7 @@ func _ally() -> void:
 		_reveal(1.2, 0.55)
 	)
 	_txt(
-		String(props.get("holds", "THE DEPARTMENT'S GOODWILL")),
+		_ps(props.get("holds", "THE DEPARTMENT'S GOODWILL")),
 		Vector2(184, 660),
 		21,
 		MID,
@@ -191,7 +191,7 @@ func _election() -> void:
 		C.hatch_rect(
 			self,
 			Rect2(770, y + 47, bw, 34),
-			_alpha(NAVY if i == winner else C.SLATE, _reveal(1.3 + i * 0.4, 0.65)),
+			_alpha(NAVY if i == winner else NIGHT, _reveal(1.3 + i * 0.4, 0.65)),
 			4.0,
 			-0.4,
 			940 + i,
@@ -238,7 +238,7 @@ func _end_watch() -> void:
 		C.line(self, Vector2(x, 330), Vector2(x - 54, 626), _alpha(NAVY, 0.62), 6, 1010 + i, 1.7)
 	C.line(self, Vector2(830, 660), Vector2(1348, 660), RED, 4, 1020)
 	_txt(
-		_slot("name", String(props.get("name", "OFFICER"))),
+		_slot("name", _ps(props.get("name", "OFFICER"))),
 		Vector2(778, 468),
 		36,
 		DARK,
@@ -246,11 +246,11 @@ func _end_watch() -> void:
 		600,
 		_reveal(1.2, 0.6)
 	)
-	_txt("BADGE " + String(props.get("badge", "0000")), Vector2(790, 525), 21, MID, 1022, 570)
+	_txt("BADGE " + _ps(props.get("badge", "0000")), Vector2(790, 525), 21, MID, 1022, 570)
 	_txt(
 		_slot(
 			"dates",
-			"WEEK %s · %s YEARS" % [String(props.get("week", 1)), String(props.get("years", 0))]
+			"WEEK %s · %s YEARS" % [_ps(props.get("week", 1)), _ps(props.get("years", 0))]
 		),
 		Vector2(790, 582),
 		19,
@@ -277,7 +277,7 @@ func _end_watch() -> void:
 
 
 func _allocation() -> void:
-	_heading("CITY COUNCIL · WEEK %s" % String(props.get("week", 1)), "THE ALLOCATION", 1040)
+	_heading("CITY COUNCIL · WEEK %s" % _ps(props.get("week", 1)), "THE ALLOCATION", 1040)
 	_panel(Rect2(104, 230, 1392, 564), 1041, STOCK, _reveal(0.25, 0.65))
 	_txt("DEPARTMENT LEDGER", Vector2(154, 300), 20, MID, 1042, 480)
 	C.line(self, Vector2(154, 318), Vector2(1450, 318), DARK, 2.5, 1043)
@@ -308,7 +308,7 @@ func _allocation() -> void:
 		C.hatch(self, rr, _alpha(AMBER, _reveal(2.0 + i * 0.11, 0.25)), 3.0, 0.4, 1070 + i, 1.5)
 		C.outline(self, rr, DARK, 1.5, 1090 + i)
 		C.letters(self, "$", Vector2(coin_x - 5, coin_y + 6), 14, DARK, 1100 + i, 1)
-	var verdict := _slot("verdict", String(props.get("verdict", "APPROVED")))
+	var verdict := _slot("verdict", _ps(props.get("verdict", "APPROVED")))
 	_stamp(verdict, Vector2(1110, 697), 1120, RED if verdict == "CUT" else DARK)
 	C.line(self, Vector2(152, 738), Vector2(1450, 738), RED if delta < 0 else DARK, 4.0, 1121, 1.2)
 
@@ -321,7 +321,7 @@ func _course() -> void:
 	_box(Rect2(242, 290, 1114, 416), 1143, _reveal(0.75, 0.6), UMBER)
 	_txt("CERTIFICATE OF COMPLETION", Vector2(440, 386), 23, MID, 1144, 730, _reveal(0.9, 0.55))
 	_txt(
-		_slot("course", String(props.get("course", "CLOSE-QUARTERS DRILL"))),
+		_slot("course", _ps(props.get("course", "CLOSE-QUARTERS DRILL"))),
 		Vector2(320, 492),
 		35,
 		DARK,
@@ -333,7 +333,7 @@ func _course() -> void:
 	for i in mini(grads, 10):
 		_person(Vector2(470 + i * 70, 625), 0.86, NAVY, 1150 + i, i % 2 == 0)
 	_txt(
-		_slot("roster", "%d GRADUATES · WEEK %s" % [grads, String(props.get("week", 1))]),
+		_slot("roster", "%d GRADUATES · WEEK %s" % [grads, _ps(props.get("week", 1))]),
 		Vector2(528, 700),
 		19,
 		MID,

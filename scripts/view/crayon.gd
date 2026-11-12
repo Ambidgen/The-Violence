@@ -21,18 +21,20 @@ extends RefCounted
 ## Presentation only. Nothing here touches the simulation.
 
 # ------------------------------------------------------------------ palette
+# Visual overhaul 2026-11-03: NAVY, BRICK, BRICK_DARK, UMBER, MOSS, SKIN and PAPER_CREAM
+# moved to the opening scenes' brighter wax; SLATE (night asphalt) and CHARCOAL stay.
 const PAPER_GREY := Color("#8d8a83")     # toned paper (most plates)
-const PAPER_CREAM := Color("#e6dfcd")    # the compound and apartment plates
+const PAPER_CREAM := Color("#fbf7ec")    # the opening scenes' drawing paper (was #e6dfcd, 2026-11-03)
 const CHALK := Color("#ecebe4")          # chalk white: markers, rain glints, steam
 const CHARCOAL := Color("#141313")
 const GRAPHITE := Color("#2f2e2d")
 const SLATE := Color("#3b4350")          # wet asphalt, night rooms
 const SLATE_LIGHT := Color("#5d6878")
-const NAVY := Color("#1f2a44")           # uniforms
-const BRICK := Color("#6b2f24")
-const BRICK_DARK := Color("#3f1d17")
-const UMBER := Color("#4a3426")
-const MOSS := Color("#55644a")           # sidewalks, grime
+const NAVY := Color("#2747e6")           # uniforms
+const BRICK := Color("#c0442a")
+const BRICK_DARK := Color("#7a2a1a")
+const UMBER := Color("#8a4a2a")
+const MOSS := Color("#4f9a3a")           # sidewalks, grime
 const AMBER := Color("#f0b53b")          # bulbs, searchlights
 const ORANGE := Color("#e8722b")         # sodium lamps, window spill
 const TAPE := Color("#e7c93b")           # warning tape, barriers
@@ -40,7 +42,7 @@ const RED := Color("#c42b33")            # police light, alarm light
 const BLOOD := Color("#7e1d1f")
 const BLUE := Color("#3b6fd6")           # police light
 const RAIN := Color("#7f9fd6")
-const SKIN := Color("#c99a7a")
+const SKIN := Color("#ffc39a")
 
 static var frame := 0          # the boil frame (advanced ~8 times a second)
 static var boil := 1.0         # wobble scale; 0 = still lines

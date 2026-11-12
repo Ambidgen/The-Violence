@@ -55,10 +55,11 @@ func _run() -> void:
 	_check(OpsUI._ward_label({"city_error": true}) == "ward unavailable", "an unlocated call does not display fabricated ward trust")
 	ui._roster()
 	await process_frame
-	_check(not ui.city_map.visible, "the city overview is hidden on other management screens")
+	# EA_TASKS P3.A1 (2026-11-03): management screens sit over the city, not the last tactical map
+	_check(ui.city_map.visible, "the city overview stays behind the other management screens (P3.A1)")
 
 	var pool: Array = c.dept.applicants_now()
-	var hire: Array = _buttons(ui.box).filter(func(b): return String(b.text).begins_with("Hire  ($"))
+	var hire: Array = _buttons(ui.box).filter(func(b): return String(b.text).begins_with("Hire  $"))
 	_check(pool.size() >= 2 and hire.size() == pool.size(), "one Hire button for each of the %d visible applicants" % pool.size())
 	_check(_buttons(ui.box).all(func(b): return not String(b.text).begins_with("Hire a recruit") and not String(b.text).begins_with("Hire laterally")),
 		"the removed blind-hire buttons stay removed")

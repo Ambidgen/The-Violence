@@ -10,25 +10,28 @@ extends RefCounted
 const C = preload("res://scripts/view/crayon.gd")
 
 ## look -> [body, shade, hair/cap]
+# Visual overhaul 2026-11-03: the opening's colours. Police are the royal blue the opening
+# draws uniforms in; suspects stay earthy but bright enough to be a child's crayon; the
+# tactical teams stay darker so they still read as heavier.
 const LOOK := {
-	"a": [Color("#2f4a86"), Color("#1a2a52"), Color("#1d2c55")],       # police: navy, a shade bright to read at night
-	"pd": [Color("#2f4a86"), Color("#1a2a52"), Color("#1d2c55")],
-	"qrf": [Color("#1e2433"), Color("#0f121a"), Color("#141313")],
+	"a": [Color("#2747e6"), Color("#1a2fa0"), Color("#1b2580")],       # police: royal blue
+	"pd": [Color("#2747e6"), Color("#1a2fa0"), Color("#1b2580")],
+	"qrf": [Color("#36457a"), Color("#1e2850"), Color("#141313")],
 	# Colours of the separately authored character sprites; the rig's live limbs match.
-	"patrol": [Color("#304d84"), Color("#1a294a"), Color("#202f56")],
-	"swat": [Color("#343e4b"), Color("#1b222b"), Color("#262e36")],
-	"riot": [Color("#2b4265"), Color("#19283d"), Color("#1f3049")],
-	"hood": [Color("#866047"), Color("#4d392e"), Color("#372b25")],
-	"leather": [Color("#694b42"), Color("#392b29"), Color("#211e1d")],
-	"workcoat": [Color("#6d704e"), Color("#393f2c"), Color("#514232")],
-	"track": [Color("#526963"), Color("#30433f"), Color("#302823")],
-	"vestlook": [Color("#796f5d"), Color("#393b37"), Color("#272521")],
-	"b": [Color("#6b5a34"), Color("#3e331c"), Color("#2a1d14")],       # suspects: olive-umber
+	"patrol": [Color("#2f52e0"), Color("#1d3399"), Color("#1b2580")],
+	"swat": [Color("#3d4f7d"), Color("#212c4d"), Color("#1a2238")],
+	"riot": [Color("#2f5ad6"), Color("#1d3a8a"), Color("#1b2580")],
+	"hood": [Color("#c8763a"), Color("#8a4a22"), Color("#4a2a18")],
+	"leather": [Color("#9a4a3a"), Color("#5c2a20"), Color("#2a1810")],
+	"workcoat": [Color("#7a9a3a"), Color("#4a6020"), Color("#5a4028")],
+	"track": [Color("#2fa08a"), Color("#1d6656"), Color("#3a2820")],
+	"vestlook": [Color("#b08a4a"), Color("#6a5228"), Color("#2a2018")],
+	"b": [Color("#8a9a2a"), Color("#56601a"), Color("#3a2414")],       # suspects: olive
 	"c": [Color("#e4dccb"), Color("#a59b88"), Color("#4a3426")],       # civilians: pale (tinted live)
-	"med": [Color("#e4dccb"), Color("#a59b88"), Color("#4a3426")],
-	"pmed": [Color("#e4dccb"), Color("#a59b88"), Color("#26324f")],
+	"med": [Color("#ffffff"), Color("#c8c4d0"), Color("#4a3426")],
+	"pmed": [Color("#ffffff"), Color("#c8c4d0"), Color("#1b2580")],
 }
-const SKIN := Color("#d6a27f")
+const SKIN := Color("#ffc39a")
 const BOOT := Color("#141313")
 
 

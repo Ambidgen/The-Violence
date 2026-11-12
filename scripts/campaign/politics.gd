@@ -58,9 +58,9 @@ const ALLIES := {
 const ALLY_ORDER := ["council", "union", "coalition", "da"]
 
 const CANDIDATES := {
-	"kettering": {"name": "Royce Kettering", "ticket": "Safe Streets", "start": 34,
-		"blurb": "A councilman with an answer for every problem: more police, more money, fewer questions. His brother-in-law builds armoured vehicles; the contracts remain a family matter."},
-	"okonjo": {"name": "Dana Okonjo-Vale", "ticket": "Carrick Together", "start": 31,
+	"kettering": {"name": "George Carrick", "ticket": "Safe Streets", "start": 34,
+		"blurb": "The head of Port Carrick Enterprises, with an answer for every problem: more police, more money, fewer questions. His son Kevin builds armoured vehicles; the contracts remain a family matter."},
+	"okonjo": {"name": "Alicia Beddrow", "ticket": "Port Carrick Together", "start": 31,
 		"blurb": "A democratic socialist who intends to repair the city. She wants your signature on the Bridge Street order read aloud—and your name off the door."},
 	"pell": {"name": "Gordon Pell", "ticket": "Independent", "start": 35,
 		"blurb": "Competent, tireless and difficult to hurry. His answer to a failed review is another review, with a clearer filing system."},
@@ -372,7 +372,7 @@ func on_operation(week: int, sit: Dictionary, res: Dictionary, w, dept) -> Array
 			_poll("pell", -0.2 * vis)
 			_trust(wi, -1 - vis / 2)
 			if vis >= 3:
-				_headline(week, "POLICE OPERATION IN %s ENDS IN FAILURE" % where.to_upper(), "The %s at %s did not go to plan. Kettering: 'The officers did their job. The chief made them wait.'" % [what, sit.get("address", "")], "op")
+				_headline(week, "POLICE OPERATION IN %s ENDS IN FAILURE" % where.to_upper(), "The %s at %s did not go to plan. Carrick: 'The officers did their job. The chief made them wait.'" % [what, sit.get("address", "")], "op")
 	# officers killed: the union blames management, the law-and-order ticket blames everyone else
 	if off_killed > 0:
 		_ally("union", -4 * off_killed, dept, lines)
@@ -393,7 +393,7 @@ func on_operation(week: int, sit: Dictionary, res: Dictionary, w, dept) -> Array
 		_poll("pell", -3.0, "%d killed at %s" % [crowd_killed, sit.get("site_name", "a public event")])
 		_trust(wi, -8)
 		var place := String(sit.get("site_name", "public event")).to_upper()
-		_headline(week, "%s KILLED AT %s" % [_num(crowd_killed).to_upper(), place], "The rally was over before the ambulances left. Pell calls for a review; Okonjo-Vale asks who signed the plan.", "op")
+		_headline(week, "%s KILLED AT %s" % [_num(crowd_killed).to_upper(), place], "The rally was over before the ambulances left. Pell calls for a review; Beddrow asks who signed the plan.", "op")
 	# what was done to civilians by police: the story is coming, sooner or later
 	if civ_hit + civ_killed + excessive > 0:
 		var p_never := 0.0
@@ -680,7 +680,7 @@ func _land(week: int, p: Dictionary, dept) -> Array:
 				_:
 					source = "The department's log records the finding at %s. " % String(p["address"])
 			var age := ("The operation was %d weeks ago. " % late) if late >= 3 else ""
-			var body := "%s%sOkonjo-Vale: 'A report is not the same thing as an answer.'" % [source, age]
+			var body := "%s%sBeddrow: 'A report is not the same thing as an answer.'" % [source, age]
 			_headline(week, head, body, "story")
 			lines.append("In the papers: %s." % head.capitalize())
 		"lawsuit":
@@ -708,7 +708,7 @@ func _land(week: int, p: Dictionary, dept) -> Array:
 			_poll("kettering", 0.6, "a no-show at %s" % String(p.get("address", "")))
 			var head2: String = {"gang": "SHOTS FIRED NEAR %s; RESIDENTS SAY POLICE NEVER CAME", "hostage": "FAMILY HELD FOR HOURS AT %s; 'WHERE WERE THE POLICE?'"}.get(
 				p["type"], "%s: POLICE A NO-SHOW") % String(p["address"]).to_upper()
-			_headline(week, head2, "Kettering: 'Under my administration, the police will come when you call.' He did not say how.", "story")
+			_headline(week, head2, "Carrick: 'Under my administration, the police will come when you call.' He did not say how.", "story")
 	return lines
 
 
@@ -724,8 +724,8 @@ func _front_page(week: int) -> void:
 		var ld := leader()
 		var sh := share(ld)
 		var lines_c := {
-			"kettering": ["KETTERING: 'I WILL GIVE THE POLICE WHATEVER THEY ASK FOR'", "%s%% back Kettering's Safe Streets ticket. His brother-in-law's armoured vehicle firm did not return the Ledger's call." % int(sh)],
-			"okonjo": ["OKONJO-VALE LEADS: 'THE CHIEF WILL BE MY FIRST APPOINTMENT TO LEAVE'", "%s%% back Carrick Together. Asked about Bridge Street, she held up the signed order. 'He knows.'" % int(sh)],
+			"kettering": ["CARRICK: 'I WILL GIVE THE POLICE WHATEVER THEY ASK FOR'", "%s%% back Carrick's Safe Streets ticket. His son Kevin's armoured vehicle firm did not return the Ledger's call." % int(sh)],
+			"okonjo": ["BEDDROW LEADS: 'THE CHIEF WILL BE MY FIRST APPOINTMENT TO LEAVE'", "%s%% back Port Carrick Together. Asked about Bridge Street, she held up the signed order. 'He knows.'" % int(sh)],
 			"pell": ["PELL UNVEILS 212-PAGE PLAN TO STREAMLINE CITY PAPERWORK", "%s%% back the independent. The plan includes a form for requesting a review of the plan." % int(sh)],
 		}
 		_headline(week, lines_c[ld][0], lines_c[ld][1], "politics")
@@ -780,22 +780,22 @@ func ending(dept) -> Dictionary:
 	match win:
 		"kettering":
 			keep = true
-			head = "Kettering keeps you. The equipment budget doubles."
-			lines.append("On his first morning, the new mayor signs the equipment increase. The first contract goes to a firm owned by his brother-in-law.")
+			head = "Carrick keeps you. The equipment budget doubles."
+			lines.append("On his first morning, the new mayor signs the equipment increase. The first contract goes to a firm owned by his son Kevin.")
 			if force >= 6:
 				lines.append("He points to your force record as proof the city needs fewer limits. The coalition's lawyer files a federal complaint before the budget meeting ends.")
 			else:
 				lines.append("He asks you to be more visible. The podium is set beside the flag; the list of neighbourhoods is on your chair.")
 			if lost("da"):
-				lines.append("Varga's office keeps charging officers. Kettering keeps pardoning them. Both offices keep the files.")
+				lines.append("Varga's office keeps charging officers. Carrick keeps pardoning them. Both offices keep the files.")
 		"okonjo":
 			keep = t >= 60.0 and not lost("coalition") and force <= 2
 			if keep:
-				head = "Okonjo-Vale keeps you—for ninety days, in writing."
+				head = "Beddrow keeps you—for ninety days, in writing."
 				lines.append("At the swearing-in, she places the Bridge Street order beside your appointment letter. 'Your signature is here,' she says. 'The next one has to mean something.'")
 				lines.append("The coalition calls the appointment a test. Rourke calls it probation. The oversight board receives its first file before the office opens.")
 			else:
-				head = "Okonjo-Vale fires you on her first morning."
+				head = "Beddrow fires you on her first morning."
 				lines.append("She reads the Bridge Street order into the record, then your force record: %d civilians hit by police, %d killed. The old signature and the new numbers share a page." % [int(record["civ_hit"]), int(record["civ_killed"])])
 				lines.append("The department goes under civilian oversight. Its first request is every file you ever closed.")
 		"pell":
@@ -816,9 +816,9 @@ func ending(dept) -> Dictionary:
 	lines.append("FILED. NOT RESOLVED.")
 	# P1.F3's breakdown is a set of rows in the election screen (ops_ui `_election_night`);
 	# what the ending says in words is the count itself. This used to be a string + int
-	# concatenation ("SCORE BREAKDOWN: Kettering=" + int(...)), which does not parse: it was
+	# concatenation ("SCORE BREAKDOWN: Carrick=" + int(...)), which does not parse: it was
 	# the last of the faults that kept the campaign from compiling (CI 2026-11-02).
-	lines.append("The count: Kettering %d%%, Okonjo-Vale %d%%, Pell %d%%." % [
+	lines.append("The count: Carrick %d%%, Beddrow %d%%, Pell %d%%." % [
 		int(result["votes"]["kettering"]), int(result["votes"]["okonjo"]), int(result["votes"]["pell"])])
 	return {"winner": win, "keep": keep, "head": head, "lines": lines}
 

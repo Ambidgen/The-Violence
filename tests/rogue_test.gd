@@ -168,12 +168,12 @@ func _init() -> void:
 		check(g.dept.balance == gm and g.run.armory.size() == gstock.size() and _draft_index(g, "procurement") >= 0 and not gl.is_empty(),
 			"a contract for stocked items is refused: no charge, no closed draft (%s)" % str(gl))
 
-	# a free military contract arriving by offer mid-week (P0.C4): Kettering's armoured
+	# a free military contract arriving by offer mid-week (P0.C4): Carrick's armoured
 	# rescue vehicle. It stocks the armoury and re-deals the draft in the same step.
 	var o = Campaign.new()
 	o.start(2024, true, mlegacy)
 	var odraft: int = _draft_index(o, "procurement")
-	o.run.apply(o, {"contract": "military"}, {"title": "Kettering's armoured truck"})
+	o.run.apply(o, {"contract": "military"}, {"title": "Carrick's armoured truck"})
 	var granted := ""
 	if not o.run.contracts.is_empty():
 		granted = String(o.run.contracts[0])

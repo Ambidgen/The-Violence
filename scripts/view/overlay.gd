@@ -105,6 +105,7 @@ func _draw() -> void:
 	if world == null:
 		return
 	var font: Font = ThemeDB.fallback_font
+	_draw_field_orders(font)
 	var cull: bool = world.city
 	var vr := view.grow(300.0)
 	for o in world.ops:
@@ -306,3 +307,31 @@ func _draw_gas() -> void:
 					x += step
 				y += step
 				row += 1
+
+
+## Orders in the field (2026-11-03): a room a squad was ordered to is ringed in red
+## pencil with the squad's number; solid once the squad holds it, dashed on the way.
+func _draw_field_orders(font: Font) -> void:
+	if world.teams.is_empty() or world.over:
+		return
+	var red := Color("#ff2b30")
+	for el in world.teams[0].get("elements", []):
+		var rn: String = el.get("ordered_room", "")
+		if rn == "" or not world.level.rooms.has(rn):
+			continue
+		var held: bool = el.get("ordered_held", false)
+		var rm: Dictionary = world.level.rooms[rn]
+		for r in rm["rects"]:
+			var rr := Rect2((r as Rect2).position * PX, (r as Rect2).size * PX).grow(-5.0)
+			var pts := [rr.position, Vector2(rr.end.x, rr.position.y), rr.end, Vector2(rr.position.x, rr.end.y), rr.position]
+			for k in 4:
+				if held:
+					draw_line(pts[k], pts[k + 1], Color(red, 0.85), 3.0)
+				else:
+					draw_dashed_line(pts[k], pts[k + 1], Color(red, 0.85), 3.0, 10.0)
+		var lp: Vector2 = (rm["label"] as Vector2) * PX + Vector2(0, -22)
+		var tag := "SQ%d %s" % [int(el["i"]) + 1, "HOLD" if held else ">>"]
+		var tw := font.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x
+		draw_rect(Rect2(lp - Vector2(tw * 0.5 + 8, 22), Vector2(tw + 16, 30)), Color(1, 1, 1, 0.92))
+		draw_rect(Rect2(lp - Vector2(tw * 0.5 + 8, 22), Vector2(tw + 16, 30)), red, false, 2.0)
+		draw_string(font, lp - Vector2(tw * 0.5, 0), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, red)

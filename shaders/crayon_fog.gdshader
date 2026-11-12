@@ -27,9 +27,11 @@ float strokes(vec2 w, float ang, float spacing, float seed) {
 
 void fragment() {
 	float a = texture(TEXTURE, UV).a;
-	float s1 = strokes(world, -0.7, 4.0, 1.0);
-	float s2 = strokes(world, 0.9, 4.6, 5.0);
+	// Visual overhaul 2026-11-03: wider strokes and the opening's indigo night, so the
+	// veil reads as crayon at game scale rather than as a flat dark tint.
+	float s1 = strokes(world, -0.7, 7.0, 1.0);
+	float s2 = strokes(world, 0.9, 8.0, 5.0);
 	float unseen = smoothstep(0.45, 0.6, a);
 	float cover = mix(0.5 + 0.5 * s1, 0.62 + 0.38 * max(s1, s2), unseen);
-	COLOR = vec4(0.07, 0.07, 0.08, clamp(a * cover * 1.3, 0.0, 0.96));
+	COLOR = vec4(0.145, 0.102, 0.478, clamp(a * cover * 1.25, 0.0, 0.93));
 }

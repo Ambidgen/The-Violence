@@ -129,12 +129,12 @@ const PEOPLE := {
 ## candidate id or a PEOPLE id. Effects are read by apply().
 const OFFERS := [
 	{"id": "kettering_armour", "who": "kettering", "min": 3,
-		"text": "Royce Kettering wants to be photographed handing you the keys to an armoured rescue vehicle. His brother-in-law's firm will throw in a rifle contract. All you have to do is stand next to him.",
+		"text": "George Carrick wants to be photographed handing you the keys to an armoured rescue vehicle. His son Kevin's firm will throw in a rifle contract. All you have to do is stand next to him.",
 		"accept": {"money": 6000, "contract": "military", "poll": {"kettering": 3.0}, "ally": {"coalition": -8},
-			"headline": ["CHIEF, KETTERING POSE WITH ARMOURED TRUCK", "Okonjo-Vale: 'A tank is not a policy.'"]},
+			"headline": ["CHIEF, CARRICK POSE WITH ARMOURED TRUCK", "Beddrow: 'A tank is not a policy.'"]},
 		"decline": {"poll": {"kettering": -0.5}}},
 	{"id": "okonjo_board", "who": "okonjo", "min": 4,
-		"text": "Dana Okonjo-Vale will stop reading the Bridge Street order into every microphone if you agree to a civilian review board with subpoena power.",
+		"text": "Alicia Beddrow will stop reading the Bridge Street order into every microphone if you agree to a civilian review board with subpoena power.",
 		"accept": {"trust": 4, "ally": {"coalition": 8, "union": -10}, "poll": {"okonjo": 1.0}, "morale": -4,
 			"headline": ["CHIEF AGREES TO CIVILIAN REVIEW BOARD", "Rourke (union): 'They will be second-guessing us from a conference room.'"]},
 		"decline": {"poll": {"okonjo": 0.5}}},
@@ -185,7 +185,7 @@ const OFFERS := [
 			"headline": ["POLICE CHIEF HEADLINES SAFE STREETS GALA", "Pell: 'Policing is not a party.' Varga declines to comment."]},
 		"decline": {}},
 	{"id": "okonjo_listening", "who": "okonjo", "min": 12,
-		"text": "Okonjo-Vale invites you to a public listening session in Eastport. She will be there. So will everyone who has a reason to be angry.",
+		"text": "Beddrow invites you to a public listening session in Eastport. She will be there. So will everyone who has a reason to be angry.",
 		"accept": {"chance": {"p": 0.55, "text": "the session", "win": {"trust": 3, "poll": {"pell": 0.5}, "ally": {"coalition": 5}},
 			"lose": {"trust": -1, "poll": {"okonjo": 1.5}, "headline": ["CHIEF SHOUTED DOWN IN EASTPORT", "'Say the names,' the room chanted."]}}},
 		"decline": {"poll": {"okonjo": 0.8}}},
@@ -297,7 +297,7 @@ const EVENTS := [
 			{"label": "A plaque, for now", "effects": {"money": -500, "morale": 2}},
 		]},
 	{"id": "protest_permit", "min": 10, "title": "A protest permit",
-		"text": "Carrick Together wants to march from Eastport to City Hall. The permit office asks the department what it recommends.",
+		"text": "Port Carrick Together wants to march from Eastport to City Hall. The permit office asks the department what it recommends.",
 		"choices": [
 			{"label": "Recommend the permit", "effects": {"trust": 2, "ally": {"coalition": 3}, "poll": {"okonjo": 0.5}}},
 			{"label": "Recommend a shorter route", "effects": {"ally": {"council": 2, "coalition": -2}}},
@@ -808,7 +808,7 @@ func _tag(c, tag: String, lines: Array) -> void:
 		"military":
 			pol._poll("kettering", 0.8)
 			pol._ally("coalition", -3, c.dept, lines)
-			pol._headline(c.week(), "CARRICK PD ARMS UP", "Mbeki-Shaw: 'Every new weapon is a promise about how it will be used.' Kettering calls it 'overdue'.", "politics")
+			pol._headline(c.week(), "CARRICK PD ARMS UP", "Mbeki-Shaw: 'Every new weapon is a promise about how it will be used.' Carrick calls it 'overdue'.", "politics")
 		"restraint":
 			pol._ally("coalition", 2, c.dept, lines)
 			pol._poll("pell", 0.3)
@@ -1261,7 +1261,7 @@ static func run_score(c) -> Dictionary:
 	}
 	var res: Dictionary = c.politics.result
 	var kept: bool = bool((res.get("ending", {}) as Dictionary).get("keep", false)) if res.get("ending", {}) is Dictionary else false
-	# EA_TASKS P1.F2: Kettering's victory pays +60 only when the record is clean — few
+	# EA_TASKS P1.F2: Carrick's victory pays +60 only when the record is clean — few
 	# officers killed and few force findings against the department; a violent record
 	# still wins the seat, but for +20.
 	var officers_killed: int = int(rec.get("officers_killed", 0))

@@ -112,6 +112,7 @@ improvements_test.gd|quick|600|exit|
 ops_ui_test.gd|quick|600|exit|
 dept_test.gd|quick|600|exit|
 orders_test.gd|quick|900|exit|
+field_orders_test.gd|quick|600|exit|
 save_test.gd|quick|600|exit|
 story_test.gd|quick|300|exit|
 politics_test.gd|quick|600|exit|

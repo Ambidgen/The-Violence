@@ -4133,6 +4133,9 @@ func _phase_ok(tm: Dictionary, el: Dictionary) -> bool:
 func _orders_tick(tm: Dictionary, el: Dictionary) -> void:
 	if el["mode"] == "withdraw":
 		return
+	if el.get("ordered_room", "") != "":
+		_ordered_tick(tm, el)
+		return
 	if el["mode"] == "wait":
 		if _phase_ok(tm, el):
 			el["phase_ok"] = true
@@ -4370,6 +4373,8 @@ func withdraw(tm: Dictionary) -> void:
 		_release_hold(tm, el)
 		el["task"] = {}
 		el["consolidating"] = false
+		el.erase("ordered_room")
+		el.erase("fixed_room")
 		el["mode"] = "withdraw"
 		var v: Vector2 = _centre(el["members"]) if not el["members"].is_empty() else Vector2.ZERO
 		if el["i"] < w.vehicles.size():
@@ -4839,8 +4844,8 @@ func _hold_tick(tm: Dictionary, el: Dictionary, al: Array) -> void:
 			best.ticker["drag"] = x.id
 			best.ticker["drag_to"] = to
 			x.ticker["dragged"] = true
-	# HD15: give up the room when it cannot be held
-	if w.t < float(el.get("fallback_t", -99.0)) + 30.0:
+	# HD15: give up the room when it cannot be held (not one the chief ordered held)
+	if w.t < float(el.get("fallback_t", -99.0)) + 30.0 or el.get("ordered_room", "") != "":
 		return
 	var has15 := false
 	for m4 in al:
@@ -4928,3 +4933,93 @@ func _fallback_room(tm: Dictionary, room: String) -> String:
 			best_s = s
 			best = other
 	return best
+
+
+# ================================================================== orders in the field (2026-11-03)
+## The chief's one live order: move a squad (never a single officer) to a room. The squad
+## breaks off what it is doing, goes there by the ordinary paths (fighting whatever it
+## meets on the way, as it would anyway), consolidates — posts on the room's doors and
+## windows — and holds until told to resume or to move again. Returns "" or why not.
+func can_order(tm: Dictionary, si: int) -> String:
+	if si < 0 or si >= tm["elements"].size():
+		return "no such squad"
+	var el: Dictionary = tm["elements"][si]
+	if el.get("child", false) or not el.has("orders"):
+		return "no such squad"
+	if el["mode"] in ["withdraw", "lost", "merged", "rejoined"] or _alive(el).is_empty():
+		return "the squad is out of the operation"
+	return ""
+
+
+func order_move(tm: Dictionary, si: int, room: String) -> String:
+	var why := can_order(tm, si)
+	if why != "":
+		return why
+	var lv = w.level
+	if not lv.rooms.has(room) or lv.is_exterior(room):
+		return "pick a room inside"
+	var el: Dictionary = tm["elements"][si]
+	if el["mode"] == "split":
+		_rejoin(tm, el, "")
+	_release(tm, el)
+	_release_hold(tm, el)
+	el["task"] = {}
+	el["consolidating"] = false
+	el["phase_ok"] = true   # the chief's word overrides a phase line
+	el["ordered_room"] = room
+	el["ordered_t"] = w.t
+	el["ordered_held"] = false
+	el["fixed_room"] = room
+	el["mode"] = "hold"
+	for m in el["members"]:
+		if m.alive():
+			m.alert_floor = maxi(m.alert_floor, Op.YELLOW)
+			if m.alert < Op.YELLOW:
+				w.raise_alert(m, Op.YELLOW)
+			w.wake(m)
+	_hold_on(el)
+	_consolidate(tm, el)
+	var title: String = String(lv.rooms[room]["title"]).to_lower()
+	w.say("%s, move to the %s and hold" % [_tag(tm, el), title], "comms")
+	w.mark("Chief: %s to the %s, consolidate and hold" % [_tag(tm, el), title], "order")
+	return ""
+
+
+## Back to the squad's own orders: the objective it had (clearing picks up from the
+## nearest room still to clear), from where it now stands.
+func order_resume(tm: Dictionary, si: int) -> String:
+	var why := can_order(tm, si)
+	if why != "":
+		return why
+	var el: Dictionary = tm["elements"][si]
+	if el.get("ordered_room", "") == "":
+		return "the squad is not holding on an order"
+	el.erase("ordered_room")
+	el.erase("fixed_room")
+	el.erase("ordered_held")
+	_release_hold(tm, el)
+	w.say("%s resumes" % _tag(tm, el), "comms")
+	w.mark("Chief: %s resumes its orders" % _tag(tm, el), "order")
+	el["mode"] = ""
+	_begin_objective(tm, el)
+	return ""
+
+
+## While an ordered squad holds: once it is all in the room and sees nobody there, the
+## room counts as cleared (it is standing in it), and the radio says so once.
+func _ordered_tick(tm: Dictionary, el: Dictionary) -> void:
+	if el.get("ordered_held", false):
+		return
+	var room: String = el["ordered_room"]
+	var al := _alive(el)
+	if al.is_empty():
+		return
+	for m in al:
+		if w.level.room_at(m.pos) != room:
+			return
+		for e in w.visible_enemies(m):
+			if e.room == room:
+				return
+	el["ordered_held"] = true
+	tm["cleared"][room] = true
+	w.say("%s holds the %s" % [_tag(tm, el), String(w.level.rooms[room]["title"]).to_lower()], "comms")

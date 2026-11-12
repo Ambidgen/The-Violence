@@ -22,13 +22,32 @@ const Risk = preload("res://scripts/campaign/risk.gd")
 const Rogue = preload("res://scripts/campaign/rogue.gd")
 const Patrol = preload("res://scripts/campaign/patrol.gd")
 const CityMap = preload("res://scripts/ui/city_map.gd")
+const FloatCard = preload("res://scripts/ui/float_card.gd")
+const Icons = preload("res://scripts/ui/icons.gd")
 const PANEL_W := 460.0
 const INK := Color("#141313")
-const GREY := Color("#6e675c")
+const GREY := Color("#5b5866")
 const OBJ_KINDS := ["clear", "arrest", "rescue", "contain", "post", "patrol"]
 
 var main
-var root: PanelContainer
+var root: Control
+var card          # the floating card every screen is drawn into (float_card.gd)
+var hud: PanelContainer
+var hud_week: Label
+var hud_money: Label
+var hud_fit: Label
+var hud_cases: Label
+var hud_end: Button
+var run_bar: PanelContainer
+var run_row: HBoxContainer
+var _titled := false
+var cmd_sq := -1   # the squad picked for an order in the field (-1: none)
+static var show_hints := false   # the card's ? : explanation lines shown
+var _confirm_op := false
+var _confirm_back: Callable
+var _card_pos := {}
+var _week_lines: Array = []
+var _week_seen := -1   # the week whose brief has been opened automatically
 var city_map
 var _scroll: ScrollContainer
 var box: VBoxContainer
@@ -53,23 +72,43 @@ func build(m) -> void:
 	main = m
 	city_map = CityMap.new()
 	city_map.set_anchors_preset(Control.PRESET_FULL_RECT)
-	city_map.offset_right = -PANEL_W
 	city_map.mouse_filter = Control.MOUSE_FILTER_STOP
 	city_map.visible = false
+	city_map.pin_pressed.connect(func(i): open_call(i))
+	city_map.landmark_pressed.connect(func(id): open_landmark(id))
 	add_child(city_map)
-	root = PanelContainer.new()
+	# Campaign UI 2026-11-03: no side panel. `root` is a transparent layer over the map
+	# or the floor plan; every screen is drawn into one floating card on it, and the HUD
+	# and the run bar sit on it beside the card.
+	root = Control.new()
 	root.theme = UI.make_theme()
-	root.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
-	root.offset_left = -PANEL_W
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.visible = false
 	add_child(root)
-	_scroll = ScrollContainer.new()
-	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	root.add_child(_scroll)
 	box = VBoxContainer.new()
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 6)
-	_scroll.add_child(box)
+	card = FloatCard.new()
+	card.setup(box)
+	card.visible = false
+	card.close_pressed.connect(_close_card)
+	card.help_toggled.connect(_set_hints)
+	card.help_btn.set_pressed_no_signal(show_hints)
+	root.add_child(card)
+	_scroll = card.scroll
+	_build_hud()
+	run_bar = PanelContainer.new()
+	run_bar.add_theme_stylebox_override("panel", UI._sb(Color("#fbf7ec"), INK, 2, 8.0))
+	run_bar.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	run_bar.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	run_bar.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	run_bar.offset_bottom = -16
+	run_bar.visible = false
+	root.add_child(run_bar)
+	run_row = HBoxContainer.new()
+	run_row.add_theme_constant_override("separation", 6)
+	run_bar.add_child(run_row)
 
 
 func hide_all() -> void:
@@ -80,18 +119,196 @@ func hide_all() -> void:
 
 func _clear() -> void:
 	city_map.visible = false
+	city_map.selected = -1
 	for c in box.get_children():
 		c.queue_free()
-	_scroll.scroll_horizontal = 0
-	_scroll.scroll_vertical = 0
+	for c in run_row.get_children():
+		c.queue_free()
+	run_bar.visible = false
+	hud.visible = false
+	_titled = false
+	card.visible = true
+	card.set_closable(true)
+	card.set_title("")
+	card.reset_scroll()
 	_run_refs.clear()
+	_place_card()
+
+
+# ------------------------------------------------------------------ the floating card
+## Where the card opens: over the map it opens on the right, under the HUD;
+## over the floor plan it opens on the right, where the camera leaves room for it.
+## Once the player has dragged it, it stays where they put it for that kind of screen.
+func _slot() -> String:
+	return "op" if mode in ["plan", "run", "debrief"] or (mode == "confirm" and _confirm_op) else "map"
+
+
+func _place_card() -> void:
+	var slot := _slot()
+	if card.get_meta("slot", "") == slot:
+		return
+	if card.get_meta("slot", "") != "":
+		if card.has_meta("moved"):
+			_card_pos[card.get_meta("slot")] = card.position
+	card.set_meta("slot", slot)
+	if card.has_meta("moved"):
+		card.remove_meta("moved")
+	var vp := root.get_viewport_rect().size if root.is_inside_tree() else Vector2(1600, 900)
+	card.set_width(PANEL_W)
+	if slot == "op":
+		# bottom left, above the operation's bar, never more than about half the window:
+		# the floor plan stays the screen
+		card.min_top = 16.0
+		card.max_frac = 0.56
+		card.bottom_gap = 96.0
+		card.position = Vector2(16.0, vp.y * 0.4)
+	else:
+		# a popup in the middle of the map, under the HUD
+		card.min_top = 84.0
+		card.max_frac = 0.72
+		card.bottom_gap = -1.0
+		card.position = Vector2(maxf(16.0, (vp.x - PANEL_W) * 0.5), 96.0)
+	if _card_pos.has(slot):
+		card.position = _card_pos[slot]
+		card.set_meta("moved", true)
+	card.set_collapsed(false)
+
+
+## The card's ?: the explanation lines on every card, shown or hidden in place.
+func _set_hints(on: bool) -> void:
+	show_hints = on
+	_apply_hints(box)
+	_apply_hints(run_row)
+
+
+func _apply_hints(n: Node) -> void:
+	for c in n.get_children():
+		if c.has_meta("hint"):
+			(c as CanvasItem).visible = show_hints
+		_apply_hints(c)
+
+
+## The card's ×: a step back to the map, or out of the operation to the board.
+func _close_card() -> void:
+	match mode:
+		"plan", "debrief":
+			main.ops_board()
+		"run":
+			card.set_collapsed(true)
+		"confirm":
+			_confirm_back.call()
+		_:
+			if main.campaign != null and main.campaign.over():
+				card.visible = false
+			else:
+				show_map()
+
+
+## True when the mouse is over a card, the HUD or the run bar (the wheel scrolls the
+## card there, it does not zoom the floor plan).
+func over_ui(p: Vector2) -> bool:
+	if not root.visible:
+		return false
+	for c in [card, hud, run_bar]:
+		if c != null and c.visible and c.get_global_rect().has_point(p):
+			return true
+	return false
+
+
+# ------------------------------------------------------------------ the HUD
+func _build_hud() -> void:
+	hud = PanelContainer.new()
+	hud.add_theme_stylebox_override("panel", UI._sb(Color("#fbf7ec"), INK, 2, 8.0))
+	hud.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	hud.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	hud.offset_right = -16
+	hud.offset_top = 16
+	hud.visible = false
+	root.add_child(hud)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 10)
+	hud.add_child(h)
+	hud_week = _chip(h, "week", "", "The week of the campaign; the election is week 40", 18)
+	hud_money = _chip(h, "money", "", "The department account", 18)
+	hud_fit = _chip(h, "force", "", "Officers fit for duty", 18)
+	hud_cases = _chip(h, "ia", "", "Internal affairs cases open", 18)
+	h.add_child(VSeparator.new())
+	hud_end = _btn(h, "End week", func(): _end_week())
+	hud_end.focus_mode = Control.FOCUS_NONE
+	var wk := _btn(h, "The week", func(): open_week())
+	wk.tooltip_text = "The week: desk, results, front page (also the Ledger on the map)"
+	wk.focus_mode = Control.FOCUS_NONE
+	var mn := _btn(h, "Main menu", func(): main.go_title())
+	mn.tooltip_text = "Main menu (the campaign is saved)"
+	mn.focus_mode = Control.FOCUS_NONE
+
+
+## An icon and a few characters, the full meaning in the tooltip. Returns the label.
+func _chip(parent: Control, icon_id: String, text: String, tip := "", size := 13, col := INK) -> Label:
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 3)
+	h.tooltip_text = tip
+	h.mouse_filter = Control.MOUSE_FILTER_PASS
+	parent.add_child(h)
+	var t := TextureRect.new()
+	t.texture = Icons.tex(icon_id, int(size * 1.45))
+	t.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	t.mouse_filter = Control.MOUSE_FILTER_PASS
+	t.tooltip_text = tip
+	h.add_child(t)
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_color_override("font_color", col)
+	l.mouse_filter = Control.MOUSE_FILTER_PASS
+	l.tooltip_text = tip
+	h.add_child(l)
+	return l
+
+
+## A row of chips: [[icon, text, tooltip, colour?], ...]
+func _chips(parent: Control, items: Array, size := 13) -> HFlowContainer:
+	var f := HFlowContainer.new()
+	f.add_theme_constant_override("h_separation", 14)
+	f.add_theme_constant_override("v_separation", 4)
+	parent.add_child(f)
+	for it in items:
+		_chip(f, String(it[0]), String(it[1]), String(it[2]) if it.size() > 2 else "", size,
+			it[3] if it.size() > 3 else INK)
+	return f
+
+
+func _refresh_hud() -> void:
+	var c = main.campaign
+	if c == null:
+		hud.visible = false
+		return
+	hud.visible = true
+	var d = c.dept
+	hud_week.text = "%d / %d" % [mini(c.week(), c.WEEKS), c.WEEKS]
+	hud_money.text = "$%s%s" % [Department.money(d.balance), "  FROZEN" if d.frozen() else ""]
+	hud_money.add_theme_color_override("font_color", Ink.accent(0.9) if d.frozen() else INK)
+	hud_fit.text = str(d.available().size())
+	var nc: int = d.open_cases().size()
+	hud_cases.text = str(nc)
+	hud_cases.add_theme_color_override("font_color", Ink.accent(0.9) if nc > 0 else INK)
+	var block: Array = c.run.blocking() if c.run != null else []
+	hud_end.text = "End week"
+	hud_end.visible = not c.over()
+	hud_end.disabled = not block.is_empty()
+	hud_end.tooltip_text = ("Settle the desk first: %s." % ", ".join(block)) if not block.is_empty() else "End week %d: pay, heal, train, and let the city answer" % c.week()
 
 
 ## EA_TASKS P1.D1: a confirm dialog for any hire, course or contract that pushes the
 ## four-week forecast into the red. back() rebuilds the screen the choice was on.
 func _confirm(title: String, body: String, on_yes: Callable, back: Callable) -> void:
+	_confirm_op = mode in ["plan", "run", "debrief"] or (mode == "confirm" and _confirm_op)
+	_confirm_back = back
 	mode = "confirm"
 	_clear()
+	if not _confirm_op:
+		_city_backdrop()
 	_title(title, 16)
 	_text(box, body, INK, 12)
 	_btn(box, "Yes — commit", func(): on_yes.call())
@@ -101,6 +318,10 @@ func _confirm(title: String, body: String, on_yes: Callable, back: Callable) -> 
 # ------------------------------------------------------------------ widgets
 func _title(text: String, size := 18) -> Label:
 	var l := Label.new()
+	if not _titled:
+		_titled = true
+		card.set_title(Ink.bb(text))
+		l.visible = false
 	l.text = Ink.bb(text)
 	l.add_theme_font_size_override("font_size", size)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -111,6 +332,11 @@ func _title(text: String, size := 18) -> Label:
 func _text(parent: Control, text: String, col := INK, size := 12) -> Label:
 	var l := Label.new()
 	l.text = Ink.bb(text)
+	# 2026-11-03 (less wordy): small grey lines are explanation, not information. They are
+	# hints, hidden until the card's ? is pressed.
+	if col == GREY and size <= 10:
+		l.set_meta("hint", true)
+		l.visible = show_hints
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", col)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -150,9 +376,51 @@ func _h(parent: Control) -> HBoxContainer:
 	return h
 
 
+## 2026-11-03 (less wordy): the words a button is known by -> the words it shows. The
+## icon carries the rest, the full wording stays in the tooltip and in meta "label".
+const SHORT := {
+	"Back to the board": "Map", "Back to board": "Map", "Board": "Map", "Back to the map": "Map",
+	"Brief and plan": "Plan", "Campaign file": "File", "People & conversations": "People",
+	"Armoury and programs": "Armoury", "Suggest a plan": "Suggest", "Use the suggested kit": "Suggested kit",
+	"Keep their current kit": "Keep kit", "Abandon the program (no refund)": "Abandon",
+	"Cancel the order": "Cancel", "Yes — commit": "Yes", "Main menu": "Menu",
+	"Open conversation": "Talk", "Read document": "Read", "Back to list": "List",
+	"Back to conversation": "Back", "Pick doors and windows": "Doors", "Pick rooms": "Rooms",
+	"+ Add a squad": "Squad", "Remove squad": "", "Skip guide": "", "Draw route": "Route",
+}
+const ICON_ONLY := ["Map", "Open", "Live", "Pause", "Play", "Menu", "The week", ""]
+
+
+static func short_label(text: String) -> String:
+	var t := text.strip_edges()
+	t = t.trim_prefix("<").strip_edges().trim_suffix(">").strip_edges()
+	if t.begins_with("Next:"):
+		t = t.trim_prefix("Next:").strip_edges()
+	if t.begins_with("Internal affairs"):
+		return "IA" + t.trim_prefix("Internal affairs")
+	if t.begins_with("Skip to the report"):
+		return "Skip"
+	if t.begins_with("RUN"):
+		return "RUN" + ("  " + t.get_slice(">", 1).strip_edges().get_slice(" ", 0) if ">" in t else "")
+	if t.begins_with("Call "):
+		return t.trim_prefix("Call ")
+	return SHORT.get(t, t)
+
+
 func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Button:
 	var b := Button.new()
-	b.text = Ink.bb(text)
+	var full := Ink.bb(text)
+	var shown := short_label(full)
+	b.set_meta("label", full)
+	var ic := Icons.for_label(full)
+	if full.begins_with("<") and ic == "open":
+		ic = "back"
+	if ic != "":
+		b.icon = Icons.tex(ic, 22)
+		b.add_theme_constant_override("h_separation", 6)
+	b.text = "" if (ic != "" and shown in ICON_ONLY) else shown
+	if b.text != full:
+		b.tooltip_text = full.trim_prefix("<").strip_edges().trim_suffix(">").strip_edges()
 	b.toggle_mode = toggle
 	if toggle:
 		b.toggled.connect(func(on): cb.call(on))
@@ -164,7 +432,7 @@ func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Butto
 
 func _card(parent: Control) -> VBoxContainer:
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", UI._sb(Color("#e6dfcd"), Color("#b3aa96"), 1, 8.0))
+	p.add_theme_stylebox_override("panel", UI._sb(Color("#fbf7ec"), Color("#8e8a95"), 1, 8.0))
 	parent.add_child(p)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 3)
@@ -190,128 +458,271 @@ static func _ward_label(s: Dictionary) -> String:
 	return "%s ward (trust %d)" % [s.get("ward", "Unknown"), int(s.get("trust", 0))]
 
 
+## EA_TASKS P3.A1 (visual overhaul 2026-11-03): every management screen sits over the
+## city, not over whatever tactical map the last operation left behind (with its stamps).
+func _city_backdrop() -> void:
+	var c = main.campaign
+	if c == null:
+		return
+	city_map.show_city(c.board, c.politics.trust, c.week())
+	_refresh_hud()
+
+
 func show_board(lines := []) -> void:
 	if mode == "debrief":
 		guide_active = false
-	mode = "board"
-	root.visible = true
-	_clear()
 	var c = main.campaign
 	var d = c.dept
 	if c.week() == 1 and int(d.ops_run) == 0 and bool(Settings.get_v("tips")) and not guide_dismissed:
 		guide_active = true
 	if c.over():
+		mode = "board"
+		root.visible = true
+		_clear()
 		_election_night(lines)
 		return
-	city_map.show_city(c.board, c.politics.trust, c.week())
-	_title("THE CAMPAIGN FILE  ·  week %d of %d" % [c.week(), c.WEEKS])
-	var fit: int = d.available().size()
+	_week_lines = lines.duplicate()
+	var block: Array = c.run.blocking() if c.run != null else []
+	if not lines.is_empty() or _week_seen != c.week() or not block.is_empty():
+		_week_seen = c.week()
+		open_week()
+	else:
+		show_map()
+
+
+## Campaign UI 2026-11-03: the board is the city. Nothing but the map and the HUD; a
+## call opens from its pin, the department from the station, politics from City Hall.
+func show_map() -> void:
+	mode = "board"
+	root.visible = true
+	_clear()
+	card.visible = false
+	_city_backdrop()
+	_refresh_hud()
+
+
+## The week: the desk, last week's results, the story and the Ledger's front page.
+## Opens by itself when a week starts or something comes back; the HUD and the Ledger
+## on the map open it again.
+func open_week() -> void:
+	mode = "board"
+	root.visible = true
+	_clear()
+	_city_backdrop()
+	_refresh_hud()
+	var c = main.campaign
+	var d = c.dept
+	if c.over():
+		_election_night(_week_lines)
+		return
+	_title("THE WEEK  ·  %d of %d" % [c.week(), c.WEEKS])
 	var out: int = d.officers.filter(func(r): return r["status"] == "injured").size()
-	var busy: int = c.committed().size()
-	_text(
-		box,
-		(
-			"PORT CARRICK PD  ·  %d fit, %d injured, %d committed this week. An officer sent to one call cannot answer another."
-			% [fit, out, busy]
-		),
-		GREY,
-		11
-	)
-	_roster_strip(box, c)
-	_dept_strip(box)
+	_chips(box, [
+		["force", str(d.available().size()), "Officers fit for duty"],
+		["hurt", str(out), "Injured"],
+		["busy", str(c.committed().size()), "Committed this week: an officer sent to one call cannot answer another"],
+		["money", "$" + Department.money(d.balance), "The account", Ink.accent(0.9) if d.frozen() else INK],
+	])
+	for ln in _week_lines:
+		_text(box, String(ln), INK, 11)
 	if c.run != null:
 		_desk_card(box)
+	_calls_list(box)
 	_patrol_card(box)
 	_story_card(box, Story.current(c))
 	if bool(Settings.get_v("tips")) and c.week() <= 2:
 		_first_weeks(box)
 	_front_page(box, c.politics, c.week() - 1 if c.week() > 1 else 1)
-	for ln in lines:
-		_text(box, String(ln), INK, 11)
+	_text(box, "Click a red pin on the map to open a call. The station opens the department; City Hall the politics.", GREY, 10)
+	_text(box, "One campaign is kept. The file is saved after each operation and each week.", GREY, 10)
+
+
+const TYPE_ICONS := {"warrant": "warrant", "gang": "guns", "barricade": "barricade",
+	"hostage": "hostage", "event": "rally"}
+
+
+static func type_icon(t: String) -> String:
+	for k in TYPE_ICONS:
+		if String(k) in t:
+			return TYPE_ICONS[k]
+	return "place"
+
+
+static func status_icon(s: Dictionary) -> String:
+	if s.get("truce", false):
+		return "truce"
+	match String(s.get("status", "")):
+		"open":
+			return "place"
+		"done":
+			return "done"
+	return "unattended"
+
+
+## The calls in one line each, so the week can be read without hunting the map.
+func _calls_list(parent: Control) -> void:
+	var c = main.campaign
+	var v := _card(parent)
+	_text(v, "CALLS", INK, 12)
 	for i in c.board.size():
 		var s: Dictionary = c.board[i]
-		var v := _card(box)
-		var t := Label.new()
-		t.text = "%d  ·  %s" % [i + 1, s["title"]]
-		t.add_theme_font_size_override("font_size", 14)
-		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		v.add_child(t)
-		if s.has("site_name"):
-			_text(v, "%s  ·  %s" % [s["site_name"], s["address"]], GREY, 11)
-		elif s.get("city_error", false):
-			_text(v, "City data unavailable: this call has no mapped location.", GREY, 11)
-		_text(
-			v,
-			(
-				"%s  ·  %s  ·  visibility %s  ·  pressure: %s"
+		var h := _h(v)
+		var ic := TextureRect.new()
+		ic.texture = Icons.tex(type_icon(String(s["type"])), 22)
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+		ic.tooltip_text = String(Situations.TYPES[s["type"]]["name"])
+		ic.mouse_filter = Control.MOUSE_FILTER_PASS
+		h.add_child(ic)
+		var t := _lab(h, "%d  %s" % [i + 1, String(s["title"]).get_slice(",", 0)], INK if s["status"] == "open" else GREY, 12)
+		t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		t.clip_text = true
+		t.tooltip_text = "%s\n%s" % [s["title"], _call_status(s)]
+		var st := TextureRect.new()
+		st.texture = Icons.tex(status_icon(s), 20)
+		st.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+		st.tooltip_text = _call_status(s)
+		st.mouse_filter = Control.MOUSE_FILTER_PASS
+		h.add_child(st)
+		var k: int = i
+		_btn(h, "Open  >", func(): open_call(k))
+
+
+func _call_status(s: Dictionary) -> String:
+	var c = main.campaign
+	var status_key: String = "truce" if s.get("truce", false) else String(s["status"])
+	match status_key:
+		"truce":
+			return "Truce: the crews are keeping it, and so are you."
+		"open":
+			var n: int = c.plan_members(s).size()
+			var st := (
+				"Open: %s"
+				% (
+					("planned, %d officer%s" % [n, "" if n == 1 else "s"])
+					if n > 0
+					else "nobody assigned yet"
+				)
+			)
+			if not s.get("canvass", []).is_empty():
+				st += ", %d canvassing" % s["canvass"].size()
+			return st
+		"done":
+			var r: Dictionary = s.get("result", {})
+			var g0: String = r.get("goal", "")
+			return (
+				"Done: %s, %d. %s."
 				% [
-					Situations.TYPES[s["type"]]["name"],
-					_ward_label(s),
-					dots(int(s["visibility"])),
-					String(s["pressure"])
+					r.get("label", "?"),
+					int(r.get("score", 0)),
+					g0.substr(0, 1).to_upper() + g0.substr(1)
 				]
-			),
-			GREY,
-			11
-		)
-		var st := ""
-		var status_key: String = "truce" if s.get("truce", false) else String(s["status"])
-		match status_key:
-			"truce":
-				st = "Truce: the crews are keeping it, and so are you."
-			"open":
-				var n: int = c.plan_members(s).size()
-				st = (
-					"Open: %s"
-					% (
-						("planned, %d officer%s" % [n, "" if n == 1 else "s"])
-						if n > 0
-						else "nobody assigned yet"
-					)
-				)
-				if not s.get("canvass", []).is_empty():
-					st += ", %d canvassing" % s["canvass"].size()
-			"done":
-				var r: Dictionary = s.get("result", {})
-				var g0: String = r.get("goal", "")
-				st = (
-					"Done: %s, %d. %s."
-					% [
-						r.get("label", "?"),
-						int(r.get("score", 0)),
-						g0.substr(0, 1).to_upper() + g0.substr(1)
-					]
-				)
-			_:
-				st = "Unattended"
-		_text(v, st, INK, 12)
-		if s["status"] == "open":
-			var h := _h(v)
-			var sid: String = s["id"]
-			var bp := _btn(h, "Brief and plan  >", func(): main.ops_select(sid))
-			if c.run != null and c.run.drafts.any(func(dr): return dr["kind"] == "doctrine"):
-				bp.disabled = true
-				bp.tooltip_text = "Choose your inheritance on the desk first."
-	_sep()
-	var hb := _h(box)
-	var block: Array = c.run.blocking() if c.run != null else []
-	var ew := _btn(hb, "End week %d" % c.week(), func(): _end_week())
-	if not block.is_empty():
-		ew.disabled = true
-		ew.tooltip_text = "Settle the desk first: %s." % ", ".join(block)
-	_btn(hb, "City Hall", func(): _city_hall())
-	_btn(hb, "Roster", func(): _roster())
-	_btn(hb, "Budget", func(): _budget())
+			)
+	return "Unattended"
+
+
+## A call, opened from its pin.
+func open_call(i: int) -> void:
+	var c = main.campaign
+	if c == null or i < 0 or i >= c.board.size():
+		return
+	mode = "board"
+	root.visible = true
+	_clear()
+	_city_backdrop()
+	_refresh_hud()
+	city_map.selected = i
+	# the call's card opens beside its pin, on whichever side has room
+	if not card.has_meta("moved"):
+		var at: Vector2 = city_map.pin_pos(i)
+		if at.x >= 0.0:
+			var vp := root.get_viewport_rect().size
+			var x := at.x + 40.0 if at.x + 40.0 + PANEL_W < vp.x - 16.0 else at.x - 40.0 - PANEL_W
+			card.position = Vector2(x, clampf(at.y - 60.0, 96.0, maxf(96.0, vp.y - 420.0)))
+	var s: Dictionary = c.board[i]
+	_title("%d  ·  %s" % [i + 1, s["title"]])
+	var v := box
+	if s.has("site_name"):
+		_text(v, "%s  ·  %s" % [s["site_name"], s["address"]], GREY, 11)
+	elif s.get("city_error", false):
+		_text(v, "City data unavailable: this call has no mapped location.", GREY, 11)
+	var spec: Dictionary = Situations.TYPES[s["type"]]
+	var pressure := String(s["pressure"])
+	_chips(v, [
+		[type_icon(String(s["type"])), String(spec["name"]), String(spec.get("blurb", ""))],
+		["trust", ("%s %d" % [s.get("ward", "?"), int(s.get("trust", 0))]) if not s.get("city_error", false) else "?",
+			"Ward trust in the police (of 100)"],
+		["eye", dots(int(s["visibility"])), "Visibility: how many people will see what happens"],
+		["clock", pressure, "Time pressure", Ink.accent(0.9) if pressure == "high" else INK],
+		[status_icon(s), _call_status(s).get_slice(":", 0), _call_status(s)],
+	], 14)
+	_text(v, String(spec.get("blurb", "")), GREY, 10)
+	var o: Dictionary = c.roster_outlook()
+	_chips(v, [["force", "%d fit" % c.dept.available().size(), "Officers fit for duty"],
+		["busy", str(c.committed().size()), "Already committed to other calls this week"],
+		["squad", "%d wanted" % int(o["want"]), "What this week's open calls want between them"]], 13)
+	if s["status"] == "open":
+		var sid: String = s["id"]
+		var bp := _btn(box, "Brief and plan  >", func(): main.ops_select(sid))
+		bp.custom_minimum_size = Vector2(0, 44)
+		bp.icon = Icons.tex("plan", 28)
+		bp.add_theme_font_size_override("font_size", 16)
+		if c.run != null and c.run.drafts.any(func(dr): return dr["kind"] == "doctrine"):
+			bp.disabled = true
+			bp.tooltip_text = "Choose your inheritance on the desk first."
+	var h := _h(box)
+	if i > 0:
+		_btn(h, "<  Call %d" % i, func(): open_call(i - 1))
+	if i < c.board.size() - 1:
+		_btn(h, "Call %d  >" % (i + 2), func(): open_call(i + 1))
+
+
+## The landmarks on the map. Police HQ is the department, City Hall the politics, the
+## Ledger the week's paper.
+func open_landmark(id: String) -> void:
+	match id:
+		"police-hq":
+			open_hq()
+		"city-hall":
+			_city_hall()
+		"ledger":
+			open_week()
+
+
+## Carrick Street Station: the department's doors.
+func open_hq() -> void:
+	mode = "board"
+	root.visible = true
+	_clear()
+	_city_backdrop()
+	_refresh_hud()
+	var c = main.campaign
+	var d = c.dept
+	_title("POLICE HQ")
+	_dept_strip(box)
+	_roster_strip(box, c)
+	var g := GridContainer.new()
+	g.columns = 3
+	g.add_theme_constant_override("h_separation", 6)
+	g.add_theme_constant_override("v_separation", 6)
+	box.add_child(g)
 	var nc: int = d.open_cases().size()
-	_btn(hb, "Internal affairs%s" % ((" (%d)" % nc) if nc > 0 else ""), func(): _cases())
-	var hb2 := _h(box)
+	var doors := [
+		["Roster", "Officers, courses, hiring and dismissals", func(): _roster()],
+		["Budget", "Account, allocation, payroll and grants", func(): _budget()],
+		["Internal affairs%s" % ((" (%d)" % nc) if nc > 0 else ""), "Complaints, reviews and discipline", func(): _cases()],
+	]
 	if c.run != null:
-		_btn(hb2, "Armoury and programs", func(): _armory())
-	_btn(hb2, "Campaign file", func(): _story_file())
-	_btn(hb2, "<  Main menu", func(): main.go_title())
-	_text(
-		box, "One campaign is kept. The file is saved after each operation and each week.", GREY, 10
-	)
+		doors.append(["Armoury and programs", "Contracts, kit and the training program", func(): _armory()])
+	doors.append(["Campaign file", "The story so far, people and documents", func(): _story_file()])
+	for dd in doors:
+		# a door is a big picture with its name under it
+		var b := _btn(g, String(dd[0]), dd[2])
+		b.tooltip_text = String(dd[1])
+		b.icon = Icons.tex(Icons.for_label(String(dd[0])), 44)
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, 86)
 
 
 # ================================================================== the desk (1.3, the run layer)
@@ -323,35 +734,43 @@ const TAG_WORDS := {"military": "MILITARY  ·  Safe Streets approves; the coalit
 func _desk_card(parent: Control) -> void:
 	var run = main.campaign.run
 	var v := _card(parent)
-	_text(v, "THE DESK", Ink.accent(1.0) if not run.blocking().is_empty() else INK, 13)
+	var hh := _h(v)
+	var di0 := TextureRect.new()
+	di0.texture = Icons.tex("desk", 26)
+	di0.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	hh.add_child(di0)
+	_lab(hh, "THE DESK", Ink.accent(1.0) if not run.blocking().is_empty() else INK, 13)
 	if run.drafts.is_empty() and run.offers.is_empty() and run.events.is_empty():
-		_text(v, "Nothing waiting. %s" % _program_line(), GREY, 11)
+		_lab(hh, "·  clear", GREY, 12)
+		_text(v, _program_line(), GREY, 10)
 		return
+	# one row per item: a picture, two or three words, and Open (the rest is a tooltip)
 	for di in run.drafts.size():
 		var d: Dictionary = run.drafts[di]
-		var h := _h(v)
 		# A card the armoury already covers is re-dealt when the inheritance is chosen
 		# (EA_TASKS P0.C2), so the count is read from the draft, not assumed to be three.
 		var ncards: int = (d.get("cards", []) as Array).size()
-		var label: String = {"doctrine": "INHERITANCE  ·  choose what the last chief left you",
-			"procurement": "PROCUREMENT  ·  %d contract%s, sign one" % [ncards, "" if ncards == 1 else "s"],
-			"program": "TRAINING PROGRAM  ·  one habit for the whole force"}.get(d["kind"], "A draft")
-		_text(h, label, INK, 12)
+		var row: Array = {"doctrine": ["file", "Inheritance", "Choose what the last chief left you"],
+			"procurement": ["armoury", "Procurement  ·  %d" % ncards, "%d contract%s: sign one" % [ncards, "" if ncards == 1 else "s"]],
+			"program": ["train", "Training program", "One habit for the whole force"]}.get(d["kind"], ["desk", "A draft", ""])
 		var k: int = di
-		_btn(h, "Open  >", func(): _desk_draft(k))
+		_desk_row(v, row, func(): _desk_draft(k))
 	for oi in run.offers.size():
 		var o: Dictionary = run.offers[oi]
-		var h2 := _h(v)
-		_text(h2, "OFFER  ·  %s (lapses at the end of the week)" % o["who_name"], INK, 12)
 		var k2: int = oi
-		_btn(h2, "Open  >", func(): _desk_offer(k2))
+		_desk_row(v, ["offer", "Offer  ·  %s" % o["who_name"], "Lapses at the end of the week"], func(): _desk_offer(k2))
 	for ei in run.events.size():
 		var e: Dictionary = run.events[ei]
-		var h3 := _h(v)
-		_text(h3, "EVENT  ·  %s (answer before the week ends)" % e["title"], INK, 12)
 		var k3: int = ei
-		_btn(h3, "Open  >", func(): _desk_event(k3))
+		_desk_row(v, ["event", String(e["title"]), "Answer before the week ends"], func(): _desk_event(k3))
 	_text(v, _program_line(), GREY, 10)
+
+
+func _desk_row(v: Control, row: Array, cb: Callable) -> void:
+	var h := _h(v)
+	var l := _chip(h, String(row[0]), String(row[1]), String(row[2]), 13)
+	l.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_btn(h, "Open  >", cb).tooltip_text = String(row[2])
 
 
 ## The patrol radio (2026-11-05): one encounter a day. The next day's call is answered
@@ -410,6 +829,7 @@ func _desk_draft(di: int) -> void:
 		return
 	mode = "desk"
 	_clear()
+	_city_backdrop()
 	var d: Dictionary = run.drafts[di]
 	var kind: String = d["kind"]
 	_title({"doctrine": "THE INHERITANCE", "procurement": "PROCUREMENT", "program": "A TRAINING PROGRAM"}.get(kind, "A DRAFT"))
@@ -485,6 +905,7 @@ func _desk_offer(oi: int) -> void:
 		return
 	mode = "desk"
 	_clear()
+	_city_backdrop()
 	var o: Dictionary = run.offers[oi]
 	_title("AN OFFER")
 	_text(box, String(o["who_name"]), GREY, 12)
@@ -507,6 +928,7 @@ func _desk_event(ei: int) -> void:
 		return
 	mode = "desk"
 	_clear()
+	_city_backdrop()
 	var e: Dictionary = run.events[ei]
 	_title(String(e["title"]).to_upper())
 	_text(box, Rogue.fill(String(e["text"]), e), INK, 13)
@@ -530,6 +952,7 @@ func _armory() -> void:
 	var run = c.run
 	mode = "desk"
 	_clear()
+	_city_backdrop()
 	_title("ARMOURY AND PROGRAMS  ·  week %d" % c.week())
 	_text(box, "Seed %d%s." % [c.seed_val, ("  ·  inheritance: " + String(Rogue.DOCTRINES[run.doctrine]["name"])) if run.doctrine != "" else ""], GREY, 11)
 	var v := _card(box)
@@ -573,6 +996,8 @@ func _end_week() -> void:
 ## A note from the outgoing chief (1.0): the first two weeks, unless tips are off.
 func _first_weeks(parent: Control) -> void:
 	var v := _card(parent)
+	v.get_parent().set_meta("hint", true)   # advice: shown with the card's ?
+	v.get_parent().visible = show_hints
 	_text(v, "FROM THE OUTGOING CHIEF", INK, 12)
 	for ln in [
 		"The board is a week, not a queue. You will not have enough officers for every call.",
@@ -639,6 +1064,7 @@ func _story_card(parent: Control, page: Dictionary) -> void:
 func _story_file() -> void:
 	mode = "story"
 	_clear()
+	_city_backdrop()
 	var c = main.campaign
 	var p = c.politics
 	var page: Dictionary = Story.current(c)
@@ -716,6 +1142,7 @@ func _story_file() -> void:
 func _people() -> void:
 	mode = "people"
 	_clear()
+	_city_backdrop()
 	var c = main.campaign
 	_title("PEOPLE  ·  WEEK %d" % mini(c.week(), c.WEEKS))
 	_text(
@@ -862,7 +1289,7 @@ func _open_document(
 	_documents(filter, document_id, return_person, return_topic)
 
 
-## Poll bars, told apart by pattern: Kettering solid ink, Okonjo-Vale hatched, Pell outline.
+## Poll bars, told apart by pattern: Carrick solid ink, Beddrow hatched, Pell outline.
 class PollBars:
 	extends Control
 	var p
@@ -941,6 +1368,7 @@ class StandBar:
 func _city_hall() -> void:
 	mode = "city_hall"
 	_clear()
+	_city_backdrop()
 	var c = main.campaign
 	var p = c.politics
 	_title("CITY HALL  ·  week %d of %d" % [c.week(), c.WEEKS])
@@ -1033,6 +1461,8 @@ func _election_night(lines: Array) -> void:
 	var c = main.campaign
 	var p = c.politics
 	var e: Dictionary = p.result.get("ending", {})
+	mode = "board"
+	_city_backdrop()
 	_title("ELECTION NIGHT  ·  THE CAMPAIGN IS FILED")
 	_story_card(box, Story.current(c))
 	var votes: Dictionary = p.result.get("votes", {})
@@ -1128,59 +1558,40 @@ static func election_reason(sc: Dictionary) -> String:
 ## department is seen a week before it costs a call.
 func _roster_strip(parent: Control, c) -> void:
 	var o: Dictionary = c.roster_outlook()
-	var parts: Array = []
+	var items := [["force", "%d next week" % int(o["fit"]), "Fit officers next week",
+		Ink.accent(0.9) if bool(o["short"]) else INK]]
 	if int(o["back"]) > 0:
-		parts.append("%d back from injury" % int(o["back"]))
+		items.append(["hurt", "+%d" % int(o["back"]), "Back from injury next week"])
 	if int(o["graduates"]) > 0:
-		parts.append("%d from the academy" % int(o["graduates"]))
+		items.append(["train", "+%d" % int(o["graduates"]), "From the academy next week"])
 	if int(o["returning"]) > 0:
-		parts.append("%d back from courses or suspension" % int(o["returning"]))
+		items.append(["back", "+%d" % int(o["returning"]), "Back from courses or suspension"])
 	if int(o["to_course"]) > 0:
-		parts.append("%d leaving for a queued course" % int(o["to_course"]))
-	var txt := "NEXT WEEK  ·  %d fit%s." % [int(o["fit"]), (" (" + ", ".join(parts) + ")") if not parts.is_empty() else ""]
+		items.append(["train", "-%d" % int(o["to_course"]), "Leaving for a queued course"])
 	if int(o["open"]) > 0:
-		txt += "  This week's %d open call%s want %d between them." % [int(o["open"]), "" if int(o["open"]) == 1 else "s", int(o["want"])]
+		items.append(["squad", "%d wanted" % int(o["want"]), "This week's %d open calls want %d officers between them" % [int(o["open"]), int(o["want"])]])
+	_chips(parent, items, 13)
 	if bool(o["short"]):
-		txt += "  Below %d fit, calls go unattended: hire, or bring people back." % c.ROSTER_FLOOR
-	_text(parent, txt, Ink.accent(0.9) if bool(o["short"]) else INK, 12)
+		_text(parent, "Below %d fit, calls go unattended: hire, or bring people back." % c.ROSTER_FLOOR, Ink.accent(0.9), 11)
 
 
 func _dept_strip(parent: Control) -> void:
 	var d = main.campaign.dept
-	var v := _card(parent)
 	var red: bool = d.frozen()   # P1.D2: the freeze is the overdraft limit, not zero
-	_text(
-		v,
-		(
-			"ACCOUNT  $%s%s   ·   allocation $%s a week   ·   payroll $%s"
-			% [
-				Department.money(d.balance),
-				"  (FROZEN)" if red else "",
-				Department.money(d.allocation),
-				Department.money(d.payroll())
-			]
-		),
-		Ink.accent(0.9) if red else INK,
-		12
-	)
 	var nc: int = d.open_cases().size()
-	_text(
-		v,
-		(
-			"Morale %d%s   ·   %d internal affairs case%s open"
-			% [
-				d.morale,
-				" (low: more stress in every operation)" if d.morale < Courses.MORALE0 else "",
-				nc,
-				"" if nc == 1 else "s"
-			]
-		),
-		GREY,
-		11
-	)
-
+	var low: bool = d.morale < Courses.MORALE0
+	_chips(parent, [
+		["money", "$" + Department.money(d.balance) + ("  FROZEN" if red else ""),
+			"The account" + (" (frozen at the overdraft limit: no new spending)" if red else ""), Ink.accent(0.9) if red else INK],
+		["income", "+" + Department.money(d.allocation), "City allocation a week"],
+		["payroll", "-" + Department.money(d.payroll()), "Payroll a week"],
+		["morale", str(d.morale), "Morale" + (" (low: more stress in every operation)" if low else ""), Ink.accent(0.9) if low else INK],
+		["ia", str(nc), "Internal affairs cases open", Ink.accent(0.9) if nc > 0 else INK],
+	], 14)
 	if nc > 0:
-		_text(v, Department.triage_line(d.cases, d.week), Ink.accent(0.85) if int(Department.case_triage(d.cases, d.week)["urgent"]) > 0 else GREY, 10)
+		_text(parent, Department.triage_line(d.cases, d.week), Ink.accent(0.85) if int(Department.case_triage(d.cases, d.week)["urgent"]) > 0 else GREY, 10)
+
+
 const STATUS_WORDS := {
 	"injured": "out injured until week %d",
 	"training": "on a course until week %d",
@@ -1245,6 +1656,7 @@ func _set_standing(n: int) -> void:
 func _roster() -> void:
 	mode = "roster"
 	_clear()
+	_city_backdrop()
 	var d = main.campaign.dept
 	_title("ROSTER  ·  week %d" % d.week)
 	_dept_strip(box)
@@ -1631,7 +2043,7 @@ func _applicants() -> void:
 		var worst := Department.forecast_worst(fc)
 		var deficit_text := ""
 		if not worst.is_empty():
-			deficit_text = " — week %d goes to -$%s" % [int(worst["week"]), Department.money(-int(worst["balance"]))]
+			deficit_text = "  ·  red wk %d" % int(worst["week"])
 		# B6: this was a multi-line lambda passed straight into _btn(), with _confirm()'s
 		# own call nested in its else branch. Godot 4.7 rejects that shape ("Unindent doesn't
 		# match the previous indentation level"), which stopped ops_ui.gd, and with it main.gd,
@@ -1654,13 +2066,13 @@ func _applicants() -> void:
 		var hb := _btn(
 			h,
 			(
-				"Hire  ($%s now, payroll +$%s a week)%s"
+				"Hire  $%s  ·  +$%s/wk%s"
 				% [Department.money(Department.applicant_cost(r)), Department.money(Courses.pay(r)), deficit_text]
 			),
 			on_hire
 		)
 		hb.disabled = d.frozen()
-		hb.tooltip_text = String(UI.officer_file(r)) + (("\n" + deficit_text.trim_prefix(" — ")) if deficit_text != "" else "")
+		hb.tooltip_text = String(UI.officer_file(r)) + "\n$%s now, payroll +$%s a week" % [Department.money(Department.applicant_cost(r)), Department.money(Courses.pay(r))] + (("\nThe four-week forecast goes into the red: week %d at -$%s" % [int(worst["week"]), Department.money(-int(worst["balance"]))]) if not worst.is_empty() else "")
 
 
 ## EA_TASKS P1.C3: an experienced officer from a neighbouring force, on duty this week,
@@ -1693,7 +2105,7 @@ func _emergency_card(d) -> void:
 	var b := _btn(
 		h,
 		(
-			"Sign  ($%s now, payroll +$%s a week)"
+			"Sign  $%s  ·  +$%s/wk"
 			% [Department.money(Department.emergency_cost(r)), Department.money(Courses.pay(r))]
 		),
 		func(): _sign_emergency()
@@ -1739,6 +2151,7 @@ func _dismiss(r: Dictionary) -> void:
 func _budget() -> void:
 	mode = "budget"
 	_clear()
+	_city_backdrop()
 	var d = main.campaign.dept
 	_title("BUDGET  ·  week %d" % d.week)
 	_dept_strip(box)
@@ -1879,6 +2292,7 @@ func _grant() -> void:
 func _cases() -> void:
 	mode = "cases"
 	_clear()
+	_city_backdrop()
 	var d = main.campaign.dept
 	_title("INTERNAL AFFAIRS  ·  week %d" % d.week)
 	_dept_strip(box)
@@ -2041,7 +2455,7 @@ func _guide() -> void:
 	var copy := [
 		"Read what is known and what is only estimated. The readiness range is a planning index, not a win chance. When you have the briefing, continue to Force.",
 		"Assign officers to squads and check their kit. Suggest a plan is a starting point, not an order. Continue to Orders when the force is ready.",
-		"Give each squad an objective and any constraints its leader can afford. Check the readiness range again, then choose RUN below. The operation itself cannot be rewound.",
+		"Give each squad an objective and any constraints its leader can afford. Check the readiness range again, then choose RUN in the bar along the bottom. The operation itself cannot be rewound.",
 	]
 	_text(v, copy[clampi(tab, 0, 2)], INK, 11)
 	var h := _h(v)
@@ -2076,23 +2490,22 @@ func _risk_card(s: Dictionary, full := true) -> void:
 
 
 func show_plan() -> void:
+	var entering: bool = mode != "plan"
 	mode = "plan"
 	root.visible = true
+	var was_folded: bool = card.collapsed and not entering
 	_clear()
+	if entering and main.has_method("_fit_camera"):
+		main._fit_camera.call_deferred()
 	var s: Dictionary = main.cur_sit
 	_title(s["title"], 15)
 	if main.campaign.week() == 1 and int(main.campaign.dept.ops_run) == 0 and bool(Settings.get_v("tips")) and not guide_dismissed:
 		guide_active = true
+	# Campaign UI 2026-11-03: the plan has no side panel. The steps, Suggest and RUN are a
+	# bar along the bottom of the floor plan; the step's card floats above it and folds
+	# away (press its step again) to leave the whole plan on screen.
+	_plan_bar(s)
 	_guide()
-	var tabs := _h(box)
-	var select_tab := func(on: bool, tab_i: int) -> void:
-		if on:
-			_tab(tab_i)
-	for i in 3:
-		var b := _btn(tabs, ["1 Briefing", "2 Force", "3 Orders"][i], select_tab.bind(i), true)
-		b.set_pressed_no_signal(i == tab)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_sep()
 	if flash != "":
 		_text(box, flash, INK, 11)
 		flash = ""
@@ -2127,20 +2540,42 @@ func show_plan() -> void:
 			_force(s)
 		2:
 			_orders(s)
-	_sep()
-	var n: int = main.campaign.plan_members(s).size()
-	var hb := _h(box)
-	_btn(hb, "<  Board", func(): main.ops_board())
+	if was_folded:
+		card.set_collapsed(true)
+
+
+## The operation's bar: back to the map, the three steps, Suggest, and RUN.
+func _plan_bar(s: Dictionary) -> void:
+	run_bar.visible = true
+	var h := run_row
+	_btn(h, "<  Map", func(): main.ops_board()).tooltip_text = "Back to the city (the plan is kept)"
+	h.add_child(VSeparator.new())
+	for i in 3:
+		var b := _btn(h, ["1 Briefing", "2 Force", "3 Orders"][i], func(_on): _step(i), true)
+		b.set_pressed_no_signal(i == tab)
+		b.custom_minimum_size = Vector2(104, 40)
+	h.add_child(VSeparator.new())
 	if bool(Settings.get_v("veteran")):
-		_lab(hb, "Veteran chief — the plan is yours.", GREY, 10)  # Q4: no Suggest at this difficulty
+		_lab(h, "Veteran chief: the plan is yours.", GREY, 10)  # Q4: no Suggest at this difficulty
 	else:
-		_btn(hb, "Suggest a plan", func(): main.ops_suggest())
-	var run := _btn(
-		box, "RUN   >   %d officer%s" % [n, "" if n == 1 else "s"], func(): main.ops_run()
-	)
-	run.custom_minimum_size = Vector2(0, 40)
+		_btn(h, "Suggest a plan", func(): main.ops_suggest())
+	var n: int = main.campaign.plan_members(s).size()
+	var run := _btn(h, "RUN  >  %d officer%s" % [n, "" if n == 1 else "s"], func(): main.ops_run())
+	run.custom_minimum_size = Vector2(170, 40)
 	run.add_theme_font_size_override("font_size", 16)
 	run.disabled = n == 0
+
+
+## A step pressed in the bar: open its card, or fold the card if it is already open.
+func _step(i: int) -> void:
+	if i == tab and card.visible:
+		card.set_collapsed(not card.collapsed)
+		for b in run_row.get_children():
+			if b is Button and (b as Button).toggle_mode:
+				(b as Button).set_pressed_no_signal((b as Button).text.begins_with(str(tab + 1) + " "))
+		return
+	card.set_collapsed(false)
+	_tab(i)
 
 
 func _tab(i: int) -> void:
@@ -2151,7 +2586,21 @@ func _tab(i: int) -> void:
 
 func _briefing(s: Dictionary) -> void:
 	var spec: Dictionary = Situations.TYPES[s["type"]]
-	_text(box, spec["blurb"], INK, 12)
+	# 2026-11-03 (less wordy): the call at a glance as chips; the sentences are hints (?)
+	var vis := int(s["visibility"])
+	var vis_words: String = ["", "Few people are watching; a report may take months.",
+		"A small number of neighbours may see it.", "Phones are out along the street.",
+		"Reporters may be there; more people will have an account.",
+		"A crowd and live cameras put the event in public view."][clampi(vis, 1, 5)]
+	var pressure := String(Situations.PRESSURE_NAMES.get(s["pressure"], s["pressure"]))
+	var items := [[type_icon(String(s["type"])), String(spec["name"]), String(spec["blurb"])]]
+	if not s.get("city_error", false):
+		items.append(["trust", "%s %d" % [s["ward"], int(s["trust"])], "%s, %s ward. Trust in police: %d of 100%s." % [s["address"], s["ward"], int(s["trust"]),
+			" (the coalition has cut off community tips)" if not bool(s.get("community", true)) else ""]])
+	items.append(["eye", dots(vis), "Visibility: " + vis_words])
+	items.append(["clock", pressure, "Time pressure", Ink.accent(0.9) if String(s["pressure"]) == "high" else INK])
+	_chips(box, items, 14)
+	_text(box, spec["blurb"], GREY, 10)
 	_text(
 		box,
 		(
@@ -2160,58 +2609,14 @@ func _briefing(s: Dictionary) -> void:
 			else "Suggested plans use the officers' current equipment. Issue or change kit on the Force tab."
 		),
 		GREY,
-		11
+		10
 	)
 	if s.has("site_name"):
-		_text(box, "%s  ·  %s. The tactical layout is a schematic proxy, not a surveyed floor plan." % [s["site_name"], s.get("site_archetype", "site")], GREY, 11)
+		_text(box, "%s  ·  %s. The tactical layout is a schematic proxy, not a surveyed floor plan." % [s["site_name"], s.get("site_archetype", "site")], GREY, 10)
 	elif s.get("city_error", false):
 		_text(box, "City data unavailable: no verified site or ward for this call.", GREY, 11)
 	if s.get("city_error", false):
 		_text(box, "Location and ward trust are unavailable; no local community group can be identified.", GREY, 11)
-	else:
-		_text(
-			box,
-			(
-				"%s, %s ward. Trust in police: %d of 100%s."
-				% [
-					s["address"],
-					s["ward"],
-					int(s["trust"]),
-					(
-						" (the coalition has cut off community tips)"
-						if not bool(s.get("community", true))
-						else ""
-					)
-				]
-			),
-			GREY,
-			11
-		)
-	_text(
-		box,
-		(
-			"Visibility %s: %s"
-			% [
-				dots(int(s["visibility"])),
-				[
-					"",
-					"Few people are watching; a report may take months.",
-					"A small number of neighbours may see it.",
-					"Phones are out along the street.",
-					"Reporters may be there; more people will have an account.",
-					"A crowd and live cameras put the event in public view."
-				][clampi(int(s["visibility"]), 1, 5)]
-			]
-		),
-		GREY,
-		11
-	)
-	_text(
-		box,
-		"Time pressure: %s" % Situations.PRESSURE_NAMES.get(s["pressure"], s["pressure"]),
-		GREY,
-		11
-	)
 	if s["type"] == "event":
 		var ch: Dictionary = Situations.chatter(s)
 		_text(
@@ -3094,73 +3499,86 @@ func show_run() -> void:
 	_rewinding = false
 	_log_shown = 0
 	_clear()
+	card.set_closable(false)
 	var s: Dictionary = main.cur_sit
 	_title(s["title"], 14)
-	var h := _h(box)
+	# Campaign UI 2026-11-03: the controls are a floating bar along the bottom of the
+	# floor plan; the card above it carries what the radio and the squads say.
+	run_bar.visible = true
+	var h := run_row
 	var pb := _btn(h, "Pause", func(on): main.set_paused(on), true)
 	_run_refs["pause"] = pb
 	var clock := Label.new()
 	clock.add_theme_font_size_override("font_size", 18)
-	clock.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	clock.custom_minimum_size = Vector2(74, 0)
+	clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	h.add_child(clock)
 	_run_refs["clock"] = clock
-	var hs := _h(box)
 	var group := ButtonGroup.new()
 	var select_speed := func(on: bool, speed: float) -> void:
 		if on:
 			main.set_speed(speed)
 	for sp in UI.SPEEDS:
 		var speed: float = sp
-		var b := _btn(hs, ("%sx" % str(sp)).replace(".0x", "x"), select_speed.bind(speed), true)
+		var b := _btn(h, ("%sx" % str(sp)).replace(".0x", "x"), select_speed.bind(speed), true)
 		b.button_group = group
-		b.custom_minimum_size = Vector2(44, 0)
+		b.custom_minimum_size = Vector2(40, 0)
 		b.set_pressed_no_signal(is_equal_approx(sp, main.speed))
-	var pacing := _text(box, "", GREY, 10)
-	_run_refs["pacing"] = pacing
-	# EA_TASKS P1.G2: offered once the operation has been quiet for a minute of its own
-	# clock. The simulation still runs to the end; only the watching is skipped.
-	if main.has_method("can_skip_report"):
-		var sk := _btn(box, "Skip to the report", func(): main.skip_to_report())
-		sk.custom_minimum_size = Vector2(0, 30)
-		sk.disabled = true
-		_run_refs["skip"] = sk
-	_text(box, "REWIND (a way of looking: the operation itself never goes back)", GREY, 10)
-	var hr := _h(box)
+	h.add_child(VSeparator.new())
+	var rw := TextureRect.new()
+	rw.texture = Icons.tex("rewind", 22)
+	rw.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	rw.tooltip_text = "Rewind: a way of looking; the operation itself never goes back"
+	h.add_child(rw)
 	var sl := HSlider.new()
 	sl.min_value = 0.0
 	sl.max_value = 1.0
 	sl.step = 0.0
-	sl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sl.custom_minimum_size = Vector2(170, 0)
+	sl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	sl.tooltip_text = rw.tooltip_text
 	sl.value_changed.connect(func(v): _on_rewind(v))
-	hr.add_child(sl)
+	h.add_child(sl)
 	_run_refs["slider"] = sl
-	_btn(hr, "Live", func(): _go_live())
+	_btn(h, "Live", func(): _go_live())
+	h.add_child(VSeparator.new())
+	# EA_TASKS P1.G2: offered once the operation has been quiet for a minute of its own
+	# clock. The simulation still runs to the end; only the watching is skipped.
+	if main.has_method("can_skip_report"):
+		var sk := _btn(h, "Skip to the report", func(): main.skip_to_report())
+		sk.disabled = true
+		_run_refs["skip"] = sk
+	var ab := _btn(h, "ABORT", func(): _abort())
+	ab.tooltip_text = "Every squad breaks contact and withdraws to its vehicles, still under fire until it gets there. A failure, but a failure with everyone alive always scores better than one with deaths."
+	_run_refs["abort"] = ab
+	var pacing := _text(box, "", GREY, 10)
+	_run_refs["pacing"] = pacing
 	var know := Label.new()
 	know.add_theme_font_size_override("font_size", 11)
 	know.add_theme_color_override("font_color", GREY)
 	know.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(know)
 	_run_refs["know"] = know
-	var sq := _rich(box, "", 120.0)
-	_run_refs["squads"] = sq
+	# Orders in the field (2026-11-03): a row per squad. Pick one, click a room on the
+	# plan: it moves there, consolidates and holds until Resume (or another room).
+	cmd_sq = -1
+	var sqbox := VBoxContainer.new()
+	sqbox.add_theme_constant_override("separation", 3)
+	box.add_child(sqbox)
+	_run_refs["sqbox"] = sqbox
+	_run_refs["sq_rows"] = {}
+	var note := _text(box, "", Ink.accent(0.9), 11)
+	note.visible = false
+	_run_refs["order_note"] = note
+	_text(box, "Pick a squad, then click a room on the plan: it moves there by the usual paths, consolidates and holds until you press Resume or pick another room. Squads only, not single officers.", GREY, 10)
 	_text(box, "RADIO", INK, 12)
 	var lg := RichTextLabel.new()
 	lg.bbcode_enabled = true
 	lg.scroll_following = true
-	lg.custom_minimum_size = Vector2(0, 300)
+	lg.custom_minimum_size = Vector2(0, 260)
 	lg.add_theme_font_size_override("normal_font_size", 11)
 	box.add_child(lg)
 	_run_refs["log"] = lg
-	var ab := _btn(box, "ABORT  ·  cut losses", func(): _abort())
-	ab.custom_minimum_size = Vector2(0, 36)
-	_run_refs["abort"] = ab
-	_text(
-		box,
-		"Abort: every squad breaks contact and withdraws to its vehicles, still under fire until it gets there. A failure, but a failure with everyone alive always scores better than one with deaths.",
-		GREY,
-		10
-	)
 
 
 func _abort() -> void:
@@ -3171,7 +3589,7 @@ func _abort() -> void:
 		_run_refs["abort"].text = "CONFIRM ABORT"
 		return
 	main.ops_abort()
-	_run_refs["abort"].text = "ABORTED: withdrawing"
+	_run_refs["abort"].text = "WITHDRAWING"
 	_run_refs["abort"].disabled = true
 
 
@@ -3207,7 +3625,8 @@ func refresh_run(w, fog) -> void:
 		var quiet: float = main.quiet_seconds() if main.has_method("quiet_seconds") else 0.0
 		var ready: bool = main.can_skip_report()
 		skip_btn.disabled = not ready
-		skip_btn.text = Ink.bb("Skip to the report") if ready else "Skip to the report  ·  %d s of quiet of %d" % [int(quiet), int(main.quiet_skip_after())]
+		skip_btn.text = "Skip" if ready else "Skip  %d/%d s" % [int(quiet), int(main.quiet_skip_after())]
+		skip_btn.tooltip_text = "Skip to the report: offered after %d s of quiet" % int(main.quiet_skip_after())
 	var sl: HSlider = _run_refs["slider"]
 	_sliding = true
 	sl.max_value = maxf(1.0, w.t)
@@ -3228,40 +3647,8 @@ func refresh_run(w, fog) -> void:
 		)
 	else:
 		_run_refs["know"].text = "Fog lifted."
-	var bb := ""
-	if w.teams.size() > 0:
-		for el in w.teams[0]["elements"]:
-			if not el.has("orders"):
-				continue
-			var alive := 0
-			for m in el["members"]:
-				if m.alive() and not m.gone:
-					alive += 1
-			var ob: Dictionary = el.get("obj", {})
-			var what: String = Orders.OBJECTIVES.get(ob.get("kind", ""), {}).get("name", "")
-			var modes := {
-				"assault": "clearing",
-				"hold": "holding",
-				"hunt": "patrolling",
-				"wait": "on the phase line",
-				"withdraw": "withdrawing",
-				"support": "waiting on the next room",
-				"lost": "lost"
-			}
-			var st: String = String(modes.get(el["mode"], el["mode"]))
-			if el.get("consolidating", false):
-				st = "consolidating"
-			bb += (
-				"[b]SQUAD %d[/b]  %d/%d  ·  %s%s\n"
-				% [
-					el["i"] + 1,
-					alive,
-					el["members"].size(),
-					st,
-					("  ·  " + what) if what != "" else ""
-				]
-			)
-	_run_refs["squads"].text = Ink.bb(bb)
+	_squad_rows(w)
+
 	# the radio: what the officers say and what happens to them
 	var lg: RichTextLabel = _run_refs["log"]
 	_log_shown = maxi(_log_shown, w.log_base)
@@ -3282,6 +3669,100 @@ func refresh_run(w, fog) -> void:
 				lg.append_text(Ink.bb("[i][color=#6e675c]%s[/color][/i]\n" % txt))
 			_:
 				lg.append_text(Ink.bb("[color=#2f2e2d]%s[/color]\n" % txt))
+
+
+const RUN_MODES := {"assault": "clearing", "hold": "holding", "hunt": "patrolling", "wait": "phase line",
+	"withdraw": "withdrawing", "support": "waiting", "lost": "lost", "split": "clearing in pairs", "done": "done"}
+
+
+## The squad rows on the run card: select (to give an order), state, and Resume.
+func _squad_rows(w) -> void:
+	if w.teams.is_empty() or not _run_refs.has("sqbox"):
+		return
+	var rows: Dictionary = _run_refs["sq_rows"]
+	var live: bool = main.view_t < 0.0 and not w.over and not w.aborted
+	for el in w.teams[0]["elements"]:
+		if not el.has("orders") or el.get("child", false):
+			continue
+		var i: int = el["i"]
+		if not rows.has(i):
+			var h := _h(_run_refs["sqbox"])
+			var b := _btn(h, "Squad %d" % (i + 1), func(on): _pick_squad(i, on), true)
+			b.custom_minimum_size = Vector2(104, 32)
+			b.tooltip_text = "Select Squad %d, then click a room on the plan" % (i + 1)
+			var lab := _lab(h, "", INK, 12)
+			lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			lab.clip_text = true
+			var res := _btn(h, "Resume", func(): _resume_squad(i))
+			res.icon = Icons.tex("play", 20)
+			res.tooltip_text = "Squad %d goes back to its own orders from where it stands" % (i + 1)
+			rows[i] = {"b": b, "lab": lab, "res": res}
+		var r: Dictionary = rows[i]
+		var alive := 0
+		for m in el["members"]:
+			if m.alive() and not m.gone:
+				alive += 1
+		var st: String = String(RUN_MODES.get(el["mode"], el["mode"]))
+		if el.get("consolidating", false):
+			st = "consolidating"
+		var oroom: String = el.get("ordered_room", "")
+		if oroom != "":
+			var title: String = String(w.level.rooms[oroom]["title"]).to_lower()
+			st = ("holding the " if el.get("ordered_held", false) else "moving to the ") + title
+		var ob: Dictionary = el.get("obj", {})
+		var what: String = Orders.OBJECTIVES.get(ob.get("kind", ""), {}).get("name", "")
+		(r["lab"] as Label).text = "%d/%d  ·  %s%s" % [alive, el["members"].size(), st, ("  ·  " + what) if what != "" and oroom == "" else ""]
+		(r["lab"] as Label).tooltip_text = (r["lab"] as Label).text
+		var out: bool = el["mode"] in ["withdraw", "lost", "merged", "rejoined"] or alive == 0
+		(r["b"] as Button).disabled = out or not live
+		if (r["b"] as Button).disabled and cmd_sq == i:
+			_pick_squad(i, false)
+		(r["res"] as Button).visible = oroom != ""
+		(r["res"] as Button).disabled = not live
+
+
+func _pick_squad(i: int, on: bool) -> void:
+	cmd_sq = i if on else (-1 if cmd_sq == i else cmd_sq)
+	var rows: Dictionary = _run_refs.get("sq_rows", {})
+	for k in rows:
+		(rows[k]["b"] as Button).set_pressed_no_signal(k == cmd_sq)
+	_order_note("Squad %d: click a room on the plan" % (i + 1) if cmd_sq == i else "", false)
+
+
+func _order_note(t: String, bad := true) -> void:
+	if not _run_refs.has("order_note"):
+		return
+	var n: Label = _run_refs["order_note"]
+	n.text = t
+	n.visible = t != ""
+	n.add_theme_color_override("font_color", Ink.accent(0.9) if bad else INK)
+
+
+## A click on the floor plan while the operation runs: the picked squad's order.
+func run_click(p: Vector2) -> bool:
+	if mode != "run" or cmd_sq < 0 or main.world == null:
+		return false
+	if main.view_t >= 0.0:
+		_go_live()
+	var w = main.world
+	var room: String = w.level.room_at(p)
+	var why: String = w.order_squad_move(cmd_sq, room)
+	if why != "":
+		_order_note("Squad %d: %s" % [cmd_sq + 1, why])
+		return true
+	_pick_squad(cmd_sq, false)
+	_squad_rows(w)
+	return true
+
+
+func _resume_squad(i: int) -> void:
+	if main.world == null:
+		return
+	if main.view_t >= 0.0:
+		_go_live()
+	var why: String = main.world.order_squad_resume(i)
+	_order_note(("Squad %d: %s" % [i + 1, why]) if why != "" else "", true)
+	_squad_rows(main.world)
 
 
 ## Is a log line something the department would hear on the radio?
@@ -3455,6 +3936,10 @@ func show_debrief(res: Dictionary, w, dept_lines: Array) -> void:
 	_run_refs["rclock"] = rc
 	var back := _btn(box, "<  Back to the board", func(): main.ops_board())
 	back.custom_minimum_size = Vector2(0, 34)
+	# the same way out in the bar, so the report can be folded away to watch the replay
+	run_bar.visible = true
+	var mb := _btn(run_row, "<  Back to the map", func(): main.ops_board())
+	mb.custom_minimum_size = Vector2(180, 40)
 
 
 func _timeline(w) -> void:

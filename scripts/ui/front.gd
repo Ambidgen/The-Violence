@@ -74,7 +74,7 @@ func _menu_btn(parent: Control, text: String, cb: Callable, enabled := true) -> 
 	b.custom_minimum_size = Vector2(340, 44)
 	b.add_theme_font_size_override("font_size", 22)
 	# 1.4: torn scraps of paper; the hovered one lifts (the art rings it in red)
-	b.add_theme_stylebox_override("normal", _scrap(Color("#e6dfcd"), Color("#6e675c")))
+	b.add_theme_stylebox_override("normal", _scrap(Color("#ffffff"), Color("#5b5866")))
 	b.add_theme_stylebox_override("hover", _scrap(Color("#f2ecdc"), Color("#2f2e2d")))
 	b.add_theme_stylebox_override("pressed", _scrap(Color("#ecd49a"), Color("#2f2e2d")))
 	b.add_theme_stylebox_override("disabled", _scrap(Color("#e6dfcd", 0.5), Color("#6e675c", 0.5)))
@@ -346,7 +346,7 @@ func show_credits(from: String) -> void:
 
 # ------------------------------------------------------------------ the manual
 const MANUAL := [
-	["The job", """You are Port Carrick's new police chief. Before the appointment, you were deputy chief. You signed the Bridge Street eviction order; the outgoing chief gave the briefing. Dana Okonjo-Vale remembers who signed and who briefed it.
+	["The job", """You are Port Carrick's new police chief. Before the appointment, you were deputy chief. You signed the Bridge Street eviction order; the outgoing chief gave the briefing. Alicia Beddrow remembers who signed and who briefed it.
 
 For forty weeks, the board gives you more calls than you can answer. Choose which to take, who to send and what orders they carry. Once an operation starts, your officers act on their own. You watch the plan meet the room.
 
@@ -395,7 +395,7 @@ The budget covers pay, overtime, kit, training, medical bills and settlements. O
 Deaths, wounds, dismissals and deficits lower morale. Low morale adds stress to every operation. Very low morale costs you officers."""],
 	["The city", """City Hall shows the polls, four allies and trust in each ward. Each ally holds something the department needs: the budget chair controls the allocation; the union affects morale; the coalition shares community tips; the district attorney decides whether a cleared case stays closed. Lose an ally below 25 and that support goes with them. Win them back above 40.
 
-Royce Kettering promises the police more money and fewer limits. Dana Okonjo-Vale wants the Bridge Street order read in public. Gordon Pell wants the books balanced before the next promise is made. At the end of week 40, the city votes. The winner decides whether you keep the office."""],
+George Carrick promises the police more money and fewer limits. Alicia Beddrow wants the Bridge Street order read in public. Gordon Pell wants the books balanced before the next promise is made. At the end of week 40, the city votes. The winner decides whether you keep the office."""],
 	["Controls", """Mouse wheel zooms. Middle- or right-drag pans. Home fits the view.
 Space pauses an operation; keys 1–7 set its speed.
 F2 switches off red ink. F3 switches off gore. Neither changes the simulation.
@@ -478,6 +478,17 @@ class CityArt extends Control:
 	var _paper: Texture2D
 	var _hov: Control = null
 	var _hov_t := 0.0
+	# Visual overhaul 2026-11-03: the opening's last frame, Port Carrick at night in a
+	# child's colours, instead of the grey-and-orange smog of the second prototype plates.
+	const NIGHT := Color("#251a7a")
+	const NIGHT_BLUE := Color("#2747e6")
+	const STAR := Color("#ffd60a")
+	const LIT := Color("#ffc400")
+	const GRASS := Color("#2fcf3f")
+	const ROAD := Color("#8a909b")
+	const SMOKE := Color("#c69cff")
+	const KID_RED := Color("#ff2b30")
+	const HOUSES := [Color("#e0472b"), Color("#9b4dff"), Color("#ff7f11"), Color("#ffc400"), Color("#ff4fa7"), Color("#33a6ff"), Color("#2fcf3f"), Color("#a5592a")]
 
 	func _process(delta: float) -> void:
 		t += delta
@@ -504,7 +515,7 @@ class CityArt extends Control:
 
 	func _build() -> void:
 		_size = size
-		_paper = C.paper_texture(Vector2i(int(size.x / 2), int(size.y / 2)), C.PAPER_GREY.lightened(0.05), 33, 1.8)
+		_paper = C.paper_texture(Vector2i(int(size.x / 2), int(size.y / 2)), Color("#fbf7ec"), 33, 0.0)
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 404
 		_blocks.clear()
@@ -524,17 +535,27 @@ class CityArt extends Control:
 
 	func _paint_city(ci) -> void:
 		var page := Rect2(Vector2(18, 16), size - Vector2(36, 32))
-		var sky := Rect2(page.position, Vector2(page.size.x, size.y * 0.37))
-		C.hatch(ci, C.rect_poly(sky), Color(C.ORANGE, 0.8), 3.2, -0.25, 1, 3.0)
-		C.hatch(ci, C.rect_poly(Rect2(sky.position, Vector2(sky.size.x, sky.size.y * 0.36))), Color(C.GRAPHITE, 0.55), 3.6, 0.2, 2, 3.0)
-		for k in 7:
-			C.smudge(ci, Vector2(120.0 + k * size.x / 7.0, 70 + 30 * C.rnd(k, 1)), 110, C.GRAPHITE)
+		var sky := Rect2(page.position, Vector2(page.size.x, size.y * 0.40))
+		C.hatch(ci, C.rect_poly(sky), NIGHT, 3.6, -0.35, 1, 3.6)
+		C.hatch(ci, C.rect_poly(sky), Color(NIGHT_BLUE, 0.55), 7.0, 0.45, 2, 2.6)
+		for k in 34:
+			var sp := Vector2(page.position.x + C.rnd(k, 3) * page.size.x, page.position.y + 10 + C.rnd(k, 4) * sky.size.y * 0.9)
+			var r := 4.0 + 5.0 * C.rnd(k, 5)
+			var star := PackedVector2Array()
+			for j in 10:
+				var ang := -PI * 0.5 + TAU * j / 10.0
+				star.append(sp + Vector2.from_angle(ang) * (r if j % 2 == 0 else r * 0.45))
+			ci.draw_colored_polygon(star, STAR)
+		var moon_c := Vector2(page.end.x - 230, page.position.y + 120)
+		C.hatch(ci, C.ellipse_poly(moon_c, 46, 46, 18, 7, 0.05), STAR, 3.0, 0.4, 8, 3.6)
+		C.outline(ci, C.ellipse_poly(moon_c, 46, 46, 18, 7, 0.05), Color("#ff9500"), 2.6, 9, 1.0)
 		var top := size.y * 0.32
-		C.charcoal(ci, PackedVector2Array([Vector2(page.position.x, top), Vector2(page.end.x, top), page.end, Vector2(page.position.x, page.end.y)]), C.GRAPHITE, 2.6, 5, 1.0, 2.6)
+		var ground := PackedVector2Array([Vector2(page.position.x, top), Vector2(page.end.x, top), page.end, Vector2(page.position.x, page.end.y)])
+		C.hatch(ci, ground, GRASS, 4.0, -0.5, 5, 3.4)
 		for row in 6:
 			var y := _row_y(row)
 			var k := _row_k(row)
-			C.hatch(ci, C.rect_poly(Rect2(page.position.x, y + 4, page.size.x, 16 * k)), Color(C.ORANGE, 0.55 + 0.15 * row / 5.0), 3.0, -0.1, 30 + row, 2.4)
+			C.hatch(ci, C.rect_poly(Rect2(page.position.x, y + 4, page.size.x, 16 * k)), ROAD, 3.0, -0.1, 30 + row, 2.8)
 			for b in _blocks:
 				if int(b["row"]) == row:
 					_block(ci, b, y, k)
@@ -548,24 +569,25 @@ class CityArt extends Control:
 		var x0 := x * (0.75 + 0.25 * k) + (1.0 - k) * 300.0
 		var front := Rect2(Vector2(x0, y - h), Vector2(w, h))
 		var roof := PackedVector2Array([Vector2(x0, y - h), Vector2(x0 + w, y - h), Vector2(x0 + w + d * 0.4, y - h - d), Vector2(x0 + d * 0.4, y - h - d)])
-		ci.draw_colored_polygon(roof, C.GRAPHITE.lightened(0.18))
-		C.hatch(ci, roof, C.CHARCOAL, 4.0, 0.3, s, 1.6, 1.0, 0.3)
-		ci.draw_colored_polygon(C.rect_poly(front), C.GRAPHITE.darkened(0.1))
-		C.hatch(ci, C.rect_poly(front), Color(C.ORANGE, 0.22), 5.0, -1.2, s + 1, 1.6)
+		var col: Color = HOUSES[int(b["seed"]) / 13 % HOUSES.size()]
+		ci.draw_colored_polygon(roof, col.darkened(0.45))
+		C.hatch(ci, roof, col.darkened(0.25), 4.0, 0.3, s, 2.2)
+		ci.draw_colored_polygon(C.rect_poly(front), col.lightened(0.15))
+		C.hatch(ci, C.rect_poly(front), col, 3.6, -1.2, s + 1, 2.6)
 		if b["kind"] == "court":
 			var cen := (roof[0] + roof[1] + roof[2] + roof[3]) * 0.25
 			var court := PackedVector2Array()
 			for rp in roof:
 				court.append(cen.lerp(rp, 0.55))
-			ci.draw_colored_polygon(court, C.CHARCOAL)
-			C.hatch(ci, court, Color(C.ORANGE, 0.35), 3.0, 0.9, s + 7, 1.4)
+			ci.draw_colored_polygon(court, col.darkened(0.6))
+			C.hatch(ci, court, Color(GRASS, 0.8), 3.0, 0.9, s + 7, 2.0)
 		var cols := maxi(3, int(w / (12.0 * maxf(0.6, k))))
 		var rows := maxi(2, int(h / (11.0 * maxf(0.6, k))))
 		for cx in cols:
 			for ry in rows:
 				var wx := front.position.x + (cx + 0.5) * w / cols
 				var wy := front.position.y + (ry + 0.5) * h / rows
-				var wc := C.AMBER if C.rnd(s + cx, ry) < 0.08 else C.CHARCOAL
+				var wc := LIT if C.rnd(s + cx, ry) < 0.55 else NIGHT
 				ci.draw_rect(Rect2(wx - 2.0 * k, wy - 2.5 * k, 4.0 * k, 5.0 * k), wc)
 		C.outline(ci, C.rect_poly(front), C.CHARCOAL, 1.6, s + 3, 0.7)
 		C.outline(ci, roof, C.CHARCOAL, 1.4, s + 4, 0.7)
@@ -573,14 +595,15 @@ class CityArt extends Control:
 			for ch in 3:
 				var cx2 := x0 + w * (0.22 + ch * 0.14)
 				var ctop := y - h - 70 * k - ch * 8 * k
-				ci.draw_rect(Rect2(cx2 - 5 * k, ctop, 10 * k, y - h - ctop), C.CHARCOAL)
+				ci.draw_rect(Rect2(cx2 - 5 * k, ctop, 10 * k, y - h - ctop), KID_RED)
+				ci.draw_rect(Rect2(cx2 - 5 * k, ctop + 10 * k, 10 * k, 6 * k), Color.WHITE)
 
 	func _smoke(base: Vector2, k: float, s: int) -> void:
 		for puff in 10:
 			var age := fmod(t * 0.3 + puff / 10.0, 1.0)
 			var c := base + Vector2(age * 260 * k + sin(age * 6.0 + s) * 14, -age * 210 * k)
 			var r := (14 + age * 60) * k
-			C.hatch(self, C.ellipse_poly(c, r, r * 0.7, 12, s + puff, 0.25), Color(C.CHARCOAL, 0.9 * (1.0 - age * 0.8)), 2.8, 0.5 + puff, s + puff * 3, 2.2)
+			C.hatch(self, C.ellipse_poly(c, r, r * 0.7, 12, s + puff, 0.25), Color(SMOKE, 0.85 * (1.0 - age * 0.8)), 2.8, 0.5 + puff, s + puff * 3, 2.6)
 
 	func _draw() -> void:
 		if size.x < 10.0:
@@ -593,20 +616,19 @@ class CityArt extends Control:
 			if b2["kind"] == "factory":
 				var k2 := _row_k(int(b2["row"]))
 				_smoke(Vector2(float(b2["x"]) * (0.75 + 0.25 * k2) + (1.0 - k2) * 300.0 + float(b2["w"]) * k2 * 0.3, _row_y(int(b2["row"])) - float(b2["h"]) * k2 - 70 * k2), k2, int(b2["seed"]))
-		C.rain(self, Rect2(Vector2(18, 16), size - Vector2(36, 32)), 160, 77, -0.18, 34.0)
 		# the title, printed on
 		var title_bg := PackedVector2Array([Vector2(60, 50), Vector2(780, 40), Vector2(792, 262), Vector2(54, 272)])
-		draw_colored_polygon(title_bg, Color(C.PAPER_CREAM, 0.94))
+		draw_colored_polygon(title_bg, Color("#ffffff", 0.96))
 		C.outline(self, title_bg, C.GRAPHITE, 1.5, 500, 0.8)
 		C.letters(self, "PORT CARRICK POLICE DEPARTMENT  ·  OFFICE OF THE CHIEF", Vector2(90, 88), 14, C.GRAPHITE, 499, 1, 1.0, rev(0.0, 0.8))
 		C.letters(self, "THE VIOLENCE", Vector2(88, 182), 84, C.CHARCOAL, 501, 3, 0.95, rev(0.2, 1.4))
-		var red := Color(0.70, 0.12, 0.15)
+		var red := KID_RED
 		C.line(self, Vector2(86, 204), Vector2(86 + 640 * rev(1.5, 0.5), 200), red, 7.0, 502, 2.4, 2)
 		C.line(self, Vector2(96, 216), Vector2(96 + 560 * rev(1.7, 0.5), 218), red, 4.0, 503, 2.0, 1)
 		# the version line, said plainly in the corner of the title plate (P0.D1)
 		C.letters(self, CHANNEL.to_upper(), Vector2(622, 84), 17, red, 505, 2, 1.0, rev(0.4, 0.7))
 		C.letters(self, "V%s" % VERSION, Vector2(700, 104), 13, C.GRAPHITE, 506, 1, 1.0, rev(0.5, 0.7))
-		C.letters(self, "FORTY WEEKS TO THE ELECTION  ·  EVERY RUN A DIFFERENT CITY", Vector2(90, 250), 18, C.BRICK, 504, 2, 1.0, rev(1.9, 0.8))
+		C.letters(self, "FORTY WEEKS TO THE ELECTION  ·  EVERY RUN A DIFFERENT CITY", Vector2(90, 250), 18, Color("#ff7f11").darkened(0.15), 504, 2, 1.0, rev(1.9, 0.8))
 		# the hovered scrap, ringed in red with an arrow at it
 		if _hov != null and is_instance_valid(_hov):
 			var r := _hov.get_global_rect()
@@ -621,7 +643,7 @@ class CityArt extends Control:
 		# the Ledger cutting, and the footer in pencil
 		var o := Vector2(size.x - 456, size.y - 270)
 		var cut := PackedVector2Array([o, o + Vector2(390, -12), o + Vector2(398, 206), o + Vector2(-6, 216)])
-		draw_colored_polygon(cut, C.PAPER_CREAM.darkened(0.1))
+		draw_colored_polygon(cut, Color("#ffffff", 0.97))
 		C.outline(self, cut, C.GRAPHITE, 1.4, 700, 0.8)
 		C.letters(self, "THE CARRICK LEDGER", o + Vector2(22, 40), 20, C.CHARCOAL, 701, 2)
 		C.line(self, o + Vector2(20, 50), o + Vector2(370, 46), C.CHARCOAL, 2.0, 702, 0.8, 1)
@@ -631,4 +653,8 @@ class CityArt extends Control:
 			var ly := o.y + 156.0 + l * 16.0
 			C.line(self, Vector2(o.x + 22, ly), Vector2(o.x + 352 - l * 60, ly + 2), C.GRAPHITE, 2.0, 710 + l, 1.0, 1)
 		C.smudge(self, o + Vector2(370, 190), 22, C.CHARCOAL)
-		C.letters(self, "V%s  ·  F2 RED INK  ·  F3 GORE  ·  ESC MENU" % version, Vector2(84, size.y - 26), 14, C.CHALK, 720, 1)
+		var foot := "V%s  ·  F2 RED INK  ·  F3 GORE  ·  ESC MENU" % version
+		var fr := Rect2(Vector2(72, size.y - 46), Vector2(C.letters_width(foot, 15, 1.0) + 26, 30))
+		draw_colored_polygon(C.rect_poly(fr), Color("#ffffff", 0.94))
+		C.outline(self, C.rect_poly(fr), C.CHARCOAL, 1.8, 719, 0.8)
+		C.letters(self, foot, Vector2(84, size.y - 24), 15, C.CHARCOAL, 720, 1)

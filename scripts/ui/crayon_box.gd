@@ -6,7 +6,7 @@ extends StyleBox
 
 const C = preload("res://scripts/view/crayon.gd")
 
-var bg := Color("#e6dfcd")
+var bg := Color("#fbf7ec")
 var border := Color("#2f2e2d")
 var border_w := 1.6
 var grain := 0.22          # how much the fill shows its strokes (0: flat)
