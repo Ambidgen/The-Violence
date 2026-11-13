@@ -847,6 +847,67 @@ head once a plate is seen). The .45 is now medium calibre (below).
     4. **Deaths overall barely moved.** Patrol deaths replaced deaths in the operations the
        roster could no longer field.
 
+### Stage A of the roadmap to release (v4): one trunk (2026-11-11 and 12)
+
+The plan of record is now `docs/ROADMAP_V4_2026-11-11.md` (the project's "Roadmap to Release v4"). Its
+Stage A puts three lines of work that had drifted into three repositories back into one tree.
+
+**What was merged**
+
+| line | from | brings |
+|---|---|---|
+| balance (the base) | `arena/m8-patrol-2026-11-05`, this repository | everything above this section |
+| map UI | `campaign-map-ui-2026-11-03`, `The-Violence-01-Nov-26` | the city map with popups instead of the side menu, 67 crayon icons, orders in the field, the bright-crayon pass |
+| cutscenes | `arena/c88475a6-the-violence-28-oct-26`, `The-Violence-28-Oct-26` | Hero, The Mayor, Jeremy and Fettick re-dated to 2001 |
+
+- The repositories share no git history, so the merge is by content, three ways, with
+  `stage0-engine-2026-11-03` as the base. 671 files the balance line had not touched since Stage 0
+  come from the map-UI line as they were. 15 files changed on both sides: 11 merged cleanly, and
+  the four conflicts (three in `ops_ui.gd`, one in `CHANGELOG.md`) keep both sides.
+- From the cutscene line, its six changed files since 612e1ec.
+
+**What was added on the trunk** (owner's answers of 11 Nov)
+
+- **The patrol radio as its own card** (`ops_ui.open_radio`), from a radio on the HUD and a row on
+  the week's card; an answer returns to the radio. The week's report folds unanswered calls where
+  nothing happened into one line (`Campaign.last_patrol_quiet`, `Patrol.uneventful`).
+  `end_week()`'s own lines are unchanged, so the harnesses read what they read before.
+- **The operation camera**: zoom out, zoom in, fit and follow-the-action on the run bar; an eye on
+  each squad's row; W A S D. The wheel, the drag and Home were already there.
+  `scripts/view/op_camera.gd`, `tests/op_camera_test.gd` (quick tier).
+- **Canon names** in display text: George Carrick, Julia Noussan, Bob Stevens. Ids (`kettering`,
+  `okonjo`, `pell`), polls and the election are unchanged until R1 and R2.
+- `ui_walk` waits for Week Closed when rendering. Pressing through it let its callback reopen the
+  week over the next screen (found on the first rendered walk of the merged tree; a player cannot
+  do it, because the recap takes the mouse).
+
+**Checked** (Godot 4.7.2, locally, 11–12 Nov): static audit clean; `_check` 159 scripts, 0 failed;
+`ops_ui_test`, `op_camera_test`, `field_orders_test`, `week_recap_test` pass; `ui_walk` 0 failures
+headless and rendered at 1600×900 and 1280×720; Hero and The Mayor render. The unmodified balance
+line passes the quick tier 26/26 in the same environment. The quick tier on both engines and the
+8-seed matrix for the trunk run in CI on `arena/m8-trunk-2026-11-11`; the matrix's report is
+`tests/results/arena/m8-trunk-2026-11-11/balance`.
+
+**CI, 13 Nov (UTC): one suite failed, and it was the runner.** The trunk's first CI run
+(43345335104) passed 27 of 28 suites on both engines and failed `test_range_determinism_test`:
+7 of 8 cases had a new digest with the same winner, time, shots and hits. The same test passes
+locally on both engines in a fresh checkout. Re-running the headless job of the 5 Nov run that
+had passed on the unmerged balance line (42092129942, attempt 2) failed the same seven cases
+with the **same seven digests**, so the merge is not the cause: GitHub's runner changed between
+5 and 13 Nov. The digest hashed running sums of seconds at full double precision
+(`stat.rec_sum_*`, `stat.tot_sum_*`), whose last bits depend on the CPU and C library. Fix: floats
+in the snapshot are settled to 1e-6 before hashing; the fixture now also stores a digest per part
+and a failing case prints which part moved and the snapshot. The fixture was rewritten; every
+winner, time, shot and hit in it is unchanged. This is not a rebaseline of the campaign
+determinism fixture, which is untouched (and whose 35 cases come out identical on the balance
+line and the trunk: the merge moved none of them).
+**Open:** the sim is not bit-identical from one machine to the next, which matters for P2.A2
+(Windows against Linux) and for anything that promises a seed plays the same everywhere.
+
+**Not done in Stage A**: the other four repositories are not archived (owner's step, after the
+pull request is merged); `cinematics/` and `trailers/` are not pruned (its own change, after the
+trunk lands); no determinism rebaseline.
+
 ## Order and overlap
 
 ```

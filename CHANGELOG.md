@@ -30,6 +30,14 @@ tree again; nothing from any of them was dropped.
 - **Tests**: `op_camera_test` joins the quick tier; `ops_ui_test` covers the radio card, the
   folded report and election night in the map UI; `ui_walk` follows a squad, zooms, fits,
   and opens the radio.
+- **The test-range digest no longer depends on the machine.** The first CI run of the trunk
+  failed `test_range_determinism_test` on both engines, 7 cases of 8, with every winner,
+  time, shot and hit unchanged. Re-running the 5 Nov commit that had passed gave the same
+  seven digests: the runner had changed, not the game. The snapshot carried running sums of
+  seconds at full double precision, whose last bits follow the CPU and C library. Floats are
+  now settled to a millionth before hashing, the fixture records a digest per part (stat,
+  rng, operators), and a failing case prints which part moved and its whole snapshot. The
+  fixture is rewritten for the new digest; no outcome in it changed.
 
 ## Unreleased — Patrol encounters, the .22 and warrant helmets (2026-11-05)
 

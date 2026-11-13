@@ -1,69 +1,110 @@
 {
   "cases": {
     "cover_repro": {
-      "digest": "880d36053bf88821",
+      "digest": "0167ca802280d620",
       "hits": 14,
+      "parts": {
+        "operators": "1850c44f3a91757e",
+        "rng": "-1401010498577551576",
+        "stat": "b601d866b31fa920"
+      },
       "shots": 135,
       "time": 87.1,
       "timeout": false,
       "winner": 1
     },
     "lane_repro": {
-      "digest": "b7dd8bf211ee1e3f",
+      "digest": "c8c7f30220e99123",
       "hits": 19,
+      "parts": {
+        "operators": "d4eb6c0d73a378eb",
+        "rng": "-7147221261847583146",
+        "stat": "6ca3ffa96b58bd53"
+      },
       "shots": 74,
       "time": 53.133,
       "timeout": false,
       "winner": 0
     },
     "large_team": {
-      "digest": "6866e7f59d65fee1",
+      "digest": "701161aeb6d816f4",
       "hits": 18,
+      "parts": {
+        "operators": "0ef1fa3d0d9f7880",
+        "rng": "-7639142901281630825",
+        "stat": "6bda27e645752b1b"
+      },
       "shots": 60,
       "time": 21.867,
       "timeout": false,
       "winner": 0
     },
     "militia_patrol": {
-      "digest": "2bdcd3bcafee0f8f",
+      "digest": "89bc194df0671c78",
       "hits": 7,
+      "parts": {
+        "operators": "db997f58c0bc0c27",
+        "rng": "-8046374173598937280",
+        "stat": "6b2bbfd2b2c1f44f"
+      },
       "shots": 17,
       "time": 26.867,
       "timeout": false,
       "winner": 1
     },
     "motel": {
-      "digest": "6a1a07d04439d846",
+      "digest": "1987ae1fbfbf8b4b",
       "hits": 18,
+      "parts": {
+        "operators": "3c38e76f8aed6d8f",
+        "rng": "-3210071015635483300",
+        "stat": "74519b7a2df0684f"
+      },
       "shots": 63,
       "time": 131.367,
       "timeout": false,
       "winner": 0
     },
     "shield": {
-      "digest": "9a0a53ce7b69baad",
+      "digest": "67a5e4aeb0322bb3",
       "hits": 13,
+      "parts": {
+        "operators": "6249bd48e8a742d6",
+        "rng": "-7121458047122590634",
+        "stat": "6e8ae61872a0a2d2"
+      },
       "shots": 100,
       "time": 118.533,
       "timeout": false,
       "winner": 0
     },
     "sof_control": {
-      "digest": "4141c639f505ff77",
+      "digest": "43a3c4a334cf94e4",
       "hits": 6,
+      "parts": {
+        "operators": "5071500e5a13709c",
+        "rng": "4042185902435579717",
+        "stat": "6b3aae516cb1605d"
+      },
       "shots": 10,
       "time": 58.733,
       "timeout": false,
       "winner": 0
     },
     "unequal": {
-      "digest": "da15e1d8e47d243c",
+      "digest": "b6fca4ad97646a33",
       "hits": 6,
+      "parts": {
+        "operators": "c54c412f7a5892d6",
+        "rng": "4509457116014605787",
+        "stat": "944642449bd3bde6"
+      },
       "shots": 17,
       "time": 39.367,
       "timeout": false,
       "winner": 1
     }
   },
+  "digest": "floats settled to 1e-6, parts recorded (2026-11-12); no change of behaviour: every winner, time, shot and hit is as before",
   "model": "test-range-2026-11-02-clearance-progress"
 }

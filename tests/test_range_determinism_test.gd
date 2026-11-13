@@ -23,6 +23,37 @@ const CASES := [
 ]
 
 
+## Floats in the snapshot are settled to a millionth before they are hashed (2026-11-12).
+## The stat block carries running sums of seconds at full double precision, and the last
+## bits of those depend on the CPU and C library a run happens on: on 2026-11-13 the same
+## commit that passed CI on 5 Nov failed 7 of 8 cases on a newer runner, with every
+## winner, time, shot and hit unchanged. A millionth of a second is arithmetic, not
+## behaviour; anything larger still changes the digest.
+static func _settle(v):
+	if v is float:
+		return snappedf(v, 0.000001)
+	if v is Dictionary:
+		var d := {}
+		for k in v:
+			d[k] = _settle(v[k])
+		return d
+	if v is Array:
+		var a: Array = []
+		for x in v:
+			a.append(_settle(x))
+		return a
+	return v
+
+
+static func _md5(v) -> String:
+	return JSON.stringify(v, "", true).md5_text().substr(0, 16)
+
+
+## The last run's snapshots, by case: printed for a failing case so that two machines'
+## logs can be compared line for line. Never written to the fixture.
+var _snapshots := {}
+
+
 func _run(c: Dictionary) -> Dictionary:
 	Equipment.armory = {}
 	var lv = Maps.get_level(c["map"])
@@ -57,10 +88,13 @@ func _run(c: Dictionary) -> Dictionary:
 			"stress": snappedf(o.stress, 0.0001), "habit_stress": snappedf(o.habit_stress, 0.0001),
 			"shots": o.shots, "hits": o.hits, "kills": o.kills, "plates": o.plates, "bad": bad,
 			"rifle": o.weapons["rifle"].duplicate(true), "pistol": o.weapons["pistol"].duplicate(true)})
-	var snapshot := {"time": snappedf(w.t, 0.001), "winner": w.winner, "stat": w.stat.duplicate(true),
-		"rng": w.rng.state, "operators": operators}
-	var result := {"digest": JSON.stringify(snapshot, "", true).md5_text().substr(0, 16), "time": snapshot["time"],
-		"winner": w.winner, "shots": w.stat["shots"], "hits": w.stat["hits"], "timeout": w.t >= w.time_limit}
+	var snapshot := {"time": snappedf(w.t, 0.001), "winner": w.winner, "stat": _settle(w.stat.duplicate(true)),
+		"rng": w.rng.state, "operators": _settle(operators)}
+	_snapshots[c["id"]] = snapshot
+	# the digest is the whole snapshot; the parts say which of it moved when it does
+	var result := {"digest": _md5(snapshot), "time": snapshot["time"],
+		"winner": w.winner, "shots": w.stat["shots"], "hits": w.stat["hits"], "timeout": w.t >= w.time_limit,
+		"parts": {"stat": _md5(snapshot["stat"]), "rng": str(snapshot["rng"]), "operators": _md5(snapshot["operators"])}}
 	w.dispose()
 	return result
 
@@ -91,6 +125,18 @@ func _init() -> void:
 			failures += 1
 		print("%s %-16s %s  winner=%d time=%.2f shots=%d" % ["ok  " if ok else "FAIL", c["id"],
 			result["digest"], result["winner"], result["time"], result["shots"]])
+		if not ok and not old.is_empty():
+			# which part moved, and the whole snapshot, so the next reader does not have to guess
+			var moved: Array = []
+			var op: Dictionary = old.get("parts", {})
+			for part in result["parts"]:
+				if op.has(part) and String(op[part]) != String(result["parts"][part]):
+					moved.append(part)
+			for k in ["winner", "time", "shots", "hits", "timeout"]:
+				if old.has(k) and str(old[k]) != str(result[k]):
+					moved.append("%s %s -> %s" % [k, str(old[k]), str(result[k])])
+			print("     moved: %s" % (", ".join(moved) if not moved.is_empty() else "(the fixture has no parts to compare)"))
+			print("     SNAPSHOT %s %s" % [c["id"], JSON.stringify(_snapshots[c["id"]], "", true)])
 	if not write:
 		for id in expected:
 			if not results.has(id):
@@ -102,7 +148,9 @@ func _init() -> void:
 			printerr("Could not write range determinism fixture")
 			quit(1)
 			return
-		out.store_string(JSON.stringify({"model": "test-range-2026-11-02-clearance-progress", "cases": results}, "  ", true) + "\n")
+		out.store_string(JSON.stringify({"model": "test-range-2026-11-02-clearance-progress",
+			"digest": "floats settled to 1e-6, parts recorded (2026-11-12); no change of behaviour: every winner, time, shot and hit is as before",
+			"cases": results}, "  ", true) + "\n")
 		out.close()
 		print("Wrote %d range-only digests to %s" % [results.size(), FIXTURE])
 	print("range determinism: %s" % ("PASS" if failures == 0 else "%d FAILED" % failures))
