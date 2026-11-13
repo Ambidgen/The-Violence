@@ -95,12 +95,28 @@ func _run(c: Dictionary) -> Dictionary:
 	var result := {"digest": _md5(snapshot), "time": snapshot["time"],
 		"winner": w.winner, "shots": w.stat["shots"], "hits": w.stat["hits"], "timeout": w.t >= w.time_limit,
 		"parts": {"stat": _md5(snapshot["stat"]), "rng": str(snapshot["rng"]), "operators": _md5(snapshot["operators"])}}
+	var per_op := {}
+	for od in snapshot["operators"]:
+		per_op[String(od["id"])] = _md5(od).substr(0, 8)
+	result["ops"] = per_op
 	w.dispose()
 	return result
 
 
 func _init() -> void:
 	var write := "--write" in OS.get_cmdline_user_args()
+	# --show=<case>: print that case's stat and operators as this machine computes them
+	for arg in OS.get_cmdline_user_args():
+		if String(arg).begins_with("--show="):
+			for c0 in CASES:
+				if c0["id"] == String(arg).trim_prefix("--show="):
+					_run(c0)
+					var sn: Dictionary = _snapshots[c0["id"]]
+					print("stat %s" % JSON.stringify(sn["stat"], "", true))
+					for od0 in sn["operators"]:
+						print("op %s" % JSON.stringify(od0, "", true))
+			quit(0)
+			return
 	var expected := {}
 	if not write:
 		var f := FileAccess.open(FIXTURE, FileAccess.READ)
@@ -126,7 +142,8 @@ func _init() -> void:
 		print("%s %-16s %s  winner=%d time=%.2f shots=%d" % ["ok  " if ok else "FAIL", c["id"],
 			result["digest"], result["winner"], result["time"], result["shots"]])
 		if not ok and not old.is_empty():
-			# which part moved, and the whole snapshot, so the next reader does not have to guess
+			# Which part moved, and what it is now, so the next reader does not have to guess.
+			# Every line says FAIL: that is what tools/run_tests.sh copies into the CI log.
 			var moved: Array = []
 			var op: Dictionary = old.get("parts", {})
 			for part in result["parts"]:
@@ -135,8 +152,17 @@ func _init() -> void:
 			for k in ["winner", "time", "shots", "hits", "timeout"]:
 				if old.has(k) and str(old[k]) != str(result[k]):
 					moved.append("%s %s -> %s" % [k, str(old[k]), str(result[k])])
-			print("     moved: %s" % (", ".join(moved) if not moved.is_empty() else "(the fixture has no parts to compare)"))
-			print("     SNAPSHOT %s %s" % [c["id"], JSON.stringify(_snapshots[c["id"]], "", true)])
+			print("FAIL   %s moved: %s" % [c["id"], ", ".join(moved) if not moved.is_empty() else "(the fixture has no parts to compare)"])
+			var snap: Dictionary = _snapshots[c["id"]]
+			if moved.has("stat"):
+				print("FAIL   %s stat %s" % [c["id"], JSON.stringify(snap["stat"], "", true)])
+			var old_ops: Dictionary = old.get("ops", {})
+			var shown := 0
+			for od in snap["operators"]:
+				var oid := String(od["id"])
+				if old_ops.has(oid) and String(old_ops[oid]) != String(result["ops"][oid]) and shown < 6:
+					shown += 1
+					print("FAIL   %s op %s" % [c["id"], JSON.stringify(od, "", true)])
 	if not write:
 		for id in expected:
 			if not results.has(id):

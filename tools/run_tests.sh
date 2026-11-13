@@ -270,7 +270,7 @@ run_one() {
 	if [ "${GITHUB_ACTIONS:-}" = "true" ] && { [ "$status" = "FAIL" ] || [ "$status" = "TIMEOUT" ] || [ "$status" = "XPASS" ]; }; then
 		local detail
 		# (with --verbose, Godot names each resource still in use at exit: EA_TASKS B4)
-		detail=$(grep -E '\bFAILED\b|\bFAIL\b|HUNG|failures?: *[1-9]|problems?: *[1-9]|stalls: *[1-9]|missing: \[.|SCRIPT ERROR|Parse Error|^ERROR:|still in use|Leaked instance' "$log" | head -12)
+		detail=$(grep -E '\bFAILED\b|\bFAIL\b|HUNG|failures?: *[1-9]|problems?: *[1-9]|stalls: *[1-9]|missing: \[.|SCRIPT ERROR|Parse Error|^ERROR:|still in use|Leaked instance' "$log" | head -40)
 		[ -z "$detail" ] && detail=$(tail -n 8 "$log")
 		[ "$status" = "TIMEOUT" ] && detail="timed out after ${seconds}s"$'\n'"$(tail -n 5 "$log")"
 		detail="${detail//'%'/'%25'}"; detail="${detail//$'\r'/}"; detail="${detail//$'\n'/'%0A'}"
