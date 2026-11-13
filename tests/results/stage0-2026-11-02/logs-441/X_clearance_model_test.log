@@ -1,0 +1,11 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+ok    route metres are divided by equipped movement speed
+ok    parallel agents use the maximum of their assigned route times, not their sum
+ok    greedy assignment chooses the earliest reachable agent/target pair
+ok    missing attackers and nonpositive speeds fail closed
+ok    a path snapped short of the target is not counted as a route
+ok    the reference includes both armour and carried-kit speed penalties
+ok    map 00 room samples are reachable and inside their named rooms
+ok    map 11 room samples are reachable and inside their named rooms
+clearance model: PASS

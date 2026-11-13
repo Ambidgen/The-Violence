@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+compact_pistol    s to the first shot from the holster (less)            0.98     1.14   PASS
+heavy_pistol      targets killed outright per hit, 6 m (more)            0.25     0.22   PASS
+smg               police rounds that met a wall and went through (less)   0.50     1.00   PASS
+sbr               s on target per acquisition, 6 m (less)                0.17     0.18   PASS
+assault_rifle     targets killed outright per hit, 15 m (more)           0.28     0.26   PASS
+battle_rifle      targets killed outright per hit, 15 m (more)           0.27     0.22   PASS
+shotgun           hits per round, 12 m (more)                            0.91     0.66   PASS
+marksman          hits per round, 38 m (more)                            0.32     0.19   PASS
+irons             s on target per acquisition, 18 m (more)               0.29     0.27   PASS
+magnified         hits per round, 38 m (more)                            0.35     0.19   PASS
+flashbang         officers hit in the entry of a room held by 3 rifles (fewer)   0.25     2.83   PASS
+ram               s to the first officer inside, outer doors locked (less)  10.30    19.60   PASS
+breach            s to the first officer inside, outer doors locked (less)   8.58    19.60   PASS
+shield            rounds through to an officer facing 3 rifles, 10 m (fewer)   0.83     0.69   FAIL
+13 of 14 items change the outcome (12 runs each way, 125 s)

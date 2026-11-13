@@ -1,0 +1,43 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+matrix untrained_vs_untrained: A/B/draw 3/3/0 (6 games); 1 cases, 7.9 s elapsed
+matrix untrained_vs_militia: A/B/draw 0/6/0 (6 games); 2 cases, 12.1 s elapsed
+matrix untrained_vs_patrol: A/B/draw 0/6/0 (6 games); 3 cases, 15.6 s elapsed
+matrix untrained_vs_regular: A/B/draw 0/6/0 (6 games); 4 cases, 20.5 s elapsed
+matrix untrained_vs_police: A/B/draw 0/6/0 (6 games); 5 cases, 24.6 s elapsed
+matrix untrained_vs_sof: A/B/draw 0/6/0 (6 games); 6 cases, 27.9 s elapsed
+matrix militia_vs_untrained: A/B/draw 4/2/0 (6 games); 7 cases, 32.6 s elapsed
+matrix militia_vs_militia: A/B/draw 3/3/0 (6 games); 8 cases, 37.9 s elapsed
+matrix militia_vs_patrol: A/B/draw 2/4/0 (6 games); 9 cases, 42.4 s elapsed
+matrix militia_vs_regular: A/B/draw 0/6/0 (6 games); 10 cases, 47.9 s elapsed
+matrix militia_vs_police: A/B/draw 0/6/0 (6 games); 11 cases, 52.2 s elapsed
+matrix militia_vs_sof: A/B/draw 0/6/0 (6 games); 12 cases, 55.3 s elapsed
+matrix patrol_vs_untrained: A/B/draw 6/0/0 (6 games); 13 cases, 61.2 s elapsed
+matrix patrol_vs_militia: A/B/draw 4/2/0 (6 games); 14 cases, 66.5 s elapsed
+matrix patrol_vs_patrol: A/B/draw 4/2/0 (6 games); 15 cases, 72.6 s elapsed
+matrix patrol_vs_regular: A/B/draw 1/4/1 (6 games); 16 cases, 84.8 s elapsed
+matrix patrol_vs_police: A/B/draw 2/4/0 (6 games); 17 cases, 91.2 s elapsed
+matrix patrol_vs_sof: A/B/draw 0/6/0 (6 games); 18 cases, 95.2 s elapsed
+matrix regular_vs_untrained: A/B/draw 6/0/0 (6 games); 19 cases, 102.0 s elapsed
+matrix regular_vs_militia: A/B/draw 4/2/0 (6 games); 20 cases, 107.5 s elapsed
+matrix regular_vs_patrol: A/B/draw 1/5/0 (6 games); 21 cases, 113.2 s elapsed
+matrix regular_vs_regular: A/B/draw 4/2/0 (6 games); 22 cases, 123.4 s elapsed
+matrix regular_vs_police: A/B/draw 1/5/0 (6 games); 23 cases, 131.4 s elapsed
+matrix regular_vs_sof: A/B/draw 0/6/0 (6 games); 24 cases, 138.1 s elapsed
+matrix police_vs_untrained: A/B/draw 6/0/0 (6 games); 25 cases, 144.7 s elapsed
+matrix police_vs_militia: A/B/draw 6/0/0 (6 games); 26 cases, 152.3 s elapsed
+matrix police_vs_patrol: A/B/draw 4/2/0 (6 games); 27 cases, 160.0 s elapsed
+matrix police_vs_regular: A/B/draw 3/3/0 (6 games); 28 cases, 168.8 s elapsed
+matrix police_vs_police: A/B/draw 2/4/0 (6 games); 29 cases, 179.3 s elapsed
+matrix police_vs_sof: A/B/draw 0/6/0 (6 games); 30 cases, 186.3 s elapsed
+matrix sof_vs_untrained: A/B/draw 6/0/0 (6 games); 31 cases, 193.4 s elapsed
+matrix sof_vs_militia: A/B/draw 6/0/0 (6 games); 32 cases, 200.5 s elapsed
+matrix sof_vs_patrol: A/B/draw 6/0/0 (6 games); 33 cases, 207.6 s elapsed
+matrix sof_vs_regular: A/B/draw 5/1/0 (6 games); 34 cases, 218.4 s elapsed
+matrix sof_vs_police: A/B/draw 5/1/0 (6 games); 35 cases, 227.8 s elapsed
+matrix sof_vs_sof: A/B/draw 5/1/0 (6 games); 36 cases, 245.6 s elapsed
+DONE matrix: 36 cases, 216 matches -> /project_study_a/study-matrix.jsonl

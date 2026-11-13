@@ -1,0 +1,19 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+map 00 Test Range 01 - Shotgun House    doors  5  ok
+map 01 Lone Cabin                       doors  1  ok
+map 02 Bunkhouse                        doors  3  ok
+map 03 Corner Store                     doors  5  ok
+map 04 Center-Hall Bungalow             doors 10  ok
+map 05 Duplex                           doors 17  ok
+map 06 L-Shaped Ranch                   doors 18  ok
+map 07 Roadside Motel                   doors 16  ok
+map 08 Warehouse & Offices              doors 20  ok
+map 09 Walled Compound                  doors 26  ok
+map 10 Apartment Block                  doors 44  ok
+map 11 Civic Plaza                      doors 10  ok
+problems: 0

@@ -1,0 +1,24 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+    0 map 03  1v1  assault/hold    civ  0 -> A at   5.7 s
+    1 map 04  3v1  assault/hunt    civ 14 -> A at   4.4 s
+    2 map 00  4v7  hunt   /assault civ  0 -> B at  14.8 s
+    3 map 04  3v8  hunt   /hold    civ 13 -> A at  63.6 s
+    4 map 02  6v8  hold   /hunt    civ 12 -> B at  29.2 s
+    5 map 09  2v5  assault/assault civ  0 police -> B at  19.2 s
+    6 map 10  5v2  hunt   /assault civ  1 police -> A at  11.4 s
+    7 map 09  2v1  hold   /hold    civ  0 -> A at   9.9 s
+    8 map 07  6v3  assault/hold    civ  0 -> A at  45.5 s
+    9 map 06  5v4  hold   /assault civ  0 police -> A at  17.8 s
+   10 map 02  5v3  assault/hold    civ  8 police -> A at  26.7 s
+   11 map 02  5v6  assault/hold    civ 12 police -> B at  23.8 s
+   12 map 10  3v4  assault/hold    civ  1 -> B at  49.0 s
+   13 map 01  6v2  hunt   /assault civ  5 -> B at  10.3 s
+   14 map 09  1v8  hold   /hold    civ  0 police -> B at   3.6 s
+   15 map 11  1v3  hunt   /assault civ  0 -> B at   5.7 s
+fuzz matches 16: A 8  B 8  draw 0 (time limit 0)   sim 341 s in 38861 ms
+bad habits activated: 27/27  missing: []

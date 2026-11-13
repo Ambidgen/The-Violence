@@ -1,0 +1,19 @@
+# Python packages for the asset tools only.
+#
+# The game and every headless harness are pure GDScript and need nothing from pip.
+# These tools synthesise audio, cut trailers, or render character assets:
+#
+#   tools/make_sounds.py     numpy, scipy.signal  (assets/sfx/*.wav)
+#   tools/mix_soundtrack.py  numpy, scipy.signal
+#   tools/make_ads.py        numpy
+#   tools/make_character_assets.py  Pillow (version pinned for reproducible PNGs)
+#   tools/make_contact_sheet.py     Pillow (cutscene capture contact sheets; CI installs the pin directly)
+#
+# Everything else (`gd47_check.py`, `sync_version.py`, `inspect_pck.py`,
+# `inspect_exe.py`, `make_placeholders.py`, `level_port.py`, `nav_probe.py`,
+# `patch_rc.py`) runs on a bare Python 3.11.
+#
+#   python3 -m pip install -r tools/requirements.txt
+numpy>=1.24
+scipy>=1.10
+Pillow==13.0.0

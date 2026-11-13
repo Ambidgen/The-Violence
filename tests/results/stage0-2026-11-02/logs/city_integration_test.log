@@ -1,0 +1,38 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ok    the committed generator output parses
+ok    the v0.4 city contract loads
+ok    every mapped site exists in the city
+ok    ward IDs follow the original saved trust order
+ok    mapped layouts match site types; the historical eviction is not replayed
+ok    generated calls inherit the exact site, address, ward, trust, visibility and coordinates
+ok    seeded calls can reach all 14 supported sites
+ok    the same seed and week reproduce the same board
+ok    a board does not deal the same site twice
+ok    a missing city produces a descriptive error
+ok    a malformed city is rejected
+ok    missing ward geometry is rejected
+ok    non-numeric ward geometry is rejected
+ok    a mapped site with an unknown ward is rejected
+ok    a mapped site outside its named ward is rejected
+ok    a mapped site outside the coordinate frame is rejected
+ok    duplicate site IDs are rejected
+ok    a missing mapped site is rejected rather than invented
+ok    all call types fall back to unlocated layouts, including the event proxy
+ok    an unlocated event changes no ward trust and its headline invents no plaza
+ok    the city projection preserves east and north
+ok    hovering a pin reveals its address, but empty map space does not
+ok    a campaign with mapped sites saves
+ok    the mapped board survives a save round trip
+ok    an existing board keeps its original address and plan
+ok    the next board of an older save uses canonical sites
+ok    history retains the original site and address
+ok    a non-purchasing plan suggestion leaves the department and kit unchanged
+ok    a nonexistent officer cannot canvass
+ok    an injured officer cannot canvass
+ok    a fit officer canvasses once and is committed
+ok    an officer canvassing this call cannot be re-assigned to its operation
+ok    a failed canvass leaves the plan intact
+ok    planned members remain available while editing their own call
+ok    a successful canvass atomically transfers an officer out of the plan
+city integration: PASS

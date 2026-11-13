@@ -1,0 +1,21 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+size 1v1: A/B/draw 4/2/0 (6 games); 1 cases, 4.8 s elapsed
+size 2v2: A/B/draw 4/2/0 (6 games); 2 cases, 10.9 s elapsed
+size 3v3: A/B/draw 2/4/0 (6 games); 3 cases, 19.3 s elapsed
+size 5v5: A/B/draw 4/2/0 (6 games); 4 cases, 34.0 s elapsed
+size 8v8: A/B/draw 5/1/0 (6 games); 5 cases, 52.5 s elapsed
+size 10v10: A/B/draw 5/1/0 (6 games); 6 cases, 79.3 s elapsed
+size 2v5: A/B/draw 2/4/0 (6 games); 7 cases, 83.7 s elapsed
+size 5v2: A/B/draw 6/0/0 (6 games); 8 cases, 93.2 s elapsed
+size 3v5: A/B/draw 3/3/0 (6 games); 9 cases, 102.5 s elapsed
+size 5v3: A/B/draw 5/1/0 (6 games); 10 cases, 113.4 s elapsed
+size 5v8: A/B/draw 3/3/0 (6 games); 11 cases, 136.4 s elapsed
+size 8v5: A/B/draw 6/0/0 (6 games); 12 cases, 147.9 s elapsed
+size 5v10: A/B/draw 2/4/0 (6 games); 13 cases, 164.5 s elapsed
+size 10v5: A/B/draw 5/1/0 (6 games); 14 cases, 181.7 s elapsed
+DONE size: 14 cases, 84 matches -> /project_study_a/study-size.jsonl

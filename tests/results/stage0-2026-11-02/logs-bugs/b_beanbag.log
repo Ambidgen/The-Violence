@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+beanbag           s until an unarmed man who will not give up is cuffed (less) 221.76   221.76   FAIL
+    with: [240.0, 240.0, 240.0, 240.0, 21.1000000000002, 240.0, 240.0, 240.0, 240.0, 240.0, 240.0, 240.0]
+    without: [240.0, 240.0, 240.0, 240.0, 21.1000000000002, 240.0, 240.0, 240.0, 240.0, 240.0, 240.0, 240.0]
+0 of 1 items change the outcome (12 runs each way, 12 s)

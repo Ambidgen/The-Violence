@@ -1,0 +1,5 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+order         measure                                     with    without   gate
+post          distance from the post at the end, m (less)    1.38     9.89   PASS
+1 of 1 orders change the outcome (8 runs each way; at least 16 for tight/less, 32 for arrest; 43 s)

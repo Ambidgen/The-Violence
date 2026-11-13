@@ -1,0 +1,21 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+gang x20: success 17, partial 3, failure 0; 108 s each
+officers: 10.00 sent, 1.05 down, 0.30 killed per operation (3 outright, 3 bled out)
+suspects: 5.25, 3.75 down, 2.20 killed per operation
+officers hit by: { "Untrained": 3, "Militia / irregular": 14, "Regular infantry": 4 }
+range: { "<3 m": 15, "3-6 m": 3, "6-12 m": 3, ">12 m": 0 }
+recognition: { "had recognised the shooter": 7, "had not": 14 }
+first shot: { "police fired first": 16, "suspects fired first": 4 }
+police rounds that hit police: { "aimed at suspect, rifle, 1 wall(s)": 3 }
+what they were doing when hit:
+    6  lizard/flinch
+    4  lizard/under fire: to cover (moving
+    3  lizard/RULE 1 > B4
+    2  lizard/RULE 1 > B2
+    1  lizard/RULE 1 > B3
+    1  ape/stacked
+    1  lion/
+    1  lizard/RULE 1 > B5
+    1  lion/stacked
+    1  ape/

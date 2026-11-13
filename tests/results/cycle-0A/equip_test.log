@@ -1,0 +1,31 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+compact_pistol    s to the first shot from the holster (less)            0.98     1.14   PASS
+heavy_pistol      targets killed outright per hit, 6 m (more)            0.25     0.22   PASS
+smg               police rounds that met a wall and went through (less)   0.40     0.91   PASS
+sbr               s on target per acquisition, 6 m (less)                0.17     0.18   PASS
+assault_rifle     targets killed outright per hit, 15 m (more)           0.28     0.26   PASS
+battle_rifle      targets killed outright per hit, 15 m (more)           0.27     0.22   PASS
+shotgun           hits per round, 12 m (more)                            0.91     0.66   PASS
+marksman          hits per round, 38 m (more)                            0.32     0.19   PASS
+irons             s on target per acquisition, 18 m (more)               0.29     0.27   PASS
+magnified         hits per round, 38 m (more)                            0.35     0.19   PASS
+flashbang         officers hit in the entry of a room held by 3 rifles (fewer)   0.00     3.25   PASS
+ram               s to the first officer inside, outer doors locked (less)  10.33    19.02   PASS
+breach            s to the first officer inside, outer doors locked (less)   8.38    19.02   PASS
+shield            rounds through to an officer facing 3 rifles, 10 m (fewer)   1.02     0.69   FAIL
+light             s for police to recognize someone, at night (less)     0.48     0.55   PASS
+medkit            share of the downed who die after the operation (less)   0.10     0.23   PASS
+taser             s until an unarmed man who will not give up is cuffed (less) 149.01   224.14   PASS
+launcher          s until an unarmed man who will not give up is cuffed (less) 169.70   224.14   PASS
+oc_spray          s until an unarmed man who will not give up is cuffed (less) 129.22   224.14   PASS
+baton             s until an unarmed man who will not give up is cuffed (less) 192.77   224.14   PASS
+pepperball        s until an unarmed man who will not give up is cuffed (less) 203.66   224.14   PASS
+beanbag           s until an unarmed man who will not give up is cuffed (less) 224.10   208.28   FAIL
+stingball         barricaded suspects who end alive in cuffs (more)      1.00     0.25   PASS
+gas               barricaded suspects who end alive in cuffs (more)      0.75     0.17   PASS
+gas_mask          officer-seconds gassed taking a gassed room (less)     0.00     3.56   PASS
+sof_helmet        head hits survived: first, second                     20/20     0/20   PASS
+ballistic_helmet  handgun rounds to the head survived, any side (more)   0.83     0.00   PASS
+25 of 27 items change the outcome (12 runs each way, 340 s)

@@ -7,7 +7,7 @@ func _init() -> void:
 	id = "m02"
 	map_name = "Bunkhouse"
 	title = "THE VIOLENCE  -  02 BUNKHOUSE"
-	notes = ["BUNKROOM AND MESS HALL, 15 x 6 m, THREE DOORS", "WORK CAMP YARD  ·  1 SQUARE = 1 m", "MAP 02  ·  SHEET 3 OF 11"]
+	notes = ["BUNKROOM AND MESS HALL, 15 x 6 m, THREE DOORS", "WORK CAMP YARD  ·  1 SQUARE = 1 m", "MAP 02  ·  SHEET 3 OF 12"]
 	W = 36.0
 	H = 22.0
 	time_limit = 300.0

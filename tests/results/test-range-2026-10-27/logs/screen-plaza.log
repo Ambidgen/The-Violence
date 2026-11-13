@@ -1,0 +1,14 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+matrix untrained_vs_untrained: A/B/draw 0/0/1 (1 games); 1 cases, 51.3 s elapsed
+matrix militia_vs_sof: A/B/draw 0/1/0 (1 games); 2 cases, 52.8 s elapsed
+matrix regular_vs_regular: A/B/draw 0/1/0 (1 games); 3 cases, 56.2 s elapsed
+matrix regular_vs_police: A/B/draw 0/1/0 (1 games); 4 cases, 58.4 s elapsed
+matrix police_vs_regular: A/B/draw 0/1/0 (1 games); 5 cases, 64.1 s elapsed
+matrix sof_vs_militia: A/B/draw 1/0/0 (1 games); 6 cases, 67.7 s elapsed
+matrix sof_vs_sof: A/B/draw 0/1/0 (1 games); 7 cases, 71.1 s elapsed
+DONE matrix: 7 cases, 7 matches -> /project_study_a/study-plaza.jsonl

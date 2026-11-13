@@ -1,0 +1,17 @@
+civ_test         original exit 0 (4s) | broken exit 1 (4s) -> RED as expected
+equip_test       original exit 1 (59s) | broken exit 1 (59s) -> RED as expected
+   original tail: gas_mask          officer-seconds gassed taking a gassed room (less)     0.00     0.00   FAIL | sof_helmet        head hits survived: first, second                     20/20     0/20   PASS | ballistic_helmet  handgun rounds to the head survived, any side (more)   1.00     0.00   PASS | 18 of 27 items change the outcome (2 runs each way, 58 s)
+lethality_test   original exit 0 (13s) | broken exit 1 (13s) -> RED as expected
+maps_test        original exit 0 (1s) | broken exit 1 (1s) -> RED as expected
+nav_door_test    original exit 0 (1s) | broken exit 1 (1s) -> RED as expected
+op_test          original exit 0 (49s) | broken exit 1 (49s) -> RED as expected
+hold_test        original exit 0 (6s) | broken exit 1 (6s) -> RED as expected
+stall_test       original exit 0 (18s) | broken exit 1 (18s) -> RED as expected
+fuzz_test        original exit 0 (5s) | broken exit 1 (5s) -> RED as expected
+sim_test         original exit 0 (2s) | broken exit 1 (2s) -> RED as expected
+perf             original exit 0 +ENGINE-ERROR (1s) | broken exit 1 +ENGINE-ERROR (1s) -> RED as expected
+   original tail: WARNING: 28 ObjectDB instances were leaked at exit (run with `--verbose` for details). |    at: cleanup (core/object/object.cpp:2536) | ERROR: 9 resources still in use at exit (run with --verbose for details). |    at: clear (core/io/resource.cpp:822)
+duel_probe       original exit 0 (6s) | broken exit 1 (6s) -> RED as expected
+trace            original exit 0 +ENGINE-ERROR (1s) | broken exit 1 +ENGINE-ERROR (1s) -> RED as expected
+   original tail: WARNING: 32 ObjectDB instances were leaked at exit (run with `--verbose` for details). |    at: cleanup (core/object/object.cpp:2536) | ERROR: 9 resources still in use at exit (run with --verbose for details). |    at: clear (core/io/resource.cpp:822)
+playtest         original exit 0 (1s) | broken exit 1 (1s) -> RED as expected

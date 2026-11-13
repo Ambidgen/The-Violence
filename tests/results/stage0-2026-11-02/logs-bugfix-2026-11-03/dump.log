@@ -1,0 +1,165 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+    0 map 03 16v16 assault/assault civ  6 -> B at  21.2 s
+    1 map 04 13v15 hold   /hunt    civ  0 police -> B at  52.7 s
+    2 map 09  8v11 hold   /hunt    civ  2 -> A at  57.9 s
+    3 map 00  3v3  hunt   /assault civ  0 police -> B at  20.4 s
+    4 map 05  4v16 assault/assault civ  7 -> B at   5.7 s
+    5 map 05 13v3  assault/hunt    civ  0 -> A at  23.5 s
+    6 map 06 20v7  assault/hold    civ 11 -> A at   9.8 s
+    7 map 07 10v6  hunt   /assault civ  3 -> A at   9.4 s
+    8 map 11 20v12 hunt   /hunt    civ 13 -> A at  33.6 s
+    9 map 00 17v9  assault/hold    civ  0 -> A at  39.3 s
+   10 map 00  1v14 hold   /hold    civ  0 -> B at   2.5 s
+   11 map 08 13v18 hunt   /hold    civ  7 -> B at 171.2 s
+   12 map 00 19v2  assault/hold    civ  0 police -> A at  24.7 s
+   13 map 08 18v17 hunt   /assault civ  0 -> B at 353.7 s
+   14 map 01 10v13 assault/assault civ 12 police -> B at  13.4 s
+   15 map 07 14v16 hold   /hold    civ  0 police -> B at  57.2 s
+   16 map 11 16v7  hunt   /hunt    civ  0 -> A at  11.9 s
+      00:55.5  A16 DOWN (chest, by B10)
+      00:55.6  A5 takes command of Team A-5
+      00:55.6  B10 recognizes A5: 18.3 m, 16 deg off eye line
+      00:55.6  B10 calls: contact, 11 o'clock, 18 m
+      00:56.2  A5 re-sectors after the casualty
+      00:56.2  B10 on target A5 after 0.52 s (16 deg traverse)
+      00:56.8  A5 DOWN (chest, by B10)
+      00:56.8  A17 takes command of Team A-5
+      01:08.8  Team B-3: back to it
+      01:08.8  B10: reloading, nobody free to cover
+      01:11.7  B10 reloaded rifle (2 spare)
+      01:24.2  B10 recognizes A17: 3.1 m, 42 deg off eye line
+      01:24.2  B10 calls: contact, 10 o'clock, 3 m
+      01:24.7  B10 on target A17 after 0.51 s (43 deg traverse)
+      05:02.7  B12 dies of wounds
+      05:03.4  B4 dies of wounds
+      05:04.2  A14 dies of wounds
+      05:04.6  B14 dies of wounds
+      05:05.2  A12 dies of wounds
+      05:05.9  A6 dies of wounds
+      05:06.6  A13 dies of wounds
+      05:07.2  B8 dies of wounds
+      05:16.5  B7 dies of wounds
+      05:31.4  A7 dies of wounds
+      05:54.8  A1 dies of wounds
+      05:55.1  A4 dies of wounds
+      05:55.5  A16 dies of wounds
+      05:56.8  A5 dies of wounds
+      07:00.0  DRAW at 420.0 s. 128 shots, 29 hits.
+      07:00.0    A1 Untrained: 5 shots, 1 hits, 1 down; DEAD
+      07:00.0    A2 Militia / irregular: 2 shots, 1 hits, 1 down; DEAD
+      07:00.0    A3 Patrol: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    A4 Special operations: 3 shots, 1 hits, 0 down; DEAD
+      07:00.0    A5 Militia / irregular: 6 shots, 1 hits, 1 down; DEAD
+      07:00.0    A6 Patrol: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    A7 Special operations: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    A8 Untrained: 0 shots, 0 hits, 1 down; DEAD
+      07:00.0    A9 Patrol: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    A10 Patrol: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    A11 Militia / irregular: 8 shots, 2 hits, 2 down; DEAD
+      07:00.0    A12 Special operations: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    A13 Special operations: 4 shots, 1 hits, 1 down; DEAD
+      07:00.0    A14 Regular infantry: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    A15 Special operations: 5 shots, 2 hits, 2 down; DEAD
+      07:00.0    A16 Militia / irregular: 2 shots, 0 hits, 0 down; DEAD
+      07:00.0    A17 Patrol: 5 shots, 1 hits, 0 down; OK
+      07:00.0    B1 Regular infantry: 3 shots, 2 hits, 2 down; GAVE UP
+      07:00.0    B2 Police tactical: 1 shots, 0 hits, 0 down; DEAD
+      07:00.0    B3 Militia / irregular: 12 shots, 2 hits, 1 down; ARRESTED
+      07:00.0    B4 Police tactical: 0 shots, 0 hits, 1 down; DEAD
+      07:00.0    B5 Special operations: 3 shots, 0 hits, 0 down; DEAD
+      07:00.0    B6 Militia / irregular: 0 shots, 0 hits, 0 down; DEAD
+      07:00.0    B7 Police tactical: 12 shots, 4 hits, 2 down; DEAD
+      07:00.0    B8 Militia / irregular: 5 shots, 0 hits, 0 down; DEAD
+      07:00.0    B9 Regular infantry: 3 shots, 0 hits, 1 down; DEAD
+      07:00.0    B10 Regular infantry: 23 shots, 8 hits, 6 down; OK
+      07:00.0    B11 Untrained: 1 shots, 0 hits, 0 down; ARRESTED
+      07:00.0    B12 Untrained: 0 shots, 0 hits, 0 down; GAVE UP
+      07:00.0    B13 Militia / irregular: 14 shots, 2 hits, 2 down; GAVE UP
+      07:00.0    B14 Police tactical: 11 shots, 1 hits, 1 down; DEAD
+      A17 el 4 (28.2, 19.7) room E LIVING dbg RULE 1 > B1
+      B1 el 0 (28.9, 21.2) room E PORCH dbg lone wolf push
+      B3 el 0 (24.9, 19.8) room E KITCHEN dbg hunting
+      B10 el 2 (29.1, 22.6) room OUT dbg RULE 1 > A17
+      B11 el 2 (29.5, 21.6) room E PORCH dbg holding fighting position
+      B13 el 0 (29.0, 21.7) room E PORCH dbg lone wolf push
+   17 map 05 17v14 assault/hunt    civ  0 police -> draw at 420.0 s
+   18 map 11  3v13 hunt   /assault civ  0 -> B at   3.1 s
+   19 map 05 16v12 assault/hold    civ  0 -> A at  22.6 s
+   20 map 06  2v5  hunt   /hunt    civ  0 -> B at  26.1 s
+   21 map 01 19v9  hold   /hold    civ  0 -> A at   5.4 s
+      03:27.1  B12 calls: contact, 1 o'clock, 25 m
+      03:27.9  B12 on target A13 after 0.82 s (31 deg traverse)
+      03:28.2  A13 wounded (chest)
+      03:28.9  A13 DOWN (chest, by B12)
+      03:28.9  A14 takes command of Team A-4
+      03:29.7  B12 recognizes A15: 23.5 m, 10 deg off eye line
+      03:29.7  B12 calls: contact, 12 o'clock, 23 m
+      03:30.1  B12 on target A15 after 0.46 s (10 deg traverse)
+      03:30.1  A15 DOWN (chest, by B12)
+      03:30.2  A14, last of Team A-4, joins Team A-3
+      03:40.3  Team B-1 enters the guard room
+      03:42.3  A9 recognizes B11: 22.9 m, 0 deg off eye line
+      03:42.3  A9 calls: contact, 12 o'clock, 22 m
+      03:42.5  A9 recognizes B12: 23.9 m, 0 deg off eye line
+      03:42.5  A9 calls: contact, 12 o'clock, 23 m
+      05:02.0  B9 dies of wounds
+      05:03.5  A16 dies of wounds
+      05:05.2  B4 dies of wounds
+      05:06.6  A6 dies of wounds
+      05:10.3  B10 dies of wounds
+      05:15.6  B5 dies of wounds
+      05:17.9  B8 dies of wounds
+      05:26.3  A2 dies of wounds
+      05:39.3  A1 dies of wounds
+      05:52.8  A8 dies of wounds
+      08:28.9  A13 dies of wounds
+      08:30.1  A15 dies of wounds
+      10:00.0  DRAW at 600.0 s. 212 shots, 36 hits.
+      10:00.0    A1 Patrol: 0 shots, 0 hits, 0 down; DEAD
+      10:00.0    A2 Special operations: 11 shots, 5 hits, 2 down; DEAD
+      10:00.0    A3 Untrained: 19 shots, 2 hits, 2 down; DEAD
+      10:00.0    A4 Untrained: 10 shots, 1 hits, 0 down; DEAD
+      10:00.0    A5 Patrol: 7 shots, 0 hits, 0 down; DEAD
+      10:00.0    A6 Regular infantry: 0 shots, 0 hits, 0 down; DEAD
+      10:00.0    A7 Police tactical: 7 shots, 0 hits, 0 down; DEAD
+      10:00.0    A8 Police tactical: 3 shots, 2 hits, 1 down; DEAD
+      10:00.0    A9 Special operations: 13 shots, 0 hits, 0 down; OK
+      10:00.0    A10 Patrol: 4 shots, 1 hits, 1 down; OK
+      10:00.0    A11 Untrained: 1 shots, 0 hits, 0 down; DEAD
+      10:00.0    A12 Police tactical: 6 shots, 0 hits, 0 down; DEAD
+      10:00.0    A13 Regular infantry: 5 shots, 1 hits, 1 down; DEAD
+      10:00.0    A14 Untrained: 0 shots, 0 hits, 0 down; OK
+      10:00.0    A15 Militia / irregular: 0 shots, 0 hits, 0 down; DEAD
+      10:00.0    A16 Special operations: 0 shots, 0 hits, 0 down; DEAD
+      10:00.0    A17 Untrained: 0 shots, 0 hits, 0 down; OK
+      10:00.0    A18 Militia / irregular: 0 shots, 0 hits, 0 down; OK
+      10:00.0    A19 Untrained: 0 shots, 0 hits, 0 down; OK
+      10:00.0    A20 Regular infantry: 5 shots, 0 hits, 0 down; OK
+      10:00.0    B1 Special operations: 25 shots, 5 hits, 4 down; DEAD
+      10:00.0    B2 Regular infantry: 0 shots, 0 hits, 0 down; ARRESTED
+      10:00.0    B3 Patrol: 24 shots, 5 hits, 2 down; GAVE UP
+      10:00.0    B4 Police tactical: 6 shots, 0 hits, 0 down; DEAD
+      10:00.0    B5 Special operations: 22 shots, 4 hits, 2 down; DEAD
+      10:00.0    B6 Militia / irregular: 1 shots, 0 hits, 0 down; ARRESTED
+      10:00.0    B7 Untrained: 23 shots, 2 hits, 2 down; GAVE UP
+      10:00.0    B8 Regular infantry: 1 shots, 0 hits, 0 down; DEAD
+      10:00.0    B9 Militia / irregular: 0 shots, 0 hits, 0 down; DEAD
+      10:00.0    B10 Regular infantry: 6 shots, 2 hits, 0 down; DEAD
+      10:00.0    B11 Untrained: 9 shots, 3 hits, 1 down; OK
+      10:00.0    B12 Special operations: 4 shots, 3 hits, 2 down; OK
+      A9 el 2 (12.6, 39.5) room OUT dbg RULE 1 > B3
+      A10 el 2 (11.9, 38.7) room OUT dbg RULE 1 > B3
+      A14 el 2 (33.8, 47.2) room OUT dbg engage > B7
+      A17 el 4 (2.4, 14.1) room OUT dbg hunting
+      A18 el 4 (2.6, 18.9) room OUT dbg hunting
+      A19 el 4 (3.4, 19.5) room OUT dbg hunting
+      A20 el 4 (12.1, 14.5) room OUT dbg waiting (tether)
+      B2 el 0 (2.4, 12.6) room OUT dbg 
+      B3 el 0 (17.2, 38.7) room OUT dbg sweeping
+      B7 el 0 (16.3, 39.1) room OUT dbg sweeping
+      B11 el 3 (35.1, 35.5) room OUT dbg supporting Team B-1
+      B12 el 3 (35.8, 36.6) room OUT dbg supporting Team B-1
+   22 map 09 20v12 hunt   /assault civ  0 police -> draw at 600.0 s
+fuzz matches 23: A 10  B 11  draw 2 (time limit 2)   sim 1985 s in 136843 ms
+bad habits activated: 27/27  missing: []

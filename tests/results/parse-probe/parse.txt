@@ -1,0 +1,12 @@
+===== scripts/ui/ops_ui.gd
+scripts/ui/ops_ui.gd: 202 top-level blocks, prologue 1 lines
+the engine does NOT report "Unindent doesn't match" for the whole file
+
+===== scripts/main.gd
+scripts/main.gd: 287 top-level blocks, prologue 1 lines
+the engine does NOT report "Unindent doesn't match" for the whole file
+
+===== scripts/ui/city_map.gd
+scripts/ui/city_map.gd: 25 top-level blocks, prologue 1 lines
+the engine does NOT report "Unindent doesn't match" for the whole file
+

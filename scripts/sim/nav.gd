@@ -4,11 +4,13 @@ extends RefCounted
 ##   profile 0: shortest path          profile 1: + PF01 doorway cost (x8)
 ##   profile 2: + PF02 exposure cost   profile 3: both
 ## Exposure is static: each cell pays +3 per door or window that can see it (cap +9).
-## Precomputed once per map (on a 1 m lattice for big maps) and cached across matches.
+## Precomputed once per map on the 0.25 m lattice and cached across matches (the city
+## keeps one lattice per building template instead: see scripts/city/city_nav.gd).
 
 const Geom = preload("res://scripts/sim/geom.gd")
 const CS := 0.25            # cell size, metres
 const RADIUS := 0.30        # body radius + margin
+const PATH_CLEARANCE := Geom.MOVE_CLEARANCE # same swept body as the movement integrator
 
 static var _cache := {}     # map id -> layers and grids, shared between World instances
 
@@ -23,10 +25,6 @@ var w_expo := PackedFloat32Array()
 var grids: Array = []
 var cover_spots: Array = []     # [{p: Vector2, gap: float}] candidate cover positions
 var _spot_cells := {}           # Vector2i (2 m cell) -> Array of spots
-## Door leaves: `solid` and the four grids are shared through the static cache,
-## so anything blocked during a match has to be put back when a map is reloaded.
-var _base_solid := PackedByteArray()
-var _blocked := {}              # Vector2i -> true, cells blocked by a closed door
 
 
 func build(lv) -> void:
@@ -44,9 +42,6 @@ func build(lv) -> void:
 		cover_spots = c["cover"]
 		grids = c["grids"]
 		_spot_cells = c["spot_cells"]
-		_base_solid = c["base_solid"]
-		reset_blocks()
-		sync_doors(lv)
 		lv.snap_posts(self)
 		return
 	_build_layers()
@@ -86,59 +81,9 @@ func build(lv) -> void:
 		if not _spot_cells.has(k):
 			_spot_cells[k] = []
 		_spot_cells[k].append(c)
-	_base_solid = solid.duplicate()
 	_cache[key] = {"solid": solid, "reach": reach, "w_door": w_door, "w_expo": w_expo, "cover": cover_spots,
-		"grids": grids, "spot_cells": _spot_cells, "base_solid": _base_solid}
-	sync_doors(lv)
+		"grids": grids, "spot_cells": _spot_cells}
 	lv.snap_posts(self)
-
-
-## Put every cell a door leaf blocked back the way it was.
-func reset_blocks() -> void:
-	if _blocked.is_empty():
-		return
-	for c in _blocked.keys():
-		var i: int = c.y * nx + c.x
-		solid[i] = _base_solid[i]
-		for g in grids:
-			g.set_point_solid(c, solid[i] == 1)
-	_blocked.clear()
-	_flood()
-
-
-## Close every door the level says is closed, and reopen the rest.
-func sync_doors(lv) -> void:
-	reset_blocks()
-	for did in lv.doors:
-		var D: Dictionary = lv.doors[did]
-		if D.get("state", "open") == "open":
-			continue
-		if D.has("leaf_rect"):
-			block_rect(D["leaf_rect"])
-
-
-## Mark every cell of a rectangle solid, remembering them so reset_blocks() undoes it.
-func block_rect(r: Rect2) -> void:
-	if _base_solid.is_empty():
-		_base_solid = solid.duplicate()
-	var x0 := clampi(int(floor(r.position.x / CS)), 0, nx - 1)
-	var x1 := clampi(int(floor(r.end.x / CS)), 0, nx - 1)
-	var y0 := clampi(int(floor(r.position.y / CS)), 0, ny - 1)
-	var y1 := clampi(int(floor(r.end.y / CS)), 0, ny - 1)
-	var any := false
-	for y in range(y0, y1 + 1):
-		for x in range(x0, x1 + 1):
-			var c := Vector2i(x, y)
-			var i: int = y * nx + x
-			if solid[i] == 1:
-				continue
-			_blocked[c] = true
-			solid[i] = 1
-			any = true
-			for g in grids:
-				g.set_point_solid(c, true)
-	if any:
-		_flood()
 
 
 ## Cover spots within r of p, as [distance_squared, spot] pairs sorted nearest first.
@@ -176,7 +121,7 @@ func _build_layers() -> void:
 	for y in ny:
 		for x in nx:
 			var p := cell_centre(Vector2i(x, y))
-			solid[y * nx + x] = 1 if geom.blocked_disc(p, RADIUS, false) else 0
+			solid[y * nx + x] = 1 if geom.blocked_disc(p, RADIUS) else 0
 	# PF01: doorway (threshold) cells within 1.5 m of every door
 	for id in level.doors:
 		var c: Vector2 = level.doors[id]["c"]
@@ -188,19 +133,19 @@ func _build_layers() -> void:
 					w_door[y * nx + x] = 7.0
 	# PF02: exposure from each opening's viewpoints, on a 0.5 m coarse grid within 14 m
 	var step := 2 if lv_area() <= 1200.0 else 4
-	var reach := 14.0
+	var reach_m := 14.0
 	for o in level.openings:
 		for vp in o["vps"]:
 			if geom.blocked_disc(vp, 0.05):
 				continue
-			var y0 := maxi(0, int((vp.y - reach) / CS) / step * step)
-			var x0 := maxi(0, int((vp.x - reach) / CS) / step * step)
-			var y1 := mini(ny, int((vp.y + reach) / CS) + 1)
-			var x1 := mini(nx, int((vp.x + reach) / CS) + 1)
+			var y0 := maxi(0, int((vp.y - reach_m) / CS) / step * step)
+			var x0 := maxi(0, int((vp.x - reach_m) / CS) / step * step)
+			var y1 := mini(ny, int((vp.y + reach_m) / CS) + 1)
+			var x1 := mini(nx, int((vp.x + reach_m) / CS) + 1)
 			for y in range(y0, y1, step):
 				for x in range(x0, x1, step):
 					var p := cell_centre(Vector2i(x, y)) + Vector2(CS, CS) * 0.5 * (step - 1)
-					if p.distance_to(vp) > reach:
+					if p.distance_to(vp) > reach_m:
 						continue
 					if not geom.sight_clear(vp, 1.65, p, 1.3):
 						continue
@@ -260,7 +205,9 @@ func _flood() -> void:
 		cid += 1
 	reach.resize(n)
 	for i in n:
-		reach[i] = 1 if comp[i] == best_id else 0
+		# With no free cells best_id remains -1, as do all unvisited solid
+		# cells. They are not a connected region.
+		reach[i] = 1 if best_id >= 0 and comp[i] == best_id else 0
 
 
 func cell_of(p: Vector2) -> Vector2i:
@@ -271,18 +218,31 @@ func cell_centre(c: Vector2i) -> Vector2:
 	return Vector2((c.x + 0.5) * CS, (c.y + 0.5) * CS)
 
 
-## Free and in the main connected region.
+## A cell's centre is clear, but an arbitrary point in that cell can still put a
+## shoulder through a wall. Also do not let cell_of()'s clamping make off-map points
+## look walkable.
+func _in_bounds(p: Vector2) -> bool:
+	return nx > 0 and ny > 0 and p.is_finite() and p.x >= 0.0 and p.y >= 0.0 and p.x < level.W and p.y < level.H
+
+
+## Free and in the main connected region, with clearance for the actual point.
 func reachable(p: Vector2) -> bool:
+	if not _in_bounds(p):
+		return false
 	var c := cell_of(p)
-	return reach[c.y * nx + c.x] == 1
+	return reach[c.y * nx + c.x] == 1 and not geom.blocked_disc(p, RADIUS)
 
 
 func is_free(p: Vector2) -> bool:
+	if not _in_bounds(p):
+		return false
 	var c := cell_of(p)
-	return solid[c.y * nx + c.x] == 0
+	return solid[c.y * nx + c.x] == 0 and not geom.blocked_disc(p, RADIUS)
 
 
 func nearest_free(p: Vector2) -> Vector2i:
+	if nx <= 0 or ny <= 0 or reach.is_empty() or not p.is_finite():
+		return Vector2i(-1, -1)
 	var c := cell_of(p)
 	if reach[c.y * nx + c.x] == 1:
 		return c
@@ -303,14 +263,56 @@ func nearest_free(p: Vector2) -> Vector2i:
 						best = q
 		if best.x >= 0:
 			return best
-	return c
+	# Large pieces of furniture and off-map destinations can be more than 2.75 m
+	# from floor. Never return the original solid cell to AStar as if it were free.
+	var best := Vector2i(-1, -1)
+	var bd := INF
+	for y in ny:
+		for x in nx:
+			if reach[y * nx + x] == 1:
+				var q := Vector2i(x, y)
+				var d := cell_centre(q).distance_squared_to(p)
+				if d < bd:
+					bd = d
+					best = q
+	return best
 
 
 func snap(p: Vector2) -> Vector2:
-	var c := cell_of(p)
-	if reach[c.y * nx + c.x] == 1:
+	if reachable(p):
 		return p
-	return cell_centre(nearest_free(p))
+	var c := nearest_free(p)
+	# No walkable floor: callers can keep their original point, and find_path()
+	# reports failure rather than inventing a position outside the map.
+	return cell_centre(c) if c.x >= 0 else p
+
+
+## A displaced actor may be clear but just outside the lattice. Its nearest free
+## centre can be across a corner or wall; search nearby centres it can actually
+## reach before declaring the actor stuck. Do not teleport a disconnected start.
+func _start_cell(p: Vector2) -> Vector2i:
+	var first := nearest_free(p)
+	if first.x < 0 or geom.move_clear(p, cell_centre(first), PATH_CLEARANCE):
+		return first
+	var c := cell_of(p)
+	for r in range(1, 12):
+		var best := Vector2i(-1, -1)
+		var bd := INF
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if absi(dx) != r and absi(dy) != r:
+					continue
+				var q := c + Vector2i(dx, dy)
+				if q.x < 0 or q.y < 0 or q.x >= nx or q.y >= ny or reach[q.y * nx + q.x] != 1:
+					continue
+				var centre := cell_centre(q)
+				var d := centre.distance_squared_to(p)
+				if d < bd and geom.move_clear(p, centre, PATH_CLEARANCE):
+					best = q
+					bd = d
+		if best.x >= 0:
+			return best
+	return Vector2i(-1, -1)
 
 
 func weight_at(prof: int, p: Vector2) -> float:
@@ -334,28 +336,132 @@ func exposure_at(p: Vector2) -> float:
 var path_calls := 0
 var path_us := 0
 
+## Avoid overlays (v0.7 order Avoid): per squad, the cells of the rooms it must keep out
+## of cost AVOID_W more to cross. They get their own grids, built on first use and
+## cached with the map (a squad keeps its overlay key for the whole operation).
+const AVOID_W := 400.0
+static var _avoid_cache := {}   # map id + key -> {"mask": PackedByteArray, "grids": {prof: AStarGrid2D}}
+var _mask := PackedByteArray()  # the overlay in use during one search (empty: none)
 
-func find_path(prof: int, a: Vector2, b: Vector2) -> PackedVector2Array:
+
+## Register the overlay for a set of rooms; returns its key ("" for no rooms).
+func avoid_key(rooms: Array) -> String:
+	if rooms.is_empty():
+		return ""
+	var names := rooms.duplicate()
+	names.sort()
+	var key := "%s|%s" % [level.id, ",".join(names)]
+	if _avoid_cache.has(key):
+		return key
+	var mask := PackedByteArray()
+	mask.resize(nx * ny)
+	mask.fill(0)
+	for rm in names:
+		if not level.rooms.has(rm):
+			continue
+		for rv in level.rooms[rm]["rects"]:
+			var r: Rect2 = (rv as Rect2).grow(0.05)
+			var c0 := cell_of(r.position)
+			var c1 := cell_of(r.end)
+			for y in range(c0.y, c1.y + 1):
+				for x in range(c0.x, c1.x + 1):
+					if r.has_point(cell_centre(Vector2i(x, y))):
+						mask[y * nx + x] = 1
+	_avoid_cache[key] = {"mask": mask, "grids": {}}
+	return key
+
+
+func avoid_mask(key: String) -> PackedByteArray:
+	if key == "" or not _avoid_cache.has(key):
+		return PackedByteArray()
+	return _avoid_cache[key]["mask"]
+
+
+func _avoid_grid(key: String, prof: int) -> AStarGrid2D:
+	var rec: Dictionary = _avoid_cache[key]
+	if rec["grids"].has(prof):
+		return rec["grids"][prof]
+	var mask: PackedByteArray = rec["mask"]
+	var g := AStarGrid2D.new()
+	g.region = Rect2i(0, 0, nx, ny)
+	g.cell_size = Vector2(1, 1)
+	g.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+	g.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+	g.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+	g.update()
+	for y in ny:
+		for x in nx:
+			var i := y * nx + x
+			if solid[i] == 1:
+				g.set_point_solid(Vector2i(x, y), true)
+				continue
+			var w := 1.0
+			if prof & 1:
+				w += w_door[i]
+			if prof & 2:
+				w += w_expo[i]
+			if mask[i] == 1:
+				w += AVOID_W
+			if w != 1.0:
+				g.set_point_weight_scale(Vector2i(x, y), w)
+	rec["grids"][prof] = g
+	return g
+
+
+func find_path(prof: int, a: Vector2, b: Vector2, avoid := "") -> PackedVector2Array:
 	path_calls += 1
 	var t0 := Time.get_ticks_usec()
-	var res := _find_path(prof, a, b)
+	var res: PackedVector2Array
+	if avoid != "" and _avoid_cache.has(avoid):
+		_mask = _avoid_cache[avoid]["mask"]
+		res = _find_path(prof, a, b, _avoid_grid(avoid, clampi(prof, 0, 3)))
+		_mask = PackedByteArray()
+	else:
+		res = _find_path(prof, a, b)
 	path_us += Time.get_ticks_usec() - t0
 	return res
 
 
-func _find_path(prof: int, a: Vector2, b: Vector2) -> PackedVector2Array:
-	var g: AStarGrid2D = grids[clampi(prof, 0, 3)]
-	var ca := nearest_free(a)
+func _find_path(prof: int, a: Vector2, b: Vector2, grid: AStarGrid2D = null) -> PackedVector2Array:
+	# No lattice is not evidence that a direct line is safe.
+	if grids.is_empty() or not a.is_finite() or not b.is_finite():
+		return PackedVector2Array()
+	var g: AStarGrid2D = grid if grid != null else grids[clampi(prof, 0, 3)]
+	# A source just outside the lattice's clearance may walk back to a reachable
+	# cell. One inside a wall, off-map, or isolated behind a wall must not be
+	# silently teleported into the main region.
+	if geom.blocked_disc(a, 0.01):
+		return PackedVector2Array()
+	var ca := _start_cell(a)
 	var cb := nearest_free(b)
+	if ca.x < 0 or cb.x < 0:
+		return PackedVector2Array()
+	var start := cell_centre(ca)
+	var finish := cell_centre(cb)
 	var ids: Array[Vector2i] = g.get_id_path(ca, cb)
-	var pts := PackedVector2Array()
 	if ids.is_empty():
-		return pts
-	pts.append(a if is_free(a) else cell_centre(ca))
-	for k in range(1, ids.size() - 1):
+		return PackedVector2Array()
+	var pts := PackedVector2Array([a])
+	if not a.is_equal_approx(start):
+		pts.append(start)
+	for k in range(1, ids.size()):
 		pts.append(cell_centre(ids[k]))
-	pts.append(b if is_free(b) else cell_centre(cb))
-	return _smooth(prof, pts)
+	# A cell can be free yet belong to a disconnected pocket. Only use the
+	# requested endpoint when the point itself is safe AND in the main region.
+	if reachable(b) and geom.move_clear(finish, b, PATH_CLEARANCE):
+		if not pts[pts.size() - 1].is_equal_approx(b):
+			pts.append(b)
+	elif not pts[pts.size() - 1].is_equal_approx(finish):
+		pts.append(finish)
+	if pts.size() == 1:
+		pts.append(pts[0])
+	var out := _smooth(prof, pts)
+	# Even adjacent lattice points and the two endpoint legs need validation;
+	# _smooth() cannot shorten them any further if they are not clear.
+	for k in range(1, out.size()):
+		if not geom.move_clear(out[k - 1], out[k], PATH_CLEARANCE):
+			return PackedVector2Array()
+	return out
 
 
 func _smooth(prof: int, pts: PackedVector2Array) -> PackedVector2Array:
@@ -380,22 +486,29 @@ func _w(prof: int, i: int) -> float:
 		v += w_door[i]
 	if prof & 2:
 		v += w_expo[i]
+	if not _mask.is_empty() and _mask[i] == 1:
+		v += AVOID_W
 	return v
 
 
+## Can a smoothed leg run from a to b? Two questions: does it cross any cell that is not
+## walkable or that costs more than the cell it starts in, and — the part the cell test
+## never answered — does the *body* fit along it.
 func line_ok(prof: int, a: Vector2, b: Vector2) -> bool:
 	var steps := int(a.distance_to(b) / CS) + 1
 	var w0 := 1.0
-	if prof != 0:
+	if prof != 0 or not _mask.is_empty():
 		w0 = _w(prof, clampi(int(a.y / CS), 0, ny - 1) * nx + clampi(int(a.x / CS), 0, nx - 1))
 	for k in range(1, steps + 1):
 		var p := a.lerp(b, float(k) / steps)
 		var i := clampi(int(p.y / CS), 0, ny - 1) * nx + clampi(int(p.x / CS), 0, nx - 1)
 		if solid[i] == 1:
 			return false
-		if prof != 0 and _w(prof, i) > w0 + 0.01:
+		if (prof != 0 or not _mask.is_empty()) and _w(prof, i) > w0 + 0.01:
 			return false
-	return true
+	# Use the same swept clearance as the movement integrator. In particular, a
+	# replan from just outside a jamb must not smooth a leg the actor cannot follow.
+	return geom.move_clear(a, b, PATH_CLEARANCE)
 
 
 func path_length(pts: PackedVector2Array) -> float:

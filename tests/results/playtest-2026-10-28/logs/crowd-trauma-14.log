@@ -1,0 +1,14 @@
+PCK /tmp/violence-browser/web/index.pck 47 2747712
+Adapted event_probe as Node for Web template with arguments: ['--trauma=14', '--n=4']
+GODOT log Engine missing features []
+GODOT log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+GODOT log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+GODOT log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+GODOT log seed 5000: { "attack": false, "civ_hit_police": 16, "civ_killed": 8, "police_shots": 33, "misjudged": 7 }
+GODOT log seed 5017: { "attack": false, "civ_hit_police": 6, "civ_killed": 4, "police_shots": 8, "misjudged": 4 }
+GODOT log seed 5034: { "attack": false, "civ_hit_police": 9, "civ_killed": 6, "police_shots": 25, "misjudged": 6 }
+GODOT log seed 5051: { "attack": false, "civ_hit_police": 12, "civ_killed": 7, "police_shots": 26, "misjudged": 6 }
+GODOT log TOTAL habits= officers=2 morale=60 n=4: { "civ_hit_police": 43, "civ_killed": 25, "police_shots": 92, "misjudged": 23, "attacks": 0 }
+GODOT log PROBE_DONE
+PROBE_FINISHED errors= 0
+GODOT log GAME_STARTED

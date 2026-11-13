@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+shield            rounds through to an officer facing 3 rifles, 10 m (fewer)   1.02     0.69   FAIL
+    with: [0, 0, 3, 1, 0, 0, 0, 0, 3, 2, 0, 1, 3, 1, 0, 0, 3, 0, 0, 0, 2, 2, 2, 1, 1, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 4, 0, 3, 3, 4, 0, 0]
+    without: [0, 0, 2, 1, 0, 0, 0, 0, 2, 2, 0, 2, 0, 1, 0, 0, 1, 0, 0, 0, 2, 1, 4, 3, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0]
+0 of 1 items change the outcome (12 runs each way, 1 s)

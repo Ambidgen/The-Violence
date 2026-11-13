@@ -1,0 +1,255 @@
+{
+  "cases": {
+    "cover_repro": {
+      "digest": "a43a4ac72b315e12",
+      "hits": 14,
+      "ops": {
+        "A1": "e20386e6",
+        "A2": "c67b63ed",
+        "A3": "b924646d",
+        "A4": "42014cbd",
+        "A5": "4988edc7",
+        "B1": "027b33f9",
+        "B2": "6cf48aaf",
+        "B3": "d1dce6f1",
+        "B4": "b0833dc5",
+        "B5": "e83a650e"
+      },
+      "parts": {
+        "operators": "1850c44f3a91757e",
+        "rng": "-1401010498577551576",
+        "stat": "fb9bc6e0ff383aa1"
+      },
+      "shots": 135,
+      "sums": {
+        "rec_sum_0": 6.733333,
+        "rec_sum_1": 8.933333,
+        "tot_sum_0": 16.237361,
+        "tot_sum_1": 7.659239
+      },
+      "time": 87.1,
+      "timeout": false,
+      "winner": 1
+    },
+    "lane_repro": {
+      "digest": "5cddc65a01138ae7",
+      "hits": 19,
+      "ops": {
+        "A1": "0b4c0afc",
+        "A2": "fc9ad782",
+        "A3": "3abb8a50",
+        "A4": "d347366d",
+        "A5": "e45c8783",
+        "B1": "6d4cb5ce",
+        "B2": "21113035",
+        "B3": "c0f843e7",
+        "B4": "c9a30953",
+        "B5": "755eb825"
+      },
+      "parts": {
+        "operators": "d4eb6c0d73a378eb",
+        "rng": "-7147221261847583146",
+        "stat": "f83704236f3404ee"
+      },
+      "shots": 74,
+      "sums": {
+        "rec_sum_0": 5.833333,
+        "rec_sum_1": 3.833333,
+        "tot_sum_0": 3.879676,
+        "tot_sum_1": 0.962297
+      },
+      "time": 53.133,
+      "timeout": false,
+      "winner": 0
+    },
+    "large_team": {
+      "digest": "29522ceff11074ad",
+      "hits": 18,
+      "ops": {
+        "A1": "dc4dae69",
+        "A10": "148118e2",
+        "A2": "8b9527ef",
+        "A3": "380eb3e9",
+        "A4": "20c0011e",
+        "A5": "714d00df",
+        "A6": "3ba7b659",
+        "A7": "4db9f6de",
+        "A8": "d52a0acf",
+        "A9": "7e1b9c95",
+        "B1": "6450a884",
+        "B10": "d0bc5b54",
+        "B2": "1569e81d",
+        "B3": "ecc8288b",
+        "B4": "330c1a29",
+        "B5": "3a7d5140",
+        "B6": "75c4b0df",
+        "B7": "b4ee6a76",
+        "B8": "92e0a080",
+        "B9": "06b1243d"
+      },
+      "parts": {
+        "operators": "0ef1fa3d0d9f7880",
+        "rng": "-7639142901281630825",
+        "stat": "1d3a30a9abd90b17"
+      },
+      "shots": 60,
+      "sums": {
+        "rec_sum_0": 12.266667,
+        "rec_sum_1": 6.6,
+        "tot_sum_0": 7.321621,
+        "tot_sum_1": 2.17877
+      },
+      "time": 21.867,
+      "timeout": false,
+      "winner": 0
+    },
+    "militia_patrol": {
+      "digest": "22b1574f237d1cd3",
+      "hits": 7,
+      "ops": {
+        "A1": "83f77b24",
+        "A2": "fa82c02f",
+        "A3": "3338aaaf",
+        "B1": "abda0d32",
+        "B2": "92ddd2ed",
+        "B3": "c5a48f57"
+      },
+      "parts": {
+        "operators": "db997f58c0bc0c27",
+        "rng": "-8046374173598937280",
+        "stat": "dc5f2fe27cf8c07a"
+      },
+      "shots": 17,
+      "sums": {
+        "rec_sum_0": 1.166667,
+        "rec_sum_1": 2.333333,
+        "tot_sum_0": 1.509869,
+        "tot_sum_1": 1.365964
+      },
+      "time": 26.867,
+      "timeout": false,
+      "winner": 1
+    },
+    "motel": {
+      "digest": "e28bccc7b7b20080",
+      "hits": 18,
+      "ops": {
+        "A1": "41006301",
+        "A2": "e311a541",
+        "A3": "a073bf86",
+        "A4": "092e6106",
+        "A5": "eb6a9c8e",
+        "A6": "9dbcdad7",
+        "A7": "1c15fb9c",
+        "A8": "237ef228",
+        "B1": "a98182e1",
+        "B2": "4d5c3de6",
+        "B3": "ed7b62a1",
+        "B4": "e05db65c",
+        "B5": "bcda6630",
+        "B6": "3fc1c82c",
+        "B7": "8abadfda",
+        "B8": "c3cdf8e9"
+      },
+      "parts": {
+        "operators": "3c38e76f8aed6d8f",
+        "rng": "-3210071015635483300",
+        "stat": "87df2f2c75d3aaf1"
+      },
+      "shots": 63,
+      "sums": {
+        "rec_sum_0": 12.466667,
+        "rec_sum_1": 8.633333,
+        "tot_sum_0": 6.856424,
+        "tot_sum_1": 4.731595
+      },
+      "time": 131.367,
+      "timeout": false,
+      "winner": 0
+    },
+    "shield": {
+      "digest": "cbe19dde9f9fb637",
+      "hits": 13,
+      "ops": {
+        "A1": "98213936",
+        "A2": "a3d2615e",
+        "A3": "ad9a03a8",
+        "B1": "e011e6e9",
+        "B2": "286dd6f2",
+        "B3": "e075e37b"
+      },
+      "parts": {
+        "operators": "6249bd48e8a742d6",
+        "rng": "-7121458047122590634",
+        "stat": "e0335b544b6769d7"
+      },
+      "shots": 100,
+      "sums": {
+        "rec_sum_0": 2.866667,
+        "rec_sum_1": 1.233333,
+        "tot_sum_0": 4.266503,
+        "tot_sum_1": 2.880505
+      },
+      "time": 118.533,
+      "timeout": false,
+      "winner": 0
+    },
+    "sof_control": {
+      "digest": "5d23e93e2f040d06",
+      "hits": 6,
+      "ops": {
+        "A1": "c10e81b8",
+        "A2": "5f10eca6",
+        "A3": "60233d59",
+        "B1": "dc221d07",
+        "B2": "0ca197a0",
+        "B3": "fa82c841"
+      },
+      "parts": {
+        "operators": "5071500e5a13709c",
+        "rng": "4042185902435579717",
+        "stat": "01396935997fa4ba"
+      },
+      "shots": 10,
+      "sums": {
+        "rec_sum_0": 1.933333,
+        "rec_sum_1": 1.5,
+        "tot_sum_0": 1.586686,
+        "tot_sum_1": 0.534312
+      },
+      "time": 58.733,
+      "timeout": false,
+      "winner": 0
+    },
+    "unequal": {
+      "digest": "2b8901780effebd8",
+      "hits": 6,
+      "ops": {
+        "A1": "d57fca7f",
+        "A2": "9b2d5567",
+        "A3": "eed98b53",
+        "A4": "c012bf3a",
+        "A5": "19183c85",
+        "B1": "1787d9f4",
+        "B2": "5138f958"
+      },
+      "parts": {
+        "operators": "c54c412f7a5892d6",
+        "rng": "4509457116014605787",
+        "stat": "17922f763791f5b7"
+      },
+      "shots": 17,
+      "sums": {
+        "rec_sum_0": 3.0,
+        "rec_sum_1": 3.7,
+        "tot_sum_0": 1.65808,
+        "tot_sum_1": 1.518497
+      },
+      "time": 39.367,
+      "timeout": false,
+      "winner": 1
+    }
+  },
+  "digest": "2026-11-12: the digest covers the outcome, the random stream, every operator and the stat counts, exactly; the float sums are in 'sums' and compared within 1e-4. No change of behaviour: every winner, time, shot and hit is as before",
+  "model": "test-range-2026-11-02-clearance-progress"
+}

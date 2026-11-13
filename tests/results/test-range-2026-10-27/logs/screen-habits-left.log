@@ -1,0 +1,51 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+habits good_off:PF01:B: A/B/draw 4/2/0 (6 games); 1 cases, 18.0 s elapsed
+habits good_off:PF03:B: A/B/draw 3/3/0 (6 games); 2 cases, 29.4 s elapsed
+habits good_off:PF05:B: A/B/draw 3/3/0 (6 games); 3 cases, 42.8 s elapsed
+habits good_off:PF07:B: A/B/draw 3/3/0 (6 games); 4 cases, 55.5 s elapsed
+habits good_off:PF09:B: A/B/draw 3/3/0 (6 games); 5 cases, 66.7 s elapsed
+habits good_off:GD01:B: A/B/draw 3/3/0 (6 games); 6 cases, 78.6 s elapsed
+habits good_off:GD03:B: A/B/draw 3/3/0 (6 games); 7 cases, 89.8 s elapsed
+habits good_off:GD05:B: A/B/draw 3/3/0 (6 games); 8 cases, 101.1 s elapsed
+habits good_off:GD07:B: A/B/draw 3/3/0 (6 games); 9 cases, 112.7 s elapsed
+habits good_off:GD09:B: A/B/draw 3/3/0 (6 games); 10 cases, 124.5 s elapsed
+habits good_off:ED01:B: A/B/draw 3/3/0 (6 games); 11 cases, 136.4 s elapsed
+habits good_off:ED03:B: A/B/draw 3/3/0 (6 games); 12 cases, 144.4 s elapsed
+habits good_off:ED05:B: A/B/draw 3/3/0 (6 games); 13 cases, 152.1 s elapsed
+habits good_off:ED07:B: A/B/draw 2/4/0 (6 games); 14 cases, 162.2 s elapsed
+habits good_off:ED09:B: A/B/draw 4/2/0 (6 games); 15 cases, 172.0 s elapsed
+habits good_off:WD01:B: A/B/draw 3/3/0 (6 games); 16 cases, 179.9 s elapsed
+habits good_off:WD03:B: A/B/draw 3/3/0 (6 games); 17 cases, 187.6 s elapsed
+habits good_off:WD05:B: A/B/draw 3/3/0 (6 games); 18 cases, 195.1 s elapsed
+habits good_off:WD07:B: A/B/draw 2/4/0 (6 games); 19 cases, 203.8 s elapsed
+habits good_off:WD09:B: A/B/draw 3/3/0 (6 games); 20 cases, 212.0 s elapsed
+habits good_off:HD01:B: A/B/draw 3/3/0 (6 games); 21 cases, 221.6 s elapsed
+habits good_off:HD03:B: A/B/draw 4/2/0 (6 games); 22 cases, 230.2 s elapsed
+habits good_off:HD05:B: A/B/draw 2/4/0 (6 games); 23 cases, 238.0 s elapsed
+habits good_off:HD07:B: A/B/draw 3/3/0 (6 games); 24 cases, 245.6 s elapsed
+habits good_off:HD09:B: A/B/draw 2/4/0 (6 games); 25 cases, 253.7 s elapsed
+habits good_off:HD11:B: A/B/draw 1/5/0 (6 games); 26 cases, 261.6 s elapsed
+habits good_off:HD13:B: A/B/draw 2/4/0 (6 games); 27 cases, 269.8 s elapsed
+habits good_off:HD15:B: A/B/draw 2/4/0 (6 games); 28 cases, 278.3 s elapsed
+habits good_off:HD17:B: A/B/draw 3/3/0 (6 games); 29 cases, 286.8 s elapsed
+habits good_off:HD19:B: A/B/draw 2/4/0 (6 games); 30 cases, 293.3 s elapsed
+habits bad_on:BH01:B: A/B/draw 2/4/0 (6 games); 31 cases, 299.2 s elapsed
+habits bad_on:BH03:B: A/B/draw 2/4/0 (6 games); 32 cases, 305.1 s elapsed
+habits bad_on:BH05:B: A/B/draw 2/4/0 (6 games); 33 cases, 311.1 s elapsed
+habits bad_on:BH07:B: A/B/draw 2/4/0 (6 games); 34 cases, 317.1 s elapsed
+habits bad_on:BH09:B: A/B/draw 2/4/0 (6 games); 35 cases, 322.9 s elapsed
+habits bad_on:BH11:B: A/B/draw 3/3/0 (6 games); 36 cases, 329.9 s elapsed
+habits bad_on:BH13:B: A/B/draw 3/3/0 (6 games); 37 cases, 338.2 s elapsed
+habits bad_on:BH15:B: A/B/draw 4/2/0 (6 games); 38 cases, 346.6 s elapsed
+habits bad_on:BH17:B: A/B/draw 3/3/0 (6 games); 39 cases, 352.6 s elapsed
+habits bad_on:BH19:B: A/B/draw 4/2/0 (6 games); 40 cases, 359.3 s elapsed
+habits bad_on:BH21:B: A/B/draw 2/4/0 (6 games); 41 cases, 365.3 s elapsed
+habits bad_on:BH23:B: A/B/draw 3/3/0 (6 games); 42 cases, 372.2 s elapsed
+habits bad_on:BH25:B: A/B/draw 4/2/0 (6 games); 43 cases, 380.9 s elapsed
+habits bad_on:BH27:B: A/B/draw 4/2/0 (6 games); 44 cases, 388.7 s elapsed
+DONE habits: 44 cases, 264 matches -> /project_habit_left/screen-habits-left.jsonl

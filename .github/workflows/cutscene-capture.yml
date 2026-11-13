@@ -1,0 +1,150 @@
+# Cutscene capture: render crayon cutscene/prototype stills on a virtual
+# display and publish them as a reviewable artifact (a labelled contact
+# sheet + the individual stills). This is the execution half of the
+# repo-only cutscene loop described in docs/CUTSCENE_CAPTURE.md; the
+# headless suites in ci.yml cannot capture frames because --headless uses
+# Godot's dummy RenderingServer.
+#
+# It does not run on every push: stills are a human-review surface, not a
+# gate. Run it from Actions -> cutscene-capture -> Run workflow, or let a
+# push that touches the cutscene views on an arena/* branch trigger it.
+# Nothing is committed back by default — download the artifact from the
+# run, or find the contact sheet in the run summary. To keep a reviewed
+# sheet as evidence, commit it by hand under tests/results/.
+
+name: cutscene-capture
+
+on:
+  workflow_dispatch:
+    inputs:
+      which:
+        description: "Prototype view to capture"
+        type: choice
+        default: cutscene
+        options: [cutscene, menu, topdown]
+      scene:
+        description: "Explicit view script (res://...gd); overrides the choice above"
+        type: string
+        default: ""
+      short:
+        description: "Native campaign short key (e.g. s11_election); overrides the view above"
+        type: string
+        default: ""
+      secs:
+        description: "Seconds of fixed-fps time to run"
+        type: string
+        default: "12"
+      stills:
+        description: "Comma-separated still times in seconds"
+        type: string
+        default: "1,4,8,11.5"
+  push:
+    branches: ["arena/**"]
+    paths:
+      - "scripts/view/proto/**"
+      - "scripts/view/crayon*.gd"
+      - "scripts/view/crayon_*.gd"
+      - "scripts/ui/shorts.gd"
+      - "assets/cutscenes/shorts/shorts.json"
+      - "tests/cutscene_capture.gd"
+      - "tools/cutscene_capture.sh"
+      - "tools/make_contact_sheet.py"
+      - ".github/workflows/cutscene-capture.yml"
+
+concurrency:
+  group: cutscene-capture-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    name: capture (${{ inputs.short || inputs.which || 'cutscene' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: "4.7.2-stable"  # the project's primary engine (project.godot)
+      WHICH: ${{ inputs.which || 'cutscene' }}
+      SCENE: ${{ inputs.scene || '' }}
+      SHORT: ${{ inputs.short || '' }}
+      SECS: ${{ inputs.secs || '12' }}
+      STILLS: ${{ inputs.stills || '1,4,8,11.5' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}
+
+      - name: install Godot ${{ env.GODOT_VERSION }}
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          curl -fsSL -o /tmp/godot.zip "$url"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+      - name: install the virtual display and sheet tools
+        # Xvfb gives Godot a real (virtual) display to render into;
+        # Pillow is the contact sheet's only dependency (pinned, as in
+        # tools/requirements.txt). ImageMagick is not needed.
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb
+          python3 -m pip install --quiet "Pillow==13.0.0"
+
+      - name: engine version
+        run: ~/godot/godot --version
+
+      - name: capture stills and build the contact sheet
+        run: |
+          set -euo pipefail
+          export GODOT="$HOME/godot/godot"
+          export XVFB=1
+          if [ -n "$SHORT" ]; then
+            if [ "$SECS" = "12" ]; then
+              tools/cutscene_capture.sh --short="$SHORT" --stills="$STILLS"
+            else
+              tools/cutscene_capture.sh --short="$SHORT" --secs="$SECS" --stills="$STILLS"
+            fi
+            name="$SHORT"
+          elif [ -n "$SCENE" ]; then
+            tools/cutscene_capture.sh --scene="$SCENE" --secs="$SECS" --stills="$STILLS"
+            name="$(basename "$SCENE" .gd)"
+          else
+            tools/cutscene_capture.sh --which="$WHICH" --secs="$SECS" --stills="$STILLS"
+            name="$WHICH"
+          fi
+          echo "CAPTURE_NAME=$name" >> "$GITHUB_ENV"
+          ls -la "build/cutscene-captures/$name"
+
+      - name: show the contact sheet in the run summary
+        if: always()
+        run: |
+          dir="build/cutscene-captures/${CAPTURE_NAME:-cutscene}"
+          {
+            echo "## Cutscene capture: ${CAPTURE_NAME:-?}"
+            echo ""
+            if [ -f "$dir/capture.json" ]; then
+              echo '```json'; cat "$dir/capture.json"; echo '```'
+            fi
+            echo ""
+            echo "Stills and contact sheet are in the **cutscene-capture-${CAPTURE_NAME:-capture}** artifact below."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: upload stills and contact sheet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cutscene-capture-${{ env.CAPTURE_NAME || 'capture' }}-${{ github.run_id }}
+          path: build/cutscene-captures/
+          if-no-files-found: warn
+          retention-days: 90

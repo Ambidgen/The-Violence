@@ -1,0 +1,625 @@
+# The Violence: the release gate. Active since 2026-10-28 (EA_TASKS P0.A3); it
+# used to sit in tools/ci/ci.yml because the account that pushed it could not
+# write workflow files.
+#
+# Until now every suite in tests/ was run by hand from the README, and the
+# changelog's own history ("pending first run", "no Godot binary could run
+# here") is what that costs: a whole feature pass landed unverified. This runs
+# the static audit and the quick gate tier on both engines the project claims
+# to support, and the full tier on main.
+#
+# The engine is downloaded from the official godotengine/godot release, which
+# is reachable from GitHub-hosted runners. Nothing else is installed: the game
+# has no package dependencies, and the harnesses are plain GDScript run with
+# `-s`.
+name: ci
+
+on:
+  push:
+    # main is the release gate. arena/* is the working branch: its push run is what
+    # gives the balance job its two-seed pilot (the pull_request run cannot -- see the
+    # job's `if`, which needs a push event to tell a pilot from a pull request).
+    branches: [main, "arena/**"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Test tier to run (balance = the Gate 1 matrix, P1.A; crowd = the 1.B crowd sweep; chief = P1.H1 planning test; determinism = P1.I1 rebaseline)"
+        type: choice
+        default: quick
+        options: [check, quick, full, balance, crowd, chief, determinism]
+      seeds:
+        description: "Balance matrix / chief test: how many seeds (balance: 4 policies x 40 weeks each; chief: both chiefs x 40 weeks each)"
+        type: string
+        default: "20"
+      first:
+        description: "Balance matrix / chief test: the first seed number (1001, then +1001 per seed: shards of a big run)"
+        type: string
+        default: "1001"
+      results:
+        description: "Balance matrix: folder the report is committed to (default tests/results/cycle-1A/baseline)"
+        type: string
+        default: ""
+  schedule:
+    # The balance matrix weekly, so a drift in the run layer is noticed without a
+    # release. Monday 04:00 UTC. Results are the artifact of the `balance` job.
+    - cron: "0 4 * * 1"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: static audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # No engine needed: bracket balance, duplicate members, tab-only
+      # indentation, the `:=` constructs 4.7 rejects, and stray class-scope
+      # statements. Catches the class of fault that made v1.2.1 unparseable.
+      - name: gd47_check
+        run: python3 tools/gd47_check.py
+      - name: gd_arity_check
+        # Arity and undeclared names: a call with more arguments than the function takes,
+        # or a CONSTANT used but never declared. Both parse; both only fail when the engine
+        # loads the script. This is the check that would have caught the 2026-11-02
+        # politics.gd break ("Identifier SURPLUS_COOLDOWN not declared").
+        run: python3 tools/gd_arity_check.py
+      - name: test runner regression tests
+        # tools/run_tests.sh itself: exit codes, xfail/xpass, timeouts, ~ in GODOT
+        run: python3 -m unittest discover -s tests -p test_runner.py -v
+      - name: timing analysis regression tests
+        run: python3 -m unittest discover -s tests -p 'test_*analysis.py' -v
+      - name: version metadata is in sync
+        run: |
+          python3 tools/sync_version.py --check || {
+            echo "::error::scripts/version.gd, project.godot and export_presets.cfg disagree. Run python3 tools/sync_version.py and commit all three."
+            exit 1
+          }
+
+  headless:
+    name: headless (${{ matrix.engine }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - engine: "4.7.2-stable"
+            tier: quick
+          # The engine the shipped Windows exe is built on. Kept in the matrix
+          # so a 4.7-only construct cannot reach a release.
+          - engine: "4.4.1-stable"
+            tier: quick
+    env:
+      GODOT_VERSION: ${{ matrix.engine }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ matrix.engine }}
+
+      - name: install Godot ${{ matrix.engine }}
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          curl -fsSL -o /tmp/godot.zip "$url"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}_linux.x86_64 ~/godot/godot || true
+          chmod +x ~/godot/godot
+
+      - name: engine version
+        run: ~/godot/godot --version
+
+      - name: import the project
+        # The first headless run builds .godot/ (the import cache); doing it
+        # explicitly keeps its output out of the test logs.
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
+
+      - name: headless suites
+        # $HOME, not ~: a ~ inside an env value is not expanded, and the runner
+        # used to stop with "no Godot binary" before running anything.
+        # A dispatch for a measurement tier (balance, crowd, chief, determinism) runs its
+        # own jobs; these jobs then run their matrix tier, because the runner has no
+        # --balance/--chief and exited 2 before this.
+        run: |
+          tier="${{ github.event.inputs.tier }}"
+          case "$tier" in
+            check|quick|full) run="$tier" ;;
+            *) run="${{ matrix.tier }}" ;;
+          esac
+          echo "headless tier: $run"
+          GODOT="$HOME/godot/godot" tools/run_tests.sh --$run
+
+      - name: upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.engine }}
+          path: build/test-logs/
+          if-no-files-found: ignore
+
+  balance-plan:
+    # The Gate 1 matrix (EA_TASKS P1.A2/P1.A4) is split into shards of four seeds: a
+    # GitHub-hosted job stops at 6 hours whatever timeout-minutes says, and one
+    # 40-week run is 21-34 minutes (four 1.A pilots), so twenty seeds in one job
+    # (7-11 h) could never finish. Four seeds x four policies at four at a time is
+    # 1.4-2.3 h per shard; the shards run side by side and balance-merge joins them.
+    # It runs
+    #   - on demand (Actions -> ci -> Run workflow, tier=balance, seeds=N),
+    #   - weekly (schedule), and
+    #   - on a push to an arena/* branch, as a two-seed pilot.
+    name: balance plan
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.tier == 'balance') ||
+      github.event_name == 'schedule' ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/arena/'))
+    runs-on: ubuntu-latest
+    env:
+      # A push is the two-seed pilot, the weekly schedule is a drift check (8), and
+      # anything else -- a dispatch without a seed count -- is the full baseline.
+      # 2026-11-05: a push to arena/m8-NAME is an 8-seed experiment against the CL3 reference;
+      # its report goes to tests/results/arena/m8-NAME/balance.
+      # CL3 (2026-11-04): a push to arena/cl3-* is the 8-seed reference, not a pilot, so the
+      # reference can run on a branch without a dispatch (dispatch needs the workflow on main).
+      SEEDS: ${{ github.event.inputs.seeds || (github.event_name == 'push' && ((startsWith(github.ref, 'refs/heads/arena/cl3-') || startsWith(github.ref, 'refs/heads/arena/m8-')) && '8' || '2') || (github.event_name == 'schedule' && '8' || '20')) }}
+      PER_SHARD: "4"
+    outputs:
+      seeds: ${{ steps.plan.outputs.seeds }}
+      shards: ${{ steps.plan.outputs.shards }}
+    steps:
+      - id: plan
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          seeds, per = int(os.environ["SEEDS"]), int(os.environ["PER_SHARD"])
+          assert seeds > 0, "seeds must be a positive number"
+          # the harness numbers seeds 1001, 2002, 3003, ...; shard k starts at seed index k*per
+          shards = [{"first": 1001 + i * 1001, "n": min(per, seeds - i)} for i in range(0, seeds, per)]
+          print("seeds=%d" % seeds)
+          print("shards=" + json.dumps(shards))
+          PY
+
+  balance:
+    name: balance shard (first ${{ matrix.shard.first }}, ${{ matrix.shard.n }} seeds)
+    needs: balance-plan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.balance-plan.outputs.shards) }}
+    # well inside GitHub's 6-hour job limit; a shard is 1.4-2.3 h on a loaded runner
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-4.7.2-stable
+      - name: install Godot 4.7.2-stable
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: import the project
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
+      - name: balance shard
+        # One process per seed x policy, each with its own XDG_DATA_HOME (the harness
+        # does that itself). Its exit code is only "these runs finished"; the merge
+        # job judges the whole matrix.
+        run: |
+          mkdir -p build/balance
+          ~/godot/godot --headless --path . -s res://tests/rogue_balance_test.gd -- \
+            --seeds=${{ matrix.shard.n }} --first=${{ matrix.shard.first }} \
+            --policy=all --weeks=40 --jobs=4 --json=build/balance 2>&1 | tee build/balance/shard.log
+      - name: what the shard left
+        # The job log and the artifacts are not reachable from every place this project
+        # is worked on; annotations are. A shard that wrote no summary, runs that wrote
+        # no JSON and engine errors in any run's own log become annotations (1.C: a 1.B
+        # matrix lost 53 of 80 runs and said nothing).
+        if: always()
+        run: |
+          cd build/balance
+          n=$(ls run-*.json 2>/dev/null | wc -l)
+          echo "::notice title=shard ${{ matrix.shard.first }}::$n run JSON file(s); summary.json $( [ -f summary.json ] && echo present || echo MISSING )"
+          if [ ! -f summary.json ]; then
+            tail="$(tail -n 15 shard.log 2>/dev/null | tr -d '\r')"
+            tail="${tail//'%'/'%25'}"; tail="${tail//$'\n'/'%0A'}"
+            echo "::error title=shard ${{ matrix.shard.first }} wrote no summary::$tail"
+          fi
+          for lg in user/*/TheViolence/logs/godot.log; do
+            [ -f "$lg" ] || continue
+            run=$(echo "$lg" | cut -d/ -f2)
+            errs="$(grep -E 'SCRIPT ERROR|^ERROR|crash|Segmentation|signal' "$lg" | head -6 | tr -d '\r')"
+            if [ -n "$errs" ] || [ ! -f "run-${run}.json" ]; then
+              last="$(tail -n 6 "$lg" | tr -d '\r')"
+              msg="${errs:-no engine error}%0A--- last lines ---%0A${last}"
+              msg="${msg//$'\n'/'%0A'}"
+              echo "::error title=run $run ($( [ -f "run-${run}.json" ] && echo 'JSON written' || echo 'NO JSON' ))::$msg"
+            fi
+          done
+      - name: upload the shard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balance-shard-${{ matrix.shard.first }}
+          # run-*.json and the shard's summary.json (its broken list) are what the
+          # merge needs; the per-run user:// folders are scratch.
+          path: |
+            build/balance/run-*.json
+            build/balance/summary.json
+            build/balance/report.md
+            build/balance/shard.log
+            build/balance/user/*/TheViolence/logs/godot.log
+          if-no-files-found: warn
+
+  balance-merge:
+    name: balance matrix
+    needs: [balance-plan, balance]
+    # also when a shard failed: the merge reports the missing runs as broken
+    # never for a cancelled run: a matrix cancelled mid-flight still uploads the runs it
+    # had finished, and its merge once committed a 27-of-80 report over a later full one
+    if: ${{ !cancelled() && needs.balance-plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    # The evidence has to live in the repository: the artifact is only downloadable
+    # from the run page, and this project's record of a cycle is tests/results/.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-4.7.2-stable
+      - name: install Godot 4.7.2-stable
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: import the project
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
+      - name: download the shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: balance-shard-*
+          path: shards
+      - name: merge the shards
+        # The same report.md and summary.json a single process would have written
+        # (checked: two one-seed shards merge to the two-seed report, byte for byte
+        # apart from the wall clock). A seed x policy no shard produced is broken.
+        run: |
+          set -uo pipefail
+          dirs=$(find shards -mindepth 1 -maxdepth 1 -type d | sort | paste -sd, -)
+          echo "shards: ${dirs:-none}"
+          ~/godot/godot --headless --path . -s res://tests/rogue_balance_test.gd -- \
+            --merge="${dirs}" --seeds=${{ needs.balance-plan.outputs.seeds }} --first=1001 \
+            --policy=all --weeks=40 --json=build/balance
+      - name: upload the matrix
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balance-${{ github.run_id }}
+          path: |
+            build/balance/report.md
+            build/balance/summary.json
+          if-no-files-found: warn
+      - name: keep the report in the repository
+        # The artifact dies with the run; the cycle evidence does not. A dispatched
+        # matrix is the baseline (P1.A4), an arena/* push is the pilot -- and the
+        # commit is tagged [skip ci] so that the evidence does not start another matrix.
+        if: >-
+          always() && hashFiles('build/balance/report.md') != '' && (
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.tier == 'balance') ||
+          (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/arena/')))
+        env:
+          # a later cycle measures itself against the baseline in its own folder (1.B)
+          DEST: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.results || 'tests/results/cycle-1A/baseline') || (startsWith(github.ref, 'refs/heads/arena/cl3-') && 'tests/results/cl3-2026-11-04/balance' || (startsWith(github.ref, 'refs/heads/arena/m8-') && format('tests/results/{0}/balance', github.ref_name) || 'tests/results/cycle-1A/pilot')) }}
+        run: |
+          set -euo pipefail
+          case "$DEST" in
+            tests/results/*) ;;
+            *) echo "::error::results must be a folder under tests/results/ (got $DEST)"; exit 1 ;;
+          esac
+          case "$DEST" in *..*) echo "::error::results may not contain .."; exit 1 ;; esac
+          mkdir -p "$DEST"
+          cp build/balance/report.md "$DEST/report.md"
+          cp build/balance/summary.json "$DEST/summary.json"
+          # every operation, one line each (EA_TASKS P1.C1); absent from runs before 1.C
+          # allies.csv and money.csv (2026-11-05): every week's ally standings and ledger by kind
+          for f in ops.csv weeks.csv allies.csv money.csv; do
+            if [ -f "build/balance/$f" ]; then cp "build/balance/$f" "$DEST/$f"; fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST"
+          if git diff --cached --quiet; then
+            echo "the matrix has not changed since the last commit"
+            exit 0
+          fi
+          git commit -m "balance: $DEST [skip ci]"
+          # the branch may have moved (another result) or gone (merged and deleted): this
+          # run's files win a conflict, and a deleted branch is created again
+          if git ls-remote --exit-code --heads origin "${{ github.ref_name }}" >/dev/null; then
+            git pull --rebase -X theirs origin "${{ github.ref_name }}"
+          fi
+          git push origin "HEAD:refs/heads/${{ github.ref_name }}"
+
+  crowd:
+    # The 1.B crowd sweep (EA_TASKS P1.B1): police on post at a public event, quiet and
+    # attacked, at three trauma floors, 60 seeds per condition, as 18 jobs side by side
+    # (a quiet event is 900 simulated seconds; one core takes ~10 minutes for 20).
+    # On demand only: Actions -> ci -> Run workflow, tier=crowd.
+    name: crowd (trauma ${{ matrix.trauma }}, ${{ matrix.kind }}, seeds ${{ matrix.first }}+20)
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.tier == 'crowd'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        trauma: [0, 14, 20]
+        kind: [quiet, attacked]
+        first: [0, 20, 40]
+    steps:
+      - uses: actions/checkout@v4
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-4.7.2-stable
+      - name: install Godot 4.7.2-stable
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: import the project
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
+      - name: crowd probe
+        run: |
+          set -o pipefail
+          ~/godot/godot --headless --path . -s res://tests/event_probe.gd -- \
+            --trauma=${{ matrix.trauma }} --first=${{ matrix.first }} --n=20 --morale=60 --json \
+            ${{ matrix.kind == 'attacked' && '--attack' || '' }} | tee crowd.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: crowd-${{ matrix.trauma }}-${{ matrix.kind }}-${{ matrix.first }}
+          path: crowd.txt
+
+  crowd-report:
+    name: crowd sweep
+    needs: crowd
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && github.event.inputs.tier == 'crowd' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: crowd-*
+          path: shards
+      - name: the table
+        run: |
+          set -uo pipefail
+          DEST="tests/results/cycle-1B/ci-${GITHUB_SHA::7}"
+          echo "DEST=$DEST" >> "$GITHUB_ENV"
+          python3 tools/crowd_sweep.py --summarize shards/*/crowd.txt --out="$DEST" | tee table.txt
+          cat table.txt >> "$GITHUB_STEP_SUMMARY"
+          n=$(grep -c '^EVENT ' shards/*/crowd.txt | awk -F: '{s+=$2} END {print s}')
+          echo "events: $n of 360"
+          echo "::notice title=crowd sweep::$n of 360 events; table in $DEST/table.md"
+      - name: keep the table in the repository
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "crowd: $DEST [skip ci]"
+          # the branch may have moved (another result) or gone (merged and deleted): this
+          # run's files win a conflict, and a deleted branch is created again
+          if git ls-remote --exit-code --heads origin "${{ github.ref_name }}" >/dev/null; then
+            git pull --rebase -X theirs origin "${{ github.ref_name }}"
+          fi
+          git push origin "HEAD:refs/heads/${{ github.ref_name }}"
+
+  chief:
+    # The planning test (EA_TASKS P1.H1): op_test --chief=sensible against --chief=manual on
+    # matched seeds, both 40 weeks. On demand: Actions -> ci -> Run workflow, tier=chief.
+    # A 40-week run is 10-15 minutes on two cores, so a dispatch of ten seeds is two hours
+    # at four at a time; the 20-seed gate is dispatched as four shards (first=1001, 6006,
+    # 11011, 16016, seeds=5, results=tests/results/cycle-1H/shard-N) and joined with
+    # tools/chief_compare.py --merge.
+    name: chief test (planning)
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.tier == 'chief'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-4.7.2-stable
+      - name: install Godot 4.7.2-stable
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: import the project
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
+      - name: what the briefing is worth
+        env:
+          DEST: ${{ github.event.inputs.results || 'tests/results/cycle-1H' }}
+        run: |
+          set -o pipefail
+          echo "DEST=$DEST" >> "$GITHUB_ENV"
+          # a shard of five seeds is ten runs: about two hours at four at a time
+          GODOT="$HOME/godot/godot" python3 tools/chief_compare.py \
+            --seeds=${{ github.event.inputs.seeds || '5' }} --first=${{ github.event.inputs.first || '1001' }} \
+            --weeks=40 --jobs=4 --out=build/chief --threshold=0.70 | tee build/chief.txt || true
+          cat build/chief.txt >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=chief test::$(tail -n 3 build/chief/report.md 2>/dev/null | tr '\n' ' ')"
+      - name: keep the report in the repository
+        if: always() && hashFiles('build/chief/report.md') != ''
+        run: |
+          set -euo pipefail
+          case "$DEST" in tests/results/*) ;; *) echo "::error::results must be under tests/results/"; exit 1 ;; esac
+          case "$DEST" in *..*) echo "::error::results may not contain .."; exit 1 ;; esac
+          mkdir -p "$DEST"
+          cp build/chief/report.md "$DEST/report.md"
+          cp build/chief/summary.json "$DEST/summary.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "chief: $DEST [skip ci]"
+          if git ls-remote --exit-code --heads origin "${{ github.ref_name }}" >/dev/null; then
+            git pull --rebase -X theirs origin "${{ github.ref_name }}"
+          fi
+          git push origin "HEAD:refs/heads/${{ github.ref_name }}"
+
+  determinism:
+    # The determinism fixture, rebaselined deliberately (EA_TASKS P1.I1). Reruns every
+    # seeded case against the fixture, prints every changed case as an annotation, then
+    # writes the new fixture and commits it with the reason. On demand only:
+    # Actions -> ci -> Run workflow, tier=determinism. The fixture is the release gate's
+    # memory of the simulation: never write it without reading the diff first.
+    name: determinism rebaseline
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.tier == 'determinism'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-4.7.2-stable
+      - name: install Godot 4.7.2-stable
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: import the project
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
+      - name: what changed, before the write
+        run: |
+          set -o pipefail
+          ~/godot/godot --headless --path . -s res://tests/determinism_test.gd -- --verbose 2>&1 \
+            | tee build/determinism-before.log || true
+          changed=$(grep -c '^  DIFF\|^  NEW\|^  MISSING' build/determinism-before.log || true)
+          echo "::notice title=determinism before::$changed case(s) differ from the fixture"
+          grep -E '^  (DIFF|NEW|MISSING)' build/determinism-before.log | head -40 \
+            | while read -r line; do echo "::warning title=determinism case::$line"; done
+      - name: write the fixture
+        run: |
+          set -o pipefail
+          ~/godot/godot --headless --path . -s res://tests/determinism_test.gd -- --write 2>&1 | tee build/determinism-write.log
+      - name: and check it reproduces
+        run: ~/godot/godot --headless --path . -s res://tests/determinism_test.gd -- --verbose
+      - name: commit the fixture
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/fixtures/determinism.json
+          if git diff --cached --quiet; then
+            echo "::notice title=determinism::the fixture already matches; nothing to write"
+            exit 0
+          fi
+          n=$(git diff --cached --numstat -- tests/fixtures/determinism.json | awk '{print $1"+"$2}')
+          git commit -m "determinism: rebaseline the fixture after Phase 1 (P1.I1, ${n} lines) [skip ci]"
+          if git ls-remote --exit-code --heads origin "${GITHUB_REF_NAME}" >/dev/null; then
+            git pull --rebase -X theirs origin "${GITHUB_REF_NAME}"
+          fi
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+
+  full:
+    # The simulation and campaign suites, on main and on demand only: they run
+    # dozens of seeded fights each and are the slow half of the suite.
+    name: full tier
+    # not on a balance or crowd dispatch: those are measurements, not the commit gate
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.tier != 'balance' &&
+       github.event.inputs.tier != 'crowd' && github.event.inputs.tier != 'chief' &&
+       github.event.inputs.tier != 'determinism')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-4.7.2-stable
+      - name: install Godot 4.7.2-stable
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v4.7.2-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: import the project
+        run: ~/godot/godot --headless --path . --import || ~/godot/godot --headless --path . --import || true   # the 4.7.2 importer has crashed (double free); a second pass finishes it
+      - name: full suites
+        # $HOME, not ~: a ~ inside an env value is not expanded, and the runner
+        # used to stop with "no Godot binary" before running anything.
+        run: GODOT="$HOME/godot/godot" tools/run_tests.sh --full
+      - name: upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-full
+          path: build/test-logs/
+          if-no-files-found: ignore

@@ -6,6 +6,8 @@ const Maps = preload("res://scripts/maps/registry.gd")
 const Nav = preload("res://scripts/sim/nav.gd")
 const World = preload("res://scripts/sim/world.gd")
 
+var played := 0   # P0.A1: a batch report; it fails only when it played nothing
+
 func cfg(id: String, team: int, slot: int, ech: String, lv, extra_bad := []) -> Dictionary:
 	var good := {}
 	for g in Habits.preset_good(ech):
@@ -30,6 +32,7 @@ func run(lv, nav, a: String, b: String, n: int, verbose := false, extra_a := [],
 		while not w.over:
 			w.step()
 		wins[w.winner] += 1
+		played += 1
 		dur += w.t
 		if verbose and s == 0:
 			for l in w.log_lines:
@@ -52,22 +55,18 @@ func _init() -> void:
 			n = int(a.trim_prefix("--n="))
 	if "--ablation" in args:
 		_ablation(lv, nav, n)
-		quit()
-		return
-	if "--exp-sweep" in args:
-		_exp_sweep(lv, nav, n)
-		quit()
+		quit(0 if played > 0 else 1)
 		return
 	if "--verbose" in args:
 		run(lv, nav, "sof", "untrained", 1, true)
-		quit()
+		quit(0 if played > 0 else 1)
 		return
 	run(lv, nav, "sof", "untrained", n)
 	run(lv, nav, "untrained", "sof", n)
 	run(lv, nav, "regular", "militia", n)
 	run(lv, nav, "militia", "regular", n)
 	run(lv, nav, "regular", "regular", n)
-	quit()
+	quit(0 if played > 0 else 1)
 
 
 ## The bible's thesis check: identical special-operations reflexes, 40 habits vs none.
@@ -94,44 +93,6 @@ func _ablation(lv, nav, n: int) -> void:
 							o.m_h = 1.0
 					w.step()
 				wins[w.winner] += 1
+				played += 1
 				w.dispose()
 			print("40 habits (A, %s) vs 0 habits (B, %s), speed bonus %s: A %d  B %d  draw %d" % [roles[0], roles[1], "on" if bonus else "OFF", wins[0], wins[1], wins[2]])
-
-
-## H1 (analysis 5.3): is Experience the whole game? Everything is held constant
-## -- both teams are "regular" stats, habits and plates, and only Experience
-## moves. A runs exp 1..5 against a fixed B (3 = police tier, then 1 = the floor).
-## The echelon ladder printed by the main matrix is the comparison curve: if this
-## curve is steeper than the echelon curve, the game is an Experience game.
-##
-## 5v5, both hunting: the tracking cap only binds when several enemies are in
-## view at once, and a 2v2 fight never produces that -- a sweep that found
-## "Experience does nothing" was measuring the wrong shape.
-##   godot --headless --path . -s res://tests/sim_test.gd -- --exp-sweep --n=20
-func _exp_sweep(lv, nav, n: int) -> void:
-	for b_exp in [3, 1]:
-		for a_exp in range(1, 6):
-			var wins := [0, 0, 0]
-			var dur := 0.0
-			var tracked_peak := [0, 0]
-			for s in n:
-				var w = World.new()
-				w.keep_events = false
-				var cfgs: Array = []
-				for side in ["A", "B"]:
-					for k in 5:
-						var id: String = side + str(k + 1)
-						var c := cfg(id, 0 if side == "A" else 1, k, "regular", lv)
-						c["exp"] = a_exp if side == "A" else b_exp
-						cfgs.append(c)
-				w.setup(lv, nav, cfgs, ["hunt", "hunt"], 5000 + s)
-				while not w.over:
-					w.step()
-					for o in w.ops:
-						tracked_peak[o.team] = maxi(tracked_peak[o.team], o.tracked.size())
-				wins[w.winner] += 1
-				dur += w.t
-				w.dispose()
-			print("exp %d vs exp %d (regular 5v5 hunt): A %d  B %d  draw %d   A win %.0f%%   mean %.1f s   peak tracked %d/%d" % [
-				a_exp, b_exp, wins[0], wins[1], wins[2], 100.0 * wins[0] / n, dur / n,
-				tracked_peak[0], tracked_peak[1]])

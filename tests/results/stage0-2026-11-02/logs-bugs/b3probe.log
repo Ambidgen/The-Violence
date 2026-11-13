@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+PROBE3 tool=beanbag on=true sd=700 v=240.0 arrested=false gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=700 v=240.0 arrested=false gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=701 v=240.0 arrested=false gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:5:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=701 v=240.0 arrested=false gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=702 v=240.0 arrested=false gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=702 v=240.0 arrested=false gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+PROBE3 tool=beanbag on=true sd=703 v=240.0 arrested=false gear=A1:5:rifle:shotgun,A2:5:rifle:shotgun,A3:4:rifle:shotgun
+PROBE3 tool=beanbag on=false sd=703 v=240.0 arrested=false gear=A1:-:rifle:shotgun,A2:-:rifle:shotgun,A3:-:rifle:shotgun
+beanbag           s until an unarmed man who will not give up is cuffed (less) 240.00   240.00   FAIL
+PROBE3 tool=taser on=true sd=700 v=56.5 arrested=true gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=700 v=240.0 arrested=false gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=701 v=240.0 arrested=false gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:2:rifle:carbine
+PROBE3 tool=taser on=false sd=701 v=240.0 arrested=false gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=702 v=56.5 arrested=true gear=A1:2:rifle:carbine,A2:0:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=702 v=240.0 arrested=false gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+PROBE3 tool=taser on=true sd=703 v=56.3 arrested=true gear=A1:2:rifle:carbine,A2:2:rifle:carbine,A3:0:rifle:carbine
+PROBE3 tool=taser on=false sd=703 v=240.0 arrested=false gear=A1:-:rifle:carbine,A2:-:rifle:carbine,A3:-:rifle:carbine
+taser             s until an unarmed man who will not give up is cuffed (less) 102.30   240.00   PASS
+1 of 2 items change the outcome (4 runs each way, 8 s)

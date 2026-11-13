@@ -1,0 +1,1159 @@
+{
+  "generator": "cinematics/scripts/manifest.mjs",
+  "note": "Native Godot crayon interstitials (5-10 s), driven by these props and slots. Remotion sources and Ogg Theora renders are archived for reference.",
+  "fps": 30,
+  "master": {
+    "width": 1920,
+    "height": 1080
+  },
+  "video": {
+    "dir": "res://assets/cutscenes/shorts",
+    "ext": "ogv",
+    "width": 1280,
+    "height": 720
+  },
+  "shorts": [
+    {
+      "id": "S01-Week",
+      "key": "s01_week",
+      "file": "S01_WeekCard",
+      "title": "The Board Refills",
+      "blurb": "The week number and the calendar, then this week's situations dealt onto the board.",
+      "trigger": "Start of every campaign week, before the board is shown",
+      "poster": 150,
+      "tags": [
+        "weekly",
+        "transition",
+        "title-card"
+      ],
+      "frames": 180,
+      "seconds": 6,
+      "slots": [
+        {
+          "id": "week-title",
+          "x": 0.055,
+          "y": 0.5,
+          "w": 0.3,
+          "h": 0.075,
+          "note": "A short engine-written line under the numeral (e.g. the ward)."
+        },
+        {
+          "id": "note",
+          "x": 0.46,
+          "y": 0.845,
+          "w": 0.46,
+          "h": 0.05,
+          "note": "One line of body text over the calendar."
+        }
+      ],
+      "props": {
+        "week": 12,
+        "of": 40,
+        "ward": "Ironworks",
+        "cards": [
+          {
+            "kind": "Warrant service",
+            "ward": "Northgate"
+          },
+          {
+            "kind": "Gang house raid",
+            "ward": "Kilbride"
+          }
+        ],
+        "note": "TWO SITUATIONS ON THE BOARD",
+        "stamp": [
+          "WEEK 12"
+        ],
+        "showSlots": false
+      },
+      "propDocs": {
+        "week": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "Campaign week, stamped large and lit on the calendar."
+        },
+        "of": {
+          "type": "int",
+          "min": 1,
+          "max": 52,
+          "doc": "Total weeks; the calendar has this many cells."
+        },
+        "ward": {
+          "type": "string",
+          "max": 24,
+          "doc": "The ward the week opens on (one of the six)."
+        },
+        "cards": {
+          "type": "array",
+          "max": 3,
+          "doc": "Up to three {kind, ward} slips; the board deals them."
+        },
+        "note": {
+          "type": "string",
+          "max": 48,
+          "doc": "The line under the week number."
+        },
+        "stamp": {
+          "type": "array",
+          "max": 2,
+          "doc": "Lines for the rubber stamp."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "click",
+        "stamp",
+        "toll at the end"
+      ]
+    },
+    {
+      "id": "S02-Situation",
+      "key": "s02_situation",
+      "file": "S02_Situation",
+      "title": "The File",
+      "blurb": "A situation dossier: what kind, which ward, how many are watching, how much time.",
+      "trigger": "A situation is selected on the board, before the briefing opens",
+      "poster": 180,
+      "tags": [
+        "briefing",
+        "card"
+      ],
+      "frames": 210,
+      "seconds": 7,
+      "slots": [
+        {
+          "id": "title",
+          "x": 0.055,
+          "y": 0.235,
+          "w": 0.52,
+          "h": 0.11,
+          "note": "The situation title, up to two short lines."
+        },
+        {
+          "id": "ward",
+          "x": 0.055,
+          "y": 0.375,
+          "w": 0.28,
+          "h": 0.05,
+          "note": "Ward name beside the kind."
+        }
+      ],
+      "props": {
+        "kind": "Hostage",
+        "title": "Hostages: Marcus Vale, 14 Foundry St",
+        "ward": "Eastport",
+        "visibility": 4,
+        "pressure": "HIGH: A DEADLINE",
+        "room": "BEDROOM (EST. 50%)",
+        "showSlots": false
+      },
+      "propDocs": {
+        "kind": {
+          "type": "string",
+          "max": 24,
+          "doc": "Warrant service / Gang house raid / Barricaded suspect / Hostage / Public event."
+        },
+        "title": {
+          "type": "string",
+          "max": 52,
+          "doc": "The situation title as the board writes it."
+        },
+        "ward": {
+          "type": "string",
+          "max": 20,
+          "doc": "The ward."
+        },
+        "visibility": {
+          "type": "int",
+          "min": 1,
+          "max": 5,
+          "doc": "How many people are watching (1-5)."
+        },
+        "pressure": {
+          "type": "string",
+          "max": 24,
+          "doc": "NONE / LOW / HIGH: A DEADLINE."
+        },
+        "room": {
+          "type": "string",
+          "max": 28,
+          "doc": "The most confident room estimate in the file."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "door",
+        "stamp x2",
+        "click"
+      ]
+    },
+    {
+      "id": "S03-Plan",
+      "key": "s03_plan",
+      "file": "S03_Plan",
+      "title": "The Plan",
+      "blurb": "A briefing route drawn in red, numbered, staffed; then the sheet is signed.",
+      "trigger": "After the squads are set and before RUN",
+      "poster": 176,
+      "tags": [
+        "planning",
+        "pre-run",
+        "diagram"
+      ],
+      "frames": 240,
+      "seconds": 8,
+      "slots": [
+        {
+          "id": "entry",
+          "x": 0.055,
+          "y": 0.7,
+          "w": 0.3,
+          "h": 0.055,
+          "note": "Entry label on the left rail."
+        },
+        {
+          "id": "objective",
+          "x": 0.055,
+          "y": 0.78,
+          "w": 0.34,
+          "h": 0.055,
+          "note": "Objective line."
+        }
+      ],
+      "props": {
+        "entry": "FRONT DOOR",
+        "squads": 2,
+        "officers": 6,
+        "objective": "CLEAR THE HOUSE",
+        "rooms": 5,
+        "showSlots": false
+      },
+      "propDocs": {
+        "entry": {
+          "type": "string",
+          "max": 20,
+          "doc": "Where the plan goes in (FRONT DOOR, GARAGE, PATIO...)."
+        },
+        "squads": {
+          "type": "int",
+          "min": 1,
+          "max": 4,
+          "doc": "How many squads the route is split into."
+        },
+        "officers": {
+          "type": "int",
+          "min": 1,
+          "max": 30,
+          "doc": "How many figures stack at the door."
+        },
+        "objective": {
+          "type": "string",
+          "max": 24,
+          "doc": "The order the squads carry."
+        },
+        "rooms": {
+          "type": "int",
+          "min": 2,
+          "max": 12,
+          "doc": "How many rooms the sheet draws (density)."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "click",
+        "stamp",
+        "toll"
+      ]
+    },
+    {
+      "id": "S04-Staging",
+      "key": "s04_staging",
+      "file": "S04_Staging",
+      "title": "Staging",
+      "blurb": "Two vans, a wet street from above, and a squad stacking on the door in the dark.",
+      "trigger": "RUN is pressed, before the operation view takes over",
+      "poster": 176,
+      "tags": [
+        "pre-run",
+        "night",
+        "street"
+      ],
+      "frames": 210,
+      "seconds": 7,
+      "slots": [
+        {
+          "id": "street",
+          "x": 0.055,
+          "y": 0.885,
+          "w": 0.3,
+          "h": 0.045,
+          "note": "Street and hour line."
+        },
+        {
+          "id": "callsign",
+          "x": 0.66,
+          "y": 0.775,
+          "w": 0.3,
+          "h": 0.06,
+          "note": "Callsign on the radio card."
+        }
+      ],
+      "props": {
+        "callsign": "A-2",
+        "time": "02:14",
+        "officers": 6,
+        "street": "FOUNDRY ST",
+        "showSlots": false
+      },
+      "propDocs": {
+        "callsign": {
+          "type": "string",
+          "max": 10,
+          "doc": "The squad's callsign, on the radio card."
+        },
+        "time": {
+          "type": "string",
+          "max": 8,
+          "doc": "The hour the operation goes in."
+        },
+        "officers": {
+          "type": "int",
+          "min": 2,
+          "max": 16,
+          "doc": "How many figures stack along the wall."
+        },
+        "street": {
+          "type": "string",
+          "max": 20,
+          "doc": "Street name on the sheet."
+        }
+      },
+      "sound": [
+        "amb_city bed",
+        "door",
+        "radio x2",
+        "kick",
+        "ram"
+      ]
+    },
+    {
+      "id": "S05-Threshold",
+      "key": "s05_threshold",
+      "file": "S05_Threshold",
+      "title": "The Threshold",
+      "blurb": "A doorway from above: the cone sweeps, recognition fills, and the room answers.",
+      "trigger": "First officer through a door; also on the first contact of an operation",
+      "poster": 194,
+      "tags": [
+        "in-run",
+        "contact",
+        "variant"
+      ],
+      "frames": 210,
+      "seconds": 7,
+      "slots": [
+        {
+          "id": "room",
+          "x": 0.055,
+          "y": 0.83,
+          "w": 0.32,
+          "h": 0.05,
+          "note": "Room name, under the plan."
+        }
+      ],
+      "props": {
+        "variant": "contact",
+        "room": "LIVING ROOM",
+        "seconds": 1.4,
+        "showSlots": false
+      },
+      "propDocs": {
+        "variant": {
+          "type": "enum",
+          "values": [
+            "clear",
+            "contact"
+          ],
+          "doc": "clear = empty room, contact = someone is there."
+        },
+        "room": {
+          "type": "string",
+          "max": 22,
+          "doc": "The room on the other side of the door."
+        },
+        "seconds": {
+          "type": "float",
+          "min": 0.2,
+          "max": 4,
+          "doc": "Time on the recognition bar."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "door",
+        "radio",
+        "shot (contact only)"
+      ]
+    },
+    {
+      "id": "S06-OfficerDown",
+      "key": "s06_officer_down",
+      "file": "S06_OfficerDown",
+      "title": "Officer Down",
+      "blurb": "A figure on the plan stops being a figure. The radio, the cross, the name.",
+      "trigger": "An officer is downed or killed during an operation (badge and name from the roster)",
+      "poster": 206,
+      "tags": [
+        "in-run",
+        "loss",
+        "event"
+      ],
+      "frames": 240,
+      "seconds": 8,
+      "slots": [
+        {
+          "id": "name",
+          "x": 0.055,
+          "y": 0.8,
+          "w": 0.34,
+          "h": 0.06,
+          "note": "Officer name."
+        },
+        {
+          "id": "badge",
+          "x": 0.055,
+          "y": 0.865,
+          "w": 0.24,
+          "h": 0.04,
+          "note": "Badge and week line."
+        }
+      ],
+      "props": {
+        "name": "J. OKAFOR",
+        "badge": "4417",
+        "week": 23,
+        "variant": "down",
+        "showSlots": false
+      },
+      "propDocs": {
+        "name": {
+          "type": "string",
+          "max": 22,
+          "doc": "The officer's name as the roster has it."
+        },
+        "badge": {
+          "type": "string",
+          "max": 8,
+          "doc": "Badge number."
+        },
+        "week": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "The week it happened."
+        },
+        "variant": {
+          "type": "enum",
+          "values": [
+            "down",
+            "killed"
+          ],
+          "doc": "down = wounded and out; killed = end of watch."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "shot x2",
+        "radio",
+        "toll"
+      ]
+    },
+    {
+      "id": "S07-Debrief",
+      "key": "s07_debrief",
+      "file": "S07_Debrief",
+      "title": "The Fog Lifts",
+      "blurb": "The plan as it was drawn, then as it happened: route, rounds, markers, findings.",
+      "trigger": "An operation ends, before the incident record is read",
+      "poster": 196,
+      "tags": [
+        "post-run",
+        "debrief",
+        "reveal"
+      ],
+      "frames": 210,
+      "seconds": 7,
+      "slots": [
+        {
+          "id": "counts",
+          "x": 0.62,
+          "y": 0.77,
+          "w": 0.31,
+          "h": 0.1,
+          "note": "The three counters on the right rail."
+        }
+      ],
+      "props": {
+        "rounds": 9,
+        "findings": 3,
+        "minutes": 41,
+        "civilians": 1,
+        "showSlots": false
+      },
+      "propDocs": {
+        "rounds": {
+          "type": "int",
+          "min": 0,
+          "max": 400,
+          "doc": "Rounds fired (the counter on the sheet)."
+        },
+        "findings": {
+          "type": "int",
+          "min": 0,
+          "max": 12,
+          "doc": "Findings listed (evidence markers)."
+        },
+        "minutes": {
+          "type": "int",
+          "min": 0,
+          "max": 600,
+          "doc": "How long it took."
+        },
+        "civilians": {
+          "type": "int",
+          "min": 0,
+          "max": 40,
+          "doc": "Civilians who were actually inside."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "click",
+        "stamp x2",
+        "radio"
+      ]
+    },
+    {
+      "id": "S08-Press",
+      "key": "s08_press",
+      "file": "S08_Press",
+      "title": "The Front Page",
+      "blurb": "The Carrick Ledger lands on the desk and types its headline. The week gets a verdict.",
+      "trigger": "End of week, when the press writes something (headline from Politics.press)",
+      "poster": 210,
+      "tags": [
+        "weekly",
+        "press",
+        "consequence"
+      ],
+      "frames": 240,
+      "seconds": 8,
+      "slots": [
+        {
+          "id": "headline",
+          "x": 0.14,
+          "y": 0.38,
+          "w": 0.72,
+          "h": 0.17,
+          "note": "Over the headline plate; engine may overprint."
+        },
+        {
+          "id": "deck",
+          "x": 0.14,
+          "y": 0.59,
+          "w": 0.7,
+          "h": 0.07,
+          "note": "Deck line."
+        }
+      ],
+      "props": {
+        "headline": "OFFICERS CLEARED IN FOUNDRY ST SHOOTING",
+        "deck": "The district attorney found no grounds to charge. The coalition has asked for the tapes.",
+        "week": 12,
+        "tone": "neutral",
+        "price": "50 CENTS",
+        "showSlots": false
+      },
+      "propDocs": {
+        "headline": {
+          "type": "string",
+          "max": 64,
+          "doc": "The headline; the type auto-fits."
+        },
+        "deck": {
+          "type": "string",
+          "max": 140,
+          "doc": "One deck line under the rule."
+        },
+        "week": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "The edition's week."
+        },
+        "tone": {
+          "type": "enum",
+          "values": [
+            "neutral",
+            "good",
+            "bad"
+          ],
+          "doc": "bad draws the red rule under the headline; good leaves it ink."
+        },
+        "price": {
+          "type": "string",
+          "max": 12,
+          "doc": "Cover price, for the masthead."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "kick",
+        "stamp",
+        "toll"
+      ]
+    },
+    {
+      "id": "S09-Case",
+      "key": "s09_case",
+      "file": "S09_Case",
+      "title": "The Case",
+      "blurb": "Internal affairs opens the file: an exhibit, the redactions, and the finding.",
+      "trigger": "A case is opened or closed on the officer who used force (finding from Outcome)",
+      "poster": 206,
+      "tags": [
+        "department",
+        "case",
+        "consequence"
+      ],
+      "frames": 240,
+      "seconds": 8,
+      "slots": [
+        {
+          "id": "officer",
+          "x": 0.055,
+          "y": 0.24,
+          "w": 0.34,
+          "h": 0.06,
+          "note": "Officer name under the tab."
+        },
+        {
+          "id": "summary",
+          "x": 0.055,
+          "y": 0.855,
+          "w": 0.55,
+          "h": 0.07,
+          "note": "Finding summary, two short lines."
+        }
+      ],
+      "props": {
+        "caseNo": "IA 26-114",
+        "officer": "J. OKAFOR",
+        "finding": "SUSTAINED",
+        "summary": "Force used after the subject was restrained. Body camera corroborates.",
+        "showSlots": false
+      },
+      "propDocs": {
+        "caseNo": {
+          "type": "string",
+          "max": 14,
+          "doc": "Case number on the tab."
+        },
+        "officer": {
+          "type": "string",
+          "max": 22,
+          "doc": "The officer under review."
+        },
+        "finding": {
+          "type": "enum",
+          "values": [
+            "CLEARED",
+            "SUSTAINED",
+            "REFERRED"
+          ],
+          "doc": "CLEARED stamps in ink; the other two in red."
+        },
+        "summary": {
+          "type": "string",
+          "max": 120,
+          "doc": "Two lines of the finding."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "door",
+        "click x2",
+        "stamp"
+      ]
+    },
+    {
+      "id": "S10-Ally",
+      "key": "s10_ally",
+      "file": "S10_Ally",
+      "title": "The Standing",
+      "blurb": "One ally, one bar, one red line at 25. It holds, or it goes.",
+      "trigger": "An ally's standing moves across a threshold (Politics.ALLIES)",
+      "poster": 200,
+      "tags": [
+        "politics",
+        "ally",
+        "consequence",
+        "variant"
+      ],
+      "frames": 210,
+      "seconds": 7,
+      "slots": [
+        {
+          "id": "name",
+          "x": 0.055,
+          "y": 0.26,
+          "w": 0.45,
+          "h": 0.07,
+          "note": "Ally name."
+        },
+        {
+          "id": "title",
+          "x": 0.055,
+          "y": 0.335,
+          "w": 0.6,
+          "h": 0.045,
+          "note": "Office line."
+        }
+      ],
+      "props": {
+        "name": "TOMMY ROURKE",
+        "title": "President, Police Benevolent Association",
+        "holds": "the officers' goodwill",
+        "from": 60,
+        "to": 22,
+        "lost": true,
+        "showSlots": false
+      },
+      "propDocs": {
+        "name": {
+          "type": "string",
+          "max": 26,
+          "doc": "The ally's name."
+        },
+        "title": {
+          "type": "string",
+          "max": 56,
+          "doc": "Their office."
+        },
+        "holds": {
+          "type": "string",
+          "max": 40,
+          "doc": "What they hold over you."
+        },
+        "from": {
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "doc": "Standing at the start of the week."
+        },
+        "to": {
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "doc": "Standing now."
+        },
+        "lost": {
+          "type": "boolean",
+          "doc": "True draws the loss stamp in red."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "click",
+        "radio",
+        "stamp"
+      ]
+    },
+    {
+      "id": "S11-Election",
+      "key": "s11_election",
+      "file": "S11_Election",
+      "title": "Election Night",
+      "blurb": "Three names, three bars, forty weeks settled in one stamp.",
+      "trigger": "End of week 40 (Politics.hold_election)",
+      "poster": 262,
+      "tags": [
+        "campaign",
+        "election",
+        "climax"
+      ],
+      "frames": 300,
+      "seconds": 10,
+      "slots": [],
+      "props": {
+        "shares": [
+          38,
+          33,
+          29
+        ],
+        "winner": 0,
+        "names": [
+          "GEORGE CARRICK",
+          "JULIA NOUSSAN",
+          "BOB STEVENS"
+        ],
+        "tickets": [
+          "SAFE STREETS",
+          "PORT CARRICK TOGETHER",
+          "INDEPENDENT"
+        ],
+        "showSlots": false
+      },
+      "propDocs": {
+        "shares": {
+          "type": "array",
+          "doc": "Three numbers summing to 100."
+        },
+        "winner": {
+          "type": "int",
+          "min": 0,
+          "max": 2,
+          "doc": "Index of the winner."
+        },
+        "names": {
+          "type": "array",
+          "doc": "Three candidate names."
+        },
+        "tickets": {
+          "type": "array",
+          "doc": "Three ticket lines."
+        }
+      },
+      "sound": [
+        "amb_city bed",
+        "click x3",
+        "radio x2",
+        "stamp",
+        "toll"
+      ]
+    },
+    {
+      "id": "S12-EndOfWatch",
+      "key": "s12_end_of_watch",
+      "file": "S12_EndOfWatch",
+      "title": "End of Watch",
+      "blurb": "A badge, a folded flag and a typed notice on a desk. No trumpets. One bell.",
+      "trigger": "An officer is killed (department roster, week)",
+      "poster": 210,
+      "tags": [
+        "loss",
+        "ceremony",
+        "event"
+      ],
+      "frames": 240,
+      "seconds": 8,
+      "slots": [
+        {
+          "id": "name",
+          "x": 0.3,
+          "y": 0.62,
+          "w": 0.4,
+          "h": 0.06,
+          "note": "Name on the notice."
+        },
+        {
+          "id": "dates",
+          "x": 0.3,
+          "y": 0.685,
+          "w": 0.34,
+          "h": 0.04,
+          "note": "Week and years line."
+        }
+      ],
+      "props": {
+        "name": "J. OKAFOR",
+        "badge": "4417",
+        "week": 23,
+        "years": 9,
+        "showSlots": false
+      },
+      "propDocs": {
+        "name": {
+          "type": "string",
+          "max": 22,
+          "doc": "The officer."
+        },
+        "badge": {
+          "type": "string",
+          "max": 8,
+          "doc": "Badge number, engraved on the plate."
+        },
+        "week": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "The week."
+        },
+        "years": {
+          "type": "int",
+          "min": 0,
+          "max": 40,
+          "doc": "Years of service."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "toll x2",
+        "stamp"
+      ]
+    },
+    {
+      "id": "S13-Allocation",
+      "key": "s13_allocation",
+      "file": "S13_Allocation",
+      "title": "The Allocation",
+      "blurb": "The council's weekly money, counted onto the ledger and either approved or cut.",
+      "trigger": "Week start, after the budget committee rules (Politics grant / cut)",
+      "poster": 150,
+      "tags": [
+        "department",
+        "budget",
+        "weekly"
+      ],
+      "frames": 180,
+      "seconds": 6,
+      "slots": [
+        {
+          "id": "amount",
+          "x": 0.1,
+          "y": 0.4,
+          "w": 0.36,
+          "h": 0.13,
+          "note": "The money, drawn large; engine may overprint its own figure."
+        },
+        {
+          "id": "verdict",
+          "x": 0.67,
+          "y": 0.66,
+          "w": 0.26,
+          "h": 0.1,
+          "note": "Verdict stamp area."
+        }
+      ],
+      "props": {
+        "amount": 28400,
+        "delta": -8,
+        "verdict": "CUT",
+        "week": 12,
+        "showSlots": false
+      },
+      "propDocs": {
+        "amount": {
+          "type": "int",
+          "min": 0,
+          "max": 999999,
+          "doc": "The week's allocation, in dollars."
+        },
+        "delta": {
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "doc": "Percent change against the last week."
+        },
+        "verdict": {
+          "type": "enum",
+          "values": [
+            "APPROVED",
+            "CUT",
+            "GRANTED"
+          ],
+          "doc": "The committee's stamp."
+        },
+        "week": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "The week."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "click x3",
+        "stamp"
+      ]
+    },
+    {
+      "id": "S14-Course",
+      "key": "s14_course",
+      "file": "S14_Course",
+      "title": "The Course",
+      "blurb": "A training week closes: names ticked off, the certificate stamped, the roster changed.",
+      "trigger": "A course finishes (Courses / department training)",
+      "poster": 152,
+      "tags": [
+        "department",
+        "training"
+      ],
+      "frames": 180,
+      "seconds": 6,
+      "slots": [
+        {
+          "id": "course",
+          "x": 0.3,
+          "y": 0.34,
+          "w": 0.44,
+          "h": 0.06,
+          "note": "Course name on the certificate."
+        },
+        {
+          "id": "roster",
+          "x": 0.58,
+          "y": 0.5,
+          "w": 0.3,
+          "h": 0.26,
+          "note": "Graduate list area, if the engine writes names."
+        }
+      ],
+      "props": {
+        "course": "CLOSE-QUARTERS DRILL",
+        "graduates": 4,
+        "week": 12,
+        "showSlots": false
+      },
+      "propDocs": {
+        "course": {
+          "type": "string",
+          "max": 30,
+          "doc": "The course name."
+        },
+        "graduates": {
+          "type": "int",
+          "min": 1,
+          "max": 12,
+          "doc": "How many names are ticked off."
+        },
+        "week": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "The week."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "click x2",
+        "stamp"
+      ]
+    },
+    {
+      "id": "S15-WeekRecap",
+      "key": "s15_week_recap",
+      "file": "S15_WeekRecap",
+      "title": "Week Closed",
+      "blurb": "The week's sheet filled in and stamped: what was answered, what was left, who was hurt, what it cost, and the Ledger's headline.",
+      "trigger": "The player ends a campaign week (every week but the last; election night has its own short)",
+      "poster": 140,
+      "tags": [
+        "weekly",
+        "recap",
+        "transition"
+      ],
+      "frames": 165,
+      "seconds": 5.5,
+      "slots": [
+        {
+          "id": "headline",
+          "x": 0.06,
+          "y": 0.84,
+          "w": 0.88,
+          "h": 0.06,
+          "note": "The Ledger headline strip."
+        }
+      ],
+      "props": {
+        "week": 12,
+        "of": 40,
+        "answered": 3,
+        "unattended": 1,
+        "arrests": 2,
+        "civilians": 0,
+        "officers": 1,
+        "wounded": 2,
+        "money": -4200,
+        "balance": 18300,
+        "headline": "RAID ON KESTREL STREET ENDS IN TWO ARRESTS",
+        "verdict": "CLOSED",
+        "showSlots": false
+      },
+      "propDocs": {
+        "week": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "The week that closed."
+        },
+        "of": {
+          "type": "int",
+          "min": 1,
+          "max": 40,
+          "doc": "Weeks in the campaign."
+        },
+        "answered": {
+          "type": "int",
+          "min": 0,
+          "max": 12,
+          "doc": "Situations an operation went to."
+        },
+        "unattended": {
+          "type": "int",
+          "min": 0,
+          "max": 12,
+          "doc": "Situations nobody went to."
+        },
+        "arrests": {
+          "type": "int",
+          "min": 0,
+          "max": 40,
+          "doc": "Suspects taken alive."
+        },
+        "civilians": {
+          "type": "int",
+          "min": 0,
+          "max": 40,
+          "doc": "Civilians killed in the week's operations."
+        },
+        "officers": {
+          "type": "int",
+          "min": 0,
+          "max": 20,
+          "doc": "Officers killed this week."
+        },
+        "wounded": {
+          "type": "int",
+          "min": 0,
+          "max": 40,
+          "doc": "Officers newly hurt this week."
+        },
+        "money": {
+          "type": "int",
+          "doc": "How the account moved over the week, dollars."
+        },
+        "balance": {
+          "type": "int",
+          "doc": "The account after the week, dollars."
+        },
+        "headline": {
+          "type": "string",
+          "max": 70,
+          "doc": "The Carrick Ledger's first headline for the week."
+        },
+        "verdict": {
+          "type": "string",
+          "max": 12,
+          "doc": "Stamp text."
+        }
+      },
+      "sound": [
+        "amb_office bed",
+        "click x3",
+        "stamp"
+      ]
+    }
+  ]
+}

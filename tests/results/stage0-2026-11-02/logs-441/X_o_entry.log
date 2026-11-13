@@ -1,0 +1,5 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+order         measure                                     with    without   gate
+entry         first room entered is the kitchen (share)     1.00     0.00   PASS
+1 of 1 orders change the outcome (8 runs each way; at least 16 for tight/less, 32 for arrest; 12 s)

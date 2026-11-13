@@ -1,0 +1,16 @@
+PROCUREMENT
+The armoury issues only what the department has a contract for. Sign one; the rest go to other cities. Account: $25,000.
+Submachine guns
+Fast handling indoors with pistol rounds: fewer of them go through the wall into the flat next door. Adds: Submachine gun (9 mm).
+$5,000
+[Choose]
+Compact and heavy pistols
+A quicker draw, or a heavier round. Choice for the sidearm. Adds: Compact pistol (9 mm), Heavy pistol (.45).
+$2,500
+[Choose]
+Flashbangs
+Two seconds of nobody thinking clearly in the room. Tactically trained officers only. Adds: Flashbang.
+$3,000  ·  MILITARY  ·  Safe Streets approves; the coalition takes note
+[Choose]
+[Pass (surplus sold: +$2,000)]
+[<  Board]

@@ -1,0 +1,34 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+    0 map 03 16v16 assault/assault civ  6 -> B at  21.2 s
+    1 map 04 13v15 hold   /hunt    civ  0 police -> B at  52.7 s
+    2 map 09  8v11 hold   /hunt    civ  2 -> A at  57.9 s
+    3 map 00  3v3  hunt   /assault civ  0 police -> B at  20.4 s
+    4 map 05  4v16 assault/assault civ  7 -> B at   5.7 s
+    5 map 05 13v3  assault/hunt    civ  0 -> A at  23.5 s
+    6 map 06 20v7  assault/hold    civ 11 -> A at   9.8 s
+    7 map 07 10v6  hunt   /assault civ  3 -> A at   9.4 s
+    8 map 11 20v12 hunt   /hunt    civ 13 -> A at  33.6 s
+    9 map 00 17v9  assault/hold    civ  0 -> A at  39.3 s
+   10 map 00  1v14 hold   /hold    civ  0 -> B at   2.5 s
+   11 map 08 13v18 hunt   /hold    civ  7 -> B at 171.2 s
+   12 map 00 19v2  assault/hold    civ  0 police -> A at  24.7 s
+   13 map 08 18v17 hunt   /assault civ  0 -> B at 353.7 s
+   14 map 01 10v13 assault/assault civ 12 police -> B at  13.4 s
+   15 map 07 14v16 hold   /hold    civ  0 police -> B at  57.2 s
+   16 map 11 16v7  hunt   /hunt    civ  0 -> A at  11.9 s
+   17 map 05 17v14 assault/hunt    civ  0 police -> draw at 420.0 s
+   18 map 11  3v13 hunt   /assault civ  0 -> B at   3.1 s
+   19 map 05 16v12 assault/hold    civ  0 -> A at  22.6 s
+   20 map 06  2v5  hunt   /hunt    civ  0 -> B at  26.1 s
+   21 map 01 19v9  hold   /hold    civ  0 -> A at   5.4 s
+   22 map 09 20v12 hunt   /assault civ  0 police -> draw at 600.0 s
+   23 map 03 11v10 hunt   /hold    civ  0 police -> A at  59.6 s
+   24 map 00  1v19 assault/hold    civ 12 police -> B at   2.5 s
+   25 map 08  5v16 assault/hunt    civ  6 police -> B at  10.4 s
+   26 map 05 11v4  hunt   /hold    civ  0 police -> A at  28.2 s
+   27 map 05  1v2  hold   /assault civ 12 -> A at  63.8 s
+   28 map 01  2v9  assault/hold    civ  0 -> B at   2.0 s
+   29 map 10  4v9  assault/hunt    civ  0 police -> B at  31.9 s
+fuzz matches 30: A 13  B 15  draw 2 (time limit 2)   sim 2184 s in 144634 ms
+bad habits activated: 27/27  missing: []

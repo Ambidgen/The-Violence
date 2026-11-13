@@ -1,0 +1,124 @@
+# Crayon cutscene prototype trailers: the same election-night cutscene
+# prototype rendered three times, each with a slight style deviation at
+# encode time (see tools/make_cutscene_trailer.sh). Review-only —
+# these are review prototypes for a human to judge, not a gate and not the
+# five rejected trailers/ experiments (different scene, crayon style).
+#
+# Each matrix job: Godot 4.7.2 under Xvfb captures every frame
+# (tests/cutscene_capture.gd --every=1) plus stills and a contact sheet,
+# then ffmpeg encodes .mp4 (review) and .ogv (Godot-ready, silent).
+# Download the three cutscene-trailer-* artifacts and compare like-for-like:
+# identical staging/camera/timing, different hand only.
+
+name: cutscene-trailers
+
+on:
+  # Push trigger (arena branches): GitHub only offers workflow_dispatch for
+  # workflows present on the default branch, so on this branch a push that
+  # touches the trailer pipeline is how a run starts. Once this file lands
+  # on main, Run workflow works as well.
+  push:
+    branches: ["arena/**"]
+    paths:
+      - ".github/workflows/cutscene-trailers.yml"
+      - "tools/make_cutscene_trailer.sh"
+      - "tools/cutscene_capture.sh"
+      - "tests/cutscene_capture.gd"
+      - "scripts/view/proto/cutscene_view.gd"
+      - "scripts/view/crayon.gd"
+  workflow_dispatch:
+    inputs:
+      secs:
+        description: "Trailer length in seconds (the prototype's camera move is tuned for 12)"
+        type: string
+        default: "12"
+      stills:
+        description: "Comma-separated still times in seconds"
+        type: string
+        default: "1,4,8,11.5"
+
+concurrency:
+  group: cutscene-trailers-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  trailer:
+    name: trailer (${{ matrix.variant }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [pencil-light, charcoal-night, warm-paper]
+    env:
+      GODOT_VERSION: "4.7.2-stable"
+      SECS: ${{ inputs.secs || '12' }}
+      STILLS: ${{ inputs.stills || '1,4,8,11.5' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: cache the engine
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}
+
+      - name: install Godot ${{ env.GODOT_VERSION }}
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          curl -fsSL -o /tmp/godot.zip "$url"
+          unzip -q -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+      - name: install the virtual display, ffmpeg and sheet tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb ffmpeg
+          python3 -m pip install --quiet "Pillow==13.0.0"
+          ffmpeg -version | head -1
+
+      - name: capture every frame of the cutscene prototype
+        run: |
+          set -euo pipefail
+          export GODOT="$HOME/godot/godot"
+          export XVFB=1
+          tools/cutscene_capture.sh --which=cutscene --secs="$SECS" --stills="$STILLS" --every=1
+
+      - name: encode the ${{ matrix.variant }} trailer
+        run: |
+          set -euo pipefail
+          tools/make_cutscene_trailer.sh --variant=${{ matrix.variant }} \
+            --frames=build/cutscene-captures/cutscene --out=build/trailers
+          cp build/cutscene-captures/cutscene/contact-sheet.png "build/trailers/${{ matrix.variant }}-contact-sheet.png"
+          ls -la build/trailers
+
+      - name: trailer in the run summary
+        if: always()
+        run: |
+          {
+            echo "## Crayon cutscene trailer — ${{ matrix.variant }}"
+            echo ""
+            echo "Same election-night prototype (staging/camera/timing identical); only the encode-time grade differs. Silent: no sound design yet."
+            echo "Video (\`.mp4\` + \`.ogv\`), stills sheet and raw frames are in the **cutscene-trailer-${{ matrix.variant }}-${{ github.run_id }}** artifact."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: upload trailer, stills and frames
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cutscene-trailer-${{ matrix.variant }}-${{ github.run_id }}
+          path: |
+            build/trailers/
+            build/cutscene-captures/cutscene/capture.json
+            build/cutscene-captures/cutscene/still_*.png
+          if-no-files-found: warn
+          retention-days: 90

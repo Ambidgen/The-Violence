@@ -1,0 +1,40 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+  DIFF  m00_2v2_sof_untrained_assault_1001           winner 0.0 -> 0, t 40.6 -> 54.7, shots 3.0 -> 4, hits 3.0 -> 3
+  DIFF  m00_2v2_sof_untrained_assault_2002           winner 0.0 -> 0, t 40.4 -> 53.5, shots 2.0 -> 4, hits 2.0 -> 4
+  DIFF  m00_2v2_sof_untrained_assault_3003           winner 0.0 -> 0, t 40.6 -> 46.3, shots 2.0 -> 2, hits 2.0 -> 2
+  DIFF  m00_3v5_police_militia_assault_1001          winner 0.0 -> 0, t 47.1 -> 33.9, shots 21.0 -> 9, hits 11.0 -> 5
+  DIFF  m00_3v5_police_militia_assault_2002          winner 0.0 -> 0, t 53.1 -> 52.1, shots 12.0 -> 10, hits 8.0 -> 7
+  DIFF  m00_3v5_police_militia_assault_3003          winner 0.0 -> 1, t 42.9 -> 22.5, shots 31.0 -> 24, hits 11.0 -> 10
+  DIFF  m00_5v5_regular_regular_assault_1001         winner 1.0 -> 1, t 69.7 -> 59.9, shots 40.0 -> 77, hits 14.0 -> 20
+  DIFF  m00_5v5_regular_regular_assault_2002         winner 0.0 -> 0, t 59.7 -> 52.9, shots 58.0 -> 39, hits 11.0 -> 13
+  DIFF  m00_5v5_regular_regular_assault_3003         winner 0.0 -> 1, t 54.8 -> 70.7, shots 28.0 -> 37, hits 6.0 -> 10
+  DIFF  m01_2v2_sof_militia_assault_1001             winner 0.0 -> 0, t 4.4 -> 4.6, shots 3.0 -> 3, hits 3.0 -> 3
+  DIFF  m01_2v2_sof_militia_assault_2002             winner 0.0 -> 0, t 3.2 -> 3.2, shots 3.0 -> 3, hits 3.0 -> 3
+  DIFF  m01_2v2_sof_militia_assault_3003             winner 0.0 -> 0, t 2.8 -> 2.7, shots 2.0 -> 2, hits 2.0 -> 2
+  DIFF  m01_4v4_regular_untrained_assault_1001       winner 0.0 -> 0, t 8.8 -> 12.0, shots 17.0 -> 22, hits 9.0 -> 7
+  DIFF  m01_4v4_regular_untrained_assault_2002       winner 0.0 -> 0, t 18.7 -> 11.9, shots 48.0 -> 15, hits 12.0 -> 5
+  DIFF  m01_4v4_regular_untrained_assault_3003       winner 0.0 -> 0, t 10.4 -> 23.7, shots 18.0 -> 35, hits 7.0 -> 11
+  DIFF  m04_5v5_police_regular_assault_1001          winner 0.0 -> 0, t 70.0 -> 40.1, shots 44.0 -> 18, hits 14.0 -> 8
+  DIFF  m04_5v5_police_regular_assault_2002          winner 0.0 -> 1, t 85.7 -> 27.0, shots 30.0 -> 25, hits 11.0 -> 6
+  DIFF  m04_5v5_police_regular_assault_3003          winner 1.0 -> 1, t 68.1 -> 29.2, shots 27.0 -> 18, hits 12.0 -> 8
+  DIFF  m04_8v8_regular_militia_hunt_1001            winner 0.0 -> 0, t 17.2 -> 18.3, shots 20.0 -> 78, hits 12.0 -> 16
+  DIFF  m04_8v8_regular_militia_hunt_2002            winner 0.0 -> 0, t 22.4 -> 18.6, shots 47.0 -> 30, hits 15.0 -> 13
+  DIFF  m04_8v8_regular_militia_hunt_3003            winner 0.0 -> 0, t 21.5 -> 33.6, shots 54.0 -> 47, hits 17.0 -> 19
+  DIFF  m07_12v12_sof_regular_assault_1001           winner 0.0 -> 0, t 62.2 -> 80.4, shots 176.0 -> 150, hits 22.0 -> 17
+  DIFF  m07_12v12_sof_regular_assault_2002           winner 0.0 -> 0, t 129.7 -> 60.5, shots 230.0 -> 203, hits 29.0 -> 21
+  DIFF  m07_12v12_sof_regular_assault_3003           winner 0.0 -> 0, t 64.2 -> 81.2, shots 184.0 -> 196, hits 22.0 -> 37
+  DIFF  m10_6v6_police_militia_assault_1001          winner 0.0 -> 0, t 72.0 -> 35.2, shots 14.0 -> 18, hits 11.0 -> 9
+  DIFF  m10_6v6_police_militia_assault_2002          winner 0.0 -> 0, t 23.8 -> 66.7, shots 10.0 -> 8, hits 9.0 -> 7
+  DIFF  m10_6v6_police_militia_assault_3003          winner 0.0 -> 0, t 67.0 -> 92.5, shots 10.0 -> 13, hits 8.0 -> 9
+  DIFF  op1001_W1-1_barricade_m03                    winner 0.0 -> 0, t 170.0 -> 87.6, shots 11.0 -> 4, hits 5.0 -> 2
+  DIFF  op1001_W1-2_warrant_m06                      winner 0.0 -> 0, t 1.0 -> 1.0, shots 1.0 -> 1, hits 1.0 -> 1
+  DIFF  op1001_W1-3_warrant_m05                      winner 0.0 -> 0, t 33.3 -> 19.4, shots 0.0 -> 2, hits 0.0 -> 2
+  DIFF  op1001_W1-4_event_m11                        winner 0.0 -> 0, t 900.0 -> 900.0, shots 0.0 -> 0, hits 0.0 -> 0
+  DIFF  op2002_W1-1_gang_m08                         winner 0.0 -> 0, t 85.2 -> 111.8, shots 35.0 -> 15, hits 14.0 -> 6
+  DIFF  op2002_W1-2_warrant_m05                      winner 0.0 -> 0, t 54.3 -> 83.3, shots 9.0 -> 7, hits 3.0 -> 2
+  DIFF  op2002_W1-3_warrant_m06                      winner 0.0 -> 0, t 88.7 -> 122.4, shots 2.0 -> 45, hits 1.0 -> 1
+  DIFF  op2002_W1-4_event_m11                        winner 0.0 -> 0, t 900.0 -> 900.0, shots 0.0 -> 0, hits 0.0 -> 0
+
+35 case(s), 35 changed, 100310 ms
+FAIL: 35 case(s) changed. If intended, re-run with --write and read the diff.

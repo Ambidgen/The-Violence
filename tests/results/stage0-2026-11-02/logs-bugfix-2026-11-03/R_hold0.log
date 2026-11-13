@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+attack     hold       layer   A wins   exchange (A lost / B lost)   fallbacks  counters  mean s
+regular    regular    off       70%       0.67  (28 / 42)                0         0     46.7
+regular    regular    on        50%       0.90  (35 / 39)                0         0     50.7
+police     police     off       30%       1.24  (42 / 34)                0         0     53.0
+police     police     on        40%       1.00  (41 / 41)                0         0     62.4
+militia    police     off        0%       1.85  (50 / 27)                0         0     31.9
+militia    police     on        10%       1.63  (49 / 30)                0         0     35.1
+sof        militia    off      100%       0.08  (4 / 50)                0         0     55.7
+sof        militia    on       100%       0.08  (4 / 50)                0         0     55.7
+militia    militia    off       80%       0.53  (24 / 45)                0         0     38.0
+militia    militia    on        80%       0.53  (24 / 45)                0         0     37.8

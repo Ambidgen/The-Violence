@@ -27,12 +27,26 @@ if defined RUNTIME if exist "%~dp0project.godot" (
   goto :done
 )
 
+REM 1.4: the standalone build arrives in parts (part0, part1, ...); join them in order on
+REM first run, replacing any older joined build
+if exist "%~dp0release\TheViolence.exe.part0" (
+  pushd "%~dp0release"
+  set "PARTS=TheViolence.exe.part0"
+  for /L %%N in (1,1,19) do if exist "TheViolence.exe.part%%N" set "PARTS=!PARTS!+TheViolence.exe.part%%N"
+  copy /y /b !PARTS! TheViolence.exe >nul && del TheViolence.exe.part*
+  popd
+)
+
 if exist "%~dp0TheViolence.exe" (
   "%~dp0TheViolence.exe" %*
   goto :done
 )
 if exist "%~dp0build\TheViolence.exe" (
   "%~dp0build\TheViolence.exe" %*
+  goto :done
+)
+if exist "%~dp0release\TheViolence.exe" (
+  "%~dp0release\TheViolence.exe" %*
   goto :done
 )
 

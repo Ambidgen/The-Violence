@@ -1,0 +1,344 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+THDBG t=55.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=700 v=56.3 arrested=true alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+THDBG t=70.0 A1 dbg=FROZEN act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg= act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=waiting for #1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=false sd=700 v=72.3 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+ARDBG t=17.0 A1 act= d=5.41 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A1 act= d=5.36 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.16 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.15 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=3.38 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=3.33 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.91 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.87 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+PROBE3 tool=taser on=true sd=701 v=23.7 arrested=true alive=true left=2,2,2 how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+ARDBG t=17.0 A1 act= d=5.41 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A1 act= d=5.36 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.16 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.15 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=3.38 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=3.33 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.91 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.87 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+PROBE3 tool=taser on=false sd=701 v=23.7 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+THDBG t=50.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=702 v=55.0 arrested=true alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+THDBG t=70.0 A1 dbg=FROZEN act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg= act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=waiting for #1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=false sd=702 v=71.3 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+THDBG t=55.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=703 v=56.0 arrested=true alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+THDBG t=70.0 A1 dbg=FROZEN act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg=hard corner act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=waiting for #1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=false sd=703 v=72.6 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+ARDBG t=17.0 A1 act= d=2.59 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A1 act= d=2.55 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=1.19 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=1.14 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A3 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A3 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+PROBE3 tool=taser on=true sd=704 v=21.2 arrested=true alive=true left=2,2,2 how=|__B1_gives_up:_hands_up,_weapon_down_(A3)
+ARDBG t=17.0 A1 act= d=2.59 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A1 act= d=2.55 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=1.19 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=1.14 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A3 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A3 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.91 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A2 act= d=4.39 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A3 act= d=3.39 team=0 gut=0 cuff_by=A1
+PROBE3 tool=taser on=false sd=704 v=21.2 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A3)
+THDBG t=50.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A2 dbg= act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=705 v=56.6 arrested=true alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+PROBE3 tool=taser on=false sd=705 v=73.5 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+THDBG t=55.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=706 v=58.4 arrested=true alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+THDBG t=70.0 A1 dbg=FROZEN act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg=hard corner act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=waiting for #1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=false sd=706 v=72.9 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+THDBG t=20.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=60.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=60.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=60.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=65.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=65.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=65.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=75.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=75.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=75.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+LOG706 00:17.9  B1 gives up: hands up, weapon down (A3)
+LOG706 01:17.9  Team B: no contact for a minute, hunting
+LOG706 01:17.9  TEAM A WINS at 77.9 s. 0 shots, 0 hits.
+LOG706 01:17.9    A1 Police tactical: 0 shots, 0 hits, 0 down; OK
+LOG706 01:17.9    A2 Police tactical: 0 shots, 0 hits, 0 down; OK
+LOG706 01:17.9    A3 Police tactical: 0 shots, 0 hits, 0 down; OK
+LOG706 01:17.9    B1 Untrained: 0 shots, 0 hits, 0 down; GAVE UP
+PROBE3 tool=taser on=true sd=707 v=240.0 arrested=false alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+PROBE3 tool=taser on=false sd=707 v=74.4 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+THDBG t=55.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=708 v=56.2 arrested=true alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+THDBG t=70.0 A1 dbg=FROZEN act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg= act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=waiting for #1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=false sd=708 v=72.4 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+THDBG t=50.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A2 dbg= act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A1 dbg= act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=stacked act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=709 v=57.3 arrested=true alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A3)
+THDBG t=70.0 A1 dbg=ARREST > B1 act=cuff mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg=hard corner act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=waiting for #1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=false sd=709 v=73.0 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+THDBG t=20.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=25.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=30.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=35.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=40.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=45.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=50.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=55.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=60.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=60.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=60.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=65.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=65.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=65.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=70.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=75.0 A1 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=75.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=75.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+PROBE3 tool=taser on=true sd=710 v=240.0 arrested=false alive=true left=2,2,1 how=|__A3:_taser_hits_B1|__B1_gives_up:_hands_up,_weapon_down_(A1)
+PROBE3 tool=taser on=false sd=710 v=74.5 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+ARDBG t=17.0 A1 act= d=5.36 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A1 act= d=5.31 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.08 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.06 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=2.80 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=2.75 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.33 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.28 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+PROBE3 tool=taser on=true sd=711 v=23.3 arrested=true alive=true left=2,2,2 how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+ARDBG t=17.0 A1 act= d=5.36 team=0 gut=0 cuff_by=A1
+ARDBG t=17.0 A1 act= d=5.31 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.08 team=0 gut=0 cuff_by=A1
+ARDBG t=18.0 A1 act= d=4.06 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=2.80 team=0 gut=0 cuff_by=A1
+ARDBG t=19.0 A1 act= d=2.75 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.33 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A1 dbg=ARREST > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=20.0 A1 act= d=1.28 team=0 gut=0 cuff_by=A1
+THDBG t=20.0 A2 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+THDBG t=20.0 A3 dbg=RULE 1 > B1 act= mag=30 lost=false active=rifle alive=true stun=false
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=21.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=22.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+ARDBG t=23.0 A1 act=cuff d=0.94 team=0 gut=0 cuff_by=A1
+PROBE3 tool=taser on=false sd=711 v=23.3 arrested=true alive=true left=-,-,- how=|__B1_gives_up:_hands_up,_weapon_down_(A1)
+taser             s until an unarmed man who will not give up is cuffed (less)  78.66    60.42   FAIL
+0 of 1 items change the outcome (12 runs each way, 12 s)

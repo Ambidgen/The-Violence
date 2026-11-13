@@ -17,7 +17,7 @@ if [ -f ./project.godot ]; then
   fi
 fi
 
-for bin in ./TheViolence.x86_64 ./build/TheViolence.x86_64 ./build/linux/TheViolence.x86_64; do
+for bin in ./TheViolence.x86_64 ./release/TheViolence.x86_64 ./build/TheViolence.x86_64 ./build/linux/TheViolence.x86_64; do
   if [ -x "$bin" ]; then
     exec "$bin" "$@"
   fi

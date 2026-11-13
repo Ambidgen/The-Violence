@@ -1,0 +1,61 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+PASS  the four policies exist in the plan's order (cautious, minimal, military, accept_all)
+PASS  parse("all") is every policy
+PASS  parse takes a list
+PASS  parse drops duplicates
+PASS  parse reports an unknown policy as nothing
+PASS  the labels are the plan's names
+PASS  cautious: the same seed settles the same desk (no random answers)
+PASS  cautious: and writes the same lines
+PASS  minimal: the same seed settles the same desk (no random answers)
+PASS  minimal: and writes the same lines
+PASS  military: the same seed settles the same desk (no random answers)
+PASS  military: and writes the same lines
+PASS  accept_all: the same seed settles the same desk (no random answers)
+PASS  accept_all: and writes the same lines
+PASS  cautious: nothing is left blocking the week ([])
+PASS  cautious: the inheritance was chosen (had one dealt: true -> pie)
+PASS  minimal: nothing is left blocking the week ([])
+PASS  minimal: the inheritance was chosen (had one dealt: true -> reserve)
+PASS  military: nothing is left blocking the week ([])
+PASS  military: the inheritance was chosen (had one dealt: true -> plates)
+PASS  accept_all: nothing is left blocking the week ([])
+PASS  accept_all: the inheritance was chosen (had one dealt: true -> reserve)
+PASS  the inheritance differs between policies ({ "cautious": "pie", "minimal": "reserve", "military": "plates", "accept_all": "reserve" })
+PASS  minimal signs no contract ([])
+PASS  cautious or military sign one (["shotgun"] / ["plates", "gas"])
+PASS  cautious never signs military hardware (shotgun)
+PASS  military-first signs hardware or neutral kit (plates: neutral)
+PASS  military-first signs hardware or neutral kit (gas: neutral)
+PASS  cautious and minimal run on current kit
+PASS  military-first and accept-all let the plan buy kit
+PASS  cautious: takes at most 2 call(s) (2)
+PASS  cautious: only open situations
+PASS  cautious: the gravest calls come first (["gang", "barricade"])
+PASS  minimal: takes at most 1 call(s) (1)
+PASS  minimal: only open situations
+PASS  minimal: the gravest calls come first (["gang"])
+PASS  military: takes at most 3 call(s) (3)
+PASS  military: only open situations
+PASS  military: the gravest calls come first (["gang", "barricade", "warrant"])
+PASS  accept_all: takes at most 3 call(s) (3)
+PASS  accept_all: only open situations
+PASS  accept_all: the gravest calls come first (["gang", "barricade", "warrant"])
+PASS  minimal answers one call a week, cautious two, military-first and accept-all three
+PASS  accept-all settles the desk with $250 in the account ([])
+PASS  the ledger accounts for every dollar of the settlement ($6750 walked, $6750 in the account)
+PASS  and it settles the week without an overdraft (lowest $250; contracts ["shotgun"])
+PASS  cautious: signs the emergency lateral at 8 fit
+PASS  cautious: standing order 18
+PASS  minimal: does not sign the emergency lateral at 8 fit
+PASS  minimal: standing order 0
+PASS  military: signs the emergency lateral at 8 fit
+PASS  military: standing order 0
+PASS  accept_all: does not sign the emergency lateral at 8 fit
+PASS  accept_all: standing order 20
+PASS  balance_bands.json parses
+PASS  it is the Gate 1 file
+PASS  and it is report-only until P1.I (status report-only, enforce false)
+PASS  every band names a known metric, test and aggregation, with a reason (13 bands)
+policies_test: 0 failures

@@ -1,0 +1,36 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+ok    an ordinary officer wears patrol uniform
+ok    tactical armour selects the SWAT uniform
+ok    a helmeted officer gets a SWAT look outside public events
+ok    public-event officers use the riot uniform
+ok    city quick-response units use the SWAT look
+ok    police paramedics retain their recognizable appearance
+ok    the four city gangs retain distinct clothing families
+ok    campaign suspects use all five criminal models
+ok    appearance selection is stable and does not consume simulation RNG
+ok    a concealed attacker looks civilian until the reveal
+ok    concealed labels do not collide with real civilian IDs or each other
+ok    ordinary civilians never receive a criminal look
+ok    non-police test-range teams retain their original look
+ok    every model has a vector source and three frames for standing, downed and all eight deaths
+ok    all character parts and the riot visor load as animated textures
+ok    the animated rig can wear patrol with matching skin
+ok    the animated rig can wear swat with matching skin
+ok    the animated rig can wear riot with matching skin
+ok    the animated rig can wear hood with matching skin
+ok    the animated rig can wear leather with matching skin
+ok    the animated rig can wear workcoat with matching skin
+ok    the animated rig can wear track with matching skin
+ok    the animated rig can wear vestlook with matching skin
+ok    the live officer wears a riot visor and shield only when equipped
+ok    a disguised attacker's vest and suspect ID are hidden live
+ok    the recorder captures the riot look and equipped helmet state
+ok    a replay does not reveal a disguised attacker prematurely
+ok    a disguised attacker's equipment and ID remain hidden in replay
+ok    replay constructs the same uniform and equipped accessories
+ok    the live attacker reveals clothing, equipment and ID
+ok    the replay switches on reveal and records a spent helmet
+ok    replayed actors update their appearance, equipment and helmet state
+ok    riot clothing alone does not create helmet or shield equipment
+character assets: PASS

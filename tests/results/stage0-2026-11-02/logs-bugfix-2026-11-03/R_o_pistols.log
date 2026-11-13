@@ -1,0 +1,5 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+order         measure                                     with    without   gate
+pistols       rifle rounds fired by police (fewer)          0.00     3.38   PASS
+1 of 1 orders change the outcome (8 runs each way; at least 16 for tight/less, 32 for arrest; 5 s)

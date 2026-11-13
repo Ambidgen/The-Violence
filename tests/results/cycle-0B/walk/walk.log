@@ -1,0 +1,36 @@
+window 1600x900, layout 1600x900 (text drawn at x1.00), rendering true, steps title,desk,brief,run,endweek,screens, seed 410255
+ok   the title has a New run button
+no button 'Start a new story'
+ok   New run starts a roguelike run
+week 1, account $25000, 20 fit, desk ["doctrine:plates,reserve,pie", "procurement:smg,pistols,bangs"]
+ok   the board draws the city map
+ok   Brief and plan waits for the inheritance
+KNOWN the first call's Brief and plan is disabled with its reason in a tooltip only (EA_TASKS P3.B1)
+ok   the desk opens the inheritance
+KNOWN management screens sit over the last tactical map, not the city (EA_TASKS P3.A1)
+ok   an inheritance can be chosen
+ok   the inheritance is settled
+ok   the desk opens procurement
+ok   a contract can be signed
+ok   a paid contract adds to the armoury
+ok   the first call can be briefed after the desk
+ok   opening a briefing spends nothing (account change $0)
+ok   the Force tab opens
+ok   the Orders tab opens
+ok   the plan can be run
+ok   the operation ends (38 s sim in 20257 ms wall)
+ok   the debrief returns to the board
+ok   End week advances to week 2 (now 2)
+ok   the board opens Roster
+ok   Roster returns to the board
+ok   the board opens Budget
+ok   Budget returns to the board
+ok   the board opens Internal affairs
+ok   Internal affairs returns to the board
+ok   the board opens City Hall
+ok   City Hall returns to the board
+ok   the board opens Armoury and programs
+no button 'Back to the board'
+ok   Armoury and programs returns to the board
+ok   the board opens Campaign file
+ok   Campaign file returns to the board

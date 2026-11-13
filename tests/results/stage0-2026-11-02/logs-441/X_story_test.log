@@ -1,0 +1,23 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+  ok    week one opens on the inherited Bridge Street order
+  ok    the outgoing chief owns the briefing, not the signature
+  ok    the page reads this week's open call and the current force record
+  ok    reading the story page is deterministic and does not mutate the campaign
+  ok    the campaign file lists the eight people with a public stake
+  ok    each key character offers three playable questions with a reply
+  ok    a conversation answers from character voice and cites a matching document
+  ok    the filing cabinet assembles handover, office, case and street records
+  ok    opening a conversation or assembling documents does not mutate the campaign
+  ok    week 1 belongs to act 1 (The Inheritance)
+  ok    week 10 belongs to act 2 (The Pattern)
+  ok    week 20 belongs to act 3 (The Record)
+  ok    week 30 belongs to act 4 (The Count)
+  ok    week 40 belongs to act 5 (Aftermath)
+  ok    the campaign reaches election night after week 40
+  ok    election night files the winner's voice against the full campaign
+  ok    the closed campaign has no open-call focus
+  ok    the public record updates from campaign consequences
+  ok    character replies change when the saved force record changes
+  ok    the Internal Affairs cabinet files case details from campaign state
+problems: 0

@@ -1,0 +1,2268 @@
+seed,policy,week,type,map,map_name,officers,down,killed,killed_by_suspect,killed_by_friendly,bled_out,suspects,suspects_killed,civ_killed,kind,score,sim_s,ended
+1001,accept_all,1,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,1,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,58,1
+1001,accept_all,1,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,partial,65,0.9,1
+1001,accept_all,2,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,2,gang,8,"Warehouse & Offices",6,2,1,1,0,0,6,0,0,partial,45,79.1,1
+1001,accept_all,2,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,1,0,partial,65,7.3,1
+1001,accept_all,3,gang,10,"Apartment Block",7,0,0,0,0,0,3,0,0,partial,65,194.2,1
+1001,accept_all,3,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,1,0,success,85,73.2,1
+1001,accept_all,3,warrant,5,"Duplex",5,0,0,0,0,0,2,0,0,failure,30,98.4,1
+1001,accept_all,4,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,4,gang,8,"Warehouse & Offices",8,0,0,0,0,0,6,1,0,partial,65,101.1,1
+1001,accept_all,4,warrant,5,"Duplex",5,0,0,0,0,0,3,1,0,partial,65,42.3,1
+1001,accept_all,5,gang,10,"Apartment Block",9,0,0,0,0,0,2,0,0,success,100,117.7,1
+1001,accept_all,5,warrant,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,105,1
+1001,accept_all,6,gang,8,"Warehouse & Offices",8,1,1,1,0,0,3,2,0,success,85,73.9,1
+1001,accept_all,6,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,1,0,partial,65,60.1,1
+1001,accept_all,6,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,partial,65,18.3,1
+1001,accept_all,7,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,7,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,1,0,partial,65,13,1
+1001,accept_all,7,warrant,5,"Duplex",6,0,0,0,0,0,3,1,0,partial,65,71.4,1
+1001,accept_all,8,gang,8,"Warehouse & Offices",10,0,0,0,0,0,3,0,0,success,100,75,1
+1001,accept_all,8,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,15.4,1
+1001,accept_all,9,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,9,gang,8,"Warehouse & Offices",7,1,0,0,0,0,3,0,0,success,95,116.6,1
+1001,accept_all,9,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,partial,65,109.4,1
+1001,accept_all,10,gang,10,"Apartment Block",10,1,1,1,0,0,6,0,0,partial,50,147.2,1
+1001,accept_all,10,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,failure,30,62.2,1
+1001,accept_all,11,hostage,3,"Corner Store",6,3,2,1,0,1,2,0,0,failure,0,68.2,1
+1001,accept_all,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,11,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,1,0,partial,50,79,1
+1001,accept_all,12,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,success,100,244.6,1
+1001,accept_all,12,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,44.9,1
+1001,accept_all,13,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,13,gang,8,"Warehouse & Offices",6,4,0,0,0,0,3,0,1,success,65,204.3,1
+1001,accept_all,13,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,20.3,1
+1001,accept_all,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,14,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,17.4,1
+1001,accept_all,14,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,29.4,1
+1001,accept_all,15,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,3,0,partial,60,79.5,1
+1001,accept_all,15,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,55.1,1
+1001,accept_all,16,barricade,1,"Lone Cabin",6,0,0,0,0,0,1,1,0,partial,65,13.2,1
+1001,accept_all,16,warrant,5,"Duplex",5,0,0,0,0,0,2,1,0,partial,65,31.2,1
+1001,accept_all,17,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,1,0,partial,65,8.3,1
+1001,accept_all,17,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,3,1,0,partial,65,78.2,1
+1001,accept_all,17,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,57.2,1
+1001,accept_all,18,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,18,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,416.5,1
+1001,accept_all,19,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,19,gang,10,"Apartment Block",6,2,0,0,0,0,3,0,0,success,90,292.9,1
+1001,accept_all,19,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,9,1
+1001,accept_all,20,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,20,gang,8,"Warehouse & Offices",7,0,0,0,0,0,3,2,0,success,100,40.6,1
+1001,accept_all,20,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,59,1
+1001,accept_all,22,hostage,8,"Warehouse & Offices",9,0,0,0,0,0,1,0,0,success,100,154.4,1
+1001,accept_all,22,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,failure,30,28.2,1
+1001,accept_all,23,barricade,1,"Lone Cabin",6,0,0,0,0,0,1,0,0,partial,65,11.9,1
+1001,accept_all,23,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,1,0,0,failure,30,45.2,1
+1001,accept_all,23,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,45.3,1
+1001,accept_all,24,hostage,3,"Corner Store",7,0,0,0,0,0,2,0,0,success,100,40.1,1
+1001,accept_all,24,warrant,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,78.6,1
+1001,accept_all,24,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,44.4,1
+1001,accept_all,25,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,25,gang,8,"Warehouse & Offices",8,0,0,0,0,0,2,1,0,success,100,74.8,1
+1001,accept_all,25,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,32.2,1
+1001,accept_all,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,26,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,110.1,1
+1001,accept_all,26,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,241,1
+1001,accept_all,27,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,27,gang,8,"Warehouse & Offices",6,2,2,2,0,0,6,2,0,success,70,199.7,1
+1001,accept_all,27,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,132,1
+1001,accept_all,28,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,28,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,69.4,1
+1001,accept_all,28,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,success,100,26.5,1
+1001,accept_all,29,hostage,5,"Duplex",6,0,0,0,0,0,3,1,0,success,100,135.6,1
+1001,accept_all,29,event,11,"Civic Plaza",3,1,1,1,0,0,1,0,1,partial,35,399.2,1
+1001,accept_all,29,gang,8,"Warehouse & Offices",6,1,0,0,0,0,5,1,0,partial,60,43.9,1
+1001,accept_all,30,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,102.1,1
+1001,accept_all,30,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,30,gang,10,"Apartment Block",6,2,1,1,0,0,4,2,0,success,80,309.2,1
+1001,accept_all,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,135.9,1
+1001,accept_all,31,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,32,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,32,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,failure,30,61.2,1
+1001,accept_all,32,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,success,100,212.7,1
+1001,accept_all,33,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,1,partial,50,604.4,1
+1001,accept_all,33,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,1,0,success,100,136,1
+1001,accept_all,33,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,1,1
+1001,accept_all,34,hostage,8,"Warehouse & Offices",8,1,1,1,0,0,3,1,0,success,85,169,1
+1001,accept_all,34,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,43,1
+1001,accept_all,35,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,35,gang,8,"Warehouse & Offices",6,3,3,3,0,0,3,1,0,partial,20,153.2,1
+1001,accept_all,36,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,102.2,1
+1001,accept_all,36,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,37,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,accept_all,37,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,success,100,27.8,1
+1001,accept_all,37,warrant,5,"Duplex",4,0,0,0,0,0,3,1,0,partial,65,215,1
+1001,accept_all,38,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,116.1,1
+1001,accept_all,38,gang,10,"Apartment Block",6,1,0,0,0,0,5,0,0,partial,60,139.2,1
+1001,accept_all,39,gang,10,"Apartment Block",8,0,0,0,0,0,6,0,0,partial,65,154.2,1
+1001,accept_all,39,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,success,100,103.3,1
+1001,accept_all,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,137.8,1
+1001,accept_all,40,warrant,5,"Duplex",5,0,0,0,0,0,1,1,0,partial,65,26.6,1
+1001,accept_all,40,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,147.9,1
+1001,cautious,1,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,1,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,95.6,1
+1001,cautious,2,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,2,gang,8,"Warehouse & Offices",7,0,0,0,0,0,6,0,0,partial,65,82.7,1
+1001,cautious,3,gang,10,"Apartment Block",7,0,0,0,0,0,3,0,0,success,100,284.5,1
+1001,cautious,3,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,119.2,1
+1001,cautious,4,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,4,gang,8,"Warehouse & Offices",8,2,0,0,0,0,6,1,0,partial,55,153.8,1
+1001,cautious,5,gang,10,"Apartment Block",10,0,0,0,0,0,2,0,0,success,100,321.8,1
+1001,cautious,5,warrant,5,"Duplex",7,0,0,0,0,0,3,0,0,success,100,114.7,1
+1001,cautious,6,gang,8,"Warehouse & Offices",7,2,1,1,0,0,3,1,0,success,80,145.8,1
+1001,cautious,6,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,55.8,1
+1001,cautious,7,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,7,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,partial,65,14.2,1
+1001,cautious,8,gang,8,"Warehouse & Offices",9,0,0,0,0,0,3,0,0,success,100,49.1,1
+1001,cautious,8,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,20.3,1
+1001,cautious,9,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,9,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,success,100,61.8,1
+1001,cautious,10,gang,10,"Apartment Block",10,0,0,0,0,0,6,2,0,success,100,179.5,1
+1001,cautious,10,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,32.4,1
+1001,cautious,11,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,70.6,1
+1001,cautious,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,12,gang,10,"Apartment Block",6,1,0,0,0,0,3,0,0,success,95,147.5,1
+1001,cautious,12,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,26.2,1
+1001,cautious,13,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,13,gang,8,"Warehouse & Offices",6,1,0,0,0,0,3,1,0,success,95,121.6,1
+1001,cautious,14,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,14,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,42.9,1
+1001,cautious,15,gang,8,"Warehouse & Offices",6,1,1,0,0,1,6,0,0,partial,50,55.3,1
+1001,cautious,15,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,47.8,1
+1001,cautious,16,barricade,1,"Lone Cabin",7,1,1,1,0,0,1,1,0,partial,50,15.1,1
+1001,cautious,16,warrant,5,"Duplex",7,0,0,0,0,0,2,0,0,partial,65,55.7,1
+1001,cautious,17,barricade,1,"Lone Cabin",5,1,1,1,0,0,1,1,0,partial,50,21,1
+1001,cautious,17,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,3,0,0,success,100,100,1
+1001,cautious,18,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,18,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,145.2,1
+1001,cautious,19,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,19,gang,10,"Apartment Block",6,1,0,0,0,0,3,1,0,success,95,245.6,1
+1001,cautious,20,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,20,gang,8,"Warehouse & Offices",7,0,0,0,0,0,3,1,0,success,100,47.8,1
+1001,cautious,21,gang,10,"Apartment Block",7,2,1,1,0,0,6,1,0,partial,45,411.7,1
+1001,cautious,21,gang,8,"Warehouse & Offices",7,3,1,1,0,0,5,0,0,success,75,112.7,1
+1001,cautious,22,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,266.2,1
+1001,cautious,22,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,1,0,success,95,130.8,1
+1001,cautious,23,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,12.1,1
+1001,cautious,23,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,85.2,1
+1001,cautious,24,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,success,100,57.2,1
+1001,cautious,24,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,failure,30,84.4,1
+1001,cautious,25,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,25,gang,8,"Warehouse & Offices",6,1,1,1,0,0,2,0,0,success,85,104,1
+1001,cautious,26,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,26,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,104.1,1
+1001,cautious,27,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,27,gang,8,"Warehouse & Offices",6,2,1,1,0,0,6,0,0,partial,45,144.5,1
+1001,cautious,28,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,28,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,26.2,1
+1001,cautious,29,hostage,5,"Duplex",6,0,0,0,0,0,3,2,0,success,100,173.3,1
+1001,cautious,29,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,0,success,100,398.9,1
+1001,cautious,30,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,99.2,1
+1001,cautious,30,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,142.4,1
+1001,cautious,31,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,32,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,32,gang,8,"Warehouse & Offices",7,1,0,0,0,0,4,1,0,partial,60,94.2,1
+1001,cautious,33,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,601.9,1
+1001,cautious,33,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,79.5,1
+1001,cautious,34,hostage,8,"Warehouse & Offices",9,1,1,1,0,0,3,2,0,success,85,163.7,1
+1001,cautious,34,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,74.3,1
+1001,cautious,35,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,35,gang,8,"Warehouse & Offices",6,1,0,0,0,0,3,0,0,partial,60,120.9,1
+1001,cautious,36,hostage,8,"Warehouse & Offices",6,2,1,1,0,0,2,0,0,failure,10,169.9,1
+1001,cautious,36,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,37,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,cautious,37,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,10.3,1
+1001,cautious,38,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,85,1
+1001,cautious,38,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,partial,65,243.2,1
+1001,cautious,39,gang,10,"Apartment Block",9,5,2,2,0,0,6,1,0,success,55,183.3,1
+1001,cautious,39,barricade,3,"Corner Store",7,0,0,0,0,0,1,0,0,partial,65,1,1
+1001,cautious,40,gang,10,"Apartment Block",6,1,1,1,0,0,5,0,0,partial,50,315.6,1
+1001,cautious,40,warrant,5,"Duplex",4,1,0,0,0,0,1,0,0,success,95,77.6,1
+1001,military,1,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,1,barricade,3,"Corner Store",4,1,0,0,0,0,1,0,0,success,95,115,1
+1001,military,1,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,partial,65,0.8,1
+1001,military,2,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,2,gang,8,"Warehouse & Offices",6,3,0,0,0,0,6,2,0,partial,50,137.3,1
+1001,military,2,barricade,1,"Lone Cabin",5,2,1,1,0,0,1,0,0,success,80,21.1,1
+1001,military,3,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,failure,30,158.2,1
+1001,military,3,gang,8,"Warehouse & Offices",6,1,0,0,0,0,4,2,0,success,95,88.8,1
+1001,military,4,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,4,gang,8,"Warehouse & Offices",6,5,3,3,0,0,6,1,0,partial,10,148.8,1
+1001,military,4,warrant,5,"Duplex",4,0,0,0,0,0,3,1,0,partial,65,71,1
+1001,military,5,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,421.1,1
+1001,military,6,gang,8,"Warehouse & Offices",6,1,0,0,0,0,3,0,0,success,95,125.3,1
+1001,military,7,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,7,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,14.2,1
+1001,military,8,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,partial,65,85.2,1
+1001,military,9,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,9,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,1,0,success,85,109.9,1
+1001,military,10,gang,10,"Apartment Block",6,0,0,0,0,0,6,0,0,partial,65,478.3,1
+1001,military,11,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,54.6,1
+1001,military,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,12,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,success,100,134.9,1
+1001,military,13,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,13,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,partial,65,110.2,1
+1001,military,14,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,14,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,17.4,1
+1001,military,14,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,19.6,1
+1001,military,15,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,success,100,108.4,1
+1001,military,15,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,failure,30,35.2,1
+1001,military,16,barricade,1,"Lone Cabin",6,0,0,0,0,0,1,0,0,partial,65,13.5,1
+1001,military,16,warrant,5,"Duplex",5,1,1,1,0,0,2,0,0,partial,50,62.2,1
+1001,military,17,barricade,1,"Lone Cabin",4,1,1,1,0,0,1,0,0,success,85,26.3,1
+1001,military,17,warrant,6,"L-Shaped Ranch",4,2,1,1,0,0,3,0,0,partial,45,600,1
+1001,military,17,warrant,5,"Duplex",4,0,0,0,0,0,1,1,0,partial,65,7.9,1
+1001,military,18,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,18,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,241.4,1
+1001,military,19,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,19,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,8.9,1
+1001,military,20,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,20,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,partial,65,58.2,1
+1001,military,21,gang,10,"Apartment Block",6,0,0,0,0,0,6,0,2,partial,35,386.3,1
+1001,military,22,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,267.8,1
+1001,military,22,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,52.2,1
+1001,military,23,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,18.3,1
+1001,military,23,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,failure,30,46.2,1
+1001,military,23,warrant,5,"Duplex",4,0,0,0,0,0,1,1,0,partial,65,147.1,1
+1001,military,24,hostage,3,"Corner Store",6,0,0,0,0,0,2,2,0,success,100,47.9,1
+1001,military,24,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,failure,30,114.2,1
+1001,military,25,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,25,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,102.3,1
+1001,military,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,26,gang,8,"Warehouse & Offices",6,1,0,0,0,0,2,0,0,partial,60,102.5,1
+1001,military,27,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,27,gang,8,"Warehouse & Offices",6,3,1,1,0,0,6,0,0,partial,40,192.3,1
+1001,military,27,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,15.8,1
+1001,military,28,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,28,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,88.1,1
+1001,military,28,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,54.1,1
+1001,military,29,hostage,5,"Duplex",6,2,2,0,0,2,3,0,1,failure,0,900,1
+1001,military,29,event,11,"Civic Plaza",2,0,0,0,0,0,1,1,0,success,100,390.1,1
+1001,military,30,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,101.1,1
+1001,military,30,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,142.7,1
+1001,military,31,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,32,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,32,gang,8,"Warehouse & Offices",6,1,0,0,0,0,4,1,0,partial,60,94.1,1
+1001,military,33,event,11,"Civic Plaza",3,0,0,0,0,0,1,1,1,partial,50,602,1
+1001,military,33,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,1,0,success,100,85.7,1
+1001,military,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,224.4,1
+1001,military,34,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,115.2,1
+1001,military,35,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,35,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,failure,30,29.2,1
+1001,military,36,hostage,8,"Warehouse & Offices",6,1,0,0,0,0,2,1,0,success,95,136.3,1
+1001,military,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,military,37,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,partial,65,900,1
+1001,military,37,barricade,4,"Center-Hall Bungalow",4,1,1,0,0,1,1,0,0,partial,50,35.3,1
+1001,military,38,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,123.6,1
+1001,military,38,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,233.7,1
+1001,military,39,gang,10,"Apartment Block",6,1,0,0,0,0,6,2,0,partial,60,110.2,1
+1001,military,39,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,success,100,31.4,1
+1001,military,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,2,0,success,100,339.2,1
+1001,military,40,warrant,5,"Duplex",4,1,0,0,0,0,1,0,0,failure,25,32.2,1
+1001,minimal,1,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,2,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,3,gang,10,"Apartment Block",7,0,0,0,0,0,3,0,0,success,100,208.7,1
+1001,minimal,4,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,5,gang,10,"Apartment Block",10,0,0,0,0,0,2,0,0,success,100,129.7,1
+1001,minimal,6,gang,8,"Warehouse & Offices",8,0,0,0,0,0,3,2,0,success,100,74.2,1
+1001,minimal,7,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,8,gang,8,"Warehouse & Offices",10,0,0,0,0,0,3,1,0,success,100,72.6,1
+1001,minimal,9,event,11,"Civic Plaza",7,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,10,gang,10,"Apartment Block",10,0,0,0,0,0,6,1,0,success,100,314.9,1
+1001,minimal,11,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,115,1
+1001,minimal,12,barricade,4,"Center-Hall Bungalow",7,1,1,1,0,0,1,0,0,partial,50,46.7,1
+1001,minimal,13,event,11,"Civic Plaza",10,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,14,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,15,gang,8,"Warehouse & Offices",8,1,1,1,0,0,6,2,0,success,85,65.5,1
+1001,minimal,16,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,partial,65,17.5,1
+1001,minimal,17,barricade,1,"Lone Cabin",6,0,0,0,0,0,1,1,0,partial,65,1.7,1
+1001,minimal,18,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,19,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,20,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,21,gang,10,"Apartment Block",9,2,2,2,0,0,6,0,0,success,70,292.9,1
+1001,minimal,22,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,244.3,1
+1001,minimal,23,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,1,0,partial,65,39.4,1
+1001,minimal,24,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,1,partial,50,69.5,1
+1001,minimal,25,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,27,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,28,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,29,hostage,5,"Duplex",6,1,1,1,0,0,3,0,0,success,85,160,1
+1001,minimal,30,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,156.3,1
+1001,minimal,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,125.2,1
+1001,minimal,32,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,33,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,604.1,1
+1001,minimal,34,hostage,8,"Warehouse & Offices",8,1,1,1,0,0,3,1,0,success,85,171.2,1
+1001,minimal,35,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,36,hostage,8,"Warehouse & Offices",6,1,0,0,0,0,2,1,0,success,95,116.6,1
+1001,minimal,37,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+1001,minimal,38,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,95.8,1
+1001,minimal,39,gang,10,"Apartment Block",8,4,4,2,0,2,6,3,0,partial,5,340.5,1
+1001,minimal,40,gang,10,"Apartment Block",6,1,1,1,0,0,5,1,0,partial,50,62.2,1
+2002,accept_all,1,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,1,failure,15,900,1
+2002,accept_all,1,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,1,0,success,100,137.1,1
+2002,accept_all,1,warrant,5,"Duplex",4,0,0,0,0,0,2,1,0,partial,65,24.2,1
+2002,accept_all,2,gang,8,"Warehouse & Offices",8,1,1,1,0,0,5,1,0,success,85,95.6,1
+2002,accept_all,2,barricade,3,"Corner Store",5,2,1,0,0,1,1,0,0,failure,10,23.2,1
+2002,accept_all,2,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,39.1,1
+2002,accept_all,3,gang,8,"Warehouse & Offices",7,0,0,0,0,0,2,0,0,success,100,58.5,1
+2002,accept_all,3,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,74.4,1
+2002,accept_all,3,warrant,5,"Duplex",5,1,1,1,0,0,2,1,0,failure,15,81.2,1
+2002,accept_all,4,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,78.5,1
+2002,accept_all,4,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,4,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,6.5,1
+2002,accept_all,5,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,5,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,166.7,1
+2002,accept_all,5,warrant,5,"Duplex",5,1,0,0,0,0,1,0,0,failure,25,33.2,1
+2002,accept_all,6,gang,8,"Warehouse & Offices",7,0,0,0,0,0,6,2,0,success,100,94.8,1
+2002,accept_all,6,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,14.8,1
+2002,accept_all,6,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,partial,65,8.7,1
+2002,accept_all,7,gang,8,"Warehouse & Offices",7,5,1,1,0,0,4,3,0,partial,30,134,1
+2002,accept_all,7,barricade,4,"Center-Hall Bungalow",5,3,0,0,0,0,1,0,0,failure,15,131.2,1
+2002,accept_all,7,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,16.8,1
+2002,accept_all,8,hostage,5,"Duplex",6,0,0,0,0,0,3,1,1,failure,15,600.4,1
+2002,accept_all,8,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,failure,30,71.2,1
+2002,accept_all,9,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,partial,65,104.3,1
+2002,accept_all,9,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,partial,65,4.8,1
+2002,accept_all,10,gang,8,"Warehouse & Offices",6,2,1,1,0,0,6,0,0,partial,45,71.9,1
+2002,accept_all,10,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,18.9,1
+2002,accept_all,11,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,150.4,1
+2002,accept_all,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+2002,accept_all,12,gang,10,"Apartment Block",6,1,1,1,0,0,5,0,0,partial,50,98.2,1
+2002,accept_all,12,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,success,100,58.6,1
+2002,accept_all,13,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,13,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,21.9,1
+2002,accept_all,13,warrant,5,"Duplex",4,0,0,0,0,0,2,2,0,partial,65,37,1
+2002,accept_all,14,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,14,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,2,0,partial,65,110.2,1
+2002,accept_all,14,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,237.7,1
+2002,accept_all,15,hostage,3,"Corner Store",6,0,0,0,0,0,3,2,0,success,100,55.9,1
+2002,accept_all,15,event,11,"Civic Plaza",5,0,0,0,0,0,1,1,0,success,100,242.3,1
+2002,accept_all,16,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,16,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,success,100,349.3,1
+2002,accept_all,17,gang,8,"Warehouse & Offices",6,2,2,2,0,0,3,1,0,partial,35,66.2,1
+2002,accept_all,17,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,6.9,1
+2002,accept_all,18,hostage,5,"Duplex",6,0,0,0,0,0,1,1,0,success,100,47.7,1
+2002,accept_all,18,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,success,100,28.3,1
+2002,accept_all,18,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,15.6,1
+2002,accept_all,19,hostage,5,"Duplex",6,4,4,0,0,4,2,1,2,failure,0,900,1
+2002,accept_all,19,gang,8,"Warehouse & Offices",6,1,1,1,0,0,5,0,0,failure,15,98.6,1
+2002,accept_all,20,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,104.9,1
+2002,accept_all,20,event,11,"Civic Plaza",2,0,0,0,0,0,1,1,1,partial,50,687,1
+2002,accept_all,21,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,21,gang,8,"Warehouse & Offices",6,6,2,2,0,0,4,1,0,failure,0,96.1,1
+2002,accept_all,22,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,23,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,25,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,26,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,26,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,success,100,30.2,1
+2002,accept_all,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,failure,30,197.1,1
+2002,accept_all,28,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,241.7,1
+2002,accept_all,29,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,29,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,success,100,352.4,1
+2002,accept_all,30,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,1,0,0,success,100,21.1,1
+2002,accept_all,30,warrant,5,"Duplex",6,0,0,0,0,0,3,1,0,failure,30,152.2,1
+2002,accept_all,31,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,31,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,259.7,1
+2002,accept_all,31,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,26.3,1
+2002,accept_all,32,hostage,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,77.7,1
+2002,accept_all,32,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,32,warrant,5,"Duplex",4,0,0,0,0,0,3,1,0,partial,65,24.2,1
+2002,accept_all,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,33,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,1,1,partial,50,94.2,1
+2002,accept_all,33,warrant,5,"Duplex",4,0,0,0,0,0,3,2,0,partial,65,67.9,1
+2002,accept_all,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,failure,30,156,1
+2002,accept_all,34,event,11,"Civic Plaza",5,0,0,0,0,0,1,1,0,success,100,458.1,1
+2002,accept_all,34,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,1,0,partial,65,10.6,1
+2002,accept_all,35,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,35,gang,10,"Apartment Block",8,0,0,0,0,0,4,1,0,success,100,93.8,1
+2002,accept_all,35,warrant,5,"Duplex",6,0,0,0,0,0,3,2,0,partial,65,84,1
+2002,accept_all,36,event,11,"Civic Plaza",7,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,36,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,2,0,success,100,111.1,1
+2002,accept_all,36,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,54.8,1
+2002,accept_all,37,hostage,3,"Corner Store",7,0,0,0,0,0,2,0,0,success,100,47.4,1
+2002,accept_all,37,gang,8,"Warehouse & Offices",7,0,0,0,0,0,4,1,0,success,100,55.5,1
+2002,accept_all,37,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,partial,65,7.8,1
+2002,accept_all,38,hostage,5,"Duplex",6,1,1,1,0,0,3,0,0,success,85,93.5,1
+2002,accept_all,38,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,accept_all,38,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,260.6,1
+2002,accept_all,39,gang,8,"Warehouse & Offices",7,0,0,0,0,0,6,1,0,partial,65,82,1
+2002,accept_all,39,gang,8,"Warehouse & Offices",6,1,1,1,0,0,2,0,0,success,85,39.9,1
+2002,accept_all,39,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,35.2,1
+2002,accept_all,40,hostage,3,"Corner Store",9,0,0,0,0,0,1,0,0,success,100,56.7,1
+2002,accept_all,40,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,39.2,1
+2002,cautious,1,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,1,gang,8,"Warehouse & Offices",6,1,0,0,0,0,5,0,1,partial,45,116.2,1
+2002,cautious,2,gang,8,"Warehouse & Offices",7,1,1,1,0,0,5,1,0,success,85,130.3,1
+2002,cautious,2,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,partial,65,8.5,1
+2002,cautious,3,gang,8,"Warehouse & Offices",8,0,0,0,0,0,2,0,0,success,100,51.8,1
+2002,cautious,3,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,77.4,1
+2002,cautious,4,hostage,5,"Duplex",6,0,0,0,0,0,1,1,0,success,100,69.4,1
+2002,cautious,4,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,5,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,5,gang,8,"Warehouse & Offices",8,0,0,0,0,0,3,1,0,partial,65,137.5,1
+2002,cautious,6,gang,8,"Warehouse & Offices",8,4,4,3,0,1,6,0,0,partial,5,137.2,1
+2002,cautious,6,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,76.8,1
+2002,cautious,7,gang,8,"Warehouse & Offices",6,5,3,3,0,0,4,0,0,partial,10,158.2,1
+2002,cautious,7,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,30.2,1
+2002,cautious,8,hostage,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,104.6,1
+2002,cautious,9,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,1,0,0,success,100,61.3,1
+2002,cautious,9,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,partial,65,4.7,1
+2002,cautious,10,gang,8,"Warehouse & Offices",6,2,1,0,0,1,6,1,0,success,80,108.4,1
+2002,cautious,10,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,1,0,partial,65,28.4,1
+2002,cautious,11,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,150.4,1
+2002,cautious,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,12,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,partial,65,144.2,1
+2002,cautious,12,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,49.9,1
+2002,cautious,13,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,13,barricade,4,"Center-Hall Bungalow",5,1,1,1,0,0,1,0,0,success,85,51.4,1
+2002,cautious,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,14,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,1,0,partial,60,109.1,1
+2002,cautious,15,hostage,3,"Corner Store",6,0,0,0,0,0,3,1,1,failure,15,29.2,1
+2002,cautious,15,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,0,success,100,245.4,1
+2002,cautious,16,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,16,gang,10,"Apartment Block",6,1,1,1,0,0,3,1,0,success,85,68.4,1
+2002,cautious,17,gang,8,"Warehouse & Offices",6,1,1,0,1,0,3,0,1,partial,35,82.4,1
+2002,cautious,17,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,6.8,1
+2002,cautious,18,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,46.1,1
+2002,cautious,18,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,0.8,1
+2002,cautious,19,hostage,5,"Duplex",6,0,0,0,0,0,2,2,0,success,100,70.9,1
+2002,cautious,19,gang,8,"Warehouse & Offices",6,1,1,1,0,0,5,0,0,failure,15,63.3,1
+2002,cautious,20,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,176.2,1
+2002,cautious,20,event,11,"Civic Plaza",3,1,1,1,0,0,1,0,0,success,85,683.4,1
+2002,cautious,21,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,21,gang,8,"Warehouse & Offices",6,2,0,0,0,0,4,2,0,success,90,115.8,1
+2002,cautious,22,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,68.9,1
+2002,cautious,23,hostage,3,"Corner Store",6,1,1,1,0,0,2,0,0,success,85,56.3,1
+2002,cautious,23,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,24,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,64.6,1
+2002,cautious,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,25,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,25,gang,10,"Apartment Block",6,1,1,1,0,0,6,1,0,partial,50,158.1,1
+2002,cautious,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,26,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,0,0,partial,65,175,1
+2002,cautious,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,161.8,1
+2002,cautious,27,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,0,1,success,70,100.2,1
+2002,cautious,28,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,356.7,1
+2002,cautious,28,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,3.1,1
+2002,cautious,29,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,29,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,success,100,229.3,1
+2002,cautious,30,gang,8,"Warehouse & Offices",7,0,0,0,0,0,5,0,0,partial,65,112.5,1
+2002,cautious,30,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,partial,65,1.9,1
+2002,cautious,31,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,31,gang,8,"Warehouse & Offices",6,3,2,2,0,0,6,1,0,partial,30,113.6,1
+2002,cautious,32,hostage,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,82,1
+2002,cautious,32,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,33,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,0,0,success,100,107.7,1
+2002,cautious,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,failure,30,156.2,1
+2002,cautious,34,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,1,partial,50,450.3,1
+2002,cautious,35,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,35,gang,10,"Apartment Block",6,1,0,0,0,0,4,0,0,success,95,227.3,1
+2002,cautious,36,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,36,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,2,0,success,100,102.7,1
+2002,cautious,37,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,success,100,48.6,1
+2002,cautious,37,gang,8,"Warehouse & Offices",6,2,2,2,0,0,4,0,0,success,70,77.8,1
+2002,cautious,38,hostage,5,"Duplex",6,1,1,1,0,0,3,0,0,success,85,101.5,1
+2002,cautious,38,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,cautious,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,1,0,success,100,92.5,1
+2002,cautious,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,38.1,1
+2002,cautious,40,hostage,3,"Corner Store",8,0,0,0,0,0,1,0,0,success,100,88.5,1
+2002,cautious,40,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,1,0,0,success,100,32.2,1
+2002,military,1,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,1,gang,8,"Warehouse & Offices",6,4,1,1,0,0,5,0,0,success,70,190.6,1
+2002,military,1,warrant,5,"Duplex",4,0,0,0,0,0,2,0,0,partial,65,82.4,1
+2002,military,2,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,0,0,success,100,131.8,1
+2002,military,2,barricade,3,"Corner Store",5,1,0,0,0,0,1,0,0,success,95,48.2,1
+2002,military,2,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,24.1,1
+2002,military,3,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,44.2,1
+2002,military,3,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,80.5,1
+2002,military,3,warrant,5,"Duplex",4,0,0,0,0,0,2,0,0,success,100,49.4,1
+2002,military,4,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,47.2,1
+2002,military,4,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,5,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,5,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,partial,65,175.4,1
+2002,military,5,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,36.9,1
+2002,military,6,gang,8,"Warehouse & Offices",7,4,2,2,0,0,6,1,0,partial,25,125.2,1
+2002,military,6,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,14.3,1
+2002,military,6,warrant,5,"Duplex",4,1,1,1,0,0,1,0,0,partial,50,13.6,1
+2002,military,7,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,0,1,partial,35,126.7,1
+2002,military,7,barricade,4,"Center-Hall Bungalow",4,4,1,0,0,1,1,0,0,failure,0,82.9,1
+2002,military,8,hostage,5,"Duplex",6,0,0,0,0,0,3,0,1,failure,15,600.4,1
+2002,military,9,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,51.2,1
+2002,military,10,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,10.6,1
+2002,military,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+2002,military,12,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,47.6,1
+2002,military,13,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,13,barricade,4,"Center-Hall Bungalow",4,3,1,1,0,0,1,0,0,failure,5,102.2,1
+2002,military,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,15,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,1,partial,50,242.6,1
+2002,military,16,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,17,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,1,0,success,85,109.8,1
+2002,military,18,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,48.2,1
+2002,military,19,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,26.2,1
+2002,military,20,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,163.3,1
+2002,military,21,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,21,gang,8,"Warehouse & Offices",6,1,0,0,0,0,4,1,0,success,95,75.8,1
+2002,military,22,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,77.1,1
+2002,military,22,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,23,hostage,3,"Corner Store",6,1,1,1,0,0,2,1,0,success,85,77,1
+2002,military,23,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,24,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,95.2,1
+2002,military,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,25,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,25,gang,10,"Apartment Block",6,0,0,0,0,0,6,0,0,partial,65,441.2,1
+2002,military,26,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,26,gang,8,"Warehouse & Offices",6,2,1,1,0,0,5,1,0,success,80,132.6,1
+2002,military,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,150.8,1
+2002,military,28,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,success,100,342.3,1
+2002,military,29,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,29,gang,10,"Apartment Block",6,0,0,0,0,0,3,2,0,success,100,388.4,1
+2002,military,30,gang,8,"Warehouse & Offices",6,5,2,2,0,0,5,1,0,failure,0,149.2,1
+2002,military,31,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,32,hostage,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,84.4,1
+2002,military,33,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,33,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,success,100,98.7,1
+2002,military,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,partial,65,163.9,1
+2002,military,34,event,11,"Civic Plaza",2,0,0,0,0,0,1,1,0,success,100,498.9,1
+2002,military,35,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,35,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,partial,65,358.1,1
+2002,military,36,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,36,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,2,0,partial,65,118.2,1
+2002,military,37,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,74.1,1
+2002,military,37,gang,8,"Warehouse & Offices",6,2,1,1,0,0,4,1,0,partial,45,56.4,1
+2002,military,38,hostage,5,"Duplex",6,2,1,1,0,0,3,0,0,failure,10,120.4,1
+2002,military,38,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,military,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,1,0,partial,65,78.2,1
+2002,military,40,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,71.8,1
+2002,minimal,1,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,2,gang,8,"Warehouse & Offices",8,0,0,0,0,0,5,0,0,success,100,137.4,1
+2002,minimal,3,gang,8,"Warehouse & Offices",8,0,0,0,0,0,2,0,0,success,100,45.8,1
+2002,minimal,4,hostage,5,"Duplex",6,0,0,0,0,0,1,1,0,success,100,101.9,1
+2002,minimal,5,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,6,gang,8,"Warehouse & Offices",8,0,0,0,0,0,6,0,0,success,100,100.9,1
+2002,minimal,7,gang,8,"Warehouse & Offices",8,0,0,0,0,0,4,2,0,success,100,118.9,1
+2002,minimal,8,hostage,5,"Duplex",7,0,0,0,0,0,3,0,0,success,100,82.2,1
+2002,minimal,9,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,failure,30,58.2,1
+2002,minimal,10,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,partial,65,13.1,1
+2002,minimal,11,hostage,3,"Corner Store",8,0,0,0,0,0,1,0,0,partial,65,150.5,1
+2002,minimal,12,gang,10,"Apartment Block",8,0,0,0,0,0,5,0,0,partial,65,105.2,1
+2002,minimal,13,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,14,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,15,hostage,3,"Corner Store",7,0,0,0,0,0,3,1,0,success,100,41.6,1
+2002,minimal,16,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,17,gang,8,"Warehouse & Offices",8,0,0,0,0,0,3,0,0,success,100,100.8,1
+2002,minimal,18,hostage,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,46.9,1
+2002,minimal,19,hostage,5,"Duplex",7,0,0,0,0,0,2,0,0,success,100,109.5,1
+2002,minimal,20,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,144.4,1
+2002,minimal,21,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,22,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,2,failure,0,450.3,1
+2002,minimal,23,hostage,3,"Corner Store",6,1,1,1,0,0,2,1,0,success,85,72.2,1
+2002,minimal,24,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,58.6,1
+2002,minimal,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,27,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,1,1,0,success,100,145,1
+2002,minimal,28,gang,10,"Apartment Block",8,5,2,2,0,0,5,1,0,partial,20,616.4,1
+2002,minimal,29,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,30,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,2,0,success,100,65.4,1
+2002,minimal,31,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,32,hostage,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,121,1
+2002,minimal,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,failure,30,157.3,1
+2002,minimal,35,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,36,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+2002,minimal,37,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,75.2,1
+2002,minimal,38,hostage,5,"Duplex",6,1,1,1,0,0,3,0,0,success,85,95.5,1
+2002,minimal,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,0,0,partial,65,87.6,1
+2002,minimal,40,hostage,3,"Corner Store",9,0,0,0,0,0,1,0,0,success,100,58.7,1
+3003,accept_all,1,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,89.7,1
+3003,accept_all,1,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,1,1
+3003,accept_all,2,gang,10,"Apartment Block",10,0,0,0,0,0,5,0,0,success,100,201.1,1
+3003,accept_all,2,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,20,1
+3003,accept_all,3,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,221.6,1
+3003,accept_all,3,event,11,"Civic Plaza",5,0,0,0,0,0,1,1,1,partial,50,540.9,1
+3003,accept_all,3,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,success,100,78.9,1
+3003,accept_all,4,gang,10,"Apartment Block",7,0,0,0,0,0,5,2,0,success,100,83.5,1
+3003,accept_all,4,gang,8,"Warehouse & Offices",7,2,0,0,0,0,3,0,0,partial,55,44.2,1
+3003,accept_all,4,warrant,5,"Duplex",5,0,0,0,0,0,3,0,0,success,100,216.2,1
+3003,accept_all,5,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,1,1,0,success,100,182.9,1
+3003,accept_all,5,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,1,failure,15,900,1
+3003,accept_all,5,warrant,5,"Duplex",5,1,1,1,0,0,1,0,0,success,85,104.8,1
+3003,accept_all,6,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,success,100,231.3,1
+3003,accept_all,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,2,0,partial,65,71.4,1
+3003,accept_all,6,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,61.4,1
+3003,accept_all,7,gang,10,"Apartment Block",6,1,0,0,0,0,6,2,0,success,95,175.8,1
+3003,accept_all,7,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,95.8,1
+3003,accept_all,7,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,166.7,1
+3003,accept_all,8,gang,8,"Warehouse & Offices",10,0,0,0,0,0,3,1,0,success,100,73.4,1
+3003,accept_all,8,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,partial,65,0.7,1
+3003,accept_all,9,hostage,5,"Duplex",8,0,0,0,0,0,3,1,0,success,100,159.7,1
+3003,accept_all,9,gang,8,"Warehouse & Offices",9,1,1,1,0,0,3,0,0,partial,50,154.7,1
+3003,accept_all,10,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,10,gang,8,"Warehouse & Offices",7,3,1,1,0,0,6,2,0,partial,40,135,1
+3003,accept_all,10,warrant,5,"Duplex",5,0,0,0,0,0,3,0,0,partial,65,38.2,1
+3003,accept_all,11,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,81.7,1
+3003,accept_all,11,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,partial,65,900,1
+3003,accept_all,12,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,34.7,1
+3003,accept_all,13,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,13,barricade,3,"Corner Store",7,0,0,0,0,0,1,1,0,partial,65,5.5,1
+3003,accept_all,14,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,14,gang,10,"Apartment Block",6,4,0,0,0,0,4,1,0,success,80,378,1
+3003,accept_all,14,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,42.5,1
+3003,accept_all,15,hostage,3,"Corner Store",6,1,0,0,0,0,1,1,0,partial,60,63.3,1
+3003,accept_all,15,barricade,3,"Corner Store",4,2,1,1,0,0,1,1,0,partial,45,105.3,1
+3003,accept_all,16,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,16,gang,10,"Apartment Block",6,0,0,0,0,0,6,1,0,partial,65,403.8,1
+3003,accept_all,17,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,59,1
+3003,accept_all,18,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,18,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,231.9,1
+3003,accept_all,19,gang,10,"Apartment Block",6,0,0,0,0,0,4,0,0,success,100,285.7,1
+3003,accept_all,20,event,11,"Civic Plaza",3,0,0,0,0,0,1,1,0,success,100,730.8,1
+3003,accept_all,20,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,partial,65,143.2,1
+3003,accept_all,20,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,7.6,1
+3003,accept_all,21,gang,10,"Apartment Block",8,0,0,0,0,0,4,1,0,partial,65,130.2,1
+3003,accept_all,21,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,partial,65,73.3,1
+3003,accept_all,22,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,64.2,1
+3003,accept_all,22,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,partial,65,101.4,1
+3003,accept_all,23,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,23,gang,8,"Warehouse & Offices",6,2,1,1,0,0,6,2,0,partial,45,95.7,1
+3003,accept_all,23,warrant,5,"Duplex",4,0,0,0,0,0,2,1,0,success,100,20.2,1
+3003,accept_all,24,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,partial,65,100.2,1
+3003,accept_all,24,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,41.4,1
+3003,accept_all,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,25,gang,10,"Apartment Block",6,1,0,0,0,0,6,1,0,success,95,402.2,1
+3003,accept_all,26,hostage,8,"Warehouse & Offices",6,3,3,0,0,3,1,0,1,failure,0,900,1
+3003,accept_all,26,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,94.8,1
+3003,accept_all,27,hostage,5,"Duplex",6,1,0,0,0,0,3,1,0,partial,60,119,1
+3003,accept_all,28,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,183.3,1
+3003,accept_all,29,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,1,partial,50,201.8,1
+3003,accept_all,30,hostage,5,"Duplex",6,2,2,2,0,0,3,2,1,failure,0,900,1
+3003,accept_all,30,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,31,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,66.5,1
+3003,accept_all,31,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,4,failure,0,466.1,1
+3003,accept_all,32,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,32,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,98.3,1
+3003,accept_all,33,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,1.7,1
+3003,accept_all,33,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,success,100,36.3,1
+3003,accept_all,33,barricade,1,"Lone Cabin",4,1,1,1,0,0,1,0,0,partial,50,315.6,1
+3003,accept_all,34,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,34,gang,10,"Apartment Block",6,0,0,0,0,0,4,0,0,success,100,281.5,1
+3003,accept_all,35,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,35,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,104.8,1
+3003,accept_all,35,barricade,4,"Center-Hall Bungalow",4,1,1,1,0,0,1,0,0,partial,50,60.3,1
+3003,accept_all,36,hostage,8,"Warehouse & Offices",6,2,0,0,0,0,3,0,0,failure,20,276.8,1
+3003,accept_all,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+3003,accept_all,37,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,2,partial,35,770.6,1
+3003,accept_all,37,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,61.2,1
+3003,accept_all,37,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,36,1
+3003,accept_all,38,hostage,8,"Warehouse & Offices",6,3,3,3,0,0,3,2,0,failure,0,900,1
+3003,accept_all,38,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,39,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,97.2,1
+3003,accept_all,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,accept_all,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,334.1,1
+3003,cautious,1,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,116.7,1
+3003,cautious,1,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,partial,65,1,1
+3003,cautious,2,gang,10,"Apartment Block",10,2,1,1,0,0,5,2,0,success,80,96.6,1
+3003,cautious,2,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,17.9,1
+3003,cautious,3,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,220.6,1
+3003,cautious,3,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,0,success,100,536.2,1
+3003,cautious,4,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,success,100,44.3,1
+3003,cautious,4,gang,8,"Warehouse & Offices",6,3,3,3,0,0,3,0,0,partial,20,64.1,1
+3003,cautious,5,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,187.5,1
+3003,cautious,5,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,partial,65,900,1
+3003,cautious,6,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,success,100,261.8,1
+3003,cautious,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,1,0,success,100,121,1
+3003,cautious,7,gang,10,"Apartment Block",6,1,1,1,0,0,6,1,0,partial,50,171.5,1
+3003,cautious,7,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,86.9,1
+3003,cautious,8,gang,8,"Warehouse & Offices",8,0,0,0,0,0,3,0,0,failure,30,150,1
+3003,cautious,8,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,partial,65,4.4,1
+3003,cautious,9,hostage,5,"Duplex",8,0,0,0,0,0,3,1,0,success,100,138,1
+3003,cautious,9,gang,8,"Warehouse & Offices",9,1,1,0,0,1,3,1,0,success,85,44.2,1
+3003,cautious,10,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,10,gang,8,"Warehouse & Offices",7,2,0,0,0,0,6,0,0,success,90,75.3,1
+3003,cautious,11,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,80.7,1
+3003,cautious,11,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,12,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,1,success,85,18.8,1
+3003,cautious,12,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,22.4,1
+3003,cautious,13,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,13,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,362.6,1
+3003,cautious,14,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,14,gang,10,"Apartment Block",6,6,3,2,0,1,4,0,0,partial,5,264.8,1
+3003,cautious,15,hostage,3,"Corner Store",6,1,1,1,0,0,1,0,0,partial,50,60.4,1
+3003,cautious,16,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,16,gang,10,"Apartment Block",6,0,0,0,0,0,6,1,0,partial,65,477.8,1
+3003,cautious,17,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,38.8,1
+3003,cautious,18,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,18,gang,10,"Apartment Block",6,1,1,1,0,0,5,0,0,partial,50,239.7,1
+3003,cautious,19,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,success,100,275.2,1
+3003,cautious,20,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,2,partial,35,725.1,1
+3003,cautious,20,gang,10,"Apartment Block",6,0,0,0,0,0,4,2,0,success,100,382.3,1
+3003,cautious,21,gang,10,"Apartment Block",6,1,1,1,0,0,4,0,0,success,85,356.6,1
+3003,cautious,22,hostage,3,"Corner Store",6,1,0,0,0,0,2,0,0,success,95,68.6,1
+3003,cautious,22,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,77.6,1
+3003,cautious,23,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,23,gang,8,"Warehouse & Offices",6,1,1,1,0,0,6,1,1,success,70,104.2,1
+3003,cautious,24,gang,8,"Warehouse & Offices",6,2,1,0,0,1,3,1,0,success,80,117.1,1
+3003,cautious,24,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,42,1
+3003,cautious,25,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,25,gang,10,"Apartment Block",6,3,0,0,0,0,6,1,0,partial,50,177,1
+3003,cautious,27,hostage,5,"Duplex",6,4,4,2,0,2,3,1,3,failure,0,900,1
+3003,cautious,29,event,11,"Civic Plaza",2,1,0,0,0,0,1,0,0,success,95,253,1
+3003,cautious,30,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,31,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,32.7,1
+3003,cautious,32,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,32,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,68.7,1
+3003,cautious,33,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,19.9,1
+3003,cautious,33,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,partial,65,17.3,1
+3003,cautious,34,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,34,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,success,100,21.5,1
+3003,cautious,35,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,35,gang,8,"Warehouse & Offices",6,1,1,0,0,1,4,0,0,partial,50,55.7,1
+3003,cautious,36,hostage,8,"Warehouse & Offices",6,3,3,0,0,3,3,2,2,failure,0,900,1
+3003,cautious,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,713.1,1
+3003,cautious,37,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,failure,30,66.2,1
+3003,cautious,38,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,success,100,306.7,1
+3003,cautious,38,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,39,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,70.7,1
+3003,cautious,40,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,cautious,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,366.3,1
+3003,military,1,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,102.7,1
+3003,military,1,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,1,1
+3003,military,2,gang,10,"Apartment Block",10,0,0,0,0,0,5,1,0,success,100,85.6,1
+3003,military,2,warrant,5,"Duplex",7,0,0,0,0,0,1,1,0,partial,65,2.4,1
+3003,military,3,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,246,1
+3003,military,3,event,11,"Civic Plaza",5,0,0,0,0,0,1,0,1,partial,50,536.7,1
+3003,military,3,gang,8,"Warehouse & Offices",6,1,0,0,0,0,3,1,0,success,95,79.8,1
+3003,military,4,gang,10,"Apartment Block",7,0,0,0,0,0,5,1,0,success,100,73.7,1
+3003,military,4,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,73.1,1
+3003,military,4,warrant,5,"Duplex",5,2,2,2,0,0,3,0,0,partial,35,130.8,1
+3003,military,5,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,1,0,0,success,100,195.2,1
+3003,military,5,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,5,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,47.2,1
+3003,military,6,gang,10,"Apartment Block",6,3,0,0,0,0,4,0,0,failure,15,191.2,1
+3003,military,6,gang,8,"Warehouse & Offices",6,1,1,1,0,0,5,1,0,success,85,109.7,1
+3003,military,6,barricade,4,"Center-Hall Bungalow",4,2,0,0,0,0,1,1,0,partial,55,121.5,1
+3003,military,7,gang,10,"Apartment Block",6,2,2,1,0,1,6,4,1,partial,20,405.2,1
+3003,military,7,gang,8,"Warehouse & Offices",6,3,2,2,0,0,4,1,0,partial,30,160.4,1
+3003,military,8,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,14,1
+3003,military,10,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,11,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,94.9,1
+3003,military,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+3003,military,12,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,17.8,1
+3003,military,13,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,13,gang,10,"Apartment Block",6,0,0,0,0,0,5,2,0,partial,65,425,1
+3003,military,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,14,gang,10,"Apartment Block",6,1,1,0,0,1,4,1,0,partial,50,272.1,1
+3003,military,15,barricade,3,"Corner Store",4,3,2,2,0,0,1,0,0,success,65,109.9,1
+3003,military,16,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,17,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,42.6,1
+3003,military,18,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,18,warrant,6,"L-Shaped Ranch",4,2,1,1,0,0,3,0,0,success,80,125,1
+3003,military,19,gang,10,"Apartment Block",6,3,3,0,3,0,4,0,2,partial,0,171,1
+3003,military,20,event,11,"Civic Plaza",2,0,0,0,0,0,1,1,0,success,100,723.7,1
+3003,military,22,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,29.5,1
+3003,military,23,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,24,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,45,1
+3003,military,25,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,26,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,199.6,1
+3003,military,27,hostage,5,"Duplex",6,1,0,0,0,0,3,1,0,partial,60,103,1
+3003,military,28,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,195.7,1
+3003,military,28,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,3,1,0,partial,65,44.5,1
+3003,military,29,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,206.7,1
+3003,military,30,hostage,5,"Duplex",6,3,2,2,0,0,3,1,1,failure,0,900,1
+3003,military,31,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,32.8,1
+3003,military,32,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,32,warrant,5,"Duplex",4,0,0,0,0,0,1,1,0,partial,65,34.3,1
+3003,military,33,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,22.6,1
+3003,military,33,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,success,100,40.2,1
+3003,military,34,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,34,gang,10,"Apartment Block",6,2,0,0,0,0,4,0,0,success,90,74.1,1
+3003,military,35,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+3003,military,35,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,22,1
+3003,military,36,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,241.5,1
+3003,military,37,event,11,"Civic Plaza",2,0,0,0,0,0,1,1,2,partial,35,711,1
+3003,military,37,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,77.2,1
+3003,military,38,hostage,8,"Warehouse & Offices",6,3,3,3,0,0,3,1,3,failure,0,900,1
+3003,military,39,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,174.9,1
+3003,military,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,military,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,partial,65,282.2,1
+3003,minimal,1,gang,8,"Warehouse & Offices",8,0,0,0,0,0,2,0,0,success,100,81.7,1
+3003,minimal,2,gang,10,"Apartment Block",10,1,0,0,0,0,5,2,0,partial,60,343.2,1
+3003,minimal,3,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,202.4,1
+3003,minimal,4,gang,10,"Apartment Block",7,1,0,0,0,0,5,0,0,partial,60,210.2,1
+3003,minimal,5,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,1,0,0,success,100,183.3,1
+3003,minimal,6,gang,10,"Apartment Block",7,0,0,0,0,0,4,0,0,success,100,337.1,1
+3003,minimal,7,gang,10,"Apartment Block",7,0,0,0,0,0,6,0,0,success,100,198.1,1
+3003,minimal,8,gang,8,"Warehouse & Offices",10,0,0,0,0,0,3,0,0,failure,30,148.2,1
+3003,minimal,9,hostage,5,"Duplex",9,0,0,0,0,0,3,0,0,success,100,171.1,1
+3003,minimal,10,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,11,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,100.2,1
+3003,minimal,12,gang,10,"Apartment Block",7,0,0,0,0,0,2,0,0,success,100,19.5,1
+3003,minimal,13,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,14,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,15,hostage,3,"Corner Store",7,0,0,0,0,0,1,0,0,success,100,64,1
+3003,minimal,16,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,17,hostage,3,"Corner Store",9,0,0,0,0,0,1,0,0,success,100,40.6,1
+3003,minimal,18,event,11,"Civic Plaza",8,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,19,gang,10,"Apartment Block",8,1,1,1,0,0,4,0,0,success,85,246.8,1
+3003,minimal,20,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,729.2,1
+3003,minimal,21,gang,10,"Apartment Block",10,0,0,0,0,0,4,0,0,success,100,212.1,1
+3003,minimal,22,hostage,3,"Corner Store",6,1,0,0,0,0,2,0,0,success,95,60,1
+3003,minimal,23,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,24,gang,8,"Warehouse & Offices",7,0,0,0,0,0,3,1,1,success,85,68.8,1
+3003,minimal,25,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,26,hostage,8,"Warehouse & Offices",6,3,2,1,0,1,1,0,1,failure,0,900,1
+3003,minimal,27,hostage,5,"Duplex",8,1,1,1,0,0,3,1,0,success,85,107.3,1
+3003,minimal,28,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,155.2,1
+3003,minimal,29,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,198.8,1
+3003,minimal,30,hostage,5,"Duplex",6,0,0,0,0,0,3,1,0,success,100,121.4,1
+3003,minimal,31,hostage,3,"Corner Store",6,1,1,1,0,0,1,1,0,partial,50,159.3,1
+3003,minimal,32,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,33,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,1.7,1
+3003,minimal,34,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,35,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,36,hostage,8,"Warehouse & Offices",6,1,0,0,0,0,3,2,0,success,95,241.7,1
+3003,minimal,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,714.4,1
+3003,minimal,38,hostage,8,"Warehouse & Offices",6,3,3,2,0,1,3,2,0,failure,0,900,1
+3003,minimal,39,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+3003,minimal,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,1,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,1,gang,8,"Warehouse & Offices",6,3,2,2,0,0,5,1,0,failure,0,71.2,1
+4004,accept_all,1,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,80.2,1
+4004,accept_all,2,hostage,3,"Corner Store",7,0,0,0,0,0,2,1,0,success,100,40.5,1
+4004,accept_all,2,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,245.4,1
+4004,accept_all,2,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,failure,30,395,1
+4004,accept_all,3,gang,10,"Apartment Block",10,1,0,0,0,0,2,0,0,partial,60,94.2,1
+4004,accept_all,3,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,success,100,21.4,1
+4004,accept_all,4,gang,8,"Warehouse & Offices",7,1,1,1,0,0,6,2,0,partial,50,84.3,1
+4004,accept_all,4,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,50.2,1
+4004,accept_all,4,warrant,5,"Duplex",4,0,0,0,0,0,2,2,0,success,100,5.6,1
+4004,accept_all,5,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,236.3,1
+4004,accept_all,5,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,5,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,310.1,1
+4004,accept_all,6,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,1,0,partial,65,55.8,1
+4004,accept_all,6,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,44.3,1
+4004,accept_all,7,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,success,100,28.9,1
+4004,accept_all,7,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,failure,30,40.2,1
+4004,accept_all,8,hostage,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,50.7,1
+4004,accept_all,8,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,8,warrant,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,122.4,1
+4004,accept_all,9,gang,10,"Apartment Block",8,1,0,0,0,0,5,1,0,partial,60,269.2,1
+4004,accept_all,9,barricade,1,"Lone Cabin",6,0,0,0,0,0,1,0,0,success,100,17.8,1
+4004,accept_all,9,warrant,5,"Duplex",6,0,0,0,0,0,2,0,0,partial,65,75.7,1
+4004,accept_all,10,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,2,0,0,failure,30,900,1
+4004,accept_all,10,gang,8,"Warehouse & Offices",7,0,0,0,0,0,3,1,0,success,100,65.4,1
+4004,accept_all,10,warrant,5,"Duplex",5,0,0,0,0,0,2,0,0,success,100,47.4,1
+4004,accept_all,11,hostage,3,"Corner Store",6,4,2,1,0,1,2,1,3,failure,0,900,1
+4004,accept_all,11,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,11,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,8.8,1
+4004,accept_all,12,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,1,0,partial,60,48,1
+4004,accept_all,12,gang,8,"Warehouse & Offices",6,2,2,2,0,0,5,1,0,success,70,106,1
+4004,accept_all,13,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,13,gang,10,"Apartment Block",6,0,0,0,0,0,2,1,0,success,100,59.6,1
+4004,accept_all,14,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,14,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,78.2,1
+4004,accept_all,14,warrant,5,"Duplex",4,0,0,0,0,0,2,1,0,partial,65,289.2,1
+4004,accept_all,15,event,11,"Civic Plaza",5,0,0,0,0,0,1,0,0,success,100,522.7,1
+4004,accept_all,15,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,3,1
+4004,accept_all,15,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,39.4,1
+4004,accept_all,16,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,success,100,79,1
+4004,accept_all,16,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,75,1
+4004,accept_all,16,warrant,5,"Duplex",4,0,0,0,0,0,3,1,0,partial,65,41.2,1
+4004,accept_all,17,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,17,gang,10,"Apartment Block",6,1,0,0,0,0,3,1,0,success,95,293,1
+4004,accept_all,17,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,success,100,84,1
+4004,accept_all,18,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,3,0,0,success,100,166.7,1
+4004,accept_all,18,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,partial,65,85.3,1
+4004,accept_all,18,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,371.3,1
+4004,accept_all,19,gang,8,"Warehouse & Offices",10,0,0,0,0,0,3,1,0,success,100,31.2,1
+4004,accept_all,19,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,failure,30,16.2,1
+4004,accept_all,20,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,20,gang,8,"Warehouse & Offices",8,0,0,0,0,0,2,1,0,success,100,61.3,1
+4004,accept_all,20,warrant,5,"Duplex",6,0,0,0,0,0,2,0,0,partial,65,75.8,1
+4004,accept_all,21,hostage,8,"Warehouse & Offices",9,1,1,1,0,0,2,1,0,success,85,154.3,1
+4004,accept_all,21,gang,8,"Warehouse & Offices",10,1,0,0,0,0,5,2,0,success,95,37.1,1
+4004,accept_all,22,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,22,barricade,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,10.7,1
+4004,accept_all,22,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,31.3,1
+4004,accept_all,23,event,11,"Civic Plaza",6,1,1,0,1,0,2,2,2,partial,20,376,1
+4004,accept_all,23,gang,8,"Warehouse & Offices",6,1,0,0,0,0,5,1,0,partial,60,172.2,1
+4004,accept_all,23,warrant,5,"Duplex",5,0,0,0,0,0,3,1,0,success,100,47.7,1
+4004,accept_all,24,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,1,0,partial,65,11.3,1
+4004,accept_all,24,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,38.1,1
+4004,accept_all,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,25,gang,8,"Warehouse & Offices",7,2,2,1,0,1,6,2,0,partial,35,137,1
+4004,accept_all,25,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,13.9,1
+4004,accept_all,26,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,35.8,1
+4004,accept_all,26,barricade,3,"Corner Store",5,0,0,0,0,0,1,0,0,success,100,63.3,1
+4004,accept_all,26,warrant,5,"Duplex",5,4,3,3,0,0,3,0,0,success,50,125.8,1
+4004,accept_all,27,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,2,1,0,success,100,124.7,1
+4004,accept_all,27,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,101.3,1
+4004,accept_all,28,gang,8,"Warehouse & Offices",7,3,2,2,0,0,2,0,0,success,65,67.5,1
+4004,accept_all,28,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,success,100,54.2,1
+4004,accept_all,29,barricade,1,"Lone Cabin",6,1,1,1,0,0,1,0,0,partial,50,17.5,1
+4004,accept_all,29,warrant,5,"Duplex",5,0,0,0,0,0,2,0,0,failure,30,75.2,1
+4004,accept_all,30,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,30,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,14.4,1
+4004,accept_all,30,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,failure,30,60.2,1
+4004,accept_all,31,hostage,5,"Duplex",6,0,0,0,0,0,3,0,2,failure,0,631.4,1
+4004,accept_all,31,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,32,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,partial,65,900,1
+4004,accept_all,32,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,230.7,1
+4004,accept_all,32,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,5.2,1
+4004,accept_all,33,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,partial,65,197.6,1
+4004,accept_all,33,event,11,"Civic Plaza",5,0,0,0,0,0,1,1,1,partial,50,256.7,1
+4004,accept_all,33,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,24.3,1
+4004,accept_all,34,event,11,"Civic Plaza",4,1,1,1,0,0,1,1,0,success,85,518.7,1
+4004,accept_all,34,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,1,0,partial,65,144,1
+4004,accept_all,34,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,1.6,1
+4004,accept_all,35,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,partial,65,900,1
+4004,accept_all,35,gang,10,"Apartment Block",6,1,1,1,0,0,6,3,0,partial,50,361,1
+4004,accept_all,35,barricade,4,"Center-Hall Bungalow",4,1,1,1,0,0,1,0,0,partial,50,17.5,1
+4004,accept_all,36,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,36,gang,10,"Apartment Block",6,0,0,0,0,0,4,2,0,success,100,272.5,1
+4004,accept_all,36,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,333.7,1
+4004,accept_all,37,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,37,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,1,0,partial,65,75.2,1
+4004,accept_all,37,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,241,1
+4004,accept_all,38,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,43.4,1
+4004,accept_all,38,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,38,warrant,5,"Duplex",4,1,1,1,0,0,2,0,0,partial,50,56.7,1
+4004,accept_all,39,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,32.2,1
+4004,accept_all,39,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,accept_all,40,gang,10,"Apartment Block",8,0,0,0,0,0,6,2,0,success,100,321.7,1
+4004,accept_all,40,barricade,3,"Corner Store",5,1,0,0,0,0,1,1,0,success,95,58.3,1
+4004,cautious,1,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,1,gang,8,"Warehouse & Offices",6,2,1,1,0,0,5,2,0,failure,10,64.2,1
+4004,cautious,2,hostage,3,"Corner Store",7,0,0,0,0,0,2,0,0,success,100,76.5,1
+4004,cautious,2,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,257.4,1
+4004,cautious,3,gang,10,"Apartment Block",10,0,0,0,0,0,2,0,0,success,100,41.5,1
+4004,cautious,3,barricade,1,"Lone Cabin",7,1,1,1,0,0,1,0,0,success,85,28.7,1
+4004,cautious,4,gang,8,"Warehouse & Offices",6,1,1,1,0,0,6,0,0,partial,50,130.7,1
+4004,cautious,4,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,80.9,1
+4004,cautious,5,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,2,0,partial,65,235.5,1
+4004,cautious,5,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,6,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,57.4,1
+4004,cautious,6,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,failure,30,18.2,1
+4004,cautious,7,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,success,100,68.3,1
+4004,cautious,7,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,35.9,1
+4004,cautious,8,hostage,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,41.7,1
+4004,cautious,8,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,9,gang,10,"Apartment Block",7,0,0,0,0,0,5,3,0,success,100,102.9,1
+4004,cautious,9,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,0,0,success,100,17.4,1
+4004,cautious,10,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,failure,30,900,1
+4004,cautious,10,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,1,0,partial,50,68.2,1
+4004,cautious,11,hostage,3,"Corner Store",6,2,0,0,0,0,2,1,0,failure,20,90,1
+4004,cautious,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,12,gang,8,"Warehouse & Offices",6,3,1,1,0,0,6,1,0,partial,40,169.4,1
+4004,cautious,12,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,2,0,partial,65,50.2,1
+4004,cautious,13,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,13,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,58.5,1
+4004,cautious,14,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,14,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,failure,30,74.2,1
+4004,cautious,15,event,11,"Civic Plaza",5,0,0,0,0,0,1,0,0,success,100,512.1,1
+4004,cautious,15,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,2.7,1
+4004,cautious,16,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,109.6,1
+4004,cautious,16,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,3,0,success,85,75.3,1
+4004,cautious,17,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,17,gang,10,"Apartment Block",6,0,0,0,0,0,3,1,0,success,100,190.2,1
+4004,cautious,18,hostage,8,"Warehouse & Offices",6,2,2,2,0,0,3,0,0,failure,0,900,1
+4004,cautious,18,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,63.2,1
+4004,cautious,19,gang,8,"Warehouse & Offices",8,0,0,0,0,0,3,0,0,partial,65,80.5,1
+4004,cautious,19,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,failure,30,39.2,1
+4004,cautious,20,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,20,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,failure,30,23.2,1
+4004,cautious,21,hostage,8,"Warehouse & Offices",8,3,2,2,0,0,2,0,0,failure,0,128.2,1
+4004,cautious,21,gang,8,"Warehouse & Offices",8,0,0,0,0,0,5,0,0,success,100,54.6,1
+4004,cautious,22,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,22,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,10.3,1
+4004,cautious,23,event,11,"Civic Plaza",5,0,0,0,0,0,2,1,2,partial,35,358,1
+4004,cautious,23,gang,8,"Warehouse & Offices",6,1,1,1,0,0,5,0,0,partial,50,103.8,1
+4004,cautious,24,barricade,1,"Lone Cabin",6,2,2,2,0,0,1,1,0,partial,35,14.6,1
+4004,cautious,24,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,181.8,1
+4004,cautious,25,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,25,gang,8,"Warehouse & Offices",6,4,1,1,0,0,6,3,0,partial,35,142.2,1
+4004,cautious,26,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,partial,65,154.5,1
+4004,cautious,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,150.6,1
+4004,cautious,28,gang,8,"Warehouse & Offices",6,2,2,1,0,1,2,1,0,success,70,52.9,1
+4004,cautious,29,barricade,1,"Lone Cabin",5,1,0,0,0,0,1,0,0,partial,60,16,1
+4004,cautious,30,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,30,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,13.9,1
+4004,cautious,31,hostage,5,"Duplex",6,0,0,0,0,0,3,0,2,failure,0,631.4,1
+4004,cautious,31,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,32,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,33,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,164.5,1
+4004,cautious,33,event,11,"Civic Plaza",2,0,0,0,0,0,1,1,0,success,100,259.4,1
+4004,cautious,34,event,11,"Civic Plaza",2,0,0,0,0,0,1,1,1,partial,50,521.4,1
+4004,cautious,34,gang,8,"Warehouse & Offices",6,2,1,1,0,0,6,0,0,success,80,118.8,1
+4004,cautious,35,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+4004,cautious,35,gang,10,"Apartment Block",6,0,0,0,0,0,6,3,0,partial,65,167.2,1
+4004,cautious,36,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,36,gang,10,"Apartment Block",6,4,1,0,0,1,4,0,0,success,70,401.4,1
+4004,cautious,37,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,cautious,38,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,46.6,1
+4004,cautious,39,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,27.4,1
+4004,cautious,40,gang,10,"Apartment Block",6,0,0,0,0,0,6,1,0,partial,65,241.2,1
+4004,military,1,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,1,gang,8,"Warehouse & Offices",6,2,1,0,1,0,5,2,0,partial,45,46.4,1
+4004,military,2,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,success,100,69,1
+4004,military,2,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,240.7,1
+4004,military,2,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,298.3,1
+4004,military,3,gang,10,"Apartment Block",10,0,0,0,0,0,2,0,0,success,100,334.6,1
+4004,military,3,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,success,100,23.3,1
+4004,military,4,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,0,0,partial,65,37.3,1
+4004,military,4,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,76.4,1
+4004,military,4,warrant,5,"Duplex",4,0,0,0,0,0,2,1,0,success,100,18.2,1
+4004,military,5,hostage,8,"Warehouse & Offices",6,3,3,0,0,3,3,1,2,failure,0,900,1
+4004,military,5,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,5,gang,10,"Apartment Block",6,3,1,1,0,0,5,0,0,failure,5,251.2,1
+4004,military,6,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,1,0,0,success,100,57.7,1
+4004,military,6,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,failure,30,26.2,1
+4004,military,7,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,success,100,16.2,1
+4004,military,7,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,success,100,34.5,1
+4004,military,8,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,37.8,1
+4004,military,8,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,9,gang,10,"Apartment Block",6,2,0,0,0,0,5,1,0,success,90,152.5,1
+4004,military,10,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,failure,30,900,1
+4004,military,10,warrant,5,"Duplex",4,0,0,0,0,0,2,0,0,success,100,78,1
+4004,military,11,hostage,3,"Corner Store",6,2,2,2,0,0,2,0,0,failure,0,222,1
+4004,military,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,12,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,50.2,1
+4004,military,13,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,13,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,3,2,0,partial,65,65.2,1
+4004,military,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,14,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,46.2,1
+4004,military,15,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,0,success,100,514.2,1
+4004,military,16,gang,8,"Warehouse & Offices",6,2,1,1,0,0,3,0,0,success,80,101.5,1
+4004,military,17,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,17,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,success,100,310.8,1
+4004,military,18,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,32.2,1
+4004,military,19,gang,8,"Warehouse & Offices",6,6,2,1,0,1,3,0,0,failure,0,101,1
+4004,military,20,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,20,warrant,5,"Duplex",4,1,0,0,0,0,2,0,0,partial,60,109.5,1
+4004,military,22,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,23,event,11,"Civic Plaza",3,1,1,1,0,0,2,1,4,failure,0,402.8,1
+4004,military,23,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,partial,65,134.9,1
+4004,military,24,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,10.2,1
+4004,military,25,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,25,gang,8,"Warehouse & Offices",6,2,0,0,0,0,6,1,0,success,90,111.6,1
+4004,military,26,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,151.8,1
+4004,military,26,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,success,100,68.3,1
+4004,military,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,148,1
+4004,military,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,50.5,1
+4004,military,29,barricade,1,"Lone Cabin",5,1,0,0,0,0,1,0,0,partial,60,12,1
+4004,military,29,warrant,5,"Duplex",5,0,0,0,0,0,2,0,0,failure,30,73.2,1
+4004,military,30,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,30,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,14.4,1
+4004,military,31,hostage,5,"Duplex",6,0,0,0,0,0,3,0,2,failure,0,631.4,1
+4004,military,31,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,32,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,32,gang,10,"Apartment Block",6,0,0,0,0,0,4,0,0,success,100,321.6,1
+4004,military,32,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,241.4,1
+4004,military,33,hostage,5,"Duplex",6,1,0,0,0,0,1,0,0,partial,60,172.7,1
+4004,military,33,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,2,partial,35,254.6,1
+4004,military,33,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,118.6,1
+4004,military,34,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,1,partial,50,505.2,1
+4004,military,34,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,1,0,partial,60,139.3,1
+4004,military,34,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,18.5,1
+4004,military,35,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,35,gang,10,"Apartment Block",6,2,2,2,0,0,6,2,0,partial,35,74.2,1
+4004,military,35,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,13.4,1
+4004,military,36,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,36,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,partial,65,151.6,1
+4004,military,37,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,37,gang,8,"Warehouse & Offices",6,1,1,0,1,0,5,2,0,success,85,109.4,1
+4004,military,38,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,59.1,1
+4004,military,38,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,39,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,35.8,1
+4004,military,39,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,military,40,barricade,3,"Corner Store",7,3,3,0,0,3,1,1,0,partial,20,77.2,1
+4004,minimal,1,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,2,hostage,3,"Corner Store",8,0,0,0,0,0,2,0,0,success,100,70.5,1
+4004,minimal,3,gang,10,"Apartment Block",10,1,1,1,0,0,2,0,0,partial,50,47.2,1
+4004,minimal,4,gang,8,"Warehouse & Offices",8,2,1,1,0,0,6,2,0,partial,45,100.6,1
+4004,minimal,5,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,2,0,success,100,206.2,1
+4004,minimal,6,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,1,0,partial,65,63.9,1
+4004,minimal,7,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,success,100,63.4,1
+4004,minimal,8,hostage,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,38,1
+4004,minimal,9,gang,10,"Apartment Block",8,1,1,1,0,0,5,0,0,success,85,179.6,1
+4004,minimal,10,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,failure,30,900,1
+4004,minimal,11,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,70.7,1
+4004,minimal,12,gang,8,"Warehouse & Offices",6,2,1,0,0,1,6,2,0,success,80,137.2,1
+4004,minimal,13,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,14,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,15,event,11,"Civic Plaza",6,0,0,0,0,0,1,1,1,partial,50,514.5,1
+4004,minimal,16,gang,8,"Warehouse & Offices",6,1,1,0,0,1,3,0,0,success,85,97.1,1
+4004,minimal,17,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,18,hostage,8,"Warehouse & Offices",6,1,1,1,0,0,3,1,0,success,85,170.4,1
+4004,minimal,19,gang,8,"Warehouse & Offices",8,1,0,0,0,0,3,1,0,partial,60,117.1,1
+4004,minimal,20,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,21,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,129.1,1
+4004,minimal,22,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,23,event,11,"Civic Plaza",5,0,0,0,0,0,2,2,0,success,100,357.5,1
+4004,minimal,24,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,success,100,23.1,1
+4004,minimal,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,partial,65,900,1
+4004,minimal,26,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,64.2,1
+4004,minimal,27,hostage,8,"Warehouse & Offices",8,0,0,0,0,0,2,1,0,success,100,133.6,1
+4004,minimal,28,gang,8,"Warehouse & Offices",8,0,0,0,0,0,2,1,0,partial,65,39.6,1
+4004,minimal,29,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,partial,65,13.1,1
+4004,minimal,30,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,1,failure,15,900,1
+4004,minimal,31,hostage,5,"Duplex",6,0,0,0,0,0,3,1,2,failure,0,631.4,1
+4004,minimal,32,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,33,hostage,5,"Duplex",6,0,0,0,0,0,1,1,0,success,100,157.7,1
+4004,minimal,34,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,1,partial,50,527.3,1
+4004,minimal,35,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,36,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,1,failure,15,900,1
+4004,minimal,37,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+4004,minimal,38,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,58.9,1
+4004,minimal,39,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,28.4,1
+4004,minimal,40,barricade,3,"Corner Store",7,1,1,1,0,0,1,0,0,partial,50,64.3,1
+5005,accept_all,1,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,1,barricade,4,"Center-Hall Bungalow",4,2,0,0,0,0,1,0,0,failure,20,34.2,1
+5005,accept_all,1,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,137.5,1
+5005,accept_all,2,hostage,8,"Warehouse & Offices",9,0,0,0,0,0,2,1,0,success,100,150.5,1
+5005,accept_all,2,warrant,5,"Duplex",7,1,0,0,0,0,3,0,0,failure,25,36.2,1
+5005,accept_all,3,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,46.7,1
+5005,accept_all,3,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,partial,65,18.6,1
+5005,accept_all,3,warrant,5,"Duplex",5,0,0,0,0,0,3,0,0,partial,65,145.7,1
+5005,accept_all,4,gang,8,"Warehouse & Offices",9,0,0,0,0,0,2,0,0,success,100,76.2,1
+5005,accept_all,4,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,2,0,0,success,100,600,1
+5005,accept_all,5,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,partial,65,18.5,1
+5005,accept_all,5,barricade,4,"Center-Hall Bungalow",7,4,1,1,0,0,1,0,0,failure,0,121.2,1
+5005,accept_all,6,gang,8,"Warehouse & Offices",6,3,1,1,0,0,6,0,0,failure,5,125.2,1
+5005,accept_all,6,warrant,5,"Duplex",5,0,0,0,0,0,2,0,0,partial,65,68.2,1
+5005,accept_all,6,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,323.3,1
+5005,accept_all,7,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,7,gang,10,"Apartment Block",6,0,0,0,0,0,5,3,0,success,100,71.4,1
+5005,accept_all,7,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,21,1
+5005,accept_all,8,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,2,failure,0,498.7,1
+5005,accept_all,8,event,11,"Civic Plaza",3,0,0,0,0,0,1,1,0,success,100,466.6,1
+5005,accept_all,9,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,1,failure,15,900,1
+5005,accept_all,9,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,101.6,1
+5005,accept_all,10,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,244.7,1
+5005,accept_all,10,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,34,1
+5005,accept_all,10,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,50.2,1
+5005,accept_all,11,hostage,5,"Duplex",6,0,0,0,0,0,1,0,1,failure,15,540.4,1
+5005,accept_all,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,11,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,1,0,success,85,36.2,1
+5005,accept_all,12,hostage,3,"Corner Store",6,0,0,0,0,0,3,2,1,partial,50,42.8,1
+5005,accept_all,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,1,failure,15,900,1
+5005,accept_all,12,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,30.5,1
+5005,accept_all,13,gang,8,"Warehouse & Offices",7,2,1,1,0,0,4,1,0,success,80,84.2,1
+5005,accept_all,13,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,17.3,1
+5005,accept_all,13,warrant,5,"Duplex",4,0,0,0,0,0,2,0,0,partial,65,43.5,1
+5005,accept_all,14,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,partial,65,900,1
+5005,accept_all,14,gang,10,"Apartment Block",6,0,0,0,0,0,4,2,0,success,100,328.8,1
+5005,accept_all,15,gang,10,"Apartment Block",9,0,0,0,0,0,6,1,0,partial,65,211.2,1
+5005,accept_all,15,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,1,0,partial,65,59,1
+5005,accept_all,16,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,111.7,1
+5005,accept_all,16,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,16,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,23,1
+5005,accept_all,17,gang,8,"Warehouse & Offices",6,6,6,6,0,0,4,0,0,failure,0,96.1,1
+5005,accept_all,17,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,48.2,1
+5005,accept_all,17,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,47.4,1
+5005,accept_all,18,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,167.6,1
+5005,accept_all,18,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,19,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,0,success,100,347.8,1
+5005,accept_all,19,gang,10,"Apartment Block",6,0,0,0,0,0,4,0,0,partial,65,273.2,1
+5005,accept_all,20,hostage,3,"Corner Store",6,0,0,0,0,0,3,1,0,success,100,69,1
+5005,accept_all,20,warrant,5,"Duplex",4,0,0,0,0,0,2,0,0,success,100,78.3,1
+5005,accept_all,21,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,21,gang,10,"Apartment Block",6,1,1,1,0,0,5,0,0,success,85,204.6,1
+5005,accept_all,22,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,3,0,0,partial,65,44.2,1
+5005,accept_all,22,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,15.2,1
+5005,accept_all,23,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,0,success,100,178.7,1
+5005,accept_all,23,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,partial,65,40,1
+5005,accept_all,24,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,0,success,100,544.6,1
+5005,accept_all,24,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,0,0,partial,50,98.9,1
+5005,accept_all,25,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,25,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,success,100,28.9,1
+5005,accept_all,26,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,26,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,239.4,1
+5005,accept_all,27,hostage,5,"Duplex",6,0,0,0,0,0,2,0,0,success,100,28.2,1
+5005,accept_all,27,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,0,success,100,169.7,1
+5005,accept_all,28,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,57.1,1
+5005,accept_all,28,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+5005,accept_all,29,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,29,gang,8,"Warehouse & Offices",6,3,2,2,0,0,2,0,0,success,65,102.5,1
+5005,accept_all,30,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,223.2,1
+5005,accept_all,32,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,32,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,17.5,1
+5005,accept_all,33,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,33,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,14.8,1
+5005,accept_all,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,117.7,1
+5005,accept_all,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,63.9,1
+5005,accept_all,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,36,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,1,partial,50,29.1,1
+5005,accept_all,37,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,3,failure,0,266.3,1
+5005,accept_all,37,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,3,0,partial,65,66.4,1
+5005,accept_all,38,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,38,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,33.2,1
+5005,accept_all,39,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,39,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,success,100,93.8,1
+5005,accept_all,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,accept_all,40,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,55.4,1
+5005,cautious,1,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,1,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,33.2,1
+5005,cautious,2,hostage,8,"Warehouse & Offices",9,1,1,1,0,0,2,1,0,success,85,151.2,1
+5005,cautious,2,warrant,5,"Duplex",7,0,0,0,0,0,3,0,0,partial,65,29.6,1
+5005,cautious,3,hostage,5,"Duplex",7,0,0,0,0,0,2,0,0,success,100,34.9,1
+5005,cautious,3,warrant,5,"Duplex",6,0,0,0,0,0,1,1,0,partial,65,20.5,1
+5005,cautious,4,gang,8,"Warehouse & Offices",10,0,0,0,0,0,2,0,0,success,100,83.5,1
+5005,cautious,4,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,2,0,0,success,100,186.4,1
+5005,cautious,5,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,partial,65,15.1,1
+5005,cautious,5,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,success,100,60.3,1
+5005,cautious,6,gang,8,"Warehouse & Offices",8,1,0,0,0,0,6,1,0,partial,60,85.7,1
+5005,cautious,6,warrant,5,"Duplex",5,0,0,0,0,0,2,0,0,partial,65,62.2,1
+5005,cautious,7,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,7,gang,10,"Apartment Block",6,0,0,0,0,0,5,4,0,success,100,49.3,1
+5005,cautious,8,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,1,failure,15,458.2,1
+5005,cautious,8,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,0,success,100,464,1
+5005,cautious,9,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,9,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,106.9,1
+5005,cautious,10,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,failure,30,264.7,1
+5005,cautious,10,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,partial,65,24.2,1
+5005,cautious,11,hostage,5,"Duplex",6,0,0,0,0,0,1,0,1,failure,15,540.4,1
+5005,cautious,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,12,hostage,3,"Corner Store",6,0,0,0,0,0,3,2,0,success,100,87.1,1
+5005,cautious,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,13,gang,8,"Warehouse & Offices",8,8,4,1,0,3,4,0,0,partial,0,126.7,1
+5005,cautious,13,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,42.2,1
+5005,cautious,14,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,14,gang,10,"Apartment Block",6,2,1,1,0,0,4,0,0,partial,45,720,1
+5005,cautious,15,gang,10,"Apartment Block",6,0,0,0,0,0,6,1,0,partial,65,433.7,1
+5005,cautious,16,hostage,5,"Duplex",6,2,2,2,0,0,2,1,0,failure,0,132.8,1
+5005,cautious,16,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,17,gang,8,"Warehouse & Offices",6,3,3,3,0,0,4,2,0,success,55,103.8,1
+5005,cautious,18,hostage,8,"Warehouse & Offices",6,2,1,0,0,1,2,1,0,failure,10,230.8,1
+5005,cautious,19,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,0,success,100,346.9,1
+5005,cautious,20,hostage,3,"Corner Store",6,1,1,1,0,0,3,0,0,partial,50,90.1,1
+5005,cautious,21,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,21,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,partial,65,228.9,1
+5005,cautious,22,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,3,0,0,partial,65,127.6,1
+5005,cautious,22,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,13.8,1
+5005,cautious,23,event,11,"Civic Plaza",5,0,0,0,0,0,1,1,3,failure,0,182.4,1
+5005,cautious,23,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,81.6,1
+5005,cautious,24,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,548.9,1
+5005,cautious,24,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,0,0,failure,15,64.2,1
+5005,cautious,25,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,25,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,8.9,1
+5005,cautious,26,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,26,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,260,1
+5005,cautious,27,hostage,5,"Duplex",6,0,0,0,0,0,2,0,0,success,100,30.3,1
+5005,cautious,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,231.1,1
+5005,cautious,28,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,51.4,1
+5005,cautious,28,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,29,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,29,gang,8,"Warehouse & Offices",6,2,1,1,0,0,2,1,0,partial,45,155,1
+5005,cautious,30,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,30,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,402.5,1
+5005,cautious,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,259.3,1
+5005,cautious,31,event,11,"Civic Plaza",3,0,0,0,0,0,2,0,0,success,100,614.9,1
+5005,cautious,32,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,32,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,success,100,31.2,1
+5005,cautious,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,33,gang,8,"Warehouse & Offices",6,2,1,1,0,0,3,1,0,success,80,92.7,1
+5005,cautious,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,163.3,1
+5005,cautious,34,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,154.3,1
+5005,cautious,35,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,1,failure,15,900,1
+5005,cautious,36,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,36,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,2,partial,35,78.9,1
+5005,cautious,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,0,success,100,255.9,1
+5005,cautious,37,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,2,0,partial,65,84.4,1
+5005,cautious,38,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,38,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,0,0,partial,50,136.2,1
+5005,cautious,39,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,39,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,success,100,67.3,1
+5005,cautious,40,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,cautious,40,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,68.8,1
+5005,military,1,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,1,barricade,4,"Center-Hall Bungalow",5,2,2,2,0,0,1,0,0,failure,0,231.2,1
+5005,military,1,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,151,1
+5005,military,2,hostage,8,"Warehouse & Offices",9,4,2,2,0,0,2,0,0,success,60,250.6,1
+5005,military,2,warrant,5,"Duplex",7,1,1,1,0,0,3,1,0,partial,50,50.3,1
+5005,military,3,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,52,1
+5005,military,3,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,29.2,1
+5005,military,4,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,111.4,1
+5005,military,5,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,14.3,1
+5005,military,5,barricade,4,"Center-Hall Bungalow",4,2,1,1,0,0,1,0,0,failure,10,97.2,1
+5005,military,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,2,0,success,100,78.6,1
+5005,military,6,warrant,5,"Duplex",4,0,0,0,0,0,2,0,0,success,100,65,1
+5005,military,7,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,7,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,18,1
+5005,military,8,hostage,8,"Warehouse & Offices",6,2,2,1,0,1,2,1,2,failure,0,900,1
+5005,military,8,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,1,partial,50,464.3,1
+5005,military,9,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,9,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,114,1
+5005,military,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,12,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,13,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,17.2,1
+5005,military,14,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,14,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,4.3,1
+5005,military,15,gang,10,"Apartment Block",6,0,0,0,0,0,6,0,0,partial,65,270.4,1
+5005,military,15,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,47.3,1
+5005,military,16,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,115.9,1
+5005,military,16,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,17,gang,8,"Warehouse & Offices",6,6,5,5,0,0,4,0,0,failure,0,118.4,1
+5005,military,17,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,49.7,1
+5005,military,18,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,163.5,1
+5005,military,19,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,1,partial,50,352.7,1
+5005,military,20,hostage,3,"Corner Store",6,0,0,0,0,0,3,0,0,success,100,74.7,1
+5005,military,21,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,21,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,1,0,partial,65,10,1
+5005,military,22,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,3,1,0,partial,65,185.3,1
+5005,military,22,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,17.7,1
+5005,military,23,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,2,partial,35,270.2,1
+5005,military,23,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,50.2,1
+5005,military,24,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,1,partial,50,544.6,1
+5005,military,24,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,2,0,success,100,109.3,1
+5005,military,25,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,25,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,8.9,1
+5005,military,26,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,26,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,241.4,1
+5005,military,26,warrant,5,"Duplex",4,1,1,1,0,0,3,0,0,failure,15,109.2,1
+5005,military,27,hostage,5,"Duplex",6,0,0,0,0,0,2,0,0,success,100,43.5,1
+5005,military,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,204.5,1
+5005,military,28,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,partial,65,157.4,1
+5005,military,28,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,29,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,29,gang,8,"Warehouse & Offices",6,1,0,0,0,0,2,1,0,success,95,54.6,1
+5005,military,30,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,30,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,partial,65,197.2,1
+5005,military,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,249.1,1
+5005,military,31,event,11,"Civic Plaza",2,0,0,0,0,0,2,1,0,success,100,614.1,1
+5005,military,32,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,32,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,33.1,1
+5005,military,32,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,45.8,1
+5005,military,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,33,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,30.3,1
+5005,military,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,partial,65,110,1
+5005,military,34,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+5005,military,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,68.2,1
+5005,military,35,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,36,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,36,gang,8,"Warehouse & Offices",6,1,0,0,0,0,4,0,0,partial,60,71.2,1
+5005,military,36,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,37.2,1
+5005,military,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,1,partial,50,263.1,1
+5005,military,37,gang,8,"Warehouse & Offices",6,1,1,1,0,0,6,1,0,partial,50,100.3,1
+5005,military,37,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,44.5,1
+5005,military,38,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,38,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,98,1
+5005,military,39,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,39,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,partial,65,405.9,1
+5005,military,40,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,military,40,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,success,100,41.3,1
+5005,minimal,1,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,partial,65,900,1
+5005,minimal,2,hostage,8,"Warehouse & Offices",9,0,0,0,0,0,2,0,0,success,100,117.6,1
+5005,minimal,3,hostage,5,"Duplex",8,0,0,0,0,0,2,1,0,success,100,31.3,1
+5005,minimal,4,gang,8,"Warehouse & Offices",10,1,1,1,0,0,2,2,0,success,85,74.7,1
+5005,minimal,5,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,1,0,partial,65,48.9,1
+5005,minimal,6,gang,8,"Warehouse & Offices",8,0,0,0,0,0,6,0,0,partial,65,112.9,1
+5005,minimal,7,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,8,hostage,8,"Warehouse & Offices",6,1,1,1,0,0,2,0,1,failure,0,355,1
+5005,minimal,9,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,10,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,failure,30,261.3,1
+5005,minimal,11,hostage,5,"Duplex",6,0,0,0,0,0,1,0,1,failure,15,540.4,1
+5005,minimal,12,hostage,3,"Corner Store",6,0,0,0,0,0,3,0,0,success,100,61.2,1
+5005,minimal,13,gang,8,"Warehouse & Offices",7,7,2,1,0,1,4,1,0,partial,10,130.2,1
+5005,minimal,14,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,15,gang,10,"Apartment Block",6,1,0,0,0,0,6,2,0,partial,60,404,1
+5005,minimal,16,hostage,5,"Duplex",6,3,3,2,0,1,2,0,3,failure,0,900,1
+5005,minimal,17,gang,8,"Warehouse & Offices",6,6,3,2,0,1,4,1,0,failure,0,104.2,1
+5005,minimal,21,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,22,warrant,6,"L-Shaped Ranch",5,1,1,1,0,0,3,0,0,partial,50,66,1
+5005,minimal,23,event,11,"Civic Plaza",3,0,0,0,0,0,1,1,1,partial,50,180,1
+5005,minimal,24,event,11,"Civic Plaza",3,0,0,0,0,0,1,1,0,success,100,541,1
+5005,minimal,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,26,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,27,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,40,1
+5005,minimal,28,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,partial,65,59.5,1
+5005,minimal,29,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,30,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,31,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,210.1,1
+5005,minimal,32,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,33,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,1,partial,50,162.4,1
+5005,minimal,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,61.4,1
+5005,minimal,36,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,260.9,1
+5005,minimal,38,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,39,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+5005,minimal,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,1,hostage,8,"Warehouse & Offices",6,2,1,1,0,0,2,1,0,failure,10,187.1,1
+6006,accept_all,1,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,1,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,1.6,1
+6006,accept_all,2,hostage,5,"Duplex",6,0,0,0,0,0,1,1,0,success,100,92.3,1
+6006,accept_all,2,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,2,gang,8,"Warehouse & Offices",6,2,1,1,0,0,6,1,0,partial,45,152.1,1
+6006,accept_all,3,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,3,barricade,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,9.4,1
+6006,accept_all,3,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,39.2,1
+6006,accept_all,4,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,94.4,1
+6006,accept_all,4,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,4,gang,8,"Warehouse & Offices",7,0,0,0,0,0,5,0,0,partial,65,56.4,1
+6006,accept_all,5,gang,8,"Warehouse & Offices",9,1,0,0,0,0,6,1,0,success,95,91.8,1
+6006,accept_all,5,warrant,5,"Duplex",7,0,0,0,0,0,2,0,0,failure,30,29.2,1
+6006,accept_all,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,93.2,1
+6006,accept_all,6,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,72.8,1
+6006,accept_all,6,warrant,5,"Duplex",4,0,0,0,0,0,2,1,0,partial,65,26.1,1
+6006,accept_all,7,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,66.1,1
+6006,accept_all,7,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,7,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,25.5,1
+6006,accept_all,8,hostage,3,"Corner Store",6,1,0,0,0,0,3,0,0,success,95,176.7,1
+6006,accept_all,8,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,1,0,partial,65,121.2,1
+6006,accept_all,8,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,success,100,28.7,1
+6006,accept_all,9,event,11,"Civic Plaza",7,0,0,0,0,0,2,1,1,partial,50,273.3,1
+6006,accept_all,9,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,17.1,1
+6006,accept_all,9,warrant,5,"Duplex",5,0,0,0,0,0,3,1,0,failure,30,39.2,1
+6006,accept_all,10,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,98.7,1
+6006,accept_all,10,gang,10,"Apartment Block",6,1,0,0,0,0,5,1,0,partial,60,198.3,1
+6006,accept_all,11,hostage,3,"Corner Store",6,1,0,0,0,0,2,2,0,success,95,58.8,1
+6006,accept_all,11,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,11,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,238.4,1
+6006,accept_all,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,12,gang,8,"Warehouse & Offices",6,1,1,1,0,0,2,0,0,success,85,82.7,1
+6006,accept_all,12,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,11.8,1
+6006,accept_all,13,hostage,5,"Duplex",6,0,0,0,0,0,2,0,0,success,100,134.7,1
+6006,accept_all,13,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,13,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,43.2,1
+6006,accept_all,14,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,3,failure,0,782.4,1
+6006,accept_all,14,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,failure,30,389.7,1
+6006,accept_all,14,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,16.5,1
+6006,accept_all,15,gang,10,"Apartment Block",10,0,0,0,0,0,3,0,0,success,100,129.9,1
+6006,accept_all,15,warrant,6,"L-Shaped Ranch",7,2,2,2,0,0,1,0,0,success,70,222.2,1
+6006,accept_all,16,gang,8,"Warehouse & Offices",10,1,1,1,0,0,3,2,0,success,85,43.2,1
+6006,accept_all,16,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,failure,30,37.2,1
+6006,accept_all,17,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,failure,30,273.3,1
+6006,accept_all,17,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,25.3,1
+6006,accept_all,18,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,18,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,0,0,partial,65,11.1,1
+6006,accept_all,18,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,31.5,1
+6006,accept_all,19,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,partial,65,4.6,1
+6006,accept_all,19,warrant,5,"Duplex",7,0,0,0,0,0,2,0,0,failure,30,32.8,1
+6006,accept_all,20,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,20,gang,8,"Warehouse & Offices",6,2,0,0,0,0,6,1,0,partial,55,111.2,1
+6006,accept_all,20,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,11.8,1
+6006,accept_all,21,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,74.4,1
+6006,accept_all,21,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,0,0,success,100,11,1
+6006,accept_all,21,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,3,0,0,failure,30,600,1
+6006,accept_all,22,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,22,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,31.8,1
+6006,accept_all,22,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,12.3,1
+6006,accept_all,23,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,34.7,1
+6006,accept_all,23,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,23,gang,10,"Apartment Block",6,0,0,0,0,0,5,2,0,partial,65,420.6,1
+6006,accept_all,24,hostage,5,"Duplex",6,0,0,0,0,0,2,0,3,failure,0,722.4,1
+6006,accept_all,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,24,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,0,0,success,85,99.6,1
+6006,accept_all,25,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,75.1,1
+6006,accept_all,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,25,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,5,1
+6006,accept_all,26,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,26,gang,8,"Warehouse & Offices",8,0,0,0,0,0,3,0,0,success,100,69.8,1
+6006,accept_all,26,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,success,100,63.6,1
+6006,accept_all,27,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,27,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,2,0,success,85,104.6,1
+6006,accept_all,27,gang,10,"Apartment Block",6,1,1,1,0,0,4,2,0,success,85,320,1
+6006,accept_all,28,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,success,100,83.1,1
+6006,accept_all,28,warrant,5,"Duplex",5,0,0,0,0,0,3,0,0,partial,65,55.2,1
+6006,accept_all,29,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,29,gang,8,"Warehouse & Offices",7,2,2,2,0,0,6,0,0,partial,35,102,1
+6006,accept_all,29,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,50.3,1
+6006,accept_all,30,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,30,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,13.9,1
+6006,accept_all,30,warrant,5,"Duplex",4,1,0,0,0,0,3,0,0,success,95,54.5,1
+6006,accept_all,31,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,31,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,69.2,1
+6006,accept_all,31,warrant,5,"Duplex",5,0,0,0,0,0,3,0,0,partial,65,45.2,1
+6006,accept_all,32,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,2,1,0,success,100,60.9,1
+6006,accept_all,32,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,failure,30,25.2,1
+6006,accept_all,33,hostage,8,"Warehouse & Offices",8,0,0,0,0,0,2,0,2,failure,0,32.3,1
+6006,accept_all,33,barricade,3,"Corner Store",7,1,1,1,0,0,1,0,0,success,85,73.5,1
+6006,accept_all,34,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,34,gang,10,"Apartment Block",6,0,0,0,0,0,6,0,0,success,100,281.6,1
+6006,accept_all,34,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,238.7,1
+6006,accept_all,35,hostage,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,54.7,1
+6006,accept_all,35,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,35,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,3,0,0,failure,30,51.2,1
+6006,accept_all,36,event,11,"Civic Plaza",7,0,0,0,0,0,0,0,1,failure,15,900,1
+6006,accept_all,36,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,2,0,0,success,100,89.3,1
+6006,accept_all,36,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,37.5,1
+6006,accept_all,37,event,11,"Civic Plaza",6,0,0,0,0,0,1,0,0,success,100,230.3,1
+6006,accept_all,37,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,449.5,1
+6006,accept_all,37,warrant,6,"L-Shaped Ranch",5,1,0,0,0,0,2,0,0,success,95,74.2,1
+6006,accept_all,38,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,accept_all,38,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,success,100,110.4,1
+6006,accept_all,38,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,26.2,1
+6006,accept_all,39,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,2,1,partial,50,192.4,1
+6006,accept_all,39,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,651.8,1
+6006,accept_all,39,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,partial,65,28.2,1
+6006,accept_all,40,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,accept_all,40,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,1,0,partial,50,73.2,1
+6006,accept_all,40,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,118.2,1
+6006,cautious,1,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,183.3,1
+6006,cautious,1,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,2,hostage,5,"Duplex",6,2,1,1,0,0,1,0,1,failure,0,900,1
+6006,cautious,2,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,cautious,3,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,3,barricade,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,9.4,1
+6006,cautious,4,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,126.7,1
+6006,cautious,4,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,5,gang,8,"Warehouse & Offices",9,0,0,0,0,0,6,3,0,success,100,38.5,1
+6006,cautious,5,warrant,5,"Duplex",7,3,2,2,0,0,2,0,0,partial,30,167.6,1
+6006,cautious,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,partial,65,85,1
+6006,cautious,6,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,87.2,1
+6006,cautious,7,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,85.9,1
+6006,cautious,7,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,cautious,8,hostage,3,"Corner Store",6,2,0,0,0,0,3,1,0,success,90,67.3,1
+6006,cautious,8,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,82.7,1
+6006,cautious,9,event,11,"Civic Plaza",4,0,0,0,0,0,2,1,0,success,100,267.6,1
+6006,cautious,9,barricade,4,"Center-Hall Bungalow",5,1,0,0,0,0,1,0,0,partial,60,17.2,1
+6006,cautious,10,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,75.8,1
+6006,cautious,10,gang,10,"Apartment Block",6,1,1,1,0,0,5,1,0,success,85,127.7,1
+6006,cautious,11,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,success,100,45.2,1
+6006,cautious,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,12,gang,8,"Warehouse & Offices",6,2,2,2,0,0,2,1,0,success,70,82.7,1
+6006,cautious,13,hostage,5,"Duplex",6,2,1,0,0,1,2,0,0,failure,10,163.6,1
+6006,cautious,13,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,14,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,3,failure,0,782.4,1
+6006,cautious,14,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,51.2,1
+6006,cautious,15,gang,10,"Apartment Block",7,0,0,0,0,0,3,0,0,success,100,289.6,1
+6006,cautious,15,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,failure,30,56.2,1
+6006,cautious,16,gang,8,"Warehouse & Offices",8,1,1,1,0,0,3,0,0,success,85,95.6,1
+6006,cautious,16,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,16.2,1
+6006,cautious,17,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,failure,30,260,1
+6006,cautious,17,warrant,6,"L-Shaped Ranch",6,1,0,0,0,0,1,0,0,partial,60,4.1,1
+6006,cautious,18,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,18,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,17.6,1
+6006,cautious,19,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,20.4,1
+6006,cautious,19,warrant,5,"Duplex",6,0,0,0,0,0,2,0,0,success,100,56.3,1
+6006,cautious,20,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,20,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,0,0,partial,65,81.1,1
+6006,cautious,21,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,1,0,partial,65,109.6,1
+6006,cautious,21,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,8.2,1
+6006,cautious,22,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,22,gang,8,"Warehouse & Offices",6,3,2,2,0,0,2,0,0,success,65,99.2,1
+6006,cautious,23,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,37.7,1
+6006,cautious,23,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,24,hostage,5,"Duplex",6,0,0,0,0,0,2,0,3,failure,0,722.4,1
+6006,cautious,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,25,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,90.4,1
+6006,cautious,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,26,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,partial,65,84.1,1
+6006,cautious,27,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,27,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,1,0,success,100,51.1,1
+6006,cautious,28,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,1,failure,15,900,1
+6006,cautious,28,gang,8,"Warehouse & Offices",6,2,1,0,1,0,3,1,0,success,80,55.8,1
+6006,cautious,29,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,29,gang,8,"Warehouse & Offices",6,2,1,1,0,0,6,1,0,partial,45,90.2,1
+6006,cautious,30,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,30,barricade,4,"Center-Hall Bungalow",4,1,1,1,0,0,1,0,0,partial,50,26.3,1
+6006,cautious,31,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,31,gang,10,"Apartment Block",6,0,0,0,0,0,4,2,0,partial,65,101.2,1
+6006,cautious,32,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,2,0,0,failure,30,58.5,1
+6006,cautious,32,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,failure,30,55.2,1
+6006,cautious,33,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,2,2,0,success,100,148,1
+6006,cautious,33,barricade,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,67.9,1
+6006,cautious,34,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,34,gang,10,"Apartment Block",6,1,1,1,0,0,6,2,0,partial,50,276.4,1
+6006,cautious,35,hostage,5,"Duplex",6,1,1,1,0,0,1,0,0,success,85,55.2,1
+6006,cautious,35,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,36,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,cautious,36,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,failure,30,32.2,1
+6006,cautious,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,1,partial,50,234.7,1
+6006,cautious,37,gang,10,"Apartment Block",6,3,1,1,0,0,5,1,0,success,75,256.6,1
+6006,cautious,38,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,cautious,38,gang,8,"Warehouse & Offices",6,3,3,0,2,1,3,0,0,success,55,110.1,1
+6006,cautious,39,hostage,8,"Warehouse & Offices",6,2,2,1,0,1,3,1,3,failure,0,900,1
+6006,cautious,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,1,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,156.2,1
+6006,military,1,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,1,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,3.4,1
+6006,military,2,hostage,5,"Duplex",6,1,1,1,0,0,1,0,0,success,85,99.5,1
+6006,military,2,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,military,2,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,4,0,success,95,84,1
+6006,military,3,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,3,barricade,3,"Corner Store",7,0,0,0,0,0,1,0,0,partial,65,9.6,1
+6006,military,3,warrant,5,"Duplex",6,3,1,1,0,0,1,0,0,partial,40,115,1
+6006,military,4,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,128.6,1
+6006,military,4,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,military,4,gang,8,"Warehouse & Offices",6,2,0,0,0,0,5,1,0,partial,55,90.7,1
+6006,military,5,gang,8,"Warehouse & Offices",7,1,0,0,0,0,6,1,0,partial,60,69.9,1
+6006,military,5,warrant,5,"Duplex",5,0,0,0,0,0,2,0,0,failure,30,82.2,1
+6006,military,6,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,62.4,1
+6006,military,7,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,78.6,1
+6006,military,7,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,8,hostage,3,"Corner Store",6,5,4,1,0,3,3,1,0,success,35,900,1
+6006,military,8,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,103.4,1
+6006,military,9,event,11,"Civic Plaza",2,0,0,0,0,0,2,1,1,partial,50,275.4,1
+6006,military,9,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,17.6,1
+6006,military,11,hostage,3,"Corner Store",6,0,0,0,0,0,2,2,0,success,100,59.8,1
+6006,military,12,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,13,hostage,5,"Duplex",6,1,0,0,0,0,2,1,0,success,95,148.3,1
+6006,military,13,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,13,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,47.4,1
+6006,military,14,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,3,failure,0,782.4,1
+6006,military,14,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,53.2,1
+6006,military,15,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,success,100,272.5,1
+6006,military,15,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,43.2,1
+6006,military,16,gang,8,"Warehouse & Offices",6,1,0,0,0,0,3,0,0,success,95,90.9,1
+6006,military,17,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,failure,30,264,1
+6006,military,17,warrant,6,"L-Shaped Ranch",4,1,1,1,0,0,1,0,0,partial,50,61.1,1
+6006,military,18,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,18,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,1,0,success,100,10.3,1
+6006,military,19,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,22.3,1
+6006,military,20,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,20,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,1,0,partial,60,115.1,1
+6006,military,21,gang,8,"Warehouse & Offices",6,1,0,0,0,0,4,0,0,success,95,95.7,1
+6006,military,21,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,partial,65,11.1,1
+6006,military,22,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,22,gang,8,"Warehouse & Offices",6,1,0,0,0,0,2,0,0,success,95,90,1
+6006,military,23,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,43.8,1
+6006,military,24,hostage,5,"Duplex",6,0,0,0,0,0,2,0,3,failure,0,722.4,1
+6006,military,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,2,failure,0,900,1
+6006,military,25,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,84.2,1
+6006,military,25,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,26,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,26,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,partial,65,112.1,1
+6006,military,27,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,27,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,43.5,1
+6006,military,28,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,39.7,1
+6006,military,29,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,military,29,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,2,0,partial,60,77.2,1
+6006,military,30,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,30,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,18.2,1
+6006,military,30,warrant,5,"Duplex",4,0,0,0,0,0,3,1,0,partial,65,71.7,1
+6006,military,31,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,31,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,failure,30,31.2,1
+6006,military,31,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,success,100,43.1,1
+6006,military,32,warrant,6,"L-Shaped Ranch",7,1,1,1,0,0,2,0,0,success,85,117.6,1
+6006,military,32,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,failure,30,53.2,1
+6006,military,33,hostage,8,"Warehouse & Offices",8,0,0,0,0,0,2,0,0,partial,65,104.9,1
+6006,military,33,barricade,3,"Corner Store",6,0,0,0,0,0,1,0,0,partial,65,61.5,1
+6006,military,34,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,34,gang,10,"Apartment Block",6,2,0,0,0,0,6,2,1,success,75,112.5,1
+6006,military,34,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,243,1
+6006,military,35,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,69.7,1
+6006,military,35,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,36,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,military,36,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,failure,30,55.2,1
+6006,military,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,0,success,100,231.8,1
+6006,military,37,gang,10,"Apartment Block",6,3,3,3,0,0,5,1,0,success,55,116.9,1
+6006,military,38,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,military,38,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,26.2,1
+6006,military,39,hostage,8,"Warehouse & Offices",6,1,1,1,0,0,3,1,1,partial,35,197.4,1
+6006,military,39,event,11,"Civic Plaza",2,0,0,0,0,0,1,0,0,success,100,651.7,1
+6006,military,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,1,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,201.2,1
+6006,minimal,2,hostage,5,"Duplex",6,0,0,0,0,0,1,1,0,success,100,120.3,1
+6006,minimal,3,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,minimal,4,hostage,3,"Corner Store",7,0,0,0,0,0,1,0,0,success,100,131.7,1
+6006,minimal,5,gang,8,"Warehouse & Offices",10,0,0,0,0,0,6,0,0,success,100,65.8,1
+6006,minimal,6,gang,8,"Warehouse & Offices",8,0,0,0,0,0,3,1,0,success,100,58.7,1
+6006,minimal,7,hostage,5,"Duplex",6,2,1,1,0,0,2,0,0,partial,45,136.7,1
+6006,minimal,8,hostage,3,"Corner Store",6,2,1,1,0,0,3,0,0,success,80,99.4,1
+6006,minimal,9,event,11,"Civic Plaza",5,0,0,0,0,0,2,0,0,success,100,272.1,1
+6006,minimal,10,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,success,100,83.6,1
+6006,minimal,11,hostage,3,"Corner Store",6,3,1,1,0,0,2,1,0,success,75,192.5,1
+6006,minimal,12,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,13,hostage,5,"Duplex",6,1,0,0,0,0,2,1,0,success,95,147.7,1
+6006,minimal,14,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,3,failure,0,782.4,1
+6006,minimal,15,gang,10,"Apartment Block",8,0,0,0,0,0,3,0,0,success,100,232.9,1
+6006,minimal,16,gang,8,"Warehouse & Offices",8,1,1,1,0,0,3,1,0,success,85,87.6,1
+6006,minimal,17,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,failure,30,308.3,1
+6006,minimal,18,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,minimal,19,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,19,1
+6006,minimal,20,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,21,gang,8,"Warehouse & Offices",7,2,2,2,0,0,4,1,0,success,70,115.8,1
+6006,minimal,22,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,23,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,40.2,1
+6006,minimal,24,hostage,5,"Duplex",6,0,0,0,0,0,2,0,3,failure,0,722.4,1
+6006,minimal,25,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,1,failure,15,540.4,1
+6006,minimal,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,27,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,28,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,29,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,1,failure,15,900,1
+6006,minimal,30,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,minimal,31,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,32,warrant,6,"L-Shaped Ranch",7,2,1,1,0,0,2,0,0,success,80,150,1
+6006,minimal,33,hostage,8,"Warehouse & Offices",6,1,1,1,0,0,2,1,0,success,85,109.5,1
+6006,minimal,34,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+6006,minimal,35,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,65.5,1
+6006,minimal,36,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,37,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,0,success,100,233.6,1
+6006,minimal,38,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+6006,minimal,39,hostage,8,"Warehouse & Offices",6,1,0,0,0,0,3,0,2,failure,0,186.7,1
+6006,minimal,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,1,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,72.2,1
+7007,accept_all,1,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,2,hostage,5,"Duplex",7,0,0,0,0,0,1,1,0,success,100,142.1,1
+7007,accept_all,2,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,2,gang,8,"Warehouse & Offices",7,0,0,0,0,0,5,1,0,partial,65,93.4,1
+7007,accept_all,3,gang,8,"Warehouse & Offices",10,5,3,3,0,0,3,0,0,success,45,111,1
+7007,accept_all,3,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,27.9,1
+7007,accept_all,4,hostage,5,"Duplex",8,0,0,0,0,0,3,2,0,success,100,116.2,1
+7007,accept_all,4,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,2,0,0,failure,30,163.2,1
+7007,accept_all,5,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,29.1,1
+7007,accept_all,5,gang,8,"Warehouse & Offices",6,4,2,2,0,0,5,2,0,success,60,99.5,1
+7007,accept_all,6,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,68.3,1
+7007,accept_all,7,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,1,failure,15,600.4,1
+7007,accept_all,7,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,8,hostage,8,"Warehouse & Offices",8,0,0,0,0,0,1,0,0,success,100,165,1
+7007,accept_all,8,warrant,5,"Duplex",6,0,0,0,0,0,3,0,0,partial,65,65,1
+7007,accept_all,9,gang,8,"Warehouse & Offices",9,2,2,2,0,0,6,0,0,success,70,91.9,1
+7007,accept_all,9,gang,8,"Warehouse & Offices",8,1,1,1,0,0,2,0,0,success,85,36.3,1
+7007,accept_all,10,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,10,warrant,5,"Duplex",5,0,0,0,0,0,3,0,0,failure,30,32.2,1
+7007,accept_all,10,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,30.2,1
+7007,accept_all,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,11,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,32.4,1
+7007,accept_all,11,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,success,100,113,1
+7007,accept_all,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,12,gang,8,"Warehouse & Offices",6,4,0,0,0,0,2,1,0,success,80,118.7,1
+7007,accept_all,12,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,13.4,1
+7007,accept_all,13,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,1,failure,15,401.1,1
+7007,accept_all,13,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,1,failure,15,900,1
+7007,accept_all,14,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,36,1
+7007,accept_all,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,15,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,234.1,1
+7007,accept_all,15,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,partial,65,900,1
+7007,accept_all,16,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,16,gang,10,"Apartment Block",6,0,0,0,0,0,6,1,0,partial,65,150.2,1
+7007,accept_all,16,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,0,0,partial,50,43,1
+7007,accept_all,17,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,17,gang,8,"Warehouse & Offices",6,1,1,1,0,0,5,2,0,success,85,93,1
+7007,accept_all,17,barricade,3,"Corner Store",4,0,0,0,0,0,1,0,0,partial,65,48.5,1
+7007,accept_all,18,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,partial,65,14.9,1
+7007,accept_all,18,warrant,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,99,1
+7007,accept_all,19,barricade,4,"Center-Hall Bungalow",7,1,1,1,0,0,1,0,0,partial,50,19.2,1
+7007,accept_all,19,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,3,0,0,failure,30,17.2,1
+7007,accept_all,20,event,11,"Civic Plaza",6,0,0,0,0,0,1,0,2,partial,35,192.1,1
+7007,accept_all,20,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,0.8,1
+7007,accept_all,20,warrant,6,"L-Shaped Ranch",4,1,0,0,0,0,3,1,0,partial,60,107.3,1
+7007,accept_all,21,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,2,0,0,success,100,90.2,1
+7007,accept_all,21,warrant,6,"L-Shaped Ranch",6,3,1,1,0,0,1,0,0,failure,5,83.2,1
+7007,accept_all,22,hostage,5,"Duplex",6,0,0,0,0,0,2,0,0,success,100,123.1,1
+7007,accept_all,22,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,23,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,1,failure,15,900,1
+7007,accept_all,23,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,45.2,1
+7007,accept_all,24,hostage,3,"Corner Store",6,0,0,0,0,0,3,1,0,success,100,77.9,1
+7007,accept_all,24,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,165,1
+7007,accept_all,25,barricade,4,"Center-Hall Bungalow",7,1,1,1,0,0,1,1,0,partial,50,88.6,1
+7007,accept_all,25,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,1,0,0,success,100,19.8,1
+7007,accept_all,26,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,success,100,61.1,1
+7007,accept_all,26,event,11,"Civic Plaza",3,0,0,0,0,0,2,1,1,partial,50,190.2,1
+7007,accept_all,27,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,27,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,success,100,304.7,1
+7007,accept_all,27,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,245.4,1
+7007,accept_all,28,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,111.7,1
+7007,accept_all,29,hostage,5,"Duplex",6,2,1,1,0,0,3,0,1,failure,0,900,1
+7007,accept_all,29,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,29,warrant,6,"L-Shaped Ranch",4,1,0,0,0,0,1,1,0,partial,60,11.3,1
+7007,accept_all,30,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,partial,65,900,1
+7007,accept_all,30,gang,10,"Apartment Block",6,1,0,0,0,0,3,0,0,success,95,301.2,1
+7007,accept_all,30,warrant,5,"Duplex",4,0,0,0,0,0,3,2,0,partial,65,46.2,1
+7007,accept_all,31,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,113.2,1
+7007,accept_all,31,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,partial,65,900,1
+7007,accept_all,32,hostage,8,"Warehouse & Offices",6,2,1,1,0,0,3,0,0,failure,10,900,1
+7007,accept_all,32,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,1,partial,50,546.9,1
+7007,accept_all,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,33,gang,8,"Warehouse & Offices",6,2,1,0,1,0,2,0,0,success,80,118.4,1
+7007,accept_all,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,205.4,1
+7007,accept_all,34,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,23.6,1
+7007,accept_all,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,60.1,1
+7007,accept_all,35,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,2,partial,35,472.4,1
+7007,accept_all,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,36,gang,8,"Warehouse & Offices",6,2,2,1,0,1,4,1,0,success,70,112,1
+7007,accept_all,37,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,accept_all,37,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,2,0,success,100,77.1,1
+7007,accept_all,38,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,3.7,1
+7007,accept_all,38,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,1,0,partial,65,4.2,1
+7007,accept_all,39,event,11,"Civic Plaza",3,0,0,0,0,0,1,1,2,partial,35,186.9,1
+7007,accept_all,39,gang,10,"Apartment Block",6,0,0,0,0,0,6,2,0,partial,65,299.9,1
+7007,accept_all,40,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,partial,65,900,1
+7007,accept_all,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,partial,65,108.2,1
+7007,cautious,1,hostage,3,"Corner Store",6,1,0,0,0,0,2,0,0,success,95,61,1
+7007,cautious,1,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,2,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,152.7,1
+7007,cautious,2,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,3,gang,8,"Warehouse & Offices",10,2,1,1,0,0,3,0,0,success,80,80.2,1
+7007,cautious,3,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,128,1
+7007,cautious,4,hostage,5,"Duplex",9,1,1,1,0,0,3,0,0,success,85,142.6,1
+7007,cautious,4,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,2,1,0,failure,30,170.2,1
+7007,cautious,5,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,24.2,1
+7007,cautious,5,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,1,0,success,100,107,1
+7007,cautious,6,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,1,failure,15,900,1
+7007,cautious,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,63.6,1
+7007,cautious,7,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,1,failure,15,600.4,1
+7007,cautious,7,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,8,hostage,8,"Warehouse & Offices",9,0,0,0,0,0,1,0,0,success,100,120.8,1
+7007,cautious,8,warrant,5,"Duplex",7,0,0,0,0,0,3,0,0,partial,65,51.4,1
+7007,cautious,9,gang,8,"Warehouse & Offices",9,1,1,1,0,0,6,1,0,success,85,57.8,1
+7007,cautious,9,gang,8,"Warehouse & Offices",9,0,0,0,0,0,2,0,0,success,100,37.8,1
+7007,cautious,10,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,10,warrant,5,"Duplex",6,2,2,2,0,0,3,0,0,failure,0,36.3,1
+7007,cautious,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,11,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,success,100,83.1,1
+7007,cautious,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,12,gang,8,"Warehouse & Offices",6,3,1,1,0,0,2,0,0,success,75,119.5,1
+7007,cautious,13,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,2,failure,0,510.3,1
+7007,cautious,13,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,14,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,40.9,1
+7007,cautious,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,15,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,234,1
+7007,cautious,15,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,16,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,16,gang,10,"Apartment Block",6,0,0,0,0,0,6,0,0,success,100,101.2,1
+7007,cautious,17,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,17,gang,8,"Warehouse & Offices",6,1,0,0,0,0,5,0,0,success,95,81.4,1
+7007,cautious,18,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,partial,65,15.9,1
+7007,cautious,18,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,76.4,1
+7007,cautious,19,barricade,4,"Center-Hall Bungalow",7,1,1,1,0,0,1,1,0,partial,50,20.2,1
+7007,cautious,19,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,3,0,0,failure,30,79.2,1
+7007,cautious,20,event,11,"Civic Plaza",5,0,0,0,0,0,1,0,0,success,100,178.6,1
+7007,cautious,20,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,partial,65,1.1,1
+7007,cautious,21,hostage,8,"Warehouse & Offices",9,0,0,0,0,0,2,0,1,failure,15,51.7,1
+7007,cautious,21,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,71.3,1
+7007,cautious,22,hostage,5,"Duplex",6,0,0,0,0,0,2,1,0,success,100,79.9,1
+7007,cautious,22,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,partial,65,900,1
+7007,cautious,23,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,partial,65,900,1
+7007,cautious,23,gang,8,"Warehouse & Offices",6,4,3,2,0,1,2,0,0,partial,15,87.1,1
+7007,cautious,24,hostage,3,"Corner Store",6,0,0,0,0,0,3,1,0,success,100,69.1,1
+7007,cautious,24,hostage,8,"Warehouse & Offices",6,1,0,0,0,0,2,1,0,success,95,176.6,1
+7007,cautious,25,barricade,4,"Center-Hall Bungalow",7,1,0,0,0,0,1,0,0,partial,60,88.8,1
+7007,cautious,25,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,1,0,success,100,5.6,1
+7007,cautious,26,hostage,3,"Corner Store",6,0,0,0,0,0,2,2,0,success,100,60.9,1
+7007,cautious,26,event,11,"Civic Plaza",2,0,0,0,0,0,2,1,0,success,100,187.5,1
+7007,cautious,27,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,27,gang,10,"Apartment Block",6,1,1,0,1,0,5,4,1,partial,35,90.2,1
+7007,cautious,28,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,28,gang,8,"Warehouse & Offices",6,2,1,1,0,0,3,0,0,success,80,109.8,1
+7007,cautious,29,hostage,5,"Duplex",6,1,0,0,0,0,3,3,0,success,95,106.5,1
+7007,cautious,29,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,30,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,30,gang,10,"Apartment Block",6,0,0,0,0,0,3,0,0,failure,30,189.2,1
+7007,cautious,31,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,74.7,1
+7007,cautious,31,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,32,hostage,8,"Warehouse & Offices",6,1,0,0,0,0,3,1,0,success,95,202.4,1
+7007,cautious,32,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,545.4,1
+7007,cautious,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,33,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,83.4,1
+7007,cautious,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,225.9,1
+7007,cautious,34,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,29.1,1
+7007,cautious,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,57.4,1
+7007,cautious,35,event,11,"Civic Plaza",5,0,0,0,0,0,1,1,0,success,100,453.3,1
+7007,cautious,36,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,36,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,0,0,partial,50,143.3,1
+7007,cautious,37,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,37,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,0,0,partial,65,93.5,1
+7007,cautious,38,barricade,4,"Center-Hall Bungalow",7,1,0,0,0,0,1,0,0,success,95,81.9,1
+7007,cautious,38,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,success,100,13,1
+7007,cautious,39,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,2,partial,35,198.2,1
+7007,cautious,39,gang,10,"Apartment Block",6,1,0,0,0,0,6,1,0,partial,60,445.6,1
+7007,cautious,40,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,cautious,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,success,100,99.7,1
+7007,military,1,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,50.6,1
+7007,military,1,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,2,hostage,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,150.4,1
+7007,military,2,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,2,gang,8,"Warehouse & Offices",7,5,1,0,1,0,5,1,0,partial,30,127.6,1
+7007,military,3,gang,8,"Warehouse & Offices",8,6,2,2,0,0,3,1,0,success,50,79.8,1
+7007,military,3,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,success,100,34,1
+7007,military,4,hostage,5,"Duplex",6,1,0,0,0,0,3,0,0,success,95,182.4,1
+7007,military,5,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,23.1,1
+7007,military,6,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,6,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,62.8,1
+7007,military,7,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,1,failure,15,600.4,1
+7007,military,8,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,190.3,1
+7007,military,9,gang,8,"Warehouse & Offices",6,6,4,1,0,3,6,1,0,failure,0,90.8,1
+7007,military,10,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,10,warrant,5,"Duplex",4,0,0,0,0,0,3,0,0,partial,65,47.5,1
+7007,military,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,12,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,13,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,14,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,15,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,230.4,1
+7007,military,16,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,16,gang,10,"Apartment Block",6,2,0,0,0,0,6,0,0,success,90,89.4,1
+7007,military,17,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,17,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,43.2,1
+7007,military,18,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,0,0,partial,65,14.7,1
+7007,military,18,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,failure,30,28.2,1
+7007,military,19,barricade,4,"Center-Hall Bungalow",5,2,2,2,0,0,1,0,0,partial,35,23.5,1
+7007,military,19,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,3,0,0,failure,30,120.3,1
+7007,military,20,event,11,"Civic Plaza",3,0,0,0,0,0,1,0,5,failure,0,900,1
+7007,military,20,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,14.2,1
+7007,military,21,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,110.4,1
+7007,military,21,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,1,0,partial,65,64.5,1
+7007,military,22,hostage,5,"Duplex",6,0,0,0,0,0,2,0,0,failure,30,161.5,1
+7007,military,22,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,23,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,23,gang,8,"Warehouse & Offices",6,3,1,1,0,0,2,0,0,success,75,123.6,1
+7007,military,24,hostage,3,"Corner Store",6,0,0,0,0,0,3,1,0,success,100,80.1,1
+7007,military,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,25,barricade,4,"Center-Hall Bungalow",5,1,0,0,0,0,1,0,0,partial,60,88.5,1
+7007,military,25,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,partial,65,5.8,1
+7007,military,26,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,success,100,69.3,1
+7007,military,26,event,11,"Civic Plaza",2,0,0,0,0,0,2,1,2,partial,35,186.8,1
+7007,military,27,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,27,gang,10,"Apartment Block",6,0,0,0,0,0,5,1,0,partial,65,233.5,1
+7007,military,27,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,241.4,1
+7007,military,28,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,failure,30,16.2,1
+7007,military,29,hostage,5,"Duplex",6,2,2,1,0,1,3,1,1,failure,0,900,1
+7007,military,29,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,30,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,30,gang,10,"Apartment Block",6,0,0,0,0,0,3,1,0,success,100,309.2,1
+7007,military,30,warrant,5,"Duplex",4,1,1,1,0,0,3,2,1,partial,35,28.1,1
+7007,military,31,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,85,1
+7007,military,31,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,32,hostage,8,"Warehouse & Offices",6,1,1,1,0,0,3,1,0,success,85,204,1
+7007,military,32,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,0,success,100,544.3,1
+7007,military,33,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,33,gang,8,"Warehouse & Offices",6,1,0,0,0,0,2,1,0,success,95,112.3,1
+7007,military,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,221.7,1
+7007,military,34,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,33.6,1
+7007,military,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,57.2,1
+7007,military,35,event,11,"Civic Plaza",3,0,0,0,0,0,1,1,1,partial,50,448.5,1
+7007,military,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,36,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,1,0,partial,65,77.6,1
+7007,military,37,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,37,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,2,0,partial,65,64.8,1
+7007,military,38,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,partial,65,3.9,1
+7007,military,38,barricade,1,"Lone Cabin",6,0,0,0,0,0,1,0,0,partial,65,3.9,1
+7007,military,39,event,11,"Civic Plaza",4,0,0,0,0,0,1,1,1,partial,50,196.6,1
+7007,military,39,gang,10,"Apartment Block",6,0,0,0,0,0,6,0,0,partial,65,459.2,1
+7007,military,40,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,military,40,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,partial,65,200.2,1
+7007,minimal,1,hostage,3,"Corner Store",6,0,0,0,0,0,2,1,0,success,100,65.7,1
+7007,minimal,2,hostage,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,134.5,1
+7007,minimal,3,gang,8,"Warehouse & Offices",10,3,1,1,0,0,3,1,0,success,75,85.8,1
+7007,minimal,4,hostage,5,"Duplex",9,3,2,2,0,0,3,1,0,success,65,134.7,1
+7007,minimal,5,hostage,5,"Duplex",6,0,0,0,0,0,1,0,0,success,100,37.1,1
+7007,minimal,6,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,7,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,1,failure,15,600.4,1
+7007,minimal,8,hostage,8,"Warehouse & Offices",8,0,0,0,0,0,1,0,0,success,100,170,1
+7007,minimal,9,gang,8,"Warehouse & Offices",8,1,1,1,0,0,6,0,0,partial,50,76.7,1
+7007,minimal,10,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,13,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,2,failure,0,510.3,1
+7007,minimal,14,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,55.9,1
+7007,minimal,15,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,199.2,1
+7007,minimal,16,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,17,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,18,barricade,1,"Lone Cabin",7,0,0,0,0,0,1,0,0,partial,65,18.5,1
+7007,minimal,19,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,failure,30,51.2,1
+7007,minimal,20,event,11,"Civic Plaza",7,0,0,0,0,0,1,0,0,success,100,177.7,1
+7007,minimal,21,hostage,8,"Warehouse & Offices",8,0,0,0,0,0,2,1,1,failure,15,32.2,1
+7007,minimal,22,hostage,5,"Duplex",6,0,0,0,0,0,2,0,0,success,100,51.3,1
+7007,minimal,23,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,24,hostage,3,"Corner Store",6,1,1,1,0,0,3,2,0,success,85,66.3,1
+7007,minimal,25,barricade,4,"Center-Hall Bungalow",7,1,0,0,0,0,1,1,0,partial,60,130.5,1
+7007,minimal,26,hostage,3,"Corner Store",6,0,0,0,0,0,2,0,0,success,100,71.3,1
+7007,minimal,27,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,28,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,29,hostage,5,"Duplex",6,1,0,0,0,0,3,0,0,success,95,91.7,1
+7007,minimal,30,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,31,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,149.1,1
+7007,minimal,32,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,3,2,0,success,100,172.7,1
+7007,minimal,33,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,178.8,1
+7007,minimal,35,hostage,3,"Corner Store",6,0,0,0,0,0,1,1,0,success,100,97.3,1
+7007,minimal,36,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,37,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+7007,minimal,38,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,partial,65,4.9,1
+7007,minimal,39,event,11,"Civic Plaza",4,0,0,0,0,0,1,0,0,success,100,187,1
+7007,minimal,40,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,1,gang,10,"Apartment Block",6,1,0,0,0,0,4,2,0,success,95,105.8,1
+8008,accept_all,1,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,success,100,99.7,1
+8008,accept_all,2,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,2,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,1,0,partial,65,70.5,1
+8008,accept_all,2,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,0,0,success,100,12.7,1
+8008,accept_all,3,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,3,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,partial,65,15.3,1
+8008,accept_all,3,warrant,6,"L-Shaped Ranch",6,0,0,0,0,0,2,2,0,partial,65,103.2,1
+8008,accept_all,4,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,1,0,2,failure,0,510.3,1
+8008,accept_all,4,event,11,"Civic Plaza",7,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,4,barricade,3,"Corner Store",5,1,0,0,0,0,1,0,0,partial,60,45,1
+8008,accept_all,5,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,5,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,107.2,1
+8008,accept_all,5,barricade,1,"Lone Cabin",4,4,2,0,0,2,1,0,0,failure,0,48.8,1
+8008,accept_all,6,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,54.7,1
+8008,accept_all,6,gang,10,"Apartment Block",6,0,0,0,0,0,2,1,0,success,100,148.8,1
+8008,accept_all,7,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,7,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,partial,65,307.3,1
+8008,accept_all,8,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,8,gang,10,"Apartment Block",6,0,0,0,0,0,5,0,0,partial,65,419.2,1
+8008,accept_all,8,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,238,1
+8008,accept_all,9,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,147.7,1
+8008,accept_all,9,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,43.8,1
+8008,accept_all,10,hostage,5,"Duplex",6,1,1,1,0,0,3,1,0,partial,50,220.1,1
+8008,accept_all,10,gang,8,"Warehouse & Offices",6,3,1,1,0,0,5,1,0,success,75,122.5,1
+8008,accept_all,11,hostage,3,"Corner Store",6,2,1,1,0,0,3,0,0,failure,10,46.8,1
+8008,accept_all,11,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,12,gang,10,"Apartment Block",6,0,0,0,0,0,3,1,0,success,100,153.1,1
+8008,accept_all,12,barricade,3,"Corner Store",4,1,1,1,0,0,1,0,0,success,85,49.3,1
+8008,accept_all,13,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,239.1,1
+8008,accept_all,13,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,50.2,1
+8008,accept_all,14,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,success,100,21.2,1
+8008,accept_all,14,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,1,0,0,success,100,55.2,1
+8008,accept_all,15,hostage,5,"Duplex",6,0,0,0,0,0,3,1,1,failure,15,606,1
+8008,accept_all,15,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,1,failure,15,489.3,1
+8008,accept_all,16,hostage,5,"Duplex",6,0,0,0,0,0,3,2,0,success,100,85,1
+8008,accept_all,16,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,1,0,partial,65,113.3,1
+8008,accept_all,16,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,0,0,success,100,11.8,1
+8008,accept_all,17,gang,10,"Apartment Block",9,0,0,0,0,0,6,2,1,success,85,178.1,1
+8008,accept_all,17,gang,8,"Warehouse & Offices",8,1,0,0,0,0,4,0,0,partial,60,27.5,1
+8008,accept_all,18,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,18,gang,8,"Warehouse & Offices",7,0,0,0,0,0,5,1,0,success,100,112.1,1
+8008,accept_all,18,barricade,3,"Corner Store",5,0,0,0,0,0,1,1,0,partial,65,16,1
+8008,accept_all,19,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,partial,65,900,1
+8008,accept_all,19,gang,10,"Apartment Block",7,0,0,0,0,0,4,0,0,partial,65,79.2,1
+8008,accept_all,19,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,2,0,success,100,60,1
+8008,accept_all,20,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,20,gang,8,"Warehouse & Offices",8,1,0,0,0,0,5,0,0,failure,25,27.2,1
+8008,accept_all,20,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,3,0,0,success,100,64.6,1
+8008,accept_all,21,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,88.6,1
+8008,accept_all,21,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,21,gang,8,"Warehouse & Offices",6,6,6,6,0,0,5,1,0,partial,0,110.7,1
+8008,accept_all,22,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,193.6,1
+8008,accept_all,22,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,16.5,1
+8008,accept_all,23,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,partial,65,900,1
+8008,accept_all,23,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,0,0,partial,65,72.2,1
+8008,accept_all,24,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,24,gang,8,"Warehouse & Offices",6,1,1,1,0,0,5,0,0,success,85,84.8,1
+8008,accept_all,24,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,238,1
+8008,accept_all,25,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,25,gang,8,"Warehouse & Offices",6,0,0,0,0,0,6,0,0,partial,65,78.8,1
+8008,accept_all,26,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,partial,65,900,1
+8008,accept_all,26,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,partial,65,100.3,1
+8008,accept_all,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,191.6,1
+8008,accept_all,27,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,28,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,1,failure,15,900,1
+8008,accept_all,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,2,0,partial,65,41.9,1
+8008,accept_all,28,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,partial,65,43.2,1
+8008,accept_all,29,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,29,gang,10,"Apartment Block",6,2,1,0,1,0,4,2,0,partial,45,506,1
+8008,accept_all,29,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,32.8,1
+8008,accept_all,30,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,74.1,1
+8008,accept_all,30,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,94.3,1
+8008,accept_all,31,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,4.5,1
+8008,accept_all,31,warrant,6,"L-Shaped Ranch",5,1,0,0,0,0,2,1,0,success,95,69.5,1
+8008,accept_all,32,event,11,"Civic Plaza",3,0,0,0,0,0,2,2,1,partial,50,590.8,1
+8008,accept_all,32,warrant,6,"L-Shaped Ranch",4,2,2,2,0,0,2,0,0,partial,35,173.6,1
+8008,accept_all,32,warrant,5,"Duplex",4,0,0,0,0,0,1,1,0,partial,65,24.5,1
+8008,accept_all,33,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,33,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,partial,65,3.7,1
+8008,accept_all,34,hostage,8,"Warehouse & Offices",6,3,3,3,0,0,2,0,3,failure,0,900,1
+8008,accept_all,35,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,119.3,1
+8008,accept_all,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,37,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,38,barricade,3,"Corner Store",4,4,1,1,0,0,1,0,0,failure,0,64.8,1
+8008,accept_all,39,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,accept_all,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,1,gang,10,"Apartment Block",6,6,4,3,0,1,4,0,0,partial,0,317.1,1
+8008,cautious,1,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,2,0,0,success,100,99.4,1
+8008,cautious,2,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,2,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,35.6,1
+8008,cautious,3,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,3,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,44.1,1
+8008,cautious,4,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,2,failure,0,472,1
+8008,cautious,4,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,5,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,1,failure,15,900,1
+8008,cautious,5,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,95.1,1
+8008,cautious,6,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,failure,30,151.6,1
+8008,cautious,6,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,207.2,1
+8008,cautious,7,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,7,gang,10,"Apartment Block",6,2,1,1,0,0,5,1,0,partial,45,162.2,1
+8008,cautious,8,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,8,gang,10,"Apartment Block",6,1,1,1,0,0,5,2,0,partial,50,129,1
+8008,cautious,9,gang,10,"Apartment Block",6,4,4,4,0,0,2,0,0,success,40,242,1
+8008,cautious,9,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,partial,65,119.6,1
+8008,cautious,10,hostage,5,"Duplex",6,2,1,1,0,0,3,2,0,failure,10,275.6,1
+8008,cautious,11,hostage,3,"Corner Store",6,0,0,0,0,0,3,0,0,failure,30,45.8,1
+8008,cautious,11,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,12,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,12,gang,10,"Apartment Block",6,1,0,0,0,0,3,2,0,partial,60,116.2,1
+8008,cautious,13,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,248.1,1
+8008,cautious,14,barricade,4,"Center-Hall Bungalow",5,0,0,0,0,0,1,0,0,partial,65,3.7,1
+8008,cautious,14,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,1,0,0,failure,30,107.2,1
+8008,cautious,15,hostage,5,"Duplex",6,0,0,0,0,0,3,0,1,failure,15,642.7,1
+8008,cautious,15,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,2,failure,0,570.4,1
+8008,cautious,16,hostage,5,"Duplex",6,0,0,0,0,0,3,1,0,success,100,79.7,1
+8008,cautious,16,gang,8,"Warehouse & Offices",6,0,0,0,0,0,5,0,0,partial,65,63.8,1
+8008,cautious,17,gang,10,"Apartment Block",7,4,2,2,0,0,6,0,0,partial,25,205.8,1
+8008,cautious,17,gang,8,"Warehouse & Offices",6,2,2,2,0,0,4,1,0,success,70,46.1,1
+8008,cautious,18,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,18,gang,8,"Warehouse & Offices",6,4,3,3,0,0,5,1,0,success,50,57.7,1
+8008,cautious,19,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+8008,cautious,20,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,21,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,22,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,210.3,1
+8008,cautious,23,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,24,gang,8,"Warehouse & Offices",6,1,1,1,0,0,5,0,0,success,85,57.4,1
+8008,cautious,25,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,26,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,26,gang,8,"Warehouse & Offices",6,1,1,1,0,0,3,0,1,partial,35,38.5,1
+8008,cautious,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,165.3,1
+8008,cautious,27,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,28,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,2,0,success,100,102.2,1
+8008,cautious,29,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,29,gang,10,"Apartment Block",6,0,0,0,0,0,4,0,0,partial,65,309,1
+8008,cautious,30,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,65.2,1
+8008,cautious,30,gang,10,"Apartment Block",6,0,0,0,0,0,3,1,0,partial,65,52.3,1
+8008,cautious,31,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,success,100,64.6,1
+8008,cautious,31,warrant,6,"L-Shaped Ranch",7,0,0,0,0,0,2,1,0,partial,65,54.2,1
+8008,cautious,32,event,11,"Civic Plaza",3,0,0,0,0,0,2,1,2,partial,35,602.3,1
+8008,cautious,32,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,1,0,partial,65,51.2,1
+8008,cautious,33,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,33,gang,10,"Apartment Block",6,2,1,1,0,0,6,2,0,partial,45,330,1
+8008,cautious,34,hostage,8,"Warehouse & Offices",6,2,2,2,0,0,2,0,3,failure,0,900,1
+8008,cautious,34,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,partial,65,342.4,1
+8008,cautious,35,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,149.6,1
+8008,cautious,35,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,36,hostage,8,"Warehouse & Offices",6,1,1,1,0,0,2,1,0,success,85,217.8,1
+8008,cautious,36,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,37,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,cautious,37,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,226.4,1
+8008,cautious,38,barricade,3,"Corner Store",5,3,1,1,0,0,1,0,0,partial,40,63.6,1
+8008,cautious,38,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,19.4,1
+8008,cautious,39,hostage,8,"Warehouse & Offices",6,3,3,1,0,2,1,0,1,failure,0,900,1
+8008,cautious,40,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,1,gang,10,"Apartment Block",6,1,0,0,0,0,4,0,0,partial,60,118.2,1
+8008,military,1,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,success,100,103.7,1
+8008,military,1,warrant,5,"Duplex",4,0,0,0,0,0,1,0,0,partial,65,46.2,1
+8008,military,2,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,2,barricade,4,"Center-Hall Bungalow",5,1,0,0,0,0,1,1,0,success,95,105,1
+8008,military,2,barricade,1,"Lone Cabin",5,0,0,0,0,0,1,1,0,partial,65,5.2,1
+8008,military,3,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,3,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,success,100,31.1,1
+8008,military,3,warrant,6,"L-Shaped Ranch",5,0,0,0,0,0,2,0,0,partial,65,89.1,1
+8008,military,4,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,1,failure,15,401.2,1
+8008,military,4,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,4,barricade,3,"Corner Store",4,1,1,1,0,0,1,0,0,partial,50,44.5,1
+8008,military,5,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,5,gang,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,partial,65,60.2,1
+8008,military,5,barricade,1,"Lone Cabin",4,2,0,0,0,0,1,0,0,partial,55,16.3,1
+8008,military,6,hostage,3,"Corner Store",6,0,0,0,0,0,1,0,0,success,100,52.7,1
+8008,military,6,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,112.3,1
+8008,military,7,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,7,gang,10,"Apartment Block",6,2,2,2,0,0,5,1,0,success,70,223,1
+8008,military,7,barricade,4,"Center-Hall Bungalow",4,1,1,1,0,0,1,1,0,partial,50,102.2,1
+8008,military,8,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,8,gang,10,"Apartment Block",6,4,2,2,0,0,5,2,0,success,60,84.6,1
+8008,military,8,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,failure,30,238.7,1
+8008,military,9,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,success,100,88.2,1
+8008,military,10,barricade,3,"Corner Store",4,0,0,0,0,0,1,1,0,partial,65,25.6,1
+8008,military,11,hostage,3,"Corner Store",6,2,2,2,0,0,3,1,0,failure,0,46.9,1
+8008,military,12,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,13,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,63.4,1
+8008,military,14,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,1,0,success,100,17,1
+8008,military,15,hostage,5,"Duplex",6,0,0,0,0,0,3,0,1,failure,15,727.7,1
+8008,military,16,barricade,1,"Lone Cabin",4,0,0,0,0,0,1,0,0,success,100,16.2,1
+8008,military,17,gang,10,"Apartment Block",6,5,0,0,0,0,6,2,0,success,75,177.7,1
+8008,military,18,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,partial,65,900,1
+8008,military,21,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,22,barricade,4,"Center-Hall Bungalow",4,0,0,0,0,0,1,0,0,success,100,17.2,1
+8008,military,23,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,23,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,3,0,0,failure,30,48.5,1
+8008,military,24,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,24,gang,8,"Warehouse & Offices",6,1,0,0,0,0,5,1,0,partial,60,89.3,1
+8008,military,25,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,25,gang,8,"Warehouse & Offices",6,1,0,0,0,0,6,3,0,success,95,75.9,1
+8008,military,26,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,26,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,56.9,1
+8008,military,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,221.3,1
+8008,military,27,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,28,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,28,gang,8,"Warehouse & Offices",6,0,0,0,0,0,4,1,0,success,100,113.9,1
+8008,military,29,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,29,gang,10,"Apartment Block",6,0,0,0,0,0,4,1,0,partial,65,291.1,1
+8008,military,30,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,77.5,1
+8008,military,30,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,success,100,103.5,1
+8008,military,31,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,partial,65,4.8,1
+8008,military,31,warrant,6,"L-Shaped Ranch",6,1,1,1,0,0,2,0,0,failure,15,42.2,1
+8008,military,32,event,11,"Civic Plaza",3,0,0,0,0,0,2,1,1,partial,50,585,1
+8008,military,32,gang,8,"Warehouse & Offices",6,0,0,0,0,0,3,0,0,success,100,125.9,1
+8008,military,32,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,success,100,94,1
+8008,military,33,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,33,gang,10,"Apartment Block",6,2,1,1,0,0,6,1,0,partial,45,129.2,1
+8008,military,33,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,1,0,0,failure,30,66.2,1
+8008,military,34,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,207.3,1
+8008,military,34,gang,10,"Apartment Block",6,0,0,0,0,0,2,0,0,partial,65,273.2,1
+8008,military,35,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,198.2,1
+8008,military,35,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,35,warrant,6,"L-Shaped Ranch",4,0,0,0,0,0,2,0,0,success,100,135.7,1
+8008,military,36,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,216.3,1
+8008,military,36,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,37,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,37,barricade,4,"Center-Hall Bungalow",6,0,0,0,0,0,1,0,0,failure,30,271.3,1
+8008,military,37,warrant,5,"Duplex",5,0,0,0,0,0,1,0,0,success,100,17.4,1
+8008,military,38,barricade,3,"Corner Store",7,4,2,2,0,0,1,0,0,partial,25,98.4,1
+8008,military,38,warrant,5,"Duplex",7,0,0,0,0,0,1,0,0,success,100,9.5,1
+8008,military,39,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,193.1,1
+8008,military,39,event,11,"Civic Plaza",2,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,40,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,military,40,gang,8,"Warehouse & Offices",6,1,1,1,0,0,4,1,0,success,85,114.5,1
+8008,minimal,1,gang,10,"Apartment Block",8,1,1,1,0,0,4,0,0,partial,50,221.2,1
+8008,minimal,2,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,3,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,4,hostage,8,"Warehouse & Offices",7,0,0,0,0,0,1,0,2,failure,0,510.3,1
+8008,minimal,5,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,6,hostage,3,"Corner Store",7,0,0,0,0,0,1,0,0,success,100,54.3,1
+8008,minimal,7,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,8,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,9,gang,10,"Apartment Block",8,0,0,0,0,0,2,0,0,success,100,113.2,1
+8008,minimal,10,hostage,5,"Duplex",7,0,0,0,0,0,3,1,0,success,100,146.5,1
+8008,minimal,11,hostage,3,"Corner Store",8,1,1,1,0,0,3,2,0,success,85,70.4,1
+8008,minimal,12,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,13,gang,10,"Apartment Block",8,0,0,0,0,0,2,1,0,success,100,264.1,1
+8008,minimal,14,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,0,0,partial,65,3.9,1
+8008,minimal,15,hostage,5,"Duplex",6,0,0,0,0,0,3,0,1,failure,15,695,1
+8008,minimal,16,hostage,5,"Duplex",6,0,0,0,0,0,3,0,0,success,100,87.7,1
+8008,minimal,17,gang,10,"Apartment Block",9,0,0,0,0,0,6,2,0,success,100,125.8,1
+8008,minimal,18,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,19,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,20,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,21,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,89.7,1
+8008,minimal,22,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,188.9,1
+8008,minimal,23,event,11,"Civic Plaza",6,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,24,event,11,"Civic Plaza",3,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,25,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,26,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,27,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,0,0,success,100,182.9,1
+8008,minimal,28,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,29,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,30,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,0,0,success,100,72.6,1
+8008,minimal,31,barricade,4,"Center-Hall Bungalow",7,0,0,0,0,0,1,1,0,partial,65,4.6,1
+8008,minimal,32,event,11,"Civic Plaza",4,0,0,0,0,0,2,1,2,partial,35,614.7,1
+8008,minimal,33,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,34,hostage,8,"Warehouse & Offices",6,3,2,1,0,1,2,0,3,failure,0,900,1
+8008,minimal,35,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,1,1,0,success,100,124.1,1
+8008,minimal,36,hostage,8,"Warehouse & Offices",6,0,0,0,0,0,2,1,0,success,100,183.3,1
+8008,minimal,37,event,11,"Civic Plaza",5,0,0,0,0,0,0,0,0,quiet,100,900,1
+8008,minimal,38,barricade,3,"Corner Store",7,2,1,1,0,0,1,1,0,partial,45,94.4,1
+8008,minimal,39,hostage,8,"Warehouse & Offices",6,1,0,0,0,0,1,1,0,success,95,149.8,1
+8008,minimal,40,event,11,"Civic Plaza",4,0,0,0,0,0,0,0,0,quiet,100,900,1

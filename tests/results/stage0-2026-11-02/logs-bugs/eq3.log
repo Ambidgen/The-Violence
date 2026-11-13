@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+item              measure                                              with   without   gate
+stingball         barricaded suspects who end alive in cuffs (more)      1.08     0.17   PASS
+gas               barricaded suspects who end alive in cuffs (more)      1.17     0.17   PASS
+gas_mask          officer-seconds gassed taking a gassed room (less)     0.00     7.19   PASS
+sof_helmet        head hits survived: first, second                     20/20     0/20   PASS
+ballistic_helmet  handgun rounds to the head survived, any side (more)   0.83     0.00   PASS
+5 of 5 items change the outcome (12 runs each way, 55 s)

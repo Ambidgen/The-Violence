@@ -1,0 +1,302 @@
+{
+  "band_status": "asserting",
+  "bands": [
+    {
+      "agg": "min",
+      "id": "roster-floor",
+      "metric": "min_fit",
+      "policies": [
+        "all"
+      ],
+      "test": ">=",
+      "value": 10.0,
+      "why": "the roster must never collapse: the worst week of the worst seed still fields a team"
+    },
+    {
+      "agg": "max",
+      "id": "roster-weeks",
+      "metric": "weeks_fit_below_12",
+      "policies": [
+        "all"
+      ],
+      "test": "<=",
+      "value": 8.0,
+      "why": "fewer than 12 fit is a week of refusals; a fifth of the campaign is too many"
+    },
+    {
+      "agg": "max",
+      "id": "money-deficit",
+      "metric": "weeks_below_zero",
+      "policies": [
+        "all"
+      ],
+      "test": "<=",
+      "value": 8.0,
+      "why": "a negative account freezes hiring, training and kit"
+    },
+    {
+      "agg": "min",
+      "id": "money-debt",
+      "metric": "balance_min",
+      "policies": [
+        "all"
+      ],
+      "test": ">=",
+      "value": -75000.0,
+      "why": "no bottomless debt in the worst seed"
+    },
+    {
+      "agg": "mean",
+      "id": "money-end",
+      "metric": "balance_end",
+      "policies": [
+        "all"
+      ],
+      "test": ">=",
+      "value": 0.0,
+      "why": "the department should not end the campaign bankrupt"
+    },
+    {
+      "agg": "mean",
+      "id": "coverage",
+      "metric": "unattended",
+      "policies": [
+        "all"
+      ],
+      "test": "<=",
+      "value": 48.0,
+      "why": "calls left unattended measured the roster collapse (48-80 on 28 Oct)"
+    },
+    {
+      "agg": "mean",
+      "id": "deaths",
+      "metric": "officers_killed",
+      "policies": [
+        "all"
+      ],
+      "test": "<=",
+      "value": 8.0,
+      "why": "13-16 of 20 died across three runs; a run is meant to cost some officers, not most"
+    },
+    {
+      "agg": "max",
+      "id": "lethality",
+      "metric": "officers_killed_per_op",
+      "policies": [
+        "all"
+      ],
+      "test": "<=",
+      "value": 0.15,
+      "why": "0.21-0.25 per operation on 28 Oct; a fifth of a squad per call is what broke the roster"
+    },
+    {
+      "agg": "mean",
+      "id": "civilians",
+      "metric": "civ_killed",
+      "policies": [
+        "all"
+      ],
+      "test": "<=",
+      "value": 6.0,
+      "why": "the crowd cliff (P1.B) is measured here: 52 civilians in 8 quiet rallies at trauma 14"
+    },
+    {
+      "agg": "mean",
+      "id": "allies-held",
+      "metric": "allies_lost_end",
+      "policies": [
+        "all"
+      ],
+      "test": "<=",
+      "value": 2.0,
+      "why": "0 of 4 allies survived every 28 Oct run"
+    },
+    {
+      "agg": "mean",
+      "id": "ally-recovery",
+      "metric": "allies_regained",
+      "policies": [
+        "all"
+      ],
+      "test": ">=",
+      "value": 0.25,
+      "why": "an ally lost must be winnable back at least once across a matrix (P1.E)"
+    },
+    {
+      "agg": "mean",
+      "id": "score",
+      "metric": "run_score",
+      "policies": [
+        "all"
+      ],
+      "test": ">=",
+      "value": 0.0,
+      "why": "restraint should out-score ruin; -2207 to -829 on 28 Oct"
+    },
+    {
+      "agg": "mean",
+      "id": "election",
+      "metric": "kept_share",
+      "policies": [
+        "all"
+      ],
+      "test": ">=",
+      "value": 0.5,
+      "why": "a chief who plays sensibly keeps the office more often than not"
+    }
+  ],
+  "broken": [],
+  "derived": {
+    "accept_all": [
+      {
+        "allies_first_lost": {
+          "coalition": 19,
+          "council": 16,
+          "union": 15
+        },
+        "allies_lost_end": 3,
+        "allies_regained": 0,
+        "balance_end": 459,
+        "balance_max": 9171,
+        "balance_min": -19643,
+        "civ_killed": 1,
+        "failures": 11,
+        "findings": 67,
+        "hung": 0,
+        "kept": true,
+        "min_fit": 6,
+        "min_fit_week": 21,
+        "officers_killed": 25,
+        "officers_killed_per_op": 0.28,
+        "ops": 90,
+        "policy": "accept_all",
+        "run_score": -554,
+        "seed": 1001,
+        "successes": 51,
+        "unattended": 34,
+        "wall_ms": 1197053,
+        "weeks": 40,
+        "weeks_below_zero": 33,
+        "weeks_below_zero_1_12": 7,
+        "weeks_fit_below_12": 14,
+        "winner": "kettering"
+      }
+    ],
+    "cautious": [
+      {
+        "allies_first_lost": {
+          "coalition": 33,
+          "council": 12,
+          "union": 8
+        },
+        "allies_lost_end": 2,
+        "allies_regained": 0,
+        "balance_end": -8723,
+        "balance_max": 8046,
+        "balance_min": -17910,
+        "civ_killed": 2,
+        "failures": 8,
+        "findings": 85,
+        "hung": 0,
+        "kept": true,
+        "min_fit": 8,
+        "min_fit_week": 22,
+        "officers_killed": 29,
+        "officers_killed_per_op": 0.39,
+        "ops": 75,
+        "policy": "cautious",
+        "run_score": -791,
+        "seed": 1001,
+        "successes": 43,
+        "unattended": 50,
+        "wall_ms": 1714773,
+        "weeks": 40,
+        "weeks_below_zero": 33,
+        "weeks_below_zero_1_12": 10,
+        "weeks_fit_below_12": 17,
+        "winner": "kettering"
+      }
+    ],
+    "military": [
+      {
+        "allies_first_lost": {
+          "coalition": 14,
+          "council": 29,
+          "union": 29
+        },
+        "allies_lost_end": 3,
+        "allies_regained": 0,
+        "balance_end": 11236,
+        "balance_max": 17837,
+        "balance_min": -3090,
+        "civ_killed": 3,
+        "failures": 9,
+        "findings": 52,
+        "hung": 0,
+        "kept": true,
+        "min_fit": 7,
+        "min_fit_week": 8,
+        "officers_killed": 15,
+        "officers_killed_per_op": 0.21,
+        "ops": 73,
+        "policy": "military",
+        "run_score": -405,
+        "seed": 1001,
+        "successes": 44,
+        "unattended": 51,
+        "wall_ms": 1045570,
+        "weeks": 40,
+        "weeks_below_zero": 3,
+        "weeks_below_zero_1_12": 3,
+        "weeks_fit_below_12": 26,
+        "winner": "kettering"
+      }
+    ],
+    "minimal": [
+      {
+        "allies_first_lost": {
+          "coalition": 9
+        },
+        "allies_lost_end": 1,
+        "allies_regained": 0,
+        "balance_end": 113457,
+        "balance_max": 125638,
+        "balance_min": 40494,
+        "civ_killed": 2,
+        "failures": 2,
+        "findings": 22,
+        "hung": 0,
+        "kept": true,
+        "min_fit": 14,
+        "min_fit_week": 39,
+        "officers_killed": 5,
+        "officers_killed_per_op": 0.13,
+        "ops": 40,
+        "policy": "minimal",
+        "run_score": -264,
+        "seed": 1001,
+        "successes": 27,
+        "unattended": 83,
+        "wall_ms": 1676889,
+        "weeks": 40,
+        "weeks_below_zero": 0,
+        "weeks_below_zero_1_12": 0,
+        "weeks_fit_below_12": 0,
+        "winner": "kettering"
+      }
+    ]
+  },
+  "engine": "4.7.2-stable (official)",
+  "misses": 28,
+  "policies": [
+    "cautious",
+    "minimal",
+    "military",
+    "accept_all"
+  ],
+  "runs": 4,
+  "seeds": 1,
+  "version": 1,
+  "wall_ms": 2914951,
+  "weeks": 40
+}

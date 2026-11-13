@@ -1,0 +1,4 @@
+name,seed,policy,winner,kept,won,failed,unattended,killed,killed_per_op,down_per_op,findings,lawsuits,stories,run_score,min_fit,min_fit_week,weeks_fit_below_12,weeks_below_zero,weeks_below_zero_1_12,first_week_below_zero,balance_min,balance_max,balance_end,allies_lost_end,allies_regained
+campaign-seed1001,1001,sensible+hire+train+run,Okonjo-Vale,False,41,11,48,16,0.21,0.36,156,10,13,-2207,5,40,8,24,8,5,-491376,23890,-491376,4,0
+campaign-seed2002,2002,sensible+run,Kettering,True,25,10,80,13,0.25,0.53,65,7,8,-829,4,12,35,0,0,,15194,369007,369007,4,0
+campaign-seed3003,3003,sensible+hire+run,Kettering,True,29,10,69,13,0.23,0.6,106,5,8,-1202,2,22,33,24,5,8,-113780,28759,8476,4,0

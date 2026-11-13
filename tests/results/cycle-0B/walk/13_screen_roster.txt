@@ -1,0 +1,39 @@
+ROSTER  ·  week 2
+ACCOUNT  $23,431   ·   allocation $30,500 a week   ·   payroll $26,264
+Morale 60   ·   0 internal affairs cases open
+APPLICANTS  ·  week 2
+Hire one and the rest walk. A recruit spends two weeks at the academy; a lateral hire has years elsewhere and reports at once. Whoever nobody hires walks at the end of the week.
+Officer Rosa Trujillo  ·  Patrol  ·  lateral, 3 years elsewhere, Blooded
+Judgment 44  ·  temper 49  ·  integrity 45  ·  +Cool head  -Slow to settle  -Slow eyes
+[Hire  ($10,640, then $1,202 a week)]
+Officer Faisal Mehta  ·  Patrol  ·  recruit (academy, two weeks)
+Judgment 62  ·  temper 37  ·  integrity 66  ·  +Cool head  -Slow to settle  -Flincher  ·  personality: rigidity (Range scar)
+[Hire  ($7,640, then $1,150 a week)]
+Officer Jun Guo  ·  Patrol  ·  recruit (academy, two weeks)
+Judgment 55  ·  temper 43  ·  integrity 72  ·  +Cool head  +Steady aim  -Slow on target  ·  personality: ego (Die at the post)
+[Hire  ($7,640, then $1,150 a week)]
+Officer Lukas Richter  ·  Patrol  ·  lateral, 3 years elsewhere, Blooded
+Judgment 50  ·  temper 42  ·  integrity 31  ·  +Fast hands
+[Hire  ($10,640, then $1,202 a week)]
+Click an officer to open their file: training, and dismissal.
+[Lieutenant Giulia Bernardi  ·  14 yr  ·  Veteran 46 xp  ·  J 64  ·  $2,118/wk  ·  fit]
+[Sergeant Ashley Stanton  ·  11 yr  ·  Seasoned 28 xp  ·  J 59  ·  $1,748/wk  ·  fit]
+[Sergeant Pedro Villagrande  ·  9 yr  ·  Seasoned 27 xp  ·  J 62  ·  $1,703/wk  ·  fit]
+[Corporal Reginald Battle  ·  5 yr  ·  Blooded 15 xp  ·  J 54  ·  $1,398/wk  ·  fit]
+[Corporal Sarah Wright  ·  7 yr  ·  Blooded 14 xp  ·  J 54  ·  $1,437/wk  ·  fit]
+[Corporal Keisha Spearman  ·  4 yr  ·  Blooded 8 xp  ·  J 62  ·  $1,378/wk  ·  fit]
+[Corporal John Carter  ·  3 yr  ·  Blooded 7 xp  ·  J 53  ·  $1,359/wk  ·  fit]
+[Officer Jean McKenzie  ·  3 yr  ·  Blooded 7 xp  ·  J 62  ·  $1,202/wk  ·  fit]
+[Officer Efua Adeyemi  ·  2 yr  ·  Blooded 6 xp  ·  J 53  ·  $1,185/wk  ·  fit]
+[Officer David Gray  ·  2 yr  ·  Green 4 xp  ·  J 52  ·  $1,185/wk  ·  fit]
+[Officer Nikolai Rudenko  ·  1 yr  ·  Green 2 xp  ·  J 43  ·  $1,167/wk  ·  fit]
+[Officer Anna Karagiannis  ·  1 yr  ·  Green 2 xp  ·  J 14  ·  $1,167/wk  ·  fit]
+[Officer Lin Hu  ·  1 yr  ·  Green 1 xp  ·  J 68  ·  $1,167/wk  ·  fit]
+[Officer Gerard Dunne  ·  0 yr  ·  Green 0 xp  ·  J 60  ·  $1,150/wk  ·  fit]
+[Officer Paddy Daly  ·  0 yr  ·  Green 0 xp  ·  J 51  ·  $1,150/wk  ·  fit]
+[Officer Paddy Heffernan  ·  0 yr  ·  Green 0 xp  ·  J 54  ·  $1,150/wk  ·  fit]
+[Officer Ruairi O'Keefe  ·  0 yr  ·  Green 0 xp  ·  J 63  ·  $1,150/wk  ·  fit]
+[Officer Pawel Pawlak  ·  0 yr  ·  Green 0 xp  ·  J 49  ·  $1,150/wk  ·  fit]
+[Officer Oleg Golubev  ·  0 yr  ·  Green 0 xp  ·  J 42  ·  $1,150/wk  ·  fit]
+[Officer Roman Krawczyk  ·  0 yr  ·  Green 0 xp  ·  J 25  ·  $1,150/wk  ·  fit]
+[<  Back to the board]

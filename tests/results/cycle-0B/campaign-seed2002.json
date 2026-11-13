@@ -1,0 +1,3031 @@
+{
+  "chief": "sensible",
+  "death_causes": {
+    "killed outright": 13
+  },
+  "decide": "lapse",
+  "deficit_weeks": 0,
+  "election": {
+    "head": "Kettering keeps you. The equipment budget doubles.",
+    "kept": true,
+    "votes": {
+      "kettering": 35.2269567758288,
+      "okonjo": 30.3558714419153,
+      "pell": 34.4171717822559
+    },
+    "winner": "kettering"
+  },
+  "engine": "4.7.2-stable (official)",
+  "findings": 65,
+  "hire": false,
+  "hung": 0,
+  "mean_op_score": 68,
+  "officers_down_per_op": 0.53,
+  "officers_killed_per_op": 0.25,
+  "ops": 53,
+  "record": {
+    "arrests": 12,
+    "charged": 0,
+    "civ_hit": 9,
+    "civ_killed": 2,
+    "cleared": 0,
+    "crowd_killed": 5,
+    "dismissed": 0,
+    "excessive": 3,
+    "failures": 10,
+    "grants": 0,
+    "leaks": 0,
+    "officers_killed": 13,
+    "settled": 7,
+    "stories": 8,
+    "successes": 25,
+    "suspects_killed": 27,
+    "unattended": 80
+  },
+  "rogue": true,
+  "run_score": {
+    "kept": true,
+    "parts": {
+      "arrests": 36,
+      "civilians hit": -108,
+      "civilians killed": -230,
+      "excessive force": -30,
+      "failures": -80,
+      "officers killed": -325,
+      "successes": 250,
+      "suspects killed": -162,
+      "the election": 60,
+      "unattended": -240
+    },
+    "total": -829
+  },
+  "seed": 2002,
+  "train": false,
+  "version": 1,
+  "wall_ms": 638591,
+  "weeks": [
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": false,
+          "standing": 45
+        },
+        "council": {
+          "lost": false,
+          "standing": 54
+        },
+        "da": {
+          "lost": false,
+          "standing": 55
+        },
+        "union": {
+          "lost": false,
+          "standing": 56
+        }
+      },
+      "balance": 23860,
+      "dead_total": 1,
+      "fit": 19,
+      "injured": 0,
+      "lines": [],
+      "morale": 57,
+      "open_cases": 2,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W1-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 2,
+          "civ_killed": 0,
+          "findings": 6,
+          "hung": false,
+          "id": "W1-1",
+          "label": "Success, at a cost",
+          "map": 8,
+          "misjudged": 1,
+          "officers": 7,
+          "officers_down": 1,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 85,
+          "sim_s": 79.1,
+          "suspects_killed": 3,
+          "type": "gang",
+          "vis": 1
+        }
+      ],
+      "pending": 2,
+      "polls": {
+        "kettering": 34.0,
+        "okonjo": 30.1,
+        "pell": 35.9
+      },
+      "trust": 43.5,
+      "week": 1
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": false,
+          "standing": 45
+        },
+        "council": {
+          "lost": false,
+          "standing": 48
+        },
+        "da": {
+          "lost": false,
+          "standing": 55
+        },
+        "union": {
+          "lost": false,
+          "standing": 44
+        }
+      },
+      "balance": 15194,
+      "dead_total": 4,
+      "fit": 15,
+      "injured": 1,
+      "lines": [],
+      "morale": 49,
+      "open_cases": 4,
+      "ops": [
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 1,
+          "civ_killed": 0,
+          "findings": 6,
+          "hung": false,
+          "id": "W2-3",
+          "label": "Failure",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 8,
+          "officers_down": 3,
+          "officers_killed": 3,
+          "ran": true,
+          "score": 0,
+          "sim_s": 57.2,
+          "suspects_killed": 0,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W2-2",
+          "label": "Partial success",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 6.7,
+          "suspects_killed": 1,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 6,
+      "polls": {
+        "kettering": 36.8,
+        "okonjo": 29.6,
+        "pell": 33.6
+      },
+      "trust": 42.5,
+      "week": 2
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": false,
+          "standing": 42
+        },
+        "council": {
+          "lost": false,
+          "standing": 47
+        },
+        "da": {
+          "lost": false,
+          "standing": 54
+        },
+        "union": {
+          "lost": false,
+          "standing": 44
+        }
+      },
+      "balance": 19935,
+      "dead_total": 4,
+      "fit": 15,
+      "injured": 1,
+      "lines": [],
+      "morale": 52,
+      "open_cases": 4,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W3-3",
+          "label": "Partial success",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 77.2,
+          "suspects_killed": 3,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W3-2",
+          "label": "Partial success",
+          "map": 4,
+          "misjudged": 0,
+          "officers": 5,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 46.3,
+          "suspects_killed": 1,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 34.8,
+        "okonjo": 31.8,
+        "pell": 33.4
+      },
+      "trust": 40.7,
+      "week": 3
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": false,
+          "standing": 31
+        },
+        "council": {
+          "lost": false,
+          "standing": 37
+        },
+        "da": {
+          "lost": false,
+          "standing": 53
+        },
+        "union": {
+          "lost": false,
+          "standing": 44
+        }
+      },
+      "balance": 27991,
+      "dead_total": 4,
+      "fit": 15,
+      "injured": 1,
+      "lines": [
+        "LOST: Rev. Alma Mbeki-Shaw (Carrick Community Coalition). The coalition tells its groups to stop talking to you: no community tips in any ward."
+      ],
+      "morale": 57,
+      "open_cases": 3,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W4-3",
+          "label": "Success",
+          "map": 5,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 42.8,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 2
+        },
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 1,
+          "civ_killed": 1,
+          "findings": 4,
+          "hung": false,
+          "id": "W4-4",
+          "label": "Failure",
+          "map": 11,
+          "misjudged": 1,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 15,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 36.5,
+        "okonjo": 33.6,
+        "pell": 29.9
+      },
+      "trust": 37.7,
+      "week": 4
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 15
+        },
+        "council": {
+          "lost": false,
+          "standing": 25
+        },
+        "da": {
+          "lost": false,
+          "standing": 50
+        },
+        "union": {
+          "lost": false,
+          "standing": 44
+        }
+      },
+      "balance": 36897,
+      "dead_total": 4,
+      "fit": 14,
+      "injured": 2,
+      "lines": [
+        "LOST: Marguerite Duff (Councillor, chair of the budget committee). The budget committee cuts the department's allocation by 8%."
+      ],
+      "morale": 57,
+      "open_cases": 2,
+      "ops": [
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 3,
+          "civ_killed": 1,
+          "findings": 5,
+          "hung": false,
+          "id": "W5-3",
+          "label": "Failure",
+          "map": 11,
+          "misjudged": 1,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 15,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 1,
+          "hung": false,
+          "id": "W5-2",
+          "label": "Partial success, at a cost",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 1,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 60,
+          "sim_s": 118.2,
+          "suspects_killed": 1,
+          "type": "gang",
+          "vis": 2
+        }
+      ],
+      "pending": 6,
+      "polls": {
+        "kettering": 37.2,
+        "okonjo": 36.6,
+        "pell": 26.2
+      },
+      "trust": 33.5,
+      "week": 5
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 6
+        },
+        "da": {
+          "lost": false,
+          "standing": 40
+        },
+        "union": {
+          "lost": false,
+          "standing": 36
+        }
+      },
+      "balance": 27558,
+      "dead_total": 6,
+      "fit": 10,
+      "injured": 4,
+      "lines": [],
+      "morale": 47,
+      "open_cases": 2,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 5,
+          "hung": false,
+          "id": "W6-1",
+          "label": "Partial success, at a cost",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 5,
+          "officers_killed": 2,
+          "ran": true,
+          "score": 20,
+          "sim_s": 214.2,
+          "suspects_killed": 1,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W6-2",
+          "label": "Partial success",
+          "map": 4,
+          "misjudged": 0,
+          "officers": 5,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 16.5,
+          "suspects_killed": 0,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 36.2,
+        "okonjo": 38.7,
+        "pell": 25.1
+      },
+      "trust": 29.0,
+      "week": 6
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 4
+        },
+        "da": {
+          "lost": false,
+          "standing": 40
+        },
+        "union": {
+          "lost": false,
+          "standing": 32
+        }
+      },
+      "balance": 31955,
+      "dead_total": 7,
+      "fit": 7,
+      "injured": 6,
+      "lines": [],
+      "morale": 43,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 1,
+          "hung": false,
+          "id": "W7-2",
+          "label": "Partial success, at a cost",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 1,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 60,
+          "sim_s": 87.4,
+          "suspects_killed": 0,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 2,
+          "hung": false,
+          "id": "W7-1",
+          "label": "Failure",
+          "map": 4,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 2,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 10,
+          "sim_s": 233.2,
+          "suspects_killed": 0,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 5,
+      "polls": {
+        "kettering": 37.2,
+        "okonjo": 38.2,
+        "pell": 24.6
+      },
+      "trust": 28.7,
+      "week": 7
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 2
+        },
+        "da": {
+          "lost": false,
+          "standing": 40
+        },
+        "union": {
+          "lost": false,
+          "standing": 28
+        }
+      },
+      "balance": 40172,
+      "dead_total": 8,
+      "fit": 5,
+      "injured": 7,
+      "lines": [],
+      "morale": 42,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 2,
+          "civ_killed": 0,
+          "findings": 4,
+          "hung": false,
+          "id": "W8-2",
+          "label": "Failure",
+          "map": 5,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 1,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 15,
+          "sim_s": 73.1,
+          "suspects_killed": 1,
+          "type": "hostage",
+          "vis": 2
+        },
+        {
+          "id": "W8-3",
+          "map": 6,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 8,
+      "polls": {
+        "kettering": 37.8,
+        "okonjo": 37.5,
+        "pell": 24.7
+      },
+      "trust": 28.2,
+      "week": 8
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 13
+        },
+        "da": {
+          "lost": false,
+          "standing": 40
+        },
+        "union": {
+          "lost": false,
+          "standing": 28
+        }
+      },
+      "balance": 53316,
+      "dead_total": 8,
+      "fit": 5,
+      "injured": 7,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W9-1",
+          "label": "Success",
+          "map": 6,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 96.8,
+          "suspects_killed": 0,
+          "type": "warrant",
+          "vis": 4
+        },
+        {
+          "id": "W9-2",
+          "map": 5,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 8,
+      "polls": {
+        "kettering": 38.1,
+        "okonjo": 35.6,
+        "pell": 26.3
+      },
+      "trust": 28.2,
+      "week": 9
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 4
+        },
+        "da": {
+          "lost": false,
+          "standing": 39
+        },
+        "union": {
+          "lost": true,
+          "standing": 24
+        }
+      },
+      "balance": 43960,
+      "dead_total": 9,
+      "fit": 5,
+      "injured": 6,
+      "lines": [
+        "LOST: Tommy Rourke (President, Port Carrick Police Benevolent Association). The union turns on you: department morale settles at 45 instead of 60."
+      ],
+      "morale": 43,
+      "open_cases": 2,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 3,
+          "hung": false,
+          "id": "W10-3",
+          "label": "Partial success, at a cost",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 2,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 45,
+          "sim_s": 136.9,
+          "suspects_killed": 1,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "id": "W10-2",
+          "map": 1,
+          "ran": false,
+          "type": "barricade",
+          "vis": 1
+        }
+      ],
+      "pending": 6,
+      "polls": {
+        "kettering": 37.7,
+        "okonjo": 36.1,
+        "pell": 26.2
+      },
+      "trust": 27.5,
+      "week": 10
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 5
+        },
+        "da": {
+          "lost": false,
+          "standing": 39
+        },
+        "union": {
+          "lost": true,
+          "standing": 24
+        }
+      },
+      "balance": 57394,
+      "dead_total": 9,
+      "fit": 6,
+      "injured": 5,
+      "lines": [],
+      "morale": 43,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W11-2",
+          "label": "Success",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 62.0,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 3
+        },
+        {
+          "id": "W11-3",
+          "map": 11,
+          "ran": false,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W11-1",
+          "map": 5,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 37.8,
+        "okonjo": 35.2,
+        "pell": 27.0
+      },
+      "trust": 27.0,
+      "week": 11
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 0
+        },
+        "da": {
+          "lost": false,
+          "standing": 39
+        },
+        "union": {
+          "lost": true,
+          "standing": 20
+        }
+      },
+      "balance": 25173,
+      "dead_total": 10,
+      "fit": 4,
+      "injured": 6,
+      "lines": [],
+      "morale": 38,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 3,
+          "hung": false,
+          "id": "W12-2",
+          "label": "Failure",
+          "map": 10,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 3,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 5,
+          "sim_s": 191.4,
+          "suspects_killed": 2,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "id": "W12-1",
+          "map": 3,
+          "ran": false,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 5,
+      "polls": {
+        "kettering": 38.8,
+        "okonjo": 34.5,
+        "pell": 26.7
+      },
+      "trust": 26.3,
+      "week": 12
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 0
+        },
+        "da": {
+          "lost": false,
+          "standing": 39
+        },
+        "union": {
+          "lost": true,
+          "standing": 18
+        }
+      },
+      "balance": 29047,
+      "dead_total": 10,
+      "fit": 6,
+      "injured": 4,
+      "lines": [
+        "LOST: Paul Varga (District Attorney). The DA's office reviews every case you clear: with evidence behind it, the officer is charged."
+      ],
+      "morale": 40,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 3,
+          "civ_hit_police": 3,
+          "civ_killed": 2,
+          "findings": 7,
+          "hung": false,
+          "id": "W13-3",
+          "label": "Failure",
+          "map": 11,
+          "misjudged": 1,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 0,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W13-2",
+          "label": "Partial success",
+          "map": 4,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 16.3,
+          "suspects_killed": 0,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 6,
+      "polls": {
+        "kettering": 40.6,
+        "okonjo": 36.1,
+        "pell": 23.3
+      },
+      "trust": 26.0,
+      "week": 13
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 1
+        },
+        "da": {
+          "lost": true,
+          "standing": 15
+        },
+        "union": {
+          "lost": true,
+          "standing": 18
+        }
+      },
+      "balance": 31521,
+      "dead_total": 10,
+      "fit": 7,
+      "injured": 3,
+      "lines": [],
+      "morale": 42,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W14-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W14-3",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W14-2",
+          "label": "Partial success",
+          "map": 4,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 28.2,
+          "suspects_killed": 1,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 35.7,
+        "okonjo": 40.6,
+        "pell": 23.8
+      },
+      "trust": 24.0,
+      "week": 14
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 1
+        },
+        "da": {
+          "lost": true,
+          "standing": 15
+        },
+        "union": {
+          "lost": true,
+          "standing": 18
+        }
+      },
+      "balance": 39940,
+      "dead_total": 10,
+      "fit": 5,
+      "injured": 5,
+      "lines": [],
+      "morale": 40,
+      "open_cases": 1,
+      "ops": [
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 5,
+          "hung": false,
+          "id": "W15-1",
+          "label": "Failure",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 2,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 20,
+          "sim_s": 33.7,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 3
+        },
+        {
+          "id": "W15-3",
+          "map": 11,
+          "ran": false,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W15-2",
+          "map": 5,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 37.1,
+        "okonjo": 39.8,
+        "pell": 23.1
+      },
+      "trust": 22.8,
+      "week": 15
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 2
+        },
+        "da": {
+          "lost": true,
+          "standing": 15
+        },
+        "union": {
+          "lost": true,
+          "standing": 18
+        }
+      },
+      "balance": 59564,
+      "dead_total": 10,
+      "fit": 5,
+      "injured": 5,
+      "lines": [],
+      "morale": 42,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W16-3",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W16-2",
+          "map": 10,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "id": "W16-1",
+          "map": 6,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 5,
+      "polls": {
+        "kettering": 36.9,
+        "okonjo": 38.5,
+        "pell": 24.6
+      },
+      "trust": 23.3,
+      "week": 16
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 2
+        },
+        "da": {
+          "lost": true,
+          "standing": 15
+        },
+        "union": {
+          "lost": true,
+          "standing": 14
+        }
+      },
+      "balance": 68568,
+      "dead_total": 11,
+      "fit": 4,
+      "injured": 5,
+      "lines": [],
+      "morale": 40,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 1,
+          "civ_killed": 0,
+          "findings": 4,
+          "hung": false,
+          "id": "W17-1",
+          "label": "Partial success, at a cost",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 1,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 50,
+          "sim_s": 99.9,
+          "suspects_killed": 4,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "id": "W17-3",
+          "map": 4,
+          "ran": false,
+          "type": "barricade",
+          "vis": 3
+        },
+        {
+          "id": "W17-2",
+          "map": 6,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 7,
+      "polls": {
+        "kettering": 37.7,
+        "okonjo": 38.4,
+        "pell": 23.9
+      },
+      "trust": 21.2,
+      "week": 17
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 1
+        },
+        "da": {
+          "lost": true,
+          "standing": 15
+        },
+        "union": {
+          "lost": true,
+          "standing": 14
+        }
+      },
+      "balance": 67184,
+      "dead_total": 11,
+      "fit": 5,
+      "injured": 4,
+      "lines": [],
+      "morale": 42,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W18-2",
+          "map": 5,
+          "ran": false,
+          "type": "hostage",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W18-1",
+          "label": "Success",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 3.1,
+          "suspects_killed": 1,
+          "type": "barricade",
+          "vis": 2
+        },
+        {
+          "id": "W18-3",
+          "map": 1,
+          "ran": false,
+          "type": "barricade",
+          "vis": 1
+        }
+      ],
+      "pending": 5,
+      "polls": {
+        "kettering": 38.2,
+        "okonjo": 37.5,
+        "pell": 24.3
+      },
+      "trust": 20.2,
+      "week": 18
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 2
+        },
+        "da": {
+          "lost": true,
+          "standing": 15
+        },
+        "union": {
+          "lost": true,
+          "standing": 14
+        }
+      },
+      "balance": 82835,
+      "dead_total": 11,
+      "fit": 7,
+      "injured": 2,
+      "lines": [],
+      "morale": 44,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W19-1",
+          "label": "Success",
+          "map": 5,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 60.3,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 2
+        },
+        {
+          "id": "W19-2",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        }
+      ],
+      "pending": 5,
+      "polls": {
+        "kettering": 38.0,
+        "okonjo": 36.9,
+        "pell": 25.2
+      },
+      "trust": 18.8,
+      "week": 19
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 0
+        },
+        "da": {
+          "lost": true,
+          "standing": 14
+        },
+        "union": {
+          "lost": true,
+          "standing": 8
+        }
+      },
+      "balance": 38906,
+      "dead_total": 11,
+      "fit": 8,
+      "injured": 1,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W20-1",
+          "label": "Success",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 111.3,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 1
+        },
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 0,
+          "civ_killed": 1,
+          "findings": 1,
+          "hung": false,
+          "id": "W20-4",
+          "label": "Partial success, at a cost",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 50,
+          "sim_s": 674.4,
+          "suspects_killed": 1,
+          "type": "event",
+          "vis": 5
+        }
+      ],
+      "pending": 1,
+      "polls": {
+        "kettering": 37.4,
+        "okonjo": 38.4,
+        "pell": 24.2
+      },
+      "trust": 17.2,
+      "week": 20
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 1
+        },
+        "da": {
+          "lost": true,
+          "standing": 14
+        },
+        "union": {
+          "lost": true,
+          "standing": 4
+        }
+      },
+      "balance": 46422,
+      "dead_total": 12,
+      "fit": 6,
+      "injured": 2,
+      "lines": [],
+      "morale": 40,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W21-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 2,
+          "hung": false,
+          "id": "W21-2",
+          "label": "Partial success, at a cost",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 2,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 45,
+          "sim_s": 110.8,
+          "suspects_killed": 1,
+          "type": "gang",
+          "vis": 1
+        }
+      ],
+      "pending": 2,
+      "polls": {
+        "kettering": 37.3,
+        "okonjo": 37.4,
+        "pell": 25.3
+      },
+      "trust": 19.2,
+      "week": 21
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 2
+        },
+        "da": {
+          "lost": true,
+          "standing": 14
+        },
+        "union": {
+          "lost": true,
+          "standing": 4
+        }
+      },
+      "balance": 59623,
+      "dead_total": 12,
+      "fit": 7,
+      "injured": 1,
+      "lines": [],
+      "morale": 42,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W22-1",
+          "label": "Success",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 65.7,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 3
+        },
+        {
+          "id": "W22-3",
+          "map": 8,
+          "ran": false,
+          "type": "hostage",
+          "vis": 1
+        },
+        {
+          "id": "W22-4",
+          "map": 11,
+          "ran": false,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W22-2",
+          "map": 6,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 2,
+      "polls": {
+        "kettering": 37.3,
+        "okonjo": 36.2,
+        "pell": 26.5
+      },
+      "trust": 20.5,
+      "week": 22
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 3
+        },
+        "da": {
+          "lost": true,
+          "standing": 19
+        },
+        "union": {
+          "lost": true,
+          "standing": 4
+        }
+      },
+      "balance": 75624,
+      "dead_total": 12,
+      "fit": 5,
+      "injured": 2,
+      "lines": [],
+      "morale": 42,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 1,
+          "hung": false,
+          "id": "W23-3",
+          "label": "Success, at a cost",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 1,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 95,
+          "sim_s": 70.9,
+          "suspects_killed": 1,
+          "type": "hostage",
+          "vis": 3
+        },
+        {
+          "id": "W23-4",
+          "map": 11,
+          "ran": false,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W23-1",
+          "map": 3,
+          "ran": false,
+          "type": "barricade",
+          "vis": 2
+        },
+        {
+          "id": "W23-2",
+          "map": 5,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 36.9,
+        "okonjo": 36.1,
+        "pell": 27.0
+      },
+      "trust": 20.7,
+      "week": 23
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 4
+        },
+        "da": {
+          "lost": true,
+          "standing": 19
+        },
+        "union": {
+          "lost": true,
+          "standing": 9
+        }
+      },
+      "balance": 93125,
+      "dead_total": 12,
+      "fit": 6,
+      "injured": 2,
+      "lines": [],
+      "morale": 44,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W24-2",
+          "label": "Success",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 60.6,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 3
+        },
+        {
+          "id": "W24-4",
+          "map": 11,
+          "ran": false,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W24-3",
+          "map": 1,
+          "ran": false,
+          "type": "barricade",
+          "vis": 1
+        },
+        {
+          "id": "W24-1",
+          "map": 6,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 5,
+      "polls": {
+        "kettering": 37.2,
+        "okonjo": 35.1,
+        "pell": 27.6
+      },
+      "trust": 19.2,
+      "week": 24
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 2
+        },
+        "da": {
+          "lost": true,
+          "standing": 19
+        },
+        "union": {
+          "lost": true,
+          "standing": 3
+        }
+      },
+      "balance": 96136,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 2,
+      "lines": [],
+      "morale": 37,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W25-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W25-1",
+          "map": 10,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 1,
+          "hung": false,
+          "id": "W25-2",
+          "label": "Failure",
+          "map": 4,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 1,
+          "officers_killed": 1,
+          "ran": true,
+          "score": 15,
+          "sim_s": 37.2,
+          "suspects_killed": 0,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 37.9,
+        "okonjo": 33.9,
+        "pell": 28.2
+      },
+      "trust": 18.3,
+      "week": 25
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 1
+        },
+        "da": {
+          "lost": true,
+          "standing": 19
+        },
+        "union": {
+          "lost": true,
+          "standing": 1
+        }
+      },
+      "balance": 106779,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 2,
+      "lines": [],
+      "morale": 39,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W26-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W26-1",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "id": "W26-3",
+          "map": 3,
+          "ran": false,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 37.6,
+        "okonjo": 34.0,
+        "pell": 28.4
+      },
+      "trust": 17.8,
+      "week": 26
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 6
+        },
+        "council": {
+          "lost": true,
+          "standing": 1
+        },
+        "da": {
+          "lost": true,
+          "standing": 22
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 121644,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 1,
+      "lines": [],
+      "morale": 32,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W27-2",
+          "map": 8,
+          "ran": false,
+          "type": "hostage",
+          "vis": 1
+        },
+        {
+          "id": "W27-1",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W27-3",
+          "label": "Partial success",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 8.6,
+          "suspects_killed": 0,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 37.5,
+        "okonjo": 34.2,
+        "pell": 28.2
+      },
+      "trust": 20.8,
+      "week": 27
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 2
+        },
+        "council": {
+          "lost": true,
+          "standing": 1
+        },
+        "da": {
+          "lost": true,
+          "standing": 22
+        },
+        "union": {
+          "lost": true,
+          "standing": 4
+        }
+      },
+      "balance": 140045,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 1,
+      "lines": [],
+      "morale": 39,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W28-3",
+          "map": 10,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W28-1",
+          "label": "Partial success",
+          "map": 1,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 3.2,
+          "suspects_killed": 0,
+          "type": "barricade",
+          "vis": 1
+        },
+        {
+          "id": "W28-2",
+          "map": 5,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 1,
+      "polls": {
+        "kettering": 37.8,
+        "okonjo": 34.0,
+        "pell": 28.1
+      },
+      "trust": 19.5,
+      "week": 28
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 6
+        },
+        "da": {
+          "lost": true,
+          "standing": 22
+        },
+        "union": {
+          "lost": true,
+          "standing": 2
+        }
+      },
+      "balance": 160566,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 1,
+      "lines": [],
+      "morale": 41,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W29-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W29-3",
+          "map": 10,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "id": "W29-1",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "id": "W29-2",
+          "map": 6,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 2,
+      "polls": {
+        "kettering": 37.7,
+        "okonjo": 33.3,
+        "pell": 29.0
+      },
+      "trust": 19.0,
+      "week": 29
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 7
+        },
+        "da": {
+          "lost": true,
+          "standing": 22
+        },
+        "union": {
+          "lost": true,
+          "standing": 2
+        }
+      },
+      "balance": 172822,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 1,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W30-3",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W30-1",
+          "label": "Success",
+          "map": 6,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 60.6,
+          "suspects_killed": 0,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 37.7,
+        "okonjo": 32.9,
+        "pell": 29.4
+      },
+      "trust": 18.8,
+      "week": 30
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 8
+        },
+        "da": {
+          "lost": true,
+          "standing": 22
+        },
+        "union": {
+          "lost": true,
+          "standing": 2
+        }
+      },
+      "balance": 188673,
+      "dead_total": 13,
+      "fit": 6,
+      "injured": 0,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W31-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W31-1",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W31-3",
+          "label": "Failure",
+          "map": 4,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 30,
+          "sim_s": 248.0,
+          "suspects_killed": 0,
+          "type": "barricade",
+          "vis": 3
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 37.6,
+        "okonjo": 32.7,
+        "pell": 29.7
+      },
+      "trust": 18.0,
+      "week": 31
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 9
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 210344,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 0,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W32-2",
+          "map": 5,
+          "ran": false,
+          "type": "hostage",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W32-3",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W32-1",
+          "map": 5,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 37.7,
+        "okonjo": 32.2,
+        "pell": 30.1
+      },
+      "trust": 17.2,
+      "week": 32
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 12
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 232015,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 0,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W33-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W33-2",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "id": "W33-3",
+          "map": 5,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 37.8,
+        "okonjo": 31.5,
+        "pell": 30.7
+      },
+      "trust": 16.7,
+      "week": 33
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 12
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 248846,
+      "dead_total": 13,
+      "fit": 6,
+      "injured": 0,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W34-3",
+          "label": "Partial success",
+          "map": 8,
+          "misjudged": 0,
+          "officers": 6,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 159.9,
+          "suspects_killed": 0,
+          "type": "hostage",
+          "vis": 1
+        },
+        {
+          "id": "W34-4",
+          "map": 11,
+          "ran": false,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W34-2",
+          "map": 1,
+          "ran": false,
+          "type": "barricade",
+          "vis": 1
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 38.2,
+        "okonjo": 30.6,
+        "pell": 31.1
+      },
+      "trust": 15.3,
+      "week": 34
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 13
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 265507,
+      "dead_total": 13,
+      "fit": 4,
+      "injured": 2,
+      "lines": [],
+      "morale": 41,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W35-3",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W35-2",
+          "map": 10,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "civ_hit": 1,
+          "civ_hit_police": 0,
+          "civ_killed": 1,
+          "findings": 4,
+          "hung": false,
+          "id": "W35-1",
+          "label": "Partial success, at a cost",
+          "map": 5,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 2,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 40,
+          "sim_s": 56.2,
+          "suspects_killed": 2,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 2,
+      "polls": {
+        "kettering": 37.9,
+        "okonjo": 31.0,
+        "pell": 31.1
+      },
+      "trust": 14.5,
+      "week": 35
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 14
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 286028,
+      "dead_total": 13,
+      "fit": 4,
+      "injured": 2,
+      "lines": [],
+      "morale": 43,
+      "open_cases": 0,
+      "ops": [
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W36-3",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W36-1",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 37.5,
+        "okonjo": 30.2,
+        "pell": 32.2
+      },
+      "trust": 14.8,
+      "week": 36
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 16
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 305374,
+      "dead_total": 13,
+      "fit": 4,
+      "injured": 2,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W37-2",
+          "map": 3,
+          "ran": false,
+          "type": "hostage",
+          "vis": 3
+        },
+        {
+          "id": "W37-1",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W37-3",
+          "label": "Partial success",
+          "map": 3,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 65,
+          "sim_s": 9.1,
+          "suspects_killed": 1,
+          "type": "barricade",
+          "vis": 2
+        }
+      ],
+      "pending": 0,
+      "polls": {
+        "kettering": 37.5,
+        "okonjo": 30.2,
+        "pell": 32.2
+      },
+      "trust": 13.7,
+      "week": 37
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 17
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 327895,
+      "dead_total": 13,
+      "fit": 4,
+      "injured": 2,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W38-3",
+          "map": 5,
+          "ran": false,
+          "type": "hostage",
+          "vis": 2
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W38-4",
+          "label": "Passed quietly",
+          "map": 11,
+          "misjudged": 0,
+          "officers": 2,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 900.0,
+          "suspects_killed": 0,
+          "type": "event",
+          "vis": 5
+        },
+        {
+          "id": "W38-2",
+          "map": 10,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "id": "W38-1",
+          "map": 6,
+          "ran": false,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 1,
+      "polls": {
+        "kettering": 37.3,
+        "okonjo": 30.1,
+        "pell": 32.7
+      },
+      "trust": 13.8,
+      "week": 38
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 17
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 348756,
+      "dead_total": 13,
+      "fit": 4,
+      "injured": 2,
+      "lines": [],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W39-1",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 2
+        },
+        {
+          "id": "W39-3",
+          "map": 8,
+          "ran": false,
+          "type": "gang",
+          "vis": 1
+        }
+      ],
+      "pending": 3,
+      "polls": {
+        "kettering": 37.8,
+        "okonjo": 29.6,
+        "pell": 32.6
+      },
+      "trust": 12.7,
+      "week": 39
+    },
+    {
+      "academy": 0,
+      "allies": {
+        "coalition": {
+          "lost": true,
+          "standing": 0
+        },
+        "council": {
+          "lost": true,
+          "standing": 18
+        },
+        "da": {
+          "lost": true,
+          "standing": 25
+        },
+        "union": {
+          "lost": true,
+          "standing": 0
+        }
+      },
+      "balance": 369007,
+      "dead_total": 13,
+      "fit": 5,
+      "injured": 1,
+      "lines": [
+        "Election day. Royce Kettering wins with 35%."
+      ],
+      "morale": 45,
+      "open_cases": 0,
+      "ops": [
+        {
+          "id": "W40-2",
+          "map": 3,
+          "ran": false,
+          "type": "hostage",
+          "vis": 3
+        },
+        {
+          "civ_hit": 0,
+          "civ_hit_police": 0,
+          "civ_killed": 0,
+          "findings": 0,
+          "hung": false,
+          "id": "W40-1",
+          "label": "Success",
+          "map": 6,
+          "misjudged": 0,
+          "officers": 4,
+          "officers_down": 0,
+          "officers_killed": 0,
+          "ran": true,
+          "score": 100,
+          "sim_s": 23.2,
+          "suspects_killed": 1,
+          "type": "warrant",
+          "vis": 4
+        }
+      ],
+      "pending": 4,
+      "polls": {
+        "kettering": 37.3,
+        "okonjo": 29.9,
+        "pell": 32.8
+      },
+      "trust": 12.8,
+      "week": 40
+    }
+  ],
+  "weeks_asked": 40,
+  "weeks_played": 40
+}

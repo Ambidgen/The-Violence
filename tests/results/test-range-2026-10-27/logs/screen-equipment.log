@@ -1,0 +1,34 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+equipment baseline: A/B/draw 2/4/0 (6 games); 1 cases, 12.4 s elapsed
+equipment kit:no_plates:A: A/B/draw 3/3/0 (6 games); 2 cases, 25.6 s elapsed
+equipment kit:vest:A: A/B/draw 3/3/0 (6 games); 3 cases, 37.4 s elapsed
+equipment kit:no_helmet:A: A/B/draw 2/4/0 (6 games); 4 cases, 48.6 s elapsed
+equipment kit:no_flashbang:A: A/B/draw 3/3/0 (6 games); 5 cases, 56.5 s elapsed
+equipment kit:no_medkit:A: A/B/draw 3/3/0 (6 games); 6 cases, 63.5 s elapsed
+equipment kit:no_gear:A: A/B/draw 5/1/0 (6 games); 7 cases, 77.2 s elapsed
+equipment kit:carbine:A: A/B/draw 5/1/0 (6 games); 8 cases, 94.2 s elapsed
+equipment kit:smg:A: A/B/draw 4/2/0 (6 games); 9 cases, 114.7 s elapsed
+equipment kit:shotgun:A: A/B/draw 4/2/0 (6 games); 10 cases, 131.9 s elapsed
+equipment kit:battle_rifle:A: A/B/draw 2/4/0 (6 games); 11 cases, 150.3 s elapsed
+equipment kit:irons:A: A/B/draw 5/1/0 (6 games); 12 cases, 168.9 s elapsed
+equipment kit:magnified:A: A/B/draw 5/1/0 (6 games); 13 cases, 182.9 s elapsed
+equipment kit:shield_point:A: A/B/draw 3/3/0 (6 games); 14 cases, 198.1 s elapsed
+equipment kit:no_plates:B: A/B/draw 3/3/0 (6 games); 15 cases, 210.4 s elapsed
+equipment kit:vest:B: A/B/draw 3/3/0 (6 games); 16 cases, 222.5 s elapsed
+equipment kit:no_helmet:B: A/B/draw 3/3/0 (6 games); 17 cases, 232.8 s elapsed
+equipment kit:no_flashbang:B: A/B/draw 2/4/0 (6 games); 18 cases, 243.7 s elapsed
+equipment kit:no_medkit:B: A/B/draw 2/4/0 (6 games); 19 cases, 255.3 s elapsed
+equipment kit:no_gear:B: A/B/draw 2/4/0 (6 games); 20 cases, 267.8 s elapsed
+equipment kit:carbine:B: A/B/draw 4/2/0 (6 games); 21 cases, 279.3 s elapsed
+equipment kit:smg:B: A/B/draw 3/3/0 (6 games); 22 cases, 289.9 s elapsed
+equipment kit:shotgun:B: A/B/draw 5/1/0 (6 games); 23 cases, 301.9 s elapsed
+equipment kit:battle_rifle:B: A/B/draw 3/3/0 (6 games); 24 cases, 313.5 s elapsed
+equipment kit:irons:B: A/B/draw 4/2/0 (6 games); 25 cases, 325.9 s elapsed
+equipment kit:magnified:B: A/B/draw 3/3/0 (6 games); 26 cases, 339.1 s elapsed
+equipment kit:shield_point:B: A/B/draw 0/6/0 (6 games); 27 cases, 351.2 s elapsed
+DONE equipment: 27 cases, 162 matches -> /project_study_a/study-equipment.jsonl

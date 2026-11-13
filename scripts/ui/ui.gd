@@ -4,11 +4,13 @@ extends CanvasLayer
 ## whole UI lives in one readable file. Greyscale, drafting-table style.
 
 const Habits = preload("res://scripts/data/habits.gd")
+const Ink = preload("res://scripts/view/ink.gd")
+const Equipment = preload("res://scripts/data/equipment.gd")
 const Maps = preload("res://scripts/maps/registry.gd")
 const PANEL_W := 460.0
-const INK := Color("#1c1c1c")
+const INK := Color("#1e1b1c")
 const SPEEDS := [0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0]
-const SHORT := {"untrained": "Untrained", "militia": "Militia", "regular": "Regular", "police": "Police tac", "sof": "Spec ops"}
+const SHORT := {"untrained": "Untrained", "militia": "Militia", "patrol": "Patrol", "regular": "Regular", "police": "Police tac", "sof": "Spec ops"}
 
 var main
 var root: PanelContainer
@@ -38,9 +40,23 @@ var roster: RichTextLabel
 var log_box: RichTextLabel
 var log_shown := 0
 var speed_note: Label
-var gang_cap_spin: SpinBox
-var police_cap_spin: SpinBox
 var _updating := false
+# v0.6
+var civ_spin: SpinBox
+var police_btn: Button
+var night_btn: Button
+var dept_btn: Button
+var cam_btn: Button
+var dept_box: VBoxContainer
+var dept_head: Label
+var dept_list: VBoxContainer
+var dept_notes: RichTextLabel
+var dept_seed: SpinBox
+var debrief: RichTextLabel
+var kit_opts := {}           # kit field -> OptionButton (v0.7.5)
+var gear_spins := {}         # gear id -> SpinBox
+var kit_label: Label
+var door_opt: OptionButton
 
 
 func build(m) -> void:
@@ -51,15 +67,33 @@ func build(m) -> void:
 	root.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
 	root.offset_left = -PANEL_W
 	add_child(root)
+	# The setup panel is taller than the screen (1100 px against 900), so the whole panel
+	# scrolls: nothing is ever unreachable, whatever the window or the content.
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	scroll.follow_focus = true
+	root.add_child(scroll)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 6)
-	root.add_child(v)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.add_child(v)
+	var head_row := HBoxContainer.new()
+	v.add_child(head_row)
 	var title := Label.new()
 	title.text = "T H E   V I O L E N C E"
 	title.add_theme_font_size_override("font_size", 20)
-	v.add_child(title)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head_row.add_child(title)
+	var ver := Label.new()
+	ver.text = "v" + str(ProjectSettings.get_setting("application/config/version", ""))
+	ver.add_theme_font_size_override("font_size", 12)
+	ver.add_theme_color_override("font_color", Color("#5b5866"))
+	ver.size_flags_vertical = Control.SIZE_SHRINK_END
+	head_row.add_child(ver)
 	sub = Label.new()
-	sub.add_theme_color_override("font_color", Color("#666666"))
+	sub.add_theme_color_override("font_color", Color("#5b5866"))
 	v.add_child(sub)
 	set_map_title(main.level)
 	v.add_child(HSeparator.new())
@@ -70,8 +104,13 @@ func build(m) -> void:
 	run_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	run_box.visible = false
 	v.add_child(run_box)
+	dept_box = VBoxContainer.new()
+	dept_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	dept_box.visible = false
+	v.add_child(dept_box)
 	_build_setup()
 	_build_run()
+	_build_dept()
 	banner = PanelContainer.new()
 	banner.theme = th
 	banner.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -82,30 +121,92 @@ func build(m) -> void:
 	banner_label.add_theme_font_size_override("font_size", 22)
 	banner_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	banner.add_child(banner_label)
+	_build_ink_strip(th)
+
+
+# ================================================================== presentation (v0.8)
+var ink_btn: Button
+var gore_btn: Button
+
+
+## Bottom left, always there: the monochrome proof (F2) and gore (F3). Presentation only.
+func _build_ink_strip(th: Theme) -> void:
+	var strip := PanelContainer.new()
+	strip.theme = th
+	strip.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	strip.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	strip.add_theme_stylebox_override("panel", _sb(Color(Ink.PAPER, 0.92), Ink.MID, 1, 4.0))
+	add_child(strip)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 4)
+	strip.add_child(h)
+	ink_btn = _btn(h, "RED INK  F2", func(on): main.set_red_ink(on), true)
+	gore_btn = _btn(h, "GORE  F3", func(on): main.set_gore(on), true)
+	for b in [ink_btn, gore_btn]:
+		b.add_theme_font_size_override("font_size", 11)
+		b.focus_mode = Control.FOCUS_NONE
+	sync_ink()
+	strip.offset_top = -44
+	strip.offset_bottom = -12
+	strip.offset_right = -PANEL_W - 12
+	strip.offset_left = -PANEL_W - 160
+
+
+func sync_ink() -> void:
+	if ink_btn == null:
+		return
+	ink_btn.set_pressed_no_signal(Ink.red_ink_enabled)
+	gore_btn.set_pressed_no_signal(Ink.gore_enabled)
+	ink_btn.text = "RED INK  F2" if Ink.red_ink_enabled else "MONOCHROME  F2"
+	gore_btn.text = "GORE  F3" if Ink.gore_enabled else "GORE OFF  F3"
 
 
 # ================================================================== theme
-static func _sb(bg: Color, border: Color, bw := 1, margin := 6.0) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = bg
-	s.border_color = border
-	s.set_border_width_all(bw)
-	s.set_content_margin_all(margin)
-	return s
+## A box in the sketchbook style (1.4: hand-drawn, see ui/crayon_box.gd).
+static func _sb(bg: Color, border: Color, bw := 1, margin := 6.0) -> StyleBox:
+	const CB = preload("res://scripts/ui/crayon_box.gd")
+	return CB.make(bg, border, margin, 1.5 * bw if bw > 0 else 0.0, 0.12)
 
 
 func _theme() -> Theme:
 	return make_theme()
 
 
+## The hand the UI is written in (1.4): Patrick Hand (SIL OFL, fonts/).
+static var _hand: Font
+
+
+static func hand_font() -> Font:
+	if _hand == null:
+		var f = load("res://fonts/PatrickHand.woff2")
+		if f is FontFile:
+			(f as FontFile).fallbacks = [ThemeDB.fallback_font]
+			_hand = f
+		else:
+			_hand = ThemeDB.fallback_font
+	return _hand
+
+
+## 1.4: the sketchbook. Panels are cream paper scraps edged in pencil, buttons are boxes
+## drawn round a word, a pressed or selected one is coloured in; one hand for all text.
 static func make_theme() -> Theme:
+	const CB = preload("res://scripts/ui/crayon_box.gd")
+	# Visual overhaul 2026-11-03: the opening's cream drawing paper and white notebook
+	# paper, its sun yellow for a pressed button and its police blue for bars.
+	var paper := Color("#fbf7ec")
+	var paper_dk := Color("#e9e2d2")
+	var pencil := Color("#1e1b1c")
+	var faint := Color("#8e8a95")
 	var th := Theme.new()
-	th.default_font_size = 13
-	th.set_stylebox("panel", "PanelContainer", _sb(Color("#f3f3f1"), INK, 1, 12.0))
-	var normal := _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 5.0)
-	var hover := _sb(Color("#f4f4f4"), INK, 1, 5.0)
-	var pressed := _sb(Color("#d4d4d1"), INK, 1, 5.0)
-	var disabled := _sb(Color("#eeeeee"), Color("#cccccc"), 1, 5.0)
+	th.default_font = hand_font()
+	th.default_font_size = 15
+	var panel = CB.make(paper, pencil, 12.0, 1.8, 0.18)
+	th.set_stylebox("panel", "PanelContainer", panel)
+	var normal = CB.make(Color("#ffffff"), faint, 5.0, 1.5, 0.14)
+	var hover = CB.make(Color("#fffaf0"), pencil, 5.0, 2.0, 0.14)
+	var pressed = CB.make(Color("#ffd166"), pencil, 5.0, 1.8, 0.25)
+	var disabled = CB.make(Color("#fbf7ec", 0.6), Color(faint, 0.6), 5.0, 1.2, 0.0)
 	var focus := StyleBoxEmpty.new()
 	for t in ["Button", "OptionButton"]:
 		th.set_stylebox("normal", t, normal)
@@ -115,32 +216,38 @@ static func make_theme() -> Theme:
 		th.set_stylebox("disabled", t, disabled)
 		th.set_stylebox("focus", t, focus)
 		th.set_color("font_color", t, INK)
-		th.set_color("font_hover_color", t, Color.BLACK)
-		th.set_color("font_pressed_color", t, Color.BLACK)
-		th.set_color("font_hover_pressed_color", t, Color.BLACK)
+		th.set_color("font_hover_color", t, Color(0.07, 0.07, 0.07))
+		th.set_color("font_pressed_color", t, Color(0.07, 0.07, 0.07))
+		th.set_color("font_hover_pressed_color", t, Color(0.07, 0.07, 0.07))
 		th.set_color("font_focus_color", t, INK)
-		th.set_color("font_disabled_color", t, Color("#9a9a9a"))
+		th.set_color("font_disabled_color", t, faint)
 	th.set_color("font_color", "Label", INK)
-	th.set_stylebox("normal", "LineEdit", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 4.0))
-	th.set_stylebox("focus", "LineEdit", _sb(Color("#ffffff"), INK, 1, 4.0))
+	th.set_stylebox("normal", "LineEdit", CB.make(Color("#fffaf0"), faint, 4.0, 1.4, 0.0))
+	th.set_stylebox("focus", "LineEdit", CB.make(Color("#fffaf0"), pencil, 4.0, 1.8, 0.0))
 	th.set_color("font_color", "LineEdit", INK)
 	th.set_color("default_color", "RichTextLabel", INK)
-	th.set_stylebox("normal", "RichTextLabel", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 6.0))
-	th.set_stylebox("background", "ProgressBar", _sb(Color("#e4e4e2"), Color("#9a9a9a"), 1, 0.0))
-	th.set_stylebox("fill", "ProgressBar", _sb(Color("#3a3a3a"), Color("#3a3a3a"), 0, 0.0))
-	th.set_stylebox("panel", "PopupMenu", _sb(Color("#ffffff"), INK, 1, 4.0))
-	th.set_stylebox("hover", "PopupMenu", _sb(Color("#e8e8e8"), Color("#e8e8e8"), 0, 2.0))
+	th.set_stylebox("normal", "RichTextLabel", CB.make(Color("#ffffff"), faint, 6.0, 1.3, 0.08))
+	th.set_stylebox("background", "ProgressBar", CB.make(paper_dk, faint, 0.0, 1.2, 0.0))
+	th.set_stylebox("fill", "ProgressBar", CB.make(Color("#2747e6"), Color(0, 0, 0, 0), 0.0, 0.0, 0.35))
+	th.set_stylebox("panel", "PopupMenu", CB.make(paper, pencil, 4.0, 1.6, 0.1))
+	th.set_stylebox("hover", "PopupMenu", CB.make(Color("#ffd166"), Color(0, 0, 0, 0), 2.0, 0.0, 0.2))
 	th.set_color("font_color", "PopupMenu", INK)
-	th.set_color("font_hover_color", "PopupMenu", Color.BLACK)
-	th.set_stylebox("panel", "TooltipPanel", _sb(Color("#ffffff"), INK, 1, 6.0))
+	th.set_color("font_hover_color", "PopupMenu", Color(0.07, 0.07, 0.07))
+	th.set_stylebox("panel", "TooltipPanel", CB.make(Color("#fffaf0"), pencil, 6.0, 1.6, 0.0))
 	th.set_color("font_color", "TooltipLabel", INK)
-	th.set_stylebox("panel", "TabContainer", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 6.0))
-	th.set_stylebox("tab_selected", "TabContainer", _sb(INK, INK, 1, 6.0))
-	th.set_stylebox("tab_unselected", "TabContainer", _sb(Color("#ffffff"), Color("#9a9a9a"), 1, 6.0))
-	th.set_stylebox("tab_hovered", "TabContainer", _sb(Color("#eeeeee"), INK, 1, 6.0))
-	th.set_color("font_selected_color", "TabContainer", Color.WHITE)
+	th.set_stylebox("panel", "TabContainer", CB.make(paper, faint, 6.0, 1.3, 0.1))
+	th.set_stylebox("tab_selected", "TabContainer", CB.make(Color("#1e1b1c"), pencil, 6.0, 1.6, 0.25))
+	th.set_stylebox("tab_unselected", "TabContainer", CB.make(Color("#ffffff"), faint, 6.0, 1.3, 0.1))
+	th.set_stylebox("tab_hovered", "TabContainer", CB.make(Color("#fffaf0"), pencil, 6.0, 1.6, 0.1))
+	th.set_color("font_selected_color", "TabContainer", Color("#fffaf0"))
 	th.set_color("font_unselected_color", "TabContainer", INK)
-	th.set_color("font_hovered_color", "TabContainer", Color.BLACK)
+	th.set_color("font_hovered_color", "TabContainer", Color(0.07, 0.07, 0.07))
+	for sc in ["VScrollBar", "HScrollBar"]:
+		# a visible track and a grabber you can find and hit: a scrolling panel has to look like one
+		th.set_stylebox("scroll", sc, CB.make(Color("#9cc3ff", 0.45), Color(0, 0, 0, 0), 5.0, 0.0, 0.0))
+		th.set_stylebox("grabber", sc, CB.make(Color("#5b5866"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
+		th.set_stylebox("grabber_highlight", sc, CB.make(Color("#1e1b1c"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
+		th.set_stylebox("grabber_pressed", sc, CB.make(Color("#1e1b1c"), Color(0, 0, 0, 0), 5.0, 0.0, 0.3))
 	return th
 
 
@@ -154,7 +261,7 @@ func _h(parent: Control) -> HBoxContainer:
 
 func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Button:
 	var b := Button.new()
-	b.text = text
+	b.text = Ink.bb(text)
 	b.toggle_mode = toggle
 	if toggle:
 		b.toggled.connect(func(on): cb.call(on))
@@ -166,16 +273,16 @@ func _btn(parent: Control, text: String, cb: Callable, toggle := false) -> Butto
 
 func _heading(parent: Control, text: String) -> Label:
 	var l := Label.new()
-	l.text = text
+	l.text = Ink.bb(text)
 	l.add_theme_font_size_override("font_size", 12)
-	l.add_theme_color_override("font_color", Color("#555555"))
+	l.add_theme_color_override("font_color", Color("#5b5866"))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	parent.add_child(l)
 	return l
 
 
 func set_map_title(lv) -> void:
-	sub.text = "%s  ·  %d x %d m  ·  up to 20 a side" % [lv.map_name, int(lv.W), int(lv.H)]
+	sub.text = "%s  ·  %d x %d m  ·  up to 30 a side" % [lv.map_name, int(lv.W), int(lv.H)]
 	if map_opt != null:
 		map_opt.select(main.map_i)
 
@@ -195,6 +302,10 @@ func _build_setup() -> void:
 	map_opt.select(main.map_i)
 	map_opt.item_selected.connect(func(i): main.set_map(i))
 	hm.add_child(map_opt)
+	var opsb := _btn(s, "<   MAIN MENU   ·   the test range is a sandbox: nothing here touches the campaign", func(): main.go_title())
+	opsb.custom_minimum_size = Vector2(0, 34)
+	opsb.add_theme_font_size_override("font_size", 14)
+	opsb.tooltip_text = "Back to the title: the campaign, the Endless Battle, settings and the manual."
 	_heading(s, "1  PLACE  ·  click the plan to place the selected operator; right-click sets facing; wheel zooms, middle-drag pans")
 	var group := ButtonGroup.new()
 	for k in 2:
@@ -232,7 +343,7 @@ func _build_setup() -> void:
 		grid.add_theme_constant_override("h_separation", 2)
 		grid.add_theme_constant_override("v_separation", 2)
 		s.add_child(grid)
-		for slot in 20:
+		for slot in 30:
 			var id := "%s%d" % ["AB"[k], slot + 1]
 			var b := _btn(grid, id, func(on): _sel(id, on), true)
 			b.button_group = group
@@ -267,8 +378,9 @@ func _build_setup() -> void:
 	_btn(hq, "Copy to team", func(): main.copy_to_team())
 	tabs = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	tabs.custom_minimum_size = Vector2(0, 250)
 	s.add_child(tabs)
-	var names := {"Pathfinding": "Path", "Group discipline": "Group", "Eye discipline": "Eyes", "Weapon discipline": "Weapon"}
+	var names := {"Pathfinding": "Path", "Group discipline": "Group", "Eye discipline": "Eyes", "Weapon discipline": "Weapon", "Defence": "Hold"}
 	for grp in Habits.GROUPS:
 		var sc := ScrollContainer.new()
 		sc.name = names[grp]
@@ -283,7 +395,8 @@ func _build_setup() -> void:
 			var gid: String = g["id"]
 			var b := _btn(col, "", func(on): _habit(gid, on), true)
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-			b.tooltip_text = "%s %s\nWith it: %s\nWithout it: %s\nOverridden by: %s" % [gid, g["name"], g["with"], g["without"], _overriders(gid)]
+			b.tooltip_text = "%s %s%s\nWith it: %s\nWithout it: %s\nOverridden by: %s" % [gid, g["name"],
+				"  (hold mode only: works while the squad holds a position)" if g.get("hold", false) else "", g["with"], g["without"], _overriders(gid)]
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			habit_buttons[gid] = b
 	var scb := ScrollContainer.new()
@@ -326,7 +439,7 @@ func _build_setup() -> void:
 	exp_spin.value_changed.connect(func(v): _exp(v))
 	hx.add_child(exp_spin)
 	exp_label = Label.new()
-	exp_label.add_theme_color_override("font_color", Color("#555555"))
+	exp_label.add_theme_color_override("font_color", Color("#5b5866"))
 	hx.add_child(exp_label)
 	_heading(colt, "Hearing: every operator hears the same (shots, footsteps, reloads; walls halve it) unless a trait changes it.")
 	for tr in Habits.TRAITS:
@@ -336,6 +449,7 @@ func _build_setup() -> void:
 		tb.tooltip_text = "%s %s (%s)\n%s" % [tid, tr["name"], tr["kind"], tr["desc"]]
 		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		habit_buttons[tid] = tb
+	_build_kit_tab()
 	summary = Label.new()
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	s.add_child(summary)
@@ -352,33 +466,163 @@ func _build_setup() -> void:
 	hs.add_child(seed_spin)
 	_btn(hs, "Random", func(): seed_spin.value = randi_range(1, 999999))
 	seed_spin.custom_minimum_size = Vector2(120, 0)
+	seed_spin.value_changed.connect(func(_v):
+		if main.n_civ > 0:
+			main.set_civilians(main.n_civ))
+	_heading(s, "3  OPERATION  ·  civilians on the map; police rules (team A judges a person before firing, challenges, arrests); team A from the department")
+	var hc := _h(s)
+	var cl := Label.new()
+	cl.text = "Civilians"
+	hc.add_child(cl)
+	civ_spin = SpinBox.new()
+	civ_spin.min_value = 0
+	civ_spin.max_value = 40
+	civ_spin.value = main.n_civ
+	civ_spin.custom_minimum_size = Vector2(72, 0)
+	civ_spin.tooltip_text = "Civilians placed from the seed, about two in three indoors.\nNobody targets them on purpose; every bullet can hit them."
+	civ_spin.value_changed.connect(func(v):
+		if not _updating:
+			main.set_civilians(int(v)))
+	hc.add_child(civ_spin)
+	police_btn = _btn(hc, "Police rules", func(on): main.set_police_rules(on), true)
+	police_btn.set_pressed_no_signal(main.police_rules)
+	police_btn.tooltip_text = "Team A judges every recognized person before firing: a threat (armed or attacking),\nunknown (challenged: Police! Show me your hands!) or a civilian. Judgment can be wrong.\nSuspects may give up; officers cuff them. Always on with the department."
+	night_btn = _btn(hc, "Night", func(on): main.set_night(on), true)
+	night_btn.set_pressed_no_signal(main.night)
+	night_btn.tooltip_text = "Darkness: recognition and judgment take longer, and civilians are misjudged more often.\nA weapon light cancels it inside its beam."
+	door_opt = OptionButton.new()
+	for dn in ["Doors open", "Inner doors shut", "Outer doors locked", "Shut and locked"]:
+		door_opt.add_item(dn)
+	door_opt.tooltip_text = "Doors (v0.7.5). A shut door blocks sight and movement until someone opens it (0.6 s).\nA locked one keeps team A out until it is rammed, shot open with a breaching round or kicked in;\nteam B and civilians hold the keys. Rounds go through doors: interior ones easily, outer ones less."
+	door_opt.item_selected.connect(func(i): main.set_door_mode(["open", "closed", "outer", "locked"][i]))
+	hc.add_child(door_opt)
+	var hd := _h(s)
+	dept_btn = _btn(hd, "Team A: department", func(on): main.set_use_dept(on), true)
+	dept_btn.set_pressed_no_signal(main.use_dept)
+	dept_btn.tooltip_text = "Team A is the officers picked in the department (Patrol echelon, rolled at hire).\nAfter the operation their experience, wounds and files are written back and saved."
+	cam_btn = _btn(hd, "Body cameras", func(on): main.set_bodycams(on), true)
+	cam_btn.set_pressed_no_signal(main.dept.bodycams)
+	cam_btn.tooltip_text = "Department officers wear body cameras: what they see is recorded as evidence."
+	_btn(hd, "Department  ...", func(): show_dept())
 	var run := _btn(s, "RUN   >   auto-resolve", func(): main.start_run(int(seed_spin.value)))
 	run.custom_minimum_size = Vector2(0, 40)
 	run.add_theme_font_size_override("font_size", 16)
-	s.add_child(HSeparator.new())
-	_heading(s, "ENDLESS BATTLE  ·  a city of four gangs, six police precincts and three hospitals that fights on for as long as you watch (uses the seed above)")
-	var he2 := _h(s)
-	var gl := Label.new()
-	gl.text = "Gang cap"
-	he2.add_child(gl)
-	gang_cap_spin = SpinBox.new()
-	gang_cap_spin.min_value = 20
-	gang_cap_spin.max_value = 120
-	gang_cap_spin.value = 60
-	gang_cap_spin.tooltip_text = "Most members a gang can have at once"
-	he2.add_child(gang_cap_spin)
-	var pl2 := Label.new()
-	pl2.text = "Police cap"
-	he2.add_child(pl2)
-	police_cap_spin = SpinBox.new()
-	police_cap_spin.min_value = 40
-	police_cap_spin.max_value = 200
-	police_cap_spin.value = 108
-	police_cap_spin.tooltip_text = "No new officers are hired while on duty + recovering + already hired reach this.\nFull strength is 108: six ten-man QRFs and twelve four-officer patrol convoys."
-	he2.add_child(police_cap_spin)
-	var eb := _btn(s, "ENDLESS BATTLE   >   Port Carrick", func(): main.start_city(int(seed_spin.value), int(gang_cap_spin.value), int(police_cap_spin.value)))
-	eb.custom_minimum_size = Vector2(0, 34)
-	eb.add_theme_font_size_override("font_size", 14)
+
+
+## The Kit tab (v0.7.5): weapons, sight, armour, helmet and gear for the selected operator.
+func _build_kit_tab() -> void:
+	var sc := ScrollContainer.new()
+	sc.name = "Kit"
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tabs.add_child(sc)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(col)
+	_heading(col, "What this operator carries. Some items need tactical training (Police tactical, Special operations); the helmet is for Special operations only. Apply preset sets the echelon's kit.")
+	var rows := [["Primary", "primary", [""] + Equipment.PRIMARY_ORDER], ["Sidearm", "secondary", [""] + Equipment.SECONDARY_ORDER],
+		["Sight", "optic", ["red_dot", "irons", "magnified"]], ["Armour", "armour", ["none", "vest", "plates"]],
+		["Helmet", "head", ["none", "sof_helmet"]]]
+	for r in rows:
+		var h := _h(col)
+		var l := Label.new()
+		l.text = r[0]
+		l.custom_minimum_size = Vector2(64, 0)
+		h.add_child(l)
+		var ob := OptionButton.new()
+		ob.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var field: String = r[1]
+		for item in r[2]:
+			ob.add_item(_kit_item_name(field, item))
+			ob.set_item_metadata(ob.item_count - 1, item)
+			ob.set_item_tooltip(ob.item_count - 1, _kit_item_desc(field, item))
+		ob.item_selected.connect(func(i):
+			if not _updating:
+				main.set_kit(field, ob.get_item_metadata(i)))
+		h.add_child(ob)
+		kit_opts[field] = ob
+	var gh := _heading(col, "Gear")
+	gh.add_theme_color_override("font_color", INK)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 6)
+	col.add_child(grid)
+	for gid in Equipment.GEAR_ORDER:
+		var spec: Dictionary = Equipment.GEAR[gid]
+		var gl := Label.new()
+		gl.text = spec["name"]
+		gl.tooltip_text = "%s (%s, %.1f kg)\n%s" % [spec["name"], Equipment.WHO_NAMES[spec["who"]], float(spec["kg"]), spec["desc"]]
+		gl.mouse_filter = Control.MOUSE_FILTER_STOP
+		gl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		grid.add_child(gl)
+		var sp := SpinBox.new()
+		sp.min_value = 0
+		sp.max_value = int(spec["max"])
+		sp.custom_minimum_size = Vector2(64, 0)
+		sp.tooltip_text = gl.tooltip_text
+		sp.value_changed.connect(func(v):
+			if not _updating:
+				main.set_gear(gid, int(v)))
+		grid.add_child(sp)
+		gear_spins[gid] = sp
+	kit_label = Label.new()
+	kit_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	kit_label.add_theme_color_override("font_color", Color("#2f2e2d"))
+	col.add_child(kit_label)
+
+
+func _kit_item_name(field: String, item: String) -> String:
+	match field:
+		"primary", "secondary":
+			return "(none)" if item == "" else String(Equipment.WEAPONS[item]["name"])
+		"optic":
+			return Equipment.OPTICS[item]["name"]
+		"armour":
+			return Equipment.ARMOUR[item]["name"]
+		"head":
+			return Equipment.HEAD[item]["name"]
+	return item
+
+
+func _kit_item_desc(field: String, item: String) -> String:
+	var d: Dictionary = {}
+	match field:
+		"primary", "secondary":
+			d = Equipment.WEAPONS.get(item, {})
+			if d.is_empty():
+				return "Nothing in this slot."
+			return "%s: %d rounds, %.1f kg (%s)\n%s" % [d["name"], int(d["mag"]), float(d["kg"]), Equipment.WHO_NAMES[d["who"]], d["desc"]]
+		"optic":
+			d = Equipment.OPTICS[item]
+		"armour":
+			d = Equipment.ARMOUR[item]
+		"head":
+			d = Equipment.HEAD[item]
+	return String(d.get("desc", d.get("name", "")))
+
+
+func _refresh_kit(c: Dictionary) -> void:
+	var kit: Dictionary = Equipment.normalize(c.get("kit", Equipment.preset(c["echelon"])))
+	var who: String = Equipment.who_of_echelon(c["echelon"])
+	for field in kit_opts:
+		var ob: OptionButton = kit_opts[field]
+		for i in ob.item_count:
+			var item: String = ob.get_item_metadata(i)
+			var ok := true
+			match field:
+				"primary", "secondary":
+					ok = item == "" or Equipment.allowed(Equipment.WEAPONS[item]["who"], who)
+				"head":
+					ok = Equipment.allowed(Equipment.HEAD[item]["who"], who)
+			ob.set_item_disabled(i, not ok)
+			if item == String(kit[field]):
+				ob.select(i)
+	for gid in gear_spins:
+		var spec: Dictionary = Equipment.GEAR[gid]
+		var sp: SpinBox = gear_spins[gid]
+		sp.set_value_no_signal(int(kit["gear"].get(gid, 0)))
+		var ok2: bool = Equipment.allowed(spec["who"], who) and (not spec.has("needs") or kit["primary"] == spec["needs"])
+		sp.editable = ok2
+	kit_label.text = "%s.  %.1f kg (pace x%.2f), cost %d." % [Equipment.describe(kit), Equipment.weight(kit), Equipment.speed_factor(kit), Equipment.cost(kit)]
 
 
 func _size(k: int, v: float) -> void:
@@ -448,7 +692,7 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		n_good += 1 if on else 0
 		var b: Button = habit_buttons[g["id"]]
 		b.set_pressed_no_signal(on)
-		b.text = "%s  %s   %s" % ["[x]" if on else "[  ]", g["id"], g["name"]]
+		b.text = "%s  %s   %s%s" % ["[x]" if on else "[  ]", g["id"], g["name"], "   (hold)" if g.get("hold", false) else ""]
 	for b0 in Habits.BAD:
 		var on2: bool = c["bad"].get(b0["id"], false)
 		n_bad += 1 if on2 else 0
@@ -456,6 +700,8 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		bb.set_pressed_no_signal(on2)
 		var trig: String = ("stress %.2f" % b0["t"]) if b0["kind"] == "stress" else b0["trait"]
 		bb.text = "%s  %s   %s   (%s)" % ["[x]" if on2 else "[  ]", b0["id"], b0["name"], trig]
+	_refresh_kit(c)
+	door_opt.select(["open", "closed", "outer", "locked"].find(main.door_mode))
 	var xp: int = c.get("exp", 1)
 	exp_spin.set_value_no_signal(xp)
 	exp_label.text = "  %s: tracks %d enem%s" % [Habits.EXP_NAMES[xp], xp, "y" if xp == 1 else "ies"]
@@ -469,9 +715,16 @@ func refresh_setup(sel: String, cfgs: Dictionary, postures: Array, sizes: Array)
 		if on3:
 			tnames.append(tr["name"])
 	var e: Dictionary = Habits.ECHELONS[c["echelon"]]
-	summary.text = "%s: %d good habits (reaction time x%.3f), %d bad habits present, experience %d. Recognition base %.2f s, stress resistance %.2f, %d plate%s, hearing x%.2f%s." % [
-		sel, n_good, 1.0 - 0.005 * n_good, n_bad, xp, e["t_rec0"], e["resist"], c["plates"], "" if c["plates"] == 1 else "s",
+	var n_base := 0
+	for gk in c["good"]:
+		if c["good"][gk] and not String(gk).begins_with("HD"):
+			n_base += 1
+	summary.text = "%s: %d good habits, %d of them hold-mode (reaction time x%.3f from the base habits), %d bad habits present, experience %d. Recognition base %.2f s, stress resistance %.2f, %d plate%s, hearing x%.2f%s." % [
+		sel, n_good, n_good - n_base, 1.0 - 0.005 * n_base, n_bad, xp, e["t_rec0"], e["resist"], c["plates"], "" if c["plates"] == 1 else "s",
 		Habits.hearing(traits), (" (" + ", ".join(tnames) + ")") if not tnames.is_empty() else ""]
+	if c.has("kit"):
+		var kn: Dictionary = Equipment.normalize(c["kit"])
+		summary.text += " Kit %.1f kg, moves at x%.2f." % [Equipment.weight(kn), Equipment.speed_factor(kn)]
 	_updating = false
 
 
@@ -496,15 +749,21 @@ func _build_run() -> void:
 		b.custom_minimum_size = Vector2(44, 0)
 		speed_buttons.append(b)
 	speed_note = Label.new()
-	speed_note.add_theme_color_override("font_color", Color("#666666"))
+	speed_note.add_theme_color_override("font_color", Color("#5b5866"))
 	speed_note.add_theme_font_size_override("font_size", 11)
 	r.add_child(speed_note)
 	var ho := _h(r)
-	for nm in ["Cones", "Attention", "Recognition", "Aim", "Paths"]:
+	for nm in ["Cones", "Recognition", "Aim", "Paths"]:
 		var b2 := _btn(ho, nm, func(on): main.set_overlay(nm, on), true)
 		b2.set_pressed_no_signal(nm != "Paths")
-		if nm == "Attention":
-			b2.tooltip_text = "The cone of attention: what each operator remembers and is watching for. Where it overlaps the cone of vision, target acquisition is up to 35% faster."
+	debrief = RichTextLabel.new()
+	debrief.bbcode_enabled = true
+	debrief.scroll_active = true
+	debrief.custom_minimum_size = Vector2(0, 300)
+	debrief.add_theme_font_size_override("normal_font_size", 11)
+	debrief.add_theme_font_size_override("bold_font_size", 11)
+	debrief.visible = false
+	r.add_child(debrief)
 	roster = RichTextLabel.new()
 	roster.bbcode_enabled = true
 	roster.scroll_active = true
@@ -528,13 +787,17 @@ func _build_run() -> void:
 func show_setup() -> void:
 	setup_box.visible = true
 	run_box.visible = false
+	dept_box.visible = false
 	banner.visible = false
 
 
 func show_run(speed: float) -> void:
 	setup_box.visible = false
 	run_box.visible = true
+	dept_box.visible = false
 	banner.visible = false
+	debrief.visible = false
+	roster.custom_minimum_size = Vector2(0, 380)
 	log_box.clear()
 	log_shown = 0
 	pause_btn.set_pressed_no_signal(false)
@@ -549,13 +812,14 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 	speed_note.text = "Simulation runs at %.1fx real time (target %sx). 30 ticks per simulated second." % [actual_speed, str(target_speed)]
 	var txt_all := ""
 	var many: bool = w.ops.size() > 10
+	var pol: bool = w.police_rules()
 	for k in 2:
 		var tm: Dictionary = w.teams[k]
 		var n_alive := 0
 		for o in tm["members"]:
-			if o.alive():
+			if o.fighting():
 				n_alive += 1
-		txt_all += "[b]TEAM %s[/b]  %d / %d standing  ·  %s  ·  %d element%s\n" % ["AB"[k], n_alive, tm["members"].size(),
+		txt_all += "[b]%s[/b]  %d / %d standing  ·  %s  ·  %d element%s\n" % [(["POLICE", "SUSPECTS"][k] if pol else "TEAM " + "AB"[k]), n_alive, tm["members"].size(),
 			tm["posture"], tm["elements"].size(), "" if tm["elements"].size() == 1 else "s"]
 		for o in tm["members"]:
 			var st := "OK"
@@ -574,37 +838,68 @@ func refresh_run(w, actual_speed: float, target_speed: float) -> void:
 				bar += "|" if i < int(o.stress * 10.0) else "."
 			var head := "[hint=\"%s\"][b]%s[/b][/hint] %s %s" % [quirks(o).replace("\"", "'"), o.id, SHORT.get(o.echelon, o.echelon), st]
 			if st == "KIA" or st == "DOWN":
-				txt_all += "[color=#7d0a0a]%s[/color]\n" % head
+				txt_all += "[color=#b31f26]%s[/color]\n" % head
 				continue
-			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s" % [head, ["[color=#3d7a46]G[/color]", "[color=#a8861c]Y[/color]", "[color=#9b2a27]R[/color]"][o.alert],
-				"R" if o.active == "rifle" else "P", s["mag"], s["spare"], o.plates, o.plates_max, o.exp, bar]
+			if o.complying:
+				txt_all += "%s  [b]%s[/b]\n" % [head, "CUFFED" if o.arrested else "HANDS UP"]
+				continue
+			var gun: String = Equipment.weapon(o.wid(o.active)).get("short", "R" if o.active == "rifle" else "P")
+			var kit_s := ""
+			for gid in Equipment.GEAR_ORDER:
+				var left: int = int(o.gear.get(gid, 0))
+				if left > 0 and not gid in ["light", "shield"]:
+					var bare: bool = gid in ["baton", "gas_mask"] or (left == 1 and gid in ["ram", "medkit", "breach"])
+					kit_s += " %s%s" % [Equipment.GEAR[gid]["short"], "" if bare else "×%d" % left]
+			var line := "%s %s  %s %d+%d  pl %d/%d  xp %d  st %s%s" % [head, ["[color=#6e675c]g[/color]", "[b]Y[/b]", "[b][color=#b31f26]R[/color][/b]"][o.alert],
+				gun, s["mag"], s["spare"], o.plates, o.plates_max, o.exp, bar,
+				"" if kit_s == "" else "  [color=#6e675c]%s[/color]" % kit_s.strip_edges()]
 			if not bad.is_empty():
 				line += "  [b]%s[/b]" % " ".join(bad)
 			txt_all += line + "\n"
 			if not many:
-				txt_all += "[color=#555555]      %s[/color]\n" % quirks(o)
+				txt_all += "[color=#6e675c]      %s[/color]\n" % quirks(o)
 			if not many or o.dbg != "":
-				txt_all += "[color=#555555]      %s[/color]\n" % o.dbg.replace("[", "(")
-	roster.text = txt_all
+				txt_all += "[color=#6e675c]      %s[/color]\n" % o.dbg.replace("[", "(")
+	if w.teams.size() > 2 and w.teams[2].get("civ", false) and not w.teams[2]["members"].is_empty():
+		var counts := {}
+		var hit := 0
+		var dead := 0
+		for c in w.teams[2]["members"]:
+			if c.state == "dead":
+				dead += 1
+			elif c.state != "ok" or c.wounds > 0 or c.leg_hit or c.arm_hit:
+				hit += 1
+			else:
+				counts[c.cstate] = counts.get(c.cstate, 0) + 1
+		var parts: Array = []
+		for st2 in ["unaware", "alarmed", "flee", "hide", "freeze", "comply", "film"]:
+			if counts.has(st2):
+				parts.append("%d %s" % [counts[st2], {"unaware": "unaware", "alarmed": "alarmed", "flee": "fleeing", "hide": "hiding",
+					"freeze": "frozen", "comply": "hands up", "film": "filming"}[st2]])
+		txt_all += "[b]CIVILIANS[/b]  %d  ·  %s%s%s\n" % [w.teams[2]["members"].size(), ", ".join(parts),
+			("  ·  [color=#b31f26]%d hurt[/color]" % hit) if hit > 0 else "", ("  ·  [color=#b31f26][b]%d dead[/b][/color]" % dead) if dead > 0 else ""]
+	roster.text = Ink.bb(txt_all)
 	log_shown = maxi(log_shown, w.log_base)
 	while log_shown < w.log_base + w.log_lines.size():
 		var ln: Dictionary = w.log_lines[log_shown - w.log_base]
 		var txt: String = ln["text"].replace("[", "(").replace("]", ")")
 		match ln["kind"]:
 			"kill":
-				log_box.append_text("[b][color=#7d0a0a]%s[/color][/b]\n" % txt)
+				log_box.append_text(Ink.bb("[b][color=#b31f26]%s[/color][/b]\n" % txt))
 			"hit":
-				log_box.append_text("[color=#5a1a1a]%s[/color]\n" % txt)
+				log_box.append_text(Ink.bb("[color=#b31f2699]%s[/color]\n" % txt))
 			"bad":
-				log_box.append_text("[b]%s[/b]\n" % txt)
+				log_box.append_text(Ink.bb("[b]%s[/b]\n" % txt))
 			"end":
-				log_box.append_text("[b]%s[/b]\n" % txt)
+				log_box.append_text(Ink.bb("[b]%s[/b]\n" % txt))
 			"comms":
-				log_box.append_text("[i][color=#555555]%s[/color][/i]\n" % txt)
+				log_box.append_text(Ink.bb("[i][color=#6e675c]%s[/color][/i]\n" % txt))
+			"civ":
+				log_box.append_text(Ink.bb("[color=#6e675c]%s[/color]\n" % txt))
 			"rule":
-				log_box.append_text("[color=#333333]%s[/color]\n" % txt)
+				log_box.append_text(Ink.bb("[color=#2f2e2d]%s[/color]\n" % txt))
 			_:
-				log_box.append_text("[color=#444444]%s[/color]\n" % txt)
+				log_box.append_text(Ink.bb("[color=#2f2e2d]%s[/color]\n" % txt))
 		log_shown += 1
 
 
@@ -620,5 +915,156 @@ static func quirks(o) -> String:
 
 
 func show_banner(text: String) -> void:
-	banner_label.text = text
+	banner_label.text = Ink.bb(text)
 	banner.visible = true
+
+
+# ================================================================== debrief (v0.6)
+## The incident record when the operation ends: what happened, what can be proved, and
+## (with the department) what was written into the officers' files.
+func show_debrief(w, dept_lines: Array, used_dept: bool) -> void:
+	if w.incident == null:
+		return
+	var s: Dictionary = w.incident.summary()
+	var t := "[b]INCIDENT RECORD[/b]  %s\n" % ("(the department's copy is saved)" if used_dept else "")
+	if w.police_rules():
+		t += "Suspects: %d, %d down (%d killed), %d gave up, %d cuffed.  Officers: %d, %d down (%d killed).\n" % [
+			s["suspects"], s["suspects_down"], s["suspects_killed"], s["surrendered"], s["arrested"],
+			s["officers"], s["officers_down"], s["officers_killed"]]
+	if s["civ_total"] > 0:
+		t += "Civilians: %d, [color=#b31f26]%d hurt, %d killed[/color]; %d police round%s struck a civilian.\n" % [
+			s["civ_total"], s["civ_hit"], s["civ_killed"], s["civ_hit_police"], "" if s["civ_hit_police"] == 1 else "s"]
+	t += "Rounds fired: %d (police %d); %d went through a wall.  Misjudgments: %d.  Shots after someone gave up or went down: %d.\n" % [
+		s["shots"], s["police_shots"], s["through_walls"], s["misjudged"], s["excessive"]]
+	if s["lines"].is_empty():
+		t += "\nNo findings.\n"
+	else:
+		t += "\n[b]FINDINGS[/b]  %d\n" % s["lines"].size()
+		for ln in s["lines"]:
+			var red: bool = ln["kind"] in ["civilian_killed", "excessive_force", "civilian_hit_by_police", "misjudgment", "officer_killed"]
+			var txt: String = String(ln["text"]).replace("[", "(").replace("]", ")")
+			t += ("[color=#b31f26]%s[/color]\n" % txt) if red else (txt + "\n")
+	if not dept_lines.is_empty():
+		t += "\n[b]THE DEPARTMENT[/b]\n"
+		for d in dept_lines:
+			t += String(d).replace("[", "(") + "\n"
+	debrief.text = Ink.bb(t)
+	debrief.visible = true
+	roster.custom_minimum_size = Vector2(0, 160)
+
+
+# ================================================================== the department (v0.5)
+func _build_dept() -> void:
+	var d := dept_box
+	d.add_theme_constant_override("separation", 5)
+	dept_head = Label.new()
+	dept_head.add_theme_font_size_override("font_size", 15)
+	dept_head.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	d.add_child(dept_head)
+	_heading(d, "Every officer was rolled once, at hire, and keeps that roll. Tick who goes on the next operation (team A, in this order). Hover a name for their file.")
+	var sc := ScrollContainer.new()
+	sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	d.add_child(sc)
+	dept_list = VBoxContainer.new()
+	dept_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dept_list.add_theme_constant_override("separation", 2)
+	sc.add_child(dept_list)
+	dept_notes = RichTextLabel.new()
+	dept_notes.bbcode_enabled = true
+	dept_notes.custom_minimum_size = Vector2(0, 150)
+	dept_notes.scroll_following = true
+	dept_notes.add_theme_font_size_override("normal_font_size", 11)
+	d.add_child(dept_notes)
+	var h := _h(d)
+	_btn(h, "Hire a recruit", func(): main.hire_recruit())
+	_btn(h, "Next week", func(): main.next_week())
+	var h2 := _h(d)
+	_btn(h2, "New department", func(): main.new_department(int(dept_seed.value)))
+	dept_seed = SpinBox.new()
+	dept_seed.min_value = 1
+	dept_seed.max_value = 999999
+	dept_seed.value = 1001
+	dept_seed.prefix = "seed"
+	dept_seed.custom_minimum_size = Vector2(130, 0)
+	h2.add_child(dept_seed)
+	var back := _btn(d, "Back to setup", func(): show_setup())
+	back.custom_minimum_size = Vector2(0, 34)
+
+
+func show_dept() -> void:
+	setup_box.visible = false
+	run_box.visible = false
+	dept_box.visible = true
+	refresh_dept(main.dept, main.dept_sel)
+
+
+func refresh_dept(dep, picked: Array) -> void:
+	if dep == null or dept_head == null:
+		return
+	var av: Array = dep.available()
+	dept_head.text = "PORT CARRICK PD  ·  week %d  ·  %d officers, %d fit  ·  %d operation%s" % [dep.week,
+		dep.officers.filter(func(r): return r["status"] != "dead").size(), av.size(), dep.ops_run, "" if dep.ops_run == 1 else "s"]
+	for ch in dept_list.get_children():
+		ch.queue_free()
+	var order: Array = dep.officers.duplicate()
+	order.sort_custom(func(a, b):
+		var sa: int = 0 if a["status"] == "active" else (1 if a["status"] == "injured" else 2)
+		var sb: int = 0 if b["status"] == "active" else (1 if b["status"] == "injured" else 2)
+		if sa != sb:
+			return sa < sb
+		var ra: int = dep.RANKS.find(a["rank"])
+		var rb: int = dep.RANKS.find(b["rank"])
+		if ra != rb:
+			return ra > rb
+		return int(a["xp"]) > int(b["xp"]))
+	for r in order:
+		var oid: String = r["id"]
+		var status: String = "fit"
+		if r["status"] == "injured":
+			status = "out until week %d" % int(r["out_until"])
+		elif r["status"] == "dead":
+			status = "killed"
+		var k: int = picked.find(oid)
+		var b := _btn(dept_list, "", func(on): main.toggle_officer(oid, on), true)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 11)
+		b.set_pressed_no_signal(k >= 0)
+		b.disabled = r["status"] != "active"
+		var pers: String = "" if r["personality"] == "" else " (" + String(r["personality"]).to_lower() + ")"
+		b.text = "%s %s %s%s   %s %d xp   J %d   %s%s" % ["[A%d]" % (k + 1) if k >= 0 else "[   ]", String(r["rank"]).substr(0, 3) + ".",
+			r["name"], pers, Habits.EXP_NAMES[int(r["exp"])], int(r["xp"]), int(r["judgment"]), status,
+			("   trauma %.0f" % float(r["trauma"])) if float(r["trauma"]) >= 1.0 else ""]
+		b.tooltip_text = officer_file(r)
+	var nt := ""
+	for n in dep.notes.slice(maxi(0, dep.notes.size() - 30)):
+		nt += "[color=#6e675c]wk %d[/color]  %s\n" % [int(n["week"]), String(n["text"]).replace("[", "(")]
+	dept_notes.text = Ink.bb(nt)
+	if cam_btn != null:
+		cam_btn.set_pressed_no_signal(dep.bodycams)
+
+
+static func officer_file(r: Dictionary) -> String:
+	var e: Dictionary = r["ech"]
+	var t := "%s %s  ·  badge %d  ·  %s  ·  hired week %d%s\n" % [r["rank"], r["name"], int(r["badge"]), r["id"], int(r["hired_week"]),
+		" (lateral)" if r.get("lateral", false) else ""]
+	var plus: Array = []
+	for q in e.get("plus", []):
+		plus.append("+" + String(q))
+	for q2 in e.get("minus", []):
+		plus.append("-" + String(q2))
+	t += "Patrol, %d year%s on the job, form %+d%%  %s\n" % [int(r.get("years", 0)), "" if int(r.get("years", 0)) == 1 else "s",
+		int(round((1.0 - float(e.get("form", 1.0))) * 100.0)), "  ".join(plus)]
+	t += "Recognition %.2f s, stress resistance %.2f.  Judgment %d, temper %d, integrity %d%s\n" % [float(e["t_rec0"]), float(e["resist"]),
+		int(r["judgment"]), int(r["temper"]), int(r["integrity"]), ("  ·  " + String(r["personality"])) if r["personality"] != "" else ""]
+	t += "Habits (%d): %s\n" % [r["good"].size(), " ".join(r["good"])]
+	if not r["bad_traits"].is_empty():
+		t += "Trait habits: %s\n" % " ".join(r["bad_traits"])
+	t += "Experience %s (%d xp).  Operations %d, rounds %d, hits %d, down %d, arrests %d, civilians hit %d, misjudgements %d, wounded %d times.\n" % [
+		Habits.EXP_NAMES[int(r["exp"])], int(r["xp"]), int(r["ops"]), int(r["shots"]), int(r["hits"]), int(r["kills"]), int(r["arrests"]),
+		int(r["civ_hits"]), int(r.get("misjudged", 0)), int(r["wounded"])]
+	t += "\nFILE\n"
+	for fe in (r["file"] as Array).slice(maxi(0, r["file"].size() - 14)):
+		t += "wk %d  %s\n" % [int(fe["week"]), fe["text"]]
+	return t

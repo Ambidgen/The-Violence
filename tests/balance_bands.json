@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "gate": 1,
+  "status": "asserting",
+  "enforce": true,
+  "note": "Gate 1 bands for the run layer (EA_TASKS P1.A3), asserting since P1.I2: a full matrix run by rogue_balance_test.gd now exits 1 on a miss. The two-week smoke in the quick tier is never judged by them, and --report-only reproduces an experiment without failing. The values are provisional: the roadmap's 8.4 says the Gate 1 numbers are the owner's decision, because they encode how hard the game should be, and the 1.C matrix (2026-11-02) still missed roster, money, deaths and ally bands before 1.D-1.F landed; the first matrix run after P1.I is where they are read as a verdict and, if a band is genuinely unreachable, re-set with a reason recorded beside it.",
+  "reference": "tests/results/arena/m8-crew-2026-11-05/balance",
+  "reference_note": "Crew-house change (2026-11-05): 8 seeds x 4 policies, CI run 41964333236, same seeds as CL3; 37 of 52 bands missed before the deaths and lethality bands were re-set. CL3 (tests/results/cl3-2026-11-04/balance) is the previous reference. Reading: docs/EA_TASKS.md, Stage 1, option 1 applied and option 4.",
+  "bands": [
+    {
+      "id": "roster-floor",
+      "metric": "min_fit",
+      "agg": "min",
+      "test": ">=",
+      "value": 10,
+      "policies": [
+        "all"
+      ],
+      "why": "the roster must never collapse: the worst week of the worst seed still fields a team"
+    },
+    {
+      "id": "roster-weeks",
+      "metric": "weeks_fit_below_12",
+      "agg": "max",
+      "test": "<=",
+      "value": 8,
+      "policies": [
+        "all"
+      ],
+      "why": "fewer than 12 fit is a week of refusals; a fifth of the campaign is too many"
+    },
+    {
+      "id": "money-deficit",
+      "metric": "weeks_below_zero",
+      "agg": "max",
+      "test": "<=",
+      "value": 8,
+      "policies": [
+        "all"
+      ],
+      "why": "a negative account freezes hiring, training and kit"
+    },
+    {
+      "id": "money-debt",
+      "metric": "balance_min",
+      "agg": "min",
+      "test": ">=",
+      "value": -75000,
+      "policies": [
+        "all"
+      ],
+      "why": "no bottomless debt in the worst seed"
+    },
+    {
+      "id": "money-end",
+      "metric": "balance_end",
+      "agg": "mean",
+      "test": ">=",
+      "value": 0,
+      "policies": [
+        "all"
+      ],
+      "why": "the department should not end the campaign bankrupt"
+    },
+    {
+      "id": "coverage",
+      "metric": "unattended",
+      "agg": "mean",
+      "test": "<=",
+      "value": 48,
+      "policies": [
+        "all"
+      ],
+      "why": "calls left unattended measured the roster collapse (48-80 on 28 Oct)"
+    },
+    {
+      "id": "deaths",
+      "metric": "officers_killed",
+      "agg": "mean",
+      "test": "<=",
+      "value": 8,
+      "policies": [
+        "all"
+      ],
+      "why": "13-16 of 20 died across three runs; a run is meant to cost some officers, not most. (Re-set to 22 on 2026-11-05 and restored the same day: the owner chose body armour by calibre instead of accepting the death rate.)"
+    },
+    {
+      "id": "lethality",
+      "metric": "officers_killed_per_op",
+      "agg": "max",
+      "test": "<=",
+      "value": 0.15,
+      "policies": [
+        "all"
+      ],
+      "why": "0.21-0.25 per operation on 28 Oct; a fifth of a squad per call is what broke the roster. (Re-set to 0.45 on 2026-11-05 and restored the same day, as for deaths.)"
+    },
+    {
+      "id": "civilians",
+      "metric": "civ_killed",
+      "agg": "mean",
+      "test": "<=",
+      "value": 6,
+      "policies": [
+        "all"
+      ],
+      "why": "the crowd cliff (P1.B) is measured here: 52 civilians in 8 quiet rallies at trauma 14"
+    },
+    {
+      "id": "allies-held",
+      "metric": "allies_lost_end",
+      "agg": "mean",
+      "test": "<=",
+      "value": 2,
+      "policies": [
+        "all"
+      ],
+      "why": "0 of 4 allies survived every 28 Oct run"
+    },
+    {
+      "id": "ally-recovery",
+      "metric": "allies_regained",
+      "agg": "mean",
+      "test": ">=",
+      "value": 0.25,
+      "policies": [
+        "all"
+      ],
+      "why": "an ally lost must be winnable back at least once across a matrix (P1.E)"
+    },
+    {
+      "id": "score",
+      "metric": "run_score",
+      "agg": "mean",
+      "test": ">=",
+      "value": 0,
+      "policies": [
+        "all"
+      ],
+      "why": "restraint should out-score ruin; -2207 to -829 on 28 Oct"
+    },
+    {
+      "id": "election",
+      "metric": "kept_share",
+      "agg": "mean",
+      "test": ">=",
+      "value": 0.5,
+      "policies": [
+        "all"
+      ],
+      "why": "a chief who plays sensibly keeps the office more often than not"
+    }
+  ]
+}

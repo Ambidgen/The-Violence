@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+seed 5000: { "attack": false, "civ_hit_police": 0, "civ_killed": 0, "police_shots": 0, "misjudged": 0 }
+seed 5017: { "attack": false, "civ_hit_police": 0, "civ_killed": 0, "police_shots": 0, "misjudged": 0 }
+seed 5034: { "attack": false, "civ_hit_police": 0, "civ_killed": 0, "police_shots": 0, "misjudged": 0 }
+seed 5051: { "attack": false, "civ_hit_police": 3, "civ_killed": 3, "police_shots": 9, "misjudged": 1 }
+seed 5068: { "attack": false, "civ_hit_police": 6, "civ_killed": 2, "police_shots": 37, "misjudged": 1 }
+seed 5085: { "attack": false, "civ_hit_police": 0, "civ_killed": 0, "police_shots": 0, "misjudged": 0 }
+seed 5102: { "attack": false, "civ_hit_police": 0, "civ_killed": 0, "police_shots": 0, "misjudged": 0 }
+seed 5119: { "attack": false, "civ_hit_police": 2, "civ_killed": 1, "police_shots": 5, "misjudged": 1 }
+TOTAL habits= officers=2 morale=60 n=8: { "civ_hit_police": 11, "civ_killed": 6, "police_shots": 51, "misjudged": 3, "attacks": 0 }

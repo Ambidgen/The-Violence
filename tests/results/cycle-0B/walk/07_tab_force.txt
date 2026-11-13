@@ -1,0 +1,93 @@
+Barricaded: Colm Kavanagh, 599 S Hopyard Place
+FIRST OPERATION  ·  2/4  ·  FORCE
+Assign officers to squads and check their kit. Suggest a plan is a starting point, not an order. Continue to Orders when the force is ready.
+[Next: Orders  >]
+[Skip guide]
+[1 Briefing]
+[2 Force]
+[3 Orders]
+Tip: each officer's assignment sets their squad. The highest rank leads; experience limits how many orders the squad can carry out. Kit comes from the department account.
+Account $20,000. New kit is bought at cost; kit handed back sells for half.
+READINESS 37–78 / 100  ·  contested
+A planning index, not a win probability. Unconfirmed rooms, people and intent remain uncertain.
+ASSUMPTIONS  ·  7 officers assigned; planning baseline 7  ·  Threat read: not established
+Build up to five squads of six. The highest rank leads; experience sets how many orders that squad can carry. You can change the suggested grouping and kit before the operation starts.
+SQUAD 1  ·  4  ·  led by Lieutenant Giulia Bernardi (Veteran): 5 points
+Forms up at
+[stage south]
+[Remove squad]
+Squad kit
+[Patrol]
+[Entry]
+[Shield]
+[Less-lethal]
+[Gas]
+Giulia Bernardi  ·  Carbine, pistol; vest; light, med, oc, baton, taser
+[Kit]
+Pedro Villagrande  ·  Carbine, pistol; vest; light, med, oc, baton, taser
+[Kit]
+Reginald Battle  ·  Carbine, pistol; vest; light, med, oc, baton, taser
+[Kit]
+John Carter  ·  Carbine, pistol; vest; light, med, oc, baton, taser
+[Kit]
+SQUAD 2  ·  3  ·  led by Sergeant Ashley Stanton (Seasoned): 3 points
+Forms up at
+[stage north]
+[Remove squad]
+Squad kit
+[Patrol]
+[Entry]
+[Shield]
+[Less-lethal]
+[Gas]
+Ashley Stanton  ·  Carbine, pistol; vest; light, med, oc, baton, taser
+[Kit]
+Sarah Wright  ·  Carbine, pistol; vest; light, med, oc, baton, taser
+[Kit]
+Keisha Spearman  ·  Carbine, pistol; vest; light, med, oc, baton, taser
+[Kit]
+[+ Add a squad]
+OFFICERS AVAILABLE THIS WEEK (20)
+[Squad 1]
+Lie. Giulia Bernardi  ·  14 yr  ·  Veteran  ·  J 64
+[Squad 2]
+Ser. Ashley Stanton  ·  11 yr  ·  Seasoned  ·  J 59
+[Squad 1]
+Ser. Pedro Villagrande  ·  9 yr  ·  Seasoned  ·  J 62  ·  aggression
+[Squad 2]
+Cor. Sarah Wright  ·  7 yr  ·  Blooded  ·  J 54
+[Squad 1]
+Cor. Reginald Battle  ·  5 yr  ·  Blooded  ·  J 54
+[Squad 2]
+Cor. Keisha Spearman  ·  4 yr  ·  Blooded  ·  J 62  ·  anxiety
+[Squad 1]
+Cor. John Carter  ·  3 yr  ·  Blooded  ·  J 53
+[—]
+Off. Jean McKenzie  ·  3 yr  ·  Blooded  ·  J 62  ·  aggression
+[—]
+Off. Efua Adeyemi  ·  2 yr  ·  Blooded  ·  J 53  ·  rigidity
+[—]
+Off. David Gray  ·  2 yr  ·  Green  ·  J 52
+[—]
+Off. Nikolai Rudenko  ·  1 yr  ·  Green  ·  J 43
+[—]
+Off. Anna Karagiannis  ·  1 yr  ·  Green  ·  J 14
+[—]
+Off. Lin Hu  ·  1 yr  ·  Green  ·  J 68  ·  aggression
+[—]
+Off. Gerard Dunne  ·  0 yr  ·  Green  ·  J 60  ·  rigidity
+[—]
+Off. Paddy Daly  ·  0 yr  ·  Green  ·  J 51  ·  anxiety
+[—]
+Off. Paddy Heffernan  ·  0 yr  ·  Green  ·  J 54  ·  complacency
+[—]
+Off. Ruairi O'Keefe  ·  0 yr  ·  Green  ·  J 63  ·  rigidity
+[—]
+Off. Pawel Pawlak  ·  0 yr  ·  Green  ·  J 49
+[—]
+Off. Oleg Golubev  ·  0 yr  ·  Green  ·  J 42
+[—]
+Off. Roman Krawczyk  ·  0 yr  ·  Green  ·  J 25  ·  ego
+[<  Board]
+[Suggest a plan]
+[RUN   >   7 officers]

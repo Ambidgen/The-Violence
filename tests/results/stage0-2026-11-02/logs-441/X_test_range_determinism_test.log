@@ -1,0 +1,11 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+ok   lane_repro       5c2d6a42960f92f2  winner=0 time=24.13 shots=66
+ok   cover_repro      880d36053bf88821  winner=1 time=87.10 shots=135
+ok   sof_control      4141c639f505ff77  winner=0 time=58.73 shots=10
+ok   militia_patrol   2bdcd3bcafee0f8f  winner=1 time=26.87 shots=17
+ok   unequal          da15e1d8e47d243c  winner=1 time=39.37 shots=17
+ok   motel            36f5db7f67ab496f  winner=0 time=118.27 shots=62
+ok   shield           d41fa412ebe294e4  winner=0 time=138.33 shots=159
+ok   large_team       6866e7f59d65fee1  winner=0 time=21.87 shots=60
+range determinism: PASS

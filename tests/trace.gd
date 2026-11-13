@@ -27,8 +27,10 @@ func _init() -> void:
 	w.setup(lv, nav, cfgs, [opt["pa"], opt["pb"]], int(opt["seed"]))
 	var next := 0.0
 	var nlog := 0
+	var steps := 0   # P0.A1
 	while not w.over and w.t < float(opt["t"]):
 		w.step()
+		steps += 1
 		if w.t >= next and step > 0.0:
 			next += step
 			var ph := ""
@@ -44,4 +46,5 @@ func _init() -> void:
 			while nlog < w.log_lines.size():
 				print("      ", w.log_lines[nlog]["text"])
 				nlog += 1
-	quit()
+	w.dispose()   # P0.A1: an undisposed World leaves 'resources still in use' (an engine ERROR line)
+	quit(0 if steps > 0 else 1)   # P0.A1: a trace; fails only if nothing ran

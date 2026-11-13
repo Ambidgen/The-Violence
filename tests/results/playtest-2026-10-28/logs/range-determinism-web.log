@@ -1,0 +1,16 @@
+PCK /tmp/violence-browser/web-range-check/index.pck 88 3269344
+GODOT log Engine missing features []
+GODOT log Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+GODOT log OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+GODOT log Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+GODOT log ok   lane_repro       10ceef8799d4b279  winner=0 time=63.20 shots=60
+GODOT log ok   cover_repro      c2c2fc48c7afe295  winner=0 time=183.07 shots=258
+GODOT log ok   sof_control      b73bdac0ee2380e9  winner=0 time=60.17 shots=11
+GODOT log ok   militia_patrol   257d05c80be3bdd9  winner=1 time=26.00 shots=9
+GODOT log ok   unequal          69cdcf73e9aa5c93  winner=1 time=39.27 shots=20
+GODOT log FAIL motel            7bfca89d986ebefa  winner=0 time=47.73 shots=166
+GODOT log ok   shield           2ab7c6b0fea2cada  winner=0 time=68.27 shots=79
+GODOT log FAIL large_team       3c4d965601752418  winner=0 time=44.83 shots=127
+GODOT log range determinism: 2 FAILED
+GODOT log PROBE_DONE failures=2
+PROBE_FINISHED errors= 0

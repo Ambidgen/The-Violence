@@ -1,0 +1,42 @@
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+WARNING: Couldn't get executable path from /proc/self/exe, using argv[0]
+     at: get_executable_path (drivers/unix/os_unix.cpp:1157)
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+=== 120.0 s; shots 141, hits 2; over false winner -1 ===
+  A1 untrained at (2.9, 23.5) room=KITCHEN shots=0 pos_goal=(3.0, 23.3) dbg= mind=lion last_seen=-99.0 path=3/4
+  A2 untrained at (2.7, 24.3) room=KITCHEN shots=0 pos_goal=(2.875, 24.375) dbg=engage > B4 mind=lizard last_seen=120.0 path=3/4
+      aim={ "tid": "B4", "zone": "chest", "weapon": "pistol", "acq_left": -0.00666666666667, "acq_total": 0.06, "from": -0.56066060066223, "on": true, "settle": 96.0666666666638, "pair": 0, "pause": 0.0, "hold": 0.0, "want_t": 120.033333333329, "fire": true, "plate_seen": false, "dth": 0.0, "held_t": 120.033333333329 } action={  } gun={ "mag": 15, "spare": 3, "jam": false, "lost": false } friend_in_lane=true sidestep={  }
+  A3 untrained at (12.0, 40.4) room=OUT shots=21 pos_goal=(12.125, 40.625) dbg=RULE 2 > cover mind=lizard last_seen=120.0 path=1/2
+      gun={ "mag": 0, "spare": 2, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=true goal_distance=0.290
+  A4 untrained at (3.1, 24.0) room=KITCHEN shots=15 pos_goal=(3.0, 24.0) dbg=RULE 2 > cover mind=lizard last_seen=120.0 path=2/3
+      gun={ "mag": 0, "spare": 3, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=false goal_distance=0.100
+  A5 untrained at (12.4, 40.6) room=OUT shots=15 pos_goal=(12.125, 40.625) dbg=RULE 2 > cover mind=lizard last_seen=120.0 path=1/2
+      gun={ "mag": 0, "spare": 3, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=true goal_distance=0.296
+  B1 untrained at (26.5, 5.4) room=HALL shots=0 pos_goal=(inf, inf) dbg=holding where he is mind=lion last_seen=-99.0 path=0/0
+  B2 untrained at (32.0, 7.9) room=HALL shots=60 pos_goal=(32.125, 7.625) dbg=out of ammo > cover mind=lizard last_seen=119.3 path=1/2
+  B3 untrained at (23.0, 5.4) room=HALL shots=0 pos_goal=(inf, inf) dbg=holding where he is mind=lion last_seen=-99.0 path=0/0
+  B4 untrained at (29.5, 7.4) room=HALL shots=15 pos_goal=(29.625, 7.625) dbg=RULE 2 > cover mind=lizard last_seen=120.0 path=1/2
+      gun={ "mag": 0, "spare": 3, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=true goal_distance=0.255
+  B5 untrained at (30.6, 6.8) room=HALL shots=15 pos_goal=(30.625, 7.125) dbg=holding where he is mind=lion last_seen=22.8 path=1/2
+  squad Team A mode=assault task={ "door": "KITCHEN BACK", "into": "KITCHEN", "check": false } phase=clear
+  squad Team B mode=hold task={  } phase=
+=== 240.0 s; shots 141, hits 2; over false winner -1 ===
+  A1 untrained at (2.9, 23.5) room=KITCHEN shots=0 pos_goal=(3.0, 23.3) dbg= mind=lion last_seen=-99.0 path=3/4
+  A2 untrained at (2.7, 24.3) room=KITCHEN shots=0 pos_goal=(2.875, 24.375) dbg=engage > B4 mind=lizard last_seen=240.0 path=3/4
+      aim={ "tid": "B4", "zone": "chest", "weapon": "pistol", "acq_left": -0.00666666666667, "acq_total": 0.06, "from": -0.56066060066223, "on": true, "settle": 216.066666666657, "pair": 0, "pause": 0.0, "hold": 0.0, "want_t": 240.033333333322, "fire": true, "plate_seen": false, "dth": 0.0, "held_t": 240.033333333322 } action={  } gun={ "mag": 15, "spare": 3, "jam": false, "lost": false } friend_in_lane=true sidestep={  }
+  A3 untrained at (12.0, 40.4) room=OUT shots=21 pos_goal=(12.125, 40.625) dbg=RULE 2 > cover mind=lizard last_seen=240.0 path=1/2
+      gun={ "mag": 0, "spare": 2, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=true goal_distance=0.290
+  A4 untrained at (3.1, 24.0) room=KITCHEN shots=15 pos_goal=(3.0, 24.0) dbg=RULE 2 > cover mind=lizard last_seen=240.0 path=2/3
+      gun={ "mag": 0, "spare": 3, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=false goal_distance=0.100
+  A5 untrained at (12.4, 40.6) room=OUT shots=15 pos_goal=(12.125, 40.625) dbg=RULE 2 > cover mind=lizard last_seen=240.0 path=1/2
+      gun={ "mag": 0, "spare": 3, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=true goal_distance=0.296
+  B1 untrained at (26.5, 5.4) room=HALL shots=0 pos_goal=(inf, inf) dbg=holding where he is mind=lion last_seen=-99.0 path=0/0
+  B2 untrained at (32.0, 7.9) room=HALL shots=60 pos_goal=(32.125, 7.625) dbg=out of ammo > cover mind=lizard last_seen=228.5 path=1/2
+  B3 untrained at (23.0, 5.4) room=HALL shots=0 pos_goal=(inf, inf) dbg=holding where he is mind=lion last_seen=-99.0 path=0/0
+  B4 untrained at (29.5, 7.4) room=HALL shots=15 pos_goal=(29.625, 7.625) dbg=RULE 2 > cover mind=lizard last_seen=240.0 path=1/2
+      gun={ "mag": 0, "spare": 3, "jam": false, "lost": false } action={  } threats=1 hidden=false goal_hidden=true goal_distance=0.255
+  B5 untrained at (30.6, 6.8) room=HALL shots=15 pos_goal=(30.625, 7.125) dbg=holding where he is mind=lion last_seen=22.8 path=1/2
+  squad Team A mode=assault task={ "door": "KITCHEN BACK", "into": "KITCHEN", "check": false } phase=clear
+  squad Team B mode=hold task={  } phase=

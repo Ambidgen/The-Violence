@@ -1,0 +1,54 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+ok    an unbuilt navigator fails closed instead of returning an unchecked straight line
+ok    snap checks the actual body, not just the containing cell centre
+ok    out-of-bounds points are not treated as free cells
+ok    a near-wall start retains its true position and can recover toward free floor
+ok    a disconnected free goal ends on reachable floor without crossing its wall
+ok    an operator in a disconnected pocket is not given a teleporting route across a wall
+ok    nearest free searches beyond the old 2.75 m limit for large obstacles
+ok    snapping a point deep inside furniture finds reachable floor
+ok    a start inside solid furniture does not produce a route that teleports it out
+ok    a displaced start tries another reachable cell if the nearest one is obstructed
+ok    a map with no floor has no reachable cells or invented route
+ok    a smoothed group route still goes around an Avoid room
+ok    an operator already in an Avoid room can still leave it
+ok    an unchanged failed request respects the retry cooldown
+ok    a changed path profile retries immediately after a failed search
+ok    changing the avoid order retries immediately after a failed search
+ok    an actor embedded in a wall can recover toward the nearest face
+ok    recovery from inside a thin wall cannot pass through its far face
+ok    a stopped officer is not shoved into a wall by a nearby teammate
+ok    a stopped officer also holds position in open ground
+ok    a sidestep cannot carry an officer through a shut door
+  a six-person group: { "finish": 5.66666666666666, "arrived": 6, "count": 6, "clips": 0, "leaf": 0, "too_fast": 0, "paths": 7, "end": "[(10.835, 5.164), (10.775, 6.913), (11.767, 5.165), (11.634, 6.878), (12.756, 5.143), (12.724, 6.886)]" }
+ok    a six-person group clear a narrow closed door without a lasting jam
+ok    a six-person group keep their bodies out of walls and shut door leaves
+ok    a six-person group never gain extra speed from separation
+ok    a six-person group do not continually re-search the map
+ok    a six-person group movement is deterministic on repetition
+  opposing groups: { "finish": 7.63333333333332, "arrived": 8, "count": 8, "clips": 0, "leaf": 0, "too_fast": 0, "paths": 13, "end": "[(10.837, 5.163), (10.775, 6.913), (11.723, 5.18), (11.801, 6.897), (5.196, 5.118), (5.225, 6.913), (4.217, 5.123), (4.26, 6.867)]" }
+ok    opposing groups clear a narrow closed door without a lasting jam
+ok    opposing groups keep their bodies out of walls and shut door leaves
+ok    opposing groups never gain extra speed from separation
+ok    opposing groups do not continually re-search the map
+ok    opposing groups movement is deterministic on repetition
+ok    ordinary hunt squad opens the door and gets everyone through without clipping
+ok    ordinary hunt squad does not endlessly replan at the jamb
+ok    disciplined hunt squad opens the door and gets everyone through without clipping
+ok    disciplined hunt squad does not endlessly replan at the jamb
+ok    the squad progress watchdog follows a long valid detour instead of abandoning it
+ok    the progress watchdog still abandons a genuinely motionless route
+ok    hunt followers recalculate slots when the leader or their squad position changes
+ok    sweep and hunt do not share stale formation slots
+ok    transit followers recalculate slots after a casualty
+ok    LAUNDRY is checked after a longer-than-12-second route
+ok    KIOSK is checked after a longer-than-12-second route
+ok    a genuinely motionless checker eventually reports the room unchecked
+ok    a surviving teammate takes over when the checker goes down
+ok    a closed check-room door is opened before the room is checked
+ok    an oscillating two-person Duplex stack enters and clears its first room within 30 s
+ok    doorway-jam recovery never passes either operator through a wall
+ok    a long Plaza entry is not marked clear from across the map
+ok    a surviving rear guard takes over without a remote clear
+group movement: PASS

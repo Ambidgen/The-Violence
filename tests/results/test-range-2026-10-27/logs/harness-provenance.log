@@ -1,0 +1,4 @@
+The Godot study workers loaded tests/test_range_study.gd with SHA-256:
+92e2381c3b09a9a2bcf70d2a5e609cbb6d34e5d32575f02faed401335457192e
+After execution began, one mixed-team comment was corrected: slot order affects spawn/assignment, but the AI selects leaders and entry order dynamically. No executable statement changed. source-sha256.txt records the corrected current files.
+After the comment correction, the complete good_off:PF01:B six-fight case was independently rerun using the current harness. All six JSON records matched the recorded worker in every field; see current-harness-check.log for its execution.
