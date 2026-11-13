@@ -1,7 +1,7 @@
 {
   "cases": {
     "cover_repro": {
-      "digest": "0167ca802280d620",
+      "digest": "a43a4ac72b315e12",
       "hits": 14,
       "ops": {
         "A1": "e20386e6",
@@ -18,15 +18,21 @@
       "parts": {
         "operators": "1850c44f3a91757e",
         "rng": "-1401010498577551576",
-        "stat": "b601d866b31fa920"
+        "stat": "fb9bc6e0ff383aa1"
       },
       "shots": 135,
+      "sums": {
+        "rec_sum_0": 6.733333,
+        "rec_sum_1": 8.933333,
+        "tot_sum_0": 16.237361,
+        "tot_sum_1": 7.659239
+      },
       "time": 87.1,
       "timeout": false,
       "winner": 1
     },
     "lane_repro": {
-      "digest": "c8c7f30220e99123",
+      "digest": "5cddc65a01138ae7",
       "hits": 19,
       "ops": {
         "A1": "0b4c0afc",
@@ -43,15 +49,21 @@
       "parts": {
         "operators": "d4eb6c0d73a378eb",
         "rng": "-7147221261847583146",
-        "stat": "6ca3ffa96b58bd53"
+        "stat": "f83704236f3404ee"
       },
       "shots": 74,
+      "sums": {
+        "rec_sum_0": 5.833333,
+        "rec_sum_1": 3.833333,
+        "tot_sum_0": 3.879676,
+        "tot_sum_1": 0.962297
+      },
       "time": 53.133,
       "timeout": false,
       "winner": 0
     },
     "large_team": {
-      "digest": "701161aeb6d816f4",
+      "digest": "29522ceff11074ad",
       "hits": 18,
       "ops": {
         "A1": "dc4dae69",
@@ -78,15 +90,21 @@
       "parts": {
         "operators": "0ef1fa3d0d9f7880",
         "rng": "-7639142901281630825",
-        "stat": "6bda27e645752b1b"
+        "stat": "1d3a30a9abd90b17"
       },
       "shots": 60,
+      "sums": {
+        "rec_sum_0": 12.266667,
+        "rec_sum_1": 6.6,
+        "tot_sum_0": 7.321621,
+        "tot_sum_1": 2.17877
+      },
       "time": 21.867,
       "timeout": false,
       "winner": 0
     },
     "militia_patrol": {
-      "digest": "89bc194df0671c78",
+      "digest": "22b1574f237d1cd3",
       "hits": 7,
       "ops": {
         "A1": "83f77b24",
@@ -99,15 +117,21 @@
       "parts": {
         "operators": "db997f58c0bc0c27",
         "rng": "-8046374173598937280",
-        "stat": "6b2bbfd2b2c1f44f"
+        "stat": "dc5f2fe27cf8c07a"
       },
       "shots": 17,
+      "sums": {
+        "rec_sum_0": 1.166667,
+        "rec_sum_1": 2.333333,
+        "tot_sum_0": 1.509869,
+        "tot_sum_1": 1.365964
+      },
       "time": 26.867,
       "timeout": false,
       "winner": 1
     },
     "motel": {
-      "digest": "1987ae1fbfbf8b4b",
+      "digest": "e28bccc7b7b20080",
       "hits": 18,
       "ops": {
         "A1": "41006301",
@@ -130,15 +154,21 @@
       "parts": {
         "operators": "3c38e76f8aed6d8f",
         "rng": "-3210071015635483300",
-        "stat": "74519b7a2df0684f"
+        "stat": "87df2f2c75d3aaf1"
       },
       "shots": 63,
+      "sums": {
+        "rec_sum_0": 12.466667,
+        "rec_sum_1": 8.633333,
+        "tot_sum_0": 6.856424,
+        "tot_sum_1": 4.731595
+      },
       "time": 131.367,
       "timeout": false,
       "winner": 0
     },
     "shield": {
-      "digest": "67a5e4aeb0322bb3",
+      "digest": "cbe19dde9f9fb637",
       "hits": 13,
       "ops": {
         "A1": "98213936",
@@ -151,15 +181,21 @@
       "parts": {
         "operators": "6249bd48e8a742d6",
         "rng": "-7121458047122590634",
-        "stat": "6e8ae61872a0a2d2"
+        "stat": "e0335b544b6769d7"
       },
       "shots": 100,
+      "sums": {
+        "rec_sum_0": 2.866667,
+        "rec_sum_1": 1.233333,
+        "tot_sum_0": 4.266503,
+        "tot_sum_1": 2.880505
+      },
       "time": 118.533,
       "timeout": false,
       "winner": 0
     },
     "sof_control": {
-      "digest": "43a3c4a334cf94e4",
+      "digest": "5d23e93e2f040d06",
       "hits": 6,
       "ops": {
         "A1": "c10e81b8",
@@ -172,15 +208,21 @@
       "parts": {
         "operators": "5071500e5a13709c",
         "rng": "4042185902435579717",
-        "stat": "6b3aae516cb1605d"
+        "stat": "01396935997fa4ba"
       },
       "shots": 10,
+      "sums": {
+        "rec_sum_0": 1.933333,
+        "rec_sum_1": 1.5,
+        "tot_sum_0": 1.586686,
+        "tot_sum_1": 0.534312
+      },
       "time": 58.733,
       "timeout": false,
       "winner": 0
     },
     "unequal": {
-      "digest": "b6fca4ad97646a33",
+      "digest": "2b8901780effebd8",
       "hits": 6,
       "ops": {
         "A1": "d57fca7f",
@@ -194,14 +236,20 @@
       "parts": {
         "operators": "c54c412f7a5892d6",
         "rng": "4509457116014605787",
-        "stat": "944642449bd3bde6"
+        "stat": "17922f763791f5b7"
       },
       "shots": 17,
+      "sums": {
+        "rec_sum_0": 3.0,
+        "rec_sum_1": 3.7,
+        "tot_sum_0": 1.65808,
+        "tot_sum_1": 1.518497
+      },
       "time": 39.367,
       "timeout": false,
       "winner": 1
     }
   },
-  "digest": "floats settled to 1e-6, parts recorded (2026-11-12); no change of behaviour: every winner, time, shot and hit is as before",
+  "digest": "2026-11-12: the digest covers the outcome, the random stream, every operator and the stat counts, exactly; the float sums are in 'sums' and compared within 1e-4. No change of behaviour: every winner, time, shot and hit is as before",
   "model": "test-range-2026-11-02-clearance-progress"
 }

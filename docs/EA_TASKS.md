@@ -894,15 +894,27 @@ line passes the quick tier 26/26 in the same environment. The quick tier on both
 locally on both engines in a fresh checkout. Re-running the headless job of the 5 Nov run that
 had passed on the unmerged balance line (42092129942, attempt 2) failed the same seven cases
 with the **same seven digests**, so the merge is not the cause: GitHub's runner changed between
-5 and 13 Nov. The digest hashed running sums of seconds at full double precision
-(`stat.rec_sum_*`, `stat.tot_sum_*`), whose last bits depend on the CPU and C library. Fix: floats
-in the snapshot are settled to 1e-6 before hashing; the fixture now also stores a digest per part
-and a failing case prints which part moved and the snapshot. The fixture was rewritten; every
-winner, time, shot and hit in it is unchanged. This is not a rebaseline of the campaign
+5 and 13 Nov.
+
+What differs between machines, measured by making a failing case print what moved (runs
+43349273855 and 43350774068): **nothing that is behaviour.** Operators (position, stress, weapons)
+and the random stream are identical. Only the stat block's running sums of seconds differ, around
+the seventh significant figure (cover_repro `tot_sum_0` 16.237361 here, 16.23736 on the runner;
+motel 6.856424 and 6.856425): single-precision noise, most likely from the C library's float
+routines, which pick a different implementation per CPU.
+
+Fix: the digest covers the outcome, the random stream, every operator and the stat counts,
+exactly; the float sums are stored beside it (`sums`) and compared within 1e-4. The fixture
+records a digest per part and per operator; a failing case prints, as FAIL lines the runner
+copies into the CI log, which moved and what it is now. The fixture was rewritten; every winner,
+time, shot, hit and timeout flag in it is unchanged. This is not a rebaseline of the campaign
 determinism fixture, which is untouched (and whose 35 cases come out identical on the balance
 line and the trunk: the merge moved none of them).
-**Open:** the sim is not bit-identical from one machine to the next, which matters for P2.A2
-(Windows against Linux) and for anything that promises a seed plays the same everywhere.
+
+**Open:** acquisition times are not bit-identical from one CPU to the next. In these eight cases
+that never changed a shot or a position, but nothing guarantees it cannot: a time that lands on a
+tick boundary could. This matters for P2.A2 (Windows against Linux) and for anything that promises
+a seed plays the same everywhere. Finding which float path differs is its own task.
 
 **Not done in Stage A**: the other four repositories are not archived (owner's step, after the
 pull request is merged); `cinematics/` and `trailers/` are not pruned (its own change, after the

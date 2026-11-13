@@ -23,12 +23,19 @@ const CASES := [
 ]
 
 
-## Floats in the snapshot are settled to a millionth before they are hashed (2026-11-12).
-## The stat block carries running sums of seconds at full double precision, and the last
-## bits of those depend on the CPU and C library a run happens on: on 2026-11-13 the same
-## commit that passed CI on 5 Nov failed 7 of 8 cases on a newer runner, with every
-## winner, time, shot and hit unchanged. A millionth of a second is arithmetic, not
-## behaviour; anything larger still changes the digest.
+## What is exact and what is measured (2026-11-12).
+## On 2026-11-13 the commit that had passed CI on 5 Nov failed 7 of 8 cases on a newer
+## runner, with every winner, time, shot and hit unchanged. Printing what moved showed
+## that the operators (positions, stress, weapons) and the random stream were identical on
+## both machines; only the stat block's running sums of seconds (rec_sum_*, tot_sum_*)
+## differed, by about one part in ten million: single-precision noise from the C
+## library's float routines, which differ from one CPU to the next.
+## So the digest covers everything that is behaviour, exactly: the outcome, the random
+## stream, every operator, and the counts in the stat block. The float sums are measured
+## quantities: they are kept beside the digest and compared within FLOAT_TOLERANCE.
+const FLOAT_TOLERANCE := 0.0001      # a tenth of a millisecond on a sum of seconds
+
+
 static func _settle(v):
 	if v is float:
 		return snappedf(v, 0.000001)
@@ -88,7 +95,14 @@ func _run(c: Dictionary) -> Dictionary:
 			"stress": snappedf(o.stress, 0.0001), "habit_stress": snappedf(o.habit_stress, 0.0001),
 			"shots": o.shots, "hits": o.hits, "kills": o.kills, "plates": o.plates, "bad": bad,
 			"rifle": o.weapons["rifle"].duplicate(true), "pistol": o.weapons["pistol"].duplicate(true)})
-	var snapshot := {"time": snappedf(w.t, 0.001), "winner": w.winner, "stat": _settle(w.stat.duplicate(true)),
+	var counts := {}
+	var sums := {}
+	for k in w.stat:
+		if w.stat[k] is float:
+			sums[k] = snappedf(w.stat[k], 0.000001)
+		else:
+			counts[k] = w.stat[k]
+	var snapshot := {"time": snappedf(w.t, 0.001), "winner": w.winner, "stat": counts,
 		"rng": w.rng.state, "operators": _settle(operators)}
 	_snapshots[c["id"]] = snapshot
 	# the digest is the whole snapshot; the parts say which of it moved when it does
@@ -99,6 +113,7 @@ func _run(c: Dictionary) -> Dictionary:
 	for od in snapshot["operators"]:
 		per_op[String(od["id"])] = _md5(od).substr(0, 8)
 	result["ops"] = per_op
+	result["sums"] = sums
 	w.dispose()
 	return result
 
@@ -137,6 +152,17 @@ func _init() -> void:
 		results[c["id"]] = result
 		var old: Dictionary = expected.get(c["id"], {})
 		var ok: bool = write or (not old.is_empty() and old["digest"] == result["digest"])
+		var off: Array = []      # measured sums outside the tolerance
+		if not write and not old.is_empty():
+			var old_sums: Dictionary = old.get("sums", {})
+			for k in result["sums"]:
+				if not old_sums.has(k) or absf(float(old_sums[k]) - float(result["sums"][k])) > FLOAT_TOLERANCE:
+					off.append("%s %s -> %s" % [k, str(old_sums.get(k, "none")), str(result["sums"][k])])
+			for k in old_sums:
+				if not result["sums"].has(k):
+					off.append("%s gone" % k)
+			if not off.is_empty():
+				ok = false
 		if not ok:
 			failures += 1
 		print("%s %-16s %s  winner=%d time=%.2f shots=%d" % ["ok  " if ok else "FAIL", c["id"],
@@ -149,9 +175,13 @@ func _init() -> void:
 			for part in result["parts"]:
 				if op.has(part) and String(op[part]) != String(result["parts"][part]):
 					moved.append(part)
-			for k in ["winner", "time", "shots", "hits", "timeout"]:
-				if old.has(k) and str(old[k]) != str(result[k]):
+			for k in ["winner", "time", "shots", "hits"]:      # the fixture is JSON: its numbers are floats
+				if old.has(k) and not is_equal_approx(float(old[k]), float(result[k])):
 					moved.append("%s %s -> %s" % [k, str(old[k]), str(result[k])])
+			if old.has("timeout") and bool(old["timeout"]) != bool(result["timeout"]):
+				moved.append("timeout %s -> %s" % [str(old["timeout"]), str(result["timeout"])])
+			for line in off:
+				moved.append("sum " + line)
 			print("FAIL   %s moved: %s" % [c["id"], ", ".join(moved) if not moved.is_empty() else "(the fixture has no parts to compare)"])
 			var snap: Dictionary = _snapshots[c["id"]]
 			if moved.has("stat"):
@@ -175,7 +205,7 @@ func _init() -> void:
 			quit(1)
 			return
 		out.store_string(JSON.stringify({"model": "test-range-2026-11-02-clearance-progress",
-			"digest": "floats settled to 1e-6, parts recorded (2026-11-12); no change of behaviour: every winner, time, shot and hit is as before",
+			"digest": "2026-11-12: the digest covers the outcome, the random stream, every operator and the stat counts, exactly; the float sums are in 'sums' and compared within 1e-4. No change of behaviour: every winner, time, shot and hit is as before",
 			"cases": results}, "  ", true) + "\n")
 		out.close()
 		print("Wrote %d range-only digests to %s" % [results.size(), FIXTURE])
